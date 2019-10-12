@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3.0">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>20</x>
+      <y>20</y>
+      <w>470</w>
+      <h>250</h>
+    </coordinates>
+    <panel_attributes>Songs
+--
+sid: INT NOT NULL UNIQUE AUTO_INCREMENT PRIMARY KEY;
+uid: INT NOT NULL;
+title: VARCHAR(255) NOT NULL;
+duration: INT NOT NULL;
+created: DEFAULT UNIX_TIMESTAMP();
+updated: INT NOT NULL;
+public: BOOLEAN NOT NULL DEFAULT 0;
+state: MEDIUMTEXT NOT NULL;
+editors: VARCHAR(255);
+cover: VARCHAR(255);
+genre: VARCHAR(50);</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>
