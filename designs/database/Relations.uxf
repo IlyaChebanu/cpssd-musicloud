@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3.0">
+  <zoom_level>9</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>108</x>
+      <y>18</y>
+      <w>387</w>
+      <h>135</h>
+    </coordinates>
+    <panel_attributes>Users
+--
+uid INT NOT NULL UNIQUE AUTO_INCREMENT PRIMARY KEY;
+email VARCHAR(255) NOT NULL UNIQUE;
+username VARCHAR(100) NOT NULL UNIQUE;
+password VARCHAR(100) NOT NULL;
+verified BOOLEAN DEFAULT 0;
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>702</x>
+      <y>18</y>
+      <w>225</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>Posts
+--
+uid: INT NOT NULL;
+message: MEDIUMTEXT NOT NULL;
+time: DEFAULT UNIX_TIMESTAMP();</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>702</x>
+      <y>126</y>
+      <w>162</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>Followers
+--
+follower: INT NOT NULL;
+following: INT NOT NULL;</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>108</x>
+      <y>180</y>
+      <w>387</w>
+      <h>198</h>
+    </coordinates>
+    <panel_attributes>Songs
+--
+sid: INT NOT NULL UNIQUE AUTO_INCREMENT PRIMARY KEY;
+uid: INT NOT NULL;
+title: VARCHAR(255) NOT NULL;
+duration: INT NOT NULL;
+created: DEFAULT UNIX_TIMESTAMP();
+updated: INT NOT NULL;
+public: BOOLEAN NOT NULL DEFAULT 0;
+state: MEDIUMTEXT NOT NULL;
+editors: VARCHAR(255);
+cover: VARCHAR(255);
+genre: VARCHAR(50);
+albums: VARCHAR(255);</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>531</x>
+      <y>252</y>
+      <w>387</w>
+      <h>126</h>
+    </coordinates>
+    <panel_attributes>Album_MetaData
+--
+aid: INT UNIQUE NOT NULL AUTO_INCREMENT PRIMARY KEY;
+uid: INT UNIQUE NOT NULL;
+public: BOOLEAN DEFAULT 0;
+title: VARCHAR(255) NOT NULL;
+description: VARCHAR(255);
+genre: VARCHAR(50);
+collaborators: VARCHAR(255);</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>441</x>
+      <y>423</y>
+      <w>126</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>Albums
+--
+aid: INT NOT NULL;
+sid: INT NOT NULL;</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>486</x>
+      <y>36</y>
+      <w>45</w>
+      <h>207</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;210.0;30.0;210.0;30.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>486</x>
+      <y>36</y>
+      <w>234</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>240.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>486</x>
+      <y>36</y>
+      <w>234</w>
+      <h>135</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>240.0;130.0;150.0;130.0;150.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>486</x>
+      <y>36</y>
+      <w>234</w>
+      <h>153</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>240.0;150.0;150.0;150.0;150.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>486</x>
+      <y>36</y>
+      <w>63</w>
+      <h>279</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>50.0;290.0;30.0;290.0;30.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>558</x>
+      <y>270</y>
+      <w>396</w>
+      <h>198</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;200.0;420.0;200.0;420.0;10.0;400.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>72</x>
+      <y>198</y>
+      <w>387</w>
+      <h>288</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>410.0;300.0;10.0;300.0;10.0;10.0;40.0;10.0</additional_attributes>
+  </element>
+</diagram>
