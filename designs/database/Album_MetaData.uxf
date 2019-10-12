@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3.0">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>10</x>
+      <y>10</y>
+      <w>430</w>
+      <h>140</h>
+    </coordinates>
+    <panel_attributes>Album_MetaData
+--
+aid: INT UNIQUE NOT NULL AUTO_INCREMENT PRIMARY KEY;
+uid: INT UNIQUE NOT NULL;
+public: BOOLEAN DEFAULT 0;
+title: VARCHAR(255) NOT NULL;
+description: VARCHAR(255);
+genre: VARCHAR(50);
+collaborators: VARCHAR(255);</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>
