@@ -6,13 +6,14 @@
     <coordinates>
       <x>10</x>
       <y>10</y>
-      <w>140</w>
-      <h>60</h>
+      <w>250</w>
+      <h>80</h>
     </coordinates>
-    <panel_attributes>Albums
+    <panel_attributes>Posts
 --
-aid: INT NOT NULL;
-sid: INT NOT NULL;</panel_attributes>
+uid: INT NOT NULL;
+message: MEDIUMTEXT NOT NULL;
+time: DEFAULT UNIX_TIMESTAMP();</panel_attributes>
     <additional_attributes/>
   </element>
 </diagram>

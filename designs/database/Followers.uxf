@@ -6,13 +6,13 @@
     <coordinates>
       <x>10</x>
       <y>10</y>
-      <w>140</w>
+      <w>180</w>
       <h>60</h>
     </coordinates>
-    <panel_attributes>Albums
+    <panel_attributes>Followers
 --
-aid: INT NOT NULL;
-sid: INT NOT NULL;</panel_attributes>
+follower: INT NOT NULL;
+following: INT NOT NULL;</panel_attributes>
     <additional_attributes/>
   </element>
 </diagram>
