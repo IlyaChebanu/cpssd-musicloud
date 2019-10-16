@@ -1,0 +1,13 @@
+Columns to be stored in the database:
+
+sid - song_id 			int(11)
+uid - user ID 			int(11)
+title - song name		varchar(255)
+duration - song duration 	int(11)
+created 			timestamp
+updated				timestamp
+public 				tinyint(1) (yes/no)
+state				json
+url				varchar(255)
+cover				varchar(255)
+genre				varchar(50)
