@@ -20,3 +20,15 @@
 .App-link {
   color: #09d3ac;
 }
+
+.blob1 {
+  position: fixed;
+  pointer-events: none;
+}
+
+.blob2 {
+  position: fixed;
+  pointer-events: none;
+  left: calc(100vw - 799px);
+  top: calc(100vh - 582px);
+}
