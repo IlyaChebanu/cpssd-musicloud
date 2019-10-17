@@ -1,0 +1,19 @@
+.input {
+  color: white;
+  font-family: "Montserrat", sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  border: unset;
+  background-color: unset;
+  height: 40px;
+
+  border-bottom: 1px solid white;
+
+  &::placeholder {
+    color: white;
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
