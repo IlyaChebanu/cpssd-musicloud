@@ -3,6 +3,20 @@
   height: 100vh;
 }
 
+@media (max-width: 1024px) {
+  .wrapper {
+    flex-direction: column;
+
+    .lCol {
+      flex: 0.5;
+    }
+
+    .rCol {
+      align-items: flex-start;
+    }
+  }
+}
+
 .lCol {
   flex: 1;
   display: flex;
@@ -19,6 +33,17 @@
 
 .formWrapper {
   width: 80%;
+  a {
+    color: #A9D8E9;
+    font-size: 18px;
+    text-decoration: none;
+  }
+
+  p {
+    color: white;
+    font-size: 18px;
+    margin: 11px 0px 11px 0px;
+  }
 
   h1 {
     font-size: 48px;
@@ -29,9 +54,18 @@
   form {
     display: flex;
     flex-direction: column;
-    // width: 100%;
     input {
       margin: 10px 0px 10px 0px;
     }
+
+    span {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
   }
+}
+
+.checkbox {
+  margin-top: 10px;
 }
