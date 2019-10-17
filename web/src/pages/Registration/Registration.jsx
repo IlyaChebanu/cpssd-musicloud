@@ -1,13 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styles from './Login.module.scss';
-import { Link } from 'react-router-dom';
+import styles from './Registration.module.scss';
 import { ReactComponent as Logo } from '../../assets/logo.svg';
 import InputField from '../../components/InputField';
 import Checkbox from '../../components/Checkbox';
 import SubmitButton from '../../components/SubmitButton';
 
-const Login = props => {
+const Registration = props => {
   return (
     <div className={styles.wrapper}>
       <div className={styles.lCol}>
@@ -15,16 +14,14 @@ const Login = props => {
       </div>
       <div className={styles.rCol}>
         <div className={styles.formWrapper}>
-          <h1>Sign in</h1>
+          <h1>Sign up</h1>
           <form>
+            <InputField name='email' placeholder='Email' />
             <InputField name='username' placeholder='Username' />
             <InputField name='password' placeholder='Password' password={true}/>
-            <span>
-              <Checkbox className={styles.checkbox}>Remember me</Checkbox>
-              <a href="">Forgot password?</a>
-            </span>
-            <SubmitButton text='Sign in'/>
-            <p>Don't have an account? <Link to='/registration'>Sign up!</Link></p>
+            <InputField name='passwordRepeat' placeholder='Repeat password' password={true}/>
+            <SubmitButton text='Sign up'/>
+            <p>Already have an account? <a href="">Sign in!</a></p>
           </form>
         </div>
       </div>
@@ -32,9 +29,9 @@ const Login = props => {
   );
 };
 
-Login.propTypes = {
+Registration.propTypes = {
 
 };
 
-export default Login;
+export default Registration;
 
