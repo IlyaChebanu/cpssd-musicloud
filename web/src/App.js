@@ -5,6 +5,7 @@ import { ReactComponent as Blob1 } from './assets/blob1.svg';
 import { ReactComponent as Blob2 } from './assets/blob2.svg';
 import LoginPage from './pages/Login';
 import Discover from './pages/Discover';
+import RegistrationPage from './pages/Registration';
 
 
 function App() {
@@ -18,6 +19,9 @@ function App() {
         </Route>
         <Route path='/discover'>
           <Discover />
+        </Route>
+        <Route path='/registration'>
+          <RegistrationPage />
         </Route>
       </Switch>
     </Router>
