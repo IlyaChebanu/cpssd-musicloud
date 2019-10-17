@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 import styles from './Registration.module.scss';
 import { ReactComponent as Logo } from '../../assets/logo.svg';
 import InputField from '../../components/InputField';
-import Checkbox from '../../components/Checkbox';
 import SubmitButton from '../../components/SubmitButton';
 
 const Registration = props => {
@@ -21,7 +21,7 @@ const Registration = props => {
             <InputField name='password' placeholder='Password' password={true}/>
             <InputField name='passwordRepeat' placeholder='Repeat password' password={true}/>
             <SubmitButton text='Sign up'/>
-            <p>Already have an account? <a href="">Sign in!</a></p>
+            <p>Already have an account? <Link to='/login'>Sign in!</Link></p>
           </form>
         </div>
       </div>
