@@ -1,3 +1,5 @@
 passlib
 mysql-connector
 argon2_cffi
+PyJWT
+flask
