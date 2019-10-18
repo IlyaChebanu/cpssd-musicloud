@@ -1,14 +1,11 @@
-FROM ubuntu:18.04
-
-RUN apt-get update -y && \
-    apt-get install -y python3 python3-pip
-
-WORKDIR /backend
+FROM python:3.6-slim
 
 COPY . /backend
 
+WORKDIR /backend
+
 RUN pip3 install -r requirements.txt
 
-ENTRYPOINT [ "python3" ]
+ENTRYPOINT [ "python" ]
 
 CMD [ "run.py" ]
