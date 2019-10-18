@@ -13,7 +13,12 @@ pip3 install -r requirements.txt
 ```
 
 ## Running The Backend
-To run a backend instance on your local machine, open a
+In order to run a backend instance, first you must populate the
+config.py file with all the usernames and passwords it requires.
+Details on what each section requires are outlined in comments in the config.py
+file itself.
+
+Then, to run a backend instance on your local machine, open a
 terminal, go to this projects `backend` directory and run
 the following command:
 ```

@@ -6,8 +6,7 @@ from flask import Blueprint
 from flask import request
 
 from ..config import GMAIL_CONFIG, HOST
-from ..query import query
-from ..utils import random_string, verify_req_body, send_mail
+from ..utils import random_string, verify_req_body, send_mail, query
 
 users = Blueprint("users", __name__)
 

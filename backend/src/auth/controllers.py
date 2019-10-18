@@ -5,9 +5,8 @@ from flask import Blueprint
 from flask import request
 from passlib.hash import argon2
 
-from ..query import query
 from ..config import JWT_SECRET
-from ..utils import random_string, verify_req_body
+from ..utils import random_string, verify_req_body, query
 
 auth = Blueprint('auth', __name__)
 
