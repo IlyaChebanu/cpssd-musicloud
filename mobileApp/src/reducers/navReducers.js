@@ -2,7 +2,7 @@ import { AppNavigator } from "../navigation/navigator";
 import * as screenNames from "../navigation/screenNames";
 
 const router = AppNavigator.router;
-const mainNavAction = router.getActionForPathAndParams(screenNames.DUMMY_SCREEN);
+const mainNavAction = router.getActionForPathAndParams(screenNames.START_SCREEN);
 const initialNavState = router.getStateForAction(mainNavAction);
 
 export const NavReducer = (state = initialNavState, action) => {

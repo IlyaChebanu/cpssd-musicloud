@@ -1,5 +1,5 @@
-import * as dummyActions from "../actions/dummyActions";
-import * as navActions from "../actions/navActions";
+import * as dummyActions from "./dummyActions";
+import * as navActions from "./navActions";
 
 //Combime all your actions
 export const ActionCreators = Object.assign({}, 
