@@ -11,8 +11,8 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 
 class RegisterScreen extends React.Component {
 
-  handleLoginClick() {
-
+  handleRegisterClick() {
+    this.props.navigateToHomeScreen()
   }
 
   handleForgotClick() {
@@ -53,9 +53,9 @@ class RegisterScreen extends React.Component {
           labelName={"Repeat Password"} />
 
         <MultiPurposeButton 
-          handleButtonClick={this.handleLoginClick.bind(this)}
+          handleButtonClick={this.handleRegisterClick.bind(this)}
           style={styles.signInButton}
-          buttonName={"Sign in"}
+          buttonName={"Create Account"}
         />
       </View>
     )

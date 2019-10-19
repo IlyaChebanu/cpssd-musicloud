@@ -28,3 +28,8 @@ export const navigateToRegisterScreen = () =>
         routeName: screenNames.REGISTER_SCREEN
     });
 
+export const navigateToHomeScreen = () =>
+    NavigationActions.navigate({
+        routeName: screenNames.HOME_SCREEN
+    });
+

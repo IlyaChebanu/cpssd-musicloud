@@ -12,7 +12,7 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 class LoginScreen extends React.Component {
 
   handleLoginClick() {
-
+    this.props.navigateToHomeScreen()
   }
 
   handleForgotClick() {
