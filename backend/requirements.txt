@@ -5,3 +5,4 @@ argon2_cffi
 PyJWT
 flask
 waitress
+mock

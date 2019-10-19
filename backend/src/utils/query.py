@@ -6,7 +6,7 @@ from ..logger.logger import log
 from ..config import MYSQL_CONFIG
 
 
-def query(query_string, get_row=False):
+def query(query_string, args, get_row=False):
     """Connects to the DB & executes the provided query."""
     res = []
     try:
@@ -15,7 +15,7 @@ def query(query_string, get_row=False):
         cursor = cnx.cursor()
 
         # Execute the query.
-        cursor.execute(query_string)
+        cursor.execute(query_string, args)
 
         # Get rows if SELECT query otherwise commit changes.
         if get_row:

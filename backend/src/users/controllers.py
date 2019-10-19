@@ -37,8 +37,9 @@ def register():
         query_1 = (
             "INSERT INTO Users "
             "(email, username, password, verified)"
-            "VALUES ('%s', '%s', '%s', %d)"
-        ) % (
+            "VALUES (?, ?, ?, ?)"
+        )
+        args_1 = (
             request.form.get("email"),
             request.form.get("username"),
             password_hash,
@@ -47,12 +48,13 @@ def register():
         # SELECT query to get user info
         query_2 = (
             "SELECT * FROM Users "
-            "WHERE email = '%s'"
-        ) % (
+            "WHERE email = ?"
+        )
+        args_2 = (
             request.form.get("email")
         )
-        query(query_1)
-        uid = int(query(query_2, True)[0][0])
+        query(query_1, args_1)
+        uid = int(query(query_2, args_2, True)[0][0])
         while True:
             try:
                 code = random_string(64)
@@ -60,12 +62,13 @@ def register():
                 query_3 = (
                     "INSERT INTO Verification "
                     "(code, uid)"
-                    "VALUES ('%s', %d)"
-                ) % (
+                    "VALUES (?, ?)"
+                )
+                args_3 = (
                     code,
                     uid
                 )
-                query(query_3)
+                query(query_3, args_3)
                 break
             except mysql.connector.errors.IntegrityError:
                 continue
