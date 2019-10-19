@@ -1,4 +1,5 @@
 import re
+import traceback
 
 import mysql.connector
 from passlib.hash import argon2
@@ -6,6 +7,7 @@ from flask import Blueprint
 from flask import request
 
 from ..config import GMAIL_CONFIG, HOST
+from ..logger.logger import log
 from ..utils import random_string, verify_req_body, send_mail, query
 
 users = Blueprint("users", __name__)
@@ -22,6 +24,7 @@ def register():
         # Hash the inputted password
         password_hash = argon2.hash(request.form.get("password"))
     except Exception:
+        log("error", "Failed to hash password", traceback.format_exc())
         return {"message": "Error while hashing password."}, 500
 
     # Verify that the email field is a valid email address str.
@@ -67,8 +70,10 @@ def register():
             except mysql.connector.errors.IntegrityError:
                 continue
     except mysql.connector.errors.IntegrityError:
+        log("warning", "Attempted to create a duplicate user.", traceback.format_exc())
         return {"message": "User already exists!"}, 400
     except Exception:
+        log("error", "MySQL query failed", traceback.format_exc())
         return {"message": "MySQL unavailable."}, 503
 
     # Send verification email.
@@ -86,6 +91,7 @@ def register():
     try:
         send_mail(sent_from, to, email_text)
     except Exception:
+        log("error", "Failed to send email.", traceback.format_exc())
         return {"message": "Verification mail failed to send."}, 500
 
     return {"message": "User created!"}
@@ -143,6 +149,7 @@ def reverify():
         else:
             code = code[0][0]
     except Exception:
+        log("error", "MySQL query failed", traceback.format_exc())
         return {"message": "MySQL unavailable."}, 503
 
     # Send verification email.
@@ -160,6 +167,7 @@ def reverify():
     try:
         send_mail(sent_from, to, email_text)
     except Exception:
+        log("error", "Failed to send email.", traceback.format_exc())
         return {"message": "Verification mail failed to send."}, 500
 
     return {"message": "Verification email sent."}

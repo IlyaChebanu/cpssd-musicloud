@@ -1,5 +1,8 @@
+import traceback
+
 import mysql.connector
 
+from ..logger.logger import log
 from ..config import MYSQL_CONFIG
 
 
@@ -28,6 +31,5 @@ def query(query_string, get_row=False):
         return res
     except mysql.connector.errors.IntegrityError:
         raise mysql.connector.errors.IntegrityError
-    except Exception as e:
-        print(e)
-        raise Exception("MySQL unavailable.")
+    except Exception:
+        log("error", "MySQL query failed", traceback.format_exc())

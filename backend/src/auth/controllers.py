@@ -1,4 +1,5 @@
 import datetime
+import traceback
 
 import jwt
 from flask import Blueprint
@@ -6,6 +7,7 @@ from flask import request
 from passlib.hash import argon2
 
 from ..config import JWT_SECRET
+from ..logger.logger import log
 from ..utils import random_string, verify_req_body, query
 
 auth = Blueprint('auth', __name__)
@@ -50,6 +52,7 @@ def verify():
         )
         query(query_3)
     except Exception:
+        log("error", "MySQL query failed", traceback.format_exc())
         return {"message": "MySQL unavailable."}, 503
 
     return {"message": "Verified."}, 200
@@ -72,6 +75,7 @@ def login():
         )
         user = query(query_1, True)
     except Exception:
+        log("error", "MySQL query failed", traceback.format_exc())
         return {"message": "MySQL unavailable."}, 503
 
     if not user:
@@ -109,7 +113,8 @@ def login():
             time_issued
         )
         query(query_2)
-    except Exception as e:
+    except Exception:
+        log("error", "MySQL query failed", traceback.format_exc())
         return {"message": "MySQL unavailable."}, 503
 
     return {"access_token": access_token}, 200
@@ -132,6 +137,7 @@ def logout():
         )
         query(query_1)
     except Exception:
+        log("error", "MySQL query failed", traceback.format_exc())
         return {"message": "MySQL unavailable."}, 503
 
     return {"message": "User has been successfully logged out!"}, 200
