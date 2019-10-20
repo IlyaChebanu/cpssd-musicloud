@@ -46,6 +46,9 @@ export default class LoginInput extends Component {
                 <View style={styles.subContainer} >
                     <Text style={styles.loginLabelName}>{this.state.labelName}</Text>
                     <TextInput
+                        autoCapitalize={'none'}
+                        autoCorrect={false}
+                        spellCheck={false}
                         underlineColorAndroid='rgba(0,0,0,0)'
                         keyboardType={Platform.OS === 'android' ? 'default' : 'ascii-capable'}
                         onChangeText={text => this.setTextInput(text)}
