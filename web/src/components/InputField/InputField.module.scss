@@ -9,17 +9,29 @@
 
     .sideContent {
       transform: scaleX(1.5);
+
+      * {
+        transform: scaleX(0.8);
+      }
     }
   }
 }
 
 .sideContent {
+  display: flex;
+  align-items: center;
   height: 25px;
   margin-bottom: 10px;
   border-bottom: 1px solid white;
   color: white;
   font-size: 12px;
   transition: border-bottom-color 150ms, transform 100ms, padding-left 100ms;
+
+  * {
+    height: 100%;
+    font-size: 12px !important;
+    transition: transform 100ms;
+  }
 }
 
 .input {

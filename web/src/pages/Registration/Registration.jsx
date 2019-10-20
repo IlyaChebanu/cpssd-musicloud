@@ -21,7 +21,7 @@ const Registration = memo(props => {
 
   const passwordStrength = useMemo(() => {
     const strengths = ['Weak', 'Weak', 'Fair', 'Good', 'Strong'];
-    return strengths[zxcvbn(password).score];
+    return <p>{strengths[zxcvbn(password).score]}</p>;
   }, [password]);
 
   const emailBorder = useMemo(() => {
