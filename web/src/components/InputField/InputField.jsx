@@ -4,6 +4,15 @@ import styles from './InputField.module.scss';
 
 const InputField = memo(props => {
   const [value, setValue] = useState(props.value || '');
+  const [hover, setHover] = useState(false);
+
+  const handleMouseEnter = useCallback(() => {
+    setHover(true);
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    setHover(false);
+  }, []);
 
   const handleChange = useCallback(e => {
     setValue(e.target.value);
@@ -19,8 +28,14 @@ const InputField = memo(props => {
     paddingLeft: props.sideContent ? '10px' : '0'
   }), [borderStyle, props.sideContent]);
 
+  console.log(hover);
+
   return (
-    <div className={styles.wrapper}>
+    <div
+      className={styles.wrapper + (hover ? ` ${styles.hover}` : '')}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       <input
         className={styles.input}
         type={props.password ? 'password' : 'text'}

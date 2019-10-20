@@ -1,14 +1,24 @@
 .wrapper {
   display: flex;
   align-items: center;
+
+  &.hover {
+    .input {
+      transform: scaleX(1.05);
+    }
+
+    .sideContent {
+      transform: scaleX(1.4);
+    }
+  }
 }
 
 .sideContent {
-  height: 43px;
+  height: 32px;
   border-bottom: 1px solid white;
   color: white;
   font-size: 10px;
-  transition: border-bottom-color 150ms;
+  transition: border-bottom-color 150ms, transform 100ms;
 }
 
 .input {
@@ -22,7 +32,7 @@
   height: 40px;
 
   border-bottom: 1px solid white;
-  transition: border-bottom-color 150ms;
+  transition: border-bottom-color 150ms, transform 100ms;
 
   &::placeholder {
     color: white;

@@ -22,12 +22,11 @@ const Login = memo(props => {
   const [rememberMe, setRememberMe] = useState(true);
 
   // useEffect(() => {
-  //   const token = cookie.get('token');
-  //   if (token) {
+  //   if (props.user.token) {
   //     // TODO: Verify token not expired
   //     props.history.push('/discover');
   //   }
-  // }, []);
+  // }, [props.user.token]);
 
   const usernameBorder = useMemo(() => {
     return submitted && !username ? '#b90539' : 'white';
@@ -37,7 +36,6 @@ const Login = memo(props => {
     return submitted && !password ? '#b90539' : 'white';
   }, [password, submitted]);
 
-  // cookie.set('token', 'testToken');
   const handleSubmit = useCallback(async e => {
     e.preventDefault();
 
@@ -92,5 +90,7 @@ Login.propTypes = {
 
 };
 
-export default connect()(Login);
+const mapStateToProps = ({ user }) => ({ user });
+
+export default connect(mapStateToProps)(Login);
 
