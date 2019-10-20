@@ -25,10 +25,8 @@ const InputField = memo(props => {
 
   const sideContentStyle = useMemo(() => ({
     ...borderStyle,
-    paddingLeft: props.sideContent ? '10px' : '0'
-  }), [borderStyle, props.sideContent]);
-
-  console.log(hover);
+    paddingLeft: props.sideContent ? hover ? '25px' : '10px' : '0'
+  }), [borderStyle, props.sideContent, hover]);
 
   return (
     <div

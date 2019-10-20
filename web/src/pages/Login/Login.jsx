@@ -53,7 +53,7 @@ const Login = memo(props => {
         setErrorText('Email not verified');
       } else {
         setErrorText('Unknown error has occurred');
-        console.error(e);
+        console.error(res);
       }
     }
 

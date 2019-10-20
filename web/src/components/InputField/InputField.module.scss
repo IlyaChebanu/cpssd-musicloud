@@ -1,6 +1,6 @@
 .wrapper {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
 
   &.hover {
     .input {
@@ -8,17 +8,18 @@
     }
 
     .sideContent {
-      transform: scaleX(1.4);
+      transform: scaleX(1.5);
     }
   }
 }
 
 .sideContent {
-  height: 32px;
+  height: 25px;
+  margin-bottom: 10px;
   border-bottom: 1px solid white;
   color: white;
-  font-size: 10px;
-  transition: border-bottom-color 150ms, transform 100ms;
+  font-size: 12px;
+  transition: border-bottom-color 150ms, transform 100ms, padding-left 100ms;
 }
 
 .input {
@@ -32,7 +33,13 @@
   height: 40px;
 
   border-bottom: 1px solid white;
-  transition: border-bottom-color 150ms, transform 100ms;
+  transition: border-bottom-color 150ms, transform 100ms, border-radius 100ms;
+
+  // Impossible to get rid of the disgusting chrome autofill styles, this is the next best thing
+  &:-internal-autofill-selected {
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0), inset 0 0 0 100px #fff;
+    border-radius: 10px;
+  }
 
   &::placeholder {
     color: white;
