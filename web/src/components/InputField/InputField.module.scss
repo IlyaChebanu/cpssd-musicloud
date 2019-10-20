@@ -1,4 +1,18 @@
+.wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.sideContent {
+  height: 43px;
+  border-bottom: 1px solid white;
+  color: white;
+  font-size: 10px;
+  transition: border-bottom-color 150ms;
+}
+
 .input {
+  flex: 1;
   color: white;
   font-family: "Montserrat", sans-serif;
   font-size: 18px;
@@ -8,6 +22,7 @@
   height: 40px;
 
   border-bottom: 1px solid white;
+  transition: border-bottom-color 150ms;
 
   &::placeholder {
     color: white;

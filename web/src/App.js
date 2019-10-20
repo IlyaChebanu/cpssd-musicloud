@@ -7,7 +7,7 @@ import LoginPage from './pages/Login';
 import RegistrationPage from './pages/Registration';
 
 
-function App() {
+const App = () => {
   return (
     <Router>
       <Blob1 className='blob1'/>
