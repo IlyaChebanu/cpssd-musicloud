@@ -12,9 +12,7 @@ export default class DummyScreen extends React.Component {
       <SafeAreaView style={{'backgroundColor': '#3D4044', 'flex': 1 }}>
         <View style={{'backgroundColor': '#1B1E23', 'flex': 1 }}>
           <HeaderComponent navigation={this.props.navigation}/>
-          <Text style={styles.testtext}>{"home screen"}</Text>
-          {/* <Text>{JSON.stringify(this.props, null, 2)}</Text> */}
-
+          <Text style={styles.testtext}>{"profile screen"}</Text>
         </View>
       </SafeAreaView>
     )
