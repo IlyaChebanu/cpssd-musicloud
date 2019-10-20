@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, Image } from "react-native"
 import styles from "./styles";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
-export default class DummyScreen extends React.Component {
+export default class HeaderComponent extends React.Component {
 
     render() {
         var logoImage = require("../../assets/images/logo.png");

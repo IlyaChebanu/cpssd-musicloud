@@ -4,15 +4,19 @@ import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import HeaderComponent from "../../components/headerComponent/headerComponent";
 import { SafeAreaView } from "react-navigation";
+import ProfileComponent from "../../components/profileComponent/profileComponent";
 
-export default class DummyScreen extends React.Component {
+export default class ProfileScreen extends React.Component {
 
   render() {
     return (
-      <SafeAreaView style={{'backgroundColor': '#3D4044', 'flex': 1 }}>
+      <SafeAreaView forceInset={{ bottom: 'never'}} style={{'backgroundColor': '#3D4044', 'flex': 1 }}>
         <View style={{'backgroundColor': '#1B1E23', 'flex': 1 }}>
           <HeaderComponent navigation={this.props.navigation}/>
-          <Text style={styles.testtext}>{"profile screen"}</Text>
+          <View style={styles.container}>
+            <Text style={styles.titleText}>{"PROFILE"}</Text>
+            <ProfileComponent />
+          </View>
         </View>
       </SafeAreaView>
     )

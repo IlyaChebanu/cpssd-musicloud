@@ -8,7 +8,7 @@ import SearchComponent from "../../components/searchComponent/searchComponent";
 import songsData from "./sampleData";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
-export default class DummyScreen extends React.Component {
+export default class HomeScreen extends React.Component {
 
   handleSongClick(item, index) {
 
