@@ -15,6 +15,8 @@ const Logo = memo(logo);
 const Link = memo(link);
 
 const Login = memo(props => {
+  const { dispatch, history } = props;
+
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -41,24 +43,32 @@ const Login = memo(props => {
 
     if (username && password) {
       const res = await login(username, password);
-      if (res.status === 200) {
-        if (rememberMe) {
-          cookie.set('token', res.data.access_token);
+      try {
+        if (res.status === 200) {
+          if (rememberMe) {
+            cookie.set('token', res.data.access_token);
+          }
+          dispatch(setToken(res.data.access_token));
+          history.push('/discover');
+        } else if (res.status === 400) {
+          setErrorText('Invalid credentails');
+        } else if (res.status === 401) {
+          setErrorText(<>
+            Email not verified.{' '}
+            <Link to='/verify' className={styles.resend}>Resend email</Link>
+          </>);
+        } else {
+          setErrorText('Unknown error has occurred');
+          console.error(res);
         }
-        props.dispatch(setToken(res.data.access_token));
-        props.history.push('/discover');
-      } else if (res.status === 400) {
-        setErrorText('Invalid credentails');
-      } else if (res.status === 401) {
-        setErrorText('Email not verified');
-      } else {
-        setErrorText('Unknown error has occurred');
-        console.error(res);
+      } catch (e) {
+        setErrorText('Fatal error');
+        console.error(e);
       }
     }
 
     setSubmitted(true);
-  }, [username, password]);
+  }, [username, password, rememberMe, dispatch, history]);
 
 
   return (
@@ -87,7 +97,7 @@ const Login = memo(props => {
 });
 
 Login.propTypes = {
-
+  user: PropTypes.object.isRequired
 };
 
 const mapStateToProps = ({ user }) => ({ user });

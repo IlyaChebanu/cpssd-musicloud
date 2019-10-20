@@ -3,12 +3,14 @@ import PropTypes from 'prop-types';
 import styles from './Checkbox.module.scss';
 
 const Checkbox = memo(props => {
+  const { onChange } = props;
+
   const [checked, setChecked] = useState(Boolean(props.value));
 
-    const handleChange = useCallback(e => {
-        setChecked(e.target.checked);
-        props.onChange && props.onChange(e.target.checked);
-    }, [props.onChange]);
+  const handleChange = useCallback(e => {
+      setChecked(e.target.checked);
+      onChange && onChange(e.target.checked);
+  }, [onChange]);
 
   return (
     <label className={styles.container + (props.className ? ` ${props.className}` : '')}>
@@ -21,7 +23,9 @@ const Checkbox = memo(props => {
 
 Checkbox.propTypes = {
   children: PropTypes.node,
-  onChange: PropTypes.func
+  onChange: PropTypes.func,
+  value: PropTypes.bool,
+  className: PropTypes.string
 };
 
 export default Checkbox;

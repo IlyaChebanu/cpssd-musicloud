@@ -1,5 +1,4 @@
 import React, { useState, useMemo, useCallback, memo } from 'react';
-import PropTypes from 'prop-types';
 import zxcvbn from 'zxcvbn';
 import { Link as link } from 'react-router-dom';
 import styles from './Registration.module.scss';
@@ -11,7 +10,12 @@ import SubmitButton from '../../components/SubmitButton';
 const Logo = memo(logo);
 const Link = memo(link);
 
+const emailRe =
+    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
 const Registration = memo(props => {
+  const { history } = props;
+
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -25,8 +29,6 @@ const Registration = memo(props => {
   }, [password]);
 
   const emailBorder = useMemo(() => {
-    const emailRe =
-    /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return submitted && !emailRe.test(email) ? '#b90539' : 'white';
   }, [email, submitted]);
 
@@ -40,23 +42,28 @@ const Registration = memo(props => {
 
   const repeatPasswordBorder = useMemo(() => {
     return submitted && (password !== repeatPassword || !repeatPassword) ? '#b90539' : 'white';
-  }, [repeatPassword, submitted]);
+  }, [repeatPassword, password, submitted]);
 
   const handleSubmit = useCallback(async e => {
     e.preventDefault();
 
-    if (username && email && password && repeatPassword === password) {
+    if (username && emailRe.test(email) && password && repeatPassword === password) {
       const res = await register(email, username, password);
-      if (res.status === 200) {
-        props.history.push('/login');
-      } else {
-        setErrorText('Unknown error has occurred');
-        console.error(res);
+      try {
+        if (res.status === 200) {
+          history.push('/login');
+        } else {
+          setErrorText('Unknown error has occurred');
+          console.error(res);
+        }
+      } catch (e) {
+        setErrorText('Fatal error');
+        console.error(e);
       }
     }
 
     setSubmitted(true);
-  }, [email, username, password, repeatPassword]);
+  }, [email, username, password, repeatPassword, history]);
 
   return (
     <div className={styles.wrapper}>
@@ -80,10 +87,6 @@ const Registration = memo(props => {
     </div>
   );
 });
-
-Registration.propTypes = {
-
-};
 
 export default Registration;
 

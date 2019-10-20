@@ -41,7 +41,6 @@
 
   .resend {
     font-size: 12px;
-    font-weight: 500;
   }
 
   p {
@@ -50,7 +49,7 @@
     margin: 11px 0px 11px 0px;
   }
 
-  .credentialsError {
+  .verifyError, .verifyError p {
     margin: 0;
     color: #b90539;
     height: 22px;
@@ -81,8 +80,4 @@
       align-items: center;
     }
   }
-}
-
-.checkbox {
-  margin-top: 10px;
 }

@@ -3,6 +3,8 @@ import PropTypes from 'prop-types'
 import styles from './InputField.module.scss';
 
 const InputField = memo(props => {
+  const { onChange, borderColour, sideContent } = props;
+
   const [value, setValue] = useState(props.value || '');
   const [hover, setHover] = useState(false);
 
@@ -16,17 +18,17 @@ const InputField = memo(props => {
 
   const handleChange = useCallback(e => {
     setValue(e.target.value);
-    props.onChange && props.onChange(e.target.value);
-  }, [props.onChange]);
+    onChange && onChange(e.target.value);
+  }, [onChange]);
 
   const borderStyle = useMemo(() => ({
-    borderBottomColor: props.borderColour ? props.borderColour : 'white'
-  }), [props.borderColour]);
+    borderBottomColor: borderColour ? borderColour : 'white'
+  }), [borderColour]);
 
   const sideContentStyle = useMemo(() => ({
     ...borderStyle,
-    paddingLeft: props.sideContent ? hover ? '25px' : '10px' : '0'
-  }), [borderStyle, props.sideContent, hover]);
+    paddingLeft: sideContent ? hover ? '25px' : '10px' : '0'
+  }), [borderStyle, sideContent, hover]);
 
   return (
     <div
