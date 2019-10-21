@@ -1,5 +1,5 @@
 import React from "react"
-import { StyleSheet, Text, View, Image } from "react-native"
+import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native"
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import HeaderComponent from "../../components/headerComponent/headerComponent";
@@ -7,7 +7,6 @@ import { SafeAreaView } from "react-navigation";
 import ProfileComponent from "../../components/profileComponent/profileComponent";
 import ProfileSongs from "../../components/profileSongs/profileSongs";
 import ProfilePosts from "../../components/profilePosts/profilePosts";
-import { TouchableOpacity } from "react-native-gesture-handler";
 
 export default class ProfileScreen extends React.Component {
   constructor(props) {

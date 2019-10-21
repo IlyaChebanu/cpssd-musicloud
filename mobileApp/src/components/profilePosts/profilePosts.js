@@ -1,8 +1,7 @@
 import React from "react"
-import { StyleSheet, Text, View, Image } from "react-native"
+import { StyleSheet, Text, View, Image, FlatList, TextInput } from "react-native"
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
-import { FlatList, TextInput } from "react-native-gesture-handler";
 import postsData from "./samplePostData";
 import MultiPurposeButton from "../multiPurposeButton/multiPurposeButton";
 

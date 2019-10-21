@@ -1,8 +1,7 @@
 import React from "react"
-import { StyleSheet, Text, View, Image } from "react-native"
+import { StyleSheet, Text, View, Image, TextInput } from "react-native"
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
-import { TextInput } from "react-native-gesture-handler";
 
 export default class SearchComponent extends React.Component {
     setTextInput(text) {

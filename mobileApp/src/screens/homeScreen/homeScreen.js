@@ -1,12 +1,11 @@
 import React from "react"
-import { StyleSheet, Text, View, Image, FlatList } from "react-native"
+import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity } from "react-native"
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import HeaderComponent from "../../components/headerComponent/headerComponent";
 import { SafeAreaView } from "react-navigation";
 import SearchComponent from "../../components/searchComponent/searchComponent";
 import songsData from "./sampleData";
-import { TouchableOpacity } from "react-native-gesture-handler";
 
 export default class HomeScreen extends React.Component {
 

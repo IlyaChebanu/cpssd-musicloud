@@ -2,12 +2,11 @@ import React from "react";
 import { connect } from 'react-redux';
 import { ActionCreators } from '../../actions/index';
 import { bindActionCreators } from 'redux';
-import { StyleSheet, Text, View, Image } from "react-native"
+import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native"
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import LoginInput from "../../components/loginInput/loginInput";
 import MultiPurposeButton from "../../components/multiPurposeButton/multiPurposeButton";
-import { TouchableOpacity } from "react-native-gesture-handler";
 
 class RegisterScreen extends React.Component {
 

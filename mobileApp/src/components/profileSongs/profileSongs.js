@@ -1,9 +1,8 @@
 import React from "react"
-import { StyleSheet, Text, View, Image, FlatList } from "react-native"
+import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity } from "react-native"
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import songsData from "../../screens/homeScreen/sampleData";
-import { TouchableOpacity } from "react-native-gesture-handler";
 
 export default class ProfileSongs extends React.Component {
 
