@@ -17,6 +17,7 @@ export default class SearchComponent extends React.Component {
                         autoCapitalize={'none'}
                         autoCorrect={false}
                         spellCheck={false}
+                        placeholderTextColor="white"
                         underlineColorAndroid='rgba(0,0,0,0)'
                         keyboardType={Platform.OS === 'android' ? 'default' : 'ascii-capable'}
                         onChangeText={text => this.setTextInput(text)}
