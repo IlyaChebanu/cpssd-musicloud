@@ -1,0 +1,47 @@
+.wrapper {
+  height: 270px;
+  width: 150px;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 25px;
+  background-color: #36393D;
+}
+
+.profilePic {
+  width: 25px;
+  height: 25px;
+}
+
+.username {
+  color: white;
+  font-size: 12px;
+  margin-left: 10px;
+}
+
+.title {
+  color: white;
+  font-size: 14px;
+  margin: 4px 0px 4px 0px;
+}
+
+.details {
+  padding: 0px 10px 0px 10px;
+  span {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.thumbWrapper {
+  width: 150px;
+  height: 200px;
+  overflow: hidden;
+  border-radius: 25px;
+  position: relative;
+  display: inline-block;
+
+  img {
+    width: auto;
+    height: 100%;
+    margin-left: -50%;
+  }
+}
