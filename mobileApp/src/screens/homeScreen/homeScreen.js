@@ -16,6 +16,15 @@ class HomeScreen extends React.Component {
 
   }
 
+  renderheader() {
+    return(
+      <View style={styles.container}>
+        <Text style={styles.titleText}>{"DISCOVER"}</Text>
+        <SearchComponent />
+      </View>
+    )
+  }
+
   renderSong({ item, index }) {
     let songName = item.name
     let authorName = item.author
@@ -36,13 +45,11 @@ class HomeScreen extends React.Component {
 
   render() {
     return (
-      <SafeAreaView forceInset={{ bottom: 'never'}} style={{ 'backgroundColor': '#3D4044', 'flex': 1 }}>
+      <SafeAreaView forceInset={{ bottom: 'never' }} style={{ 'backgroundColor': '#3D4044', 'flex': 1 }}>
         <View style={{ 'backgroundColor': '#1B1E23', 'flex': 1 }}>
           <HeaderComponent navigation={this.props.navigation} />
-          <View style={styles.container}>
-            <Text style={styles.titleText}>{"DISCOVER"}</Text>
-            <SearchComponent />
-            <FlatList 
+            <FlatList
+              ListHeaderComponent={this.renderheader()}
               style={styles.discoverFlatList}
               data={songsData}
               renderItem={this.renderSong.bind(this)}
@@ -52,7 +59,7 @@ class HomeScreen extends React.Component {
           </View>
           {/* <Text>{JSON.stringify(this.props, null, 2)}</Text> */}
 
-        </View>
+
       </SafeAreaView>
     )
   }
