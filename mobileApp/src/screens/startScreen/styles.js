@@ -20,10 +20,10 @@ export default StyleSheet.create({
     },
     signInButton: {
       position: 'absolute',
-      bottom: 100,
+      bottom: height > 600 ? 100 : 50,
     },
     createButton: {
       position: 'absolute',
-      bottom: 190,
+      bottom: height > 600 ? 190 : 140,
     },
 })

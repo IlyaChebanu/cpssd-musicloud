@@ -3,17 +3,16 @@ const { width, height } = Dimensions.get("window");
 
 export default StyleSheet.create({
     container: {
+      paddingTop: height > 600 ? 70 : 50,
+      backgroundColor: '#1B1E23',
       flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: '#F5FCFF',
     },
     logoContainer: {
-      marginTop: 100,
+      marginTop: 30,
       flexDirection: 'row',
       marginLeft: 20,
       alignItems: 'center',
-      marginBottom: 50,
+      marginBottom: height > 600 ? 50 : 20,
     },
     arrowback: {
       width: 32,
@@ -36,6 +35,6 @@ export default StyleSheet.create({
     },
     signInButton: {
       position: 'absolute',
-      bottom: 100,
+      bottom: height > 600 ? 100 : 50,
     }
 })

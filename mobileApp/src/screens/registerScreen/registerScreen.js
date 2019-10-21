@@ -26,7 +26,7 @@ class RegisterScreen extends React.Component {
     var logoImage = require("../../assets/images/logo.png");
     var arrowback = require("../../assets/images/back_arrow.png");
     return (
-      <View style={{ 'paddingTop': 70, 'backgroundColor': '#1B1E23', 'flex': 1 }}>
+      <View style={styles.container}>
         {/* <Text style={styles.mandatoryErrorText}>{GLOBALS.DUMMY_SCREEN_TITLE}</Text> */}
 
         <View style={styles.logoContainer}>
