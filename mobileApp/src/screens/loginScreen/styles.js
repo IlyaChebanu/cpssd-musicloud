@@ -3,12 +3,12 @@ const { width, height } = Dimensions.get("window");
 
 export default StyleSheet.create({
     container: {
-      paddingTop: height > 600 ? 70 : 50,
+      // paddingTop: height > 600 ? 70 : 50,
       backgroundColor: '#1B1E23',
       flex: 1,
     },
     logoContainer: {
-      marginTop: 30,
+      marginTop: height > 600 ? 100 : 80,
       flexDirection: 'row',
       marginLeft: 20,
       alignItems: 'center',
@@ -46,5 +46,19 @@ export default StyleSheet.create({
     },
     verifyText: {
       color: '#FFF',
+    },
+    topVector: {
+      position: 'absolute',
+      top: 0,
+      width: width,
+      resizeMode: 'cover',
+      zIndex: -1,
+    },
+    bottomVector: {
+      position: 'absolute',
+      bottom: -20,
+      width: width,
+      resizeMode: 'cover',
+      zIndex: -1,
     },
 })

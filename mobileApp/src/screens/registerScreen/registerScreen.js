@@ -89,8 +89,11 @@ class RegisterScreen extends React.Component {
   render() {
     var logoImage = require("../../assets/images/logo.png");
     var arrowback = require("../../assets/images/back_arrow.png");
+    var topVector = require("../../assets/images/topVector.png");
+    var bottomVector = require("../../assets/images/bottomVector.png");
     return (
       <View style={styles.container}>
+        <Image style={styles.topVector} source={topVector} />
         <KeyboardAwareScrollView>
         {/* <Text style={styles.mandatoryErrorText}>{GLOBALS.DUMMY_SCREEN_TITLE}</Text> */}
 
@@ -124,7 +127,7 @@ class RegisterScreen extends React.Component {
           setText={this.setPasswordRepeatTextInput.bind(this)}
           labelName={"Repeat Password"} />
         </KeyboardAwareScrollView>
-        
+        <Image style={styles.bottomVector}source={bottomVector} />
         <MultiPurposeButton 
           handleButtonClick={this.handleRegisterClick.bind(this)}
           style={styles.signInButton}
