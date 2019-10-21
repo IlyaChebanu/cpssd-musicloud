@@ -11,9 +11,17 @@ export default StyleSheet.create({
     paddingLeft: 30,
     paddingRight: 20,
     paddingTop: 20,
+    marginBottom: 10,
+  },
+  profileTitleText: {
+    color: 'white',
+    fontSize: 24,
+    paddingLeft: 20,
+    paddingRight: 20,
+    paddingTop: 20,
   },
   songFlatList: {
-    marginTop: 10,
+    // marginTop: 10,
   },
   songContainer: {
     width: width - 40,

@@ -45,14 +45,10 @@ export default class ProfileScreen extends React.Component {
               </TouchableOpacity>
             </View>
           </View>
-          <View style={styles.container}>
-            <Text style={styles.titleText}>{"PROFILE"}</Text>
-            <ProfileComponent />
             {this.state.activeTab === 1 ?
             <ProfileSongs />
             : <ProfilePosts />
             }
-          </View>
         </View>
       </SafeAreaView>
     )

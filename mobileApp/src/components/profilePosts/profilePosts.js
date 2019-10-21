@@ -4,11 +4,22 @@ import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import postsData from "./samplePostData";
 import MultiPurposeButton from "../multiPurposeButton/multiPurposeButton";
+import ProfileComponent from "../profileComponent/profileComponent";
 
 export default class DummyScreen extends React.Component {
 
   setTextInput(text) {
     this.setState({ inputText: text });
+  }
+
+  renderheader() {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.profileTitleText}>{"PROFILE"}</Text>
+        <ProfileComponent />
+        <Text style={styles.titleText}>{"Posts"}</Text>
+      </View>
+    )
   }
 
   renderPost({ item, index }) {
@@ -30,7 +41,6 @@ export default class DummyScreen extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <Text style={styles.titleText}>{"Posts"}</Text>
         {/* <View style={styles.inputContainer}>
           <TextInput
             autoCapitalize={'none'}
@@ -47,6 +57,7 @@ export default class DummyScreen extends React.Component {
           </View>
         </View> */}
         <FlatList 
+          ListHeaderComponent={this.renderheader()}
           style={styles.postFlatList}
           data={postsData}
           renderItem={this.renderPost.bind(this)}
