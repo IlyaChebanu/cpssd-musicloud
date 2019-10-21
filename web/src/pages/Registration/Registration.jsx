@@ -6,12 +6,10 @@ import { ReactComponent as logo } from '../../assets/logo.svg';
 import { register } from '../../helpers/api';
 import InputField from '../../components/InputField';
 import SubmitButton from '../../components/SubmitButton';
+import { emailRe } from '../../helpers/constants';
 
 const Logo = memo(logo);
 const Link = memo(link);
-
-const emailRe =
-    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
 const Registration = memo(props => {
   const { history } = props;
