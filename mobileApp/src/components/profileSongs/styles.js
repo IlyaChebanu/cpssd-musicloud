@@ -28,7 +28,6 @@ export default StyleSheet.create({
     height: 220,
     marginBottom: 20,
     marginLeft: 20,
-    backgroundColor: 'green',
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
