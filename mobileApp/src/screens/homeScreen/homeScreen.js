@@ -35,7 +35,6 @@ class HomeScreen extends React.Component {
   }
 
   render() {
-    console.warn(this.props.token)
     return (
       <SafeAreaView forceInset={{ bottom: 'never'}} style={{ 'backgroundColor': '#3D4044', 'flex': 1 }}>
         <View style={{ 'backgroundColor': '#1B1E23', 'flex': 1 }}>

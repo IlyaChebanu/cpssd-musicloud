@@ -7,7 +7,7 @@ import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import LoginInput from "../../components/loginInput/loginInput";
 import MultiPurposeButton from "../../components/multiPurposeButton/multiPurposeButton";
-import { loginUser } from "../../api/usersAPI";
+import { loginUser, reVerifyEmail } from "../../api/usersAPI";
 import { writeDataToStorage, TOKEN_DATA_KEY } from "../../utils/localStorage";
 import { getInvalidLoginDetails } from "../../utils/helpers";
 // import { loginUser } from "../../api/usersAPI";
@@ -22,10 +22,34 @@ class LoginScreen extends React.Component {
     }
   }
 
-  showAlert() {
+  componentDidMount() {
+    if(this.props.newAccount) {
+      Alert.alert(
+        'Account Created',
+        'Verify the email first before login',
+        [
+          {text: 'OK', onPress: () => console.log('OK Pressed')},
+        ],
+        {cancelable: false},
+      );
+    }
+  }
+
+  showAlert(text) {
     Alert.alert(
       'Error',
-      'Invalid Credentials',
+      text,
+      [
+        {text: 'OK', onPress: () => console.log('OK Pressed')},
+      ],
+      {cancelable: false},
+    );
+  }
+
+  reverifyAlert() {
+    Alert.alert(
+      'Verication email resent',
+      'Verification email sent to: ' + this.props.email,
       [
         {text: 'OK', onPress: () => console.log('OK Pressed')},
       ],
@@ -44,14 +68,25 @@ class LoginScreen extends React.Component {
       loginUser(this.state.username, this.state.password).then(response => {
         if (response.access_token) {
           this.saveLoginDetails(response.access_token)
+          this.props.setNewAccount(false)
           this.props.navigateToHomeScreen()
         } else {
-          this.showAlert()
+          this.showAlert('Invalid Credentials')
         }
       })
     } else {
-      this.showAlert()
+      this.showAlert("Invalid: " + invalidFields.join(', '))
     }
+  }
+
+  handleVerifyClick() {
+    reVerifyEmail(this.props.email).then(response => {
+      if (response.message == "Verification email sent.") {
+        this.reverifyAlert()
+      } else {
+        this.showAlert('Failed to resent verification email')
+      }
+    })
   }
 
   handleForgotClick() {
@@ -60,6 +95,7 @@ class LoginScreen extends React.Component {
 
   handleBackClick() {
     this.props.navigateBack()
+    this.props.setNewAccount(false)
   }
 
   setUserTextInput(text) {
@@ -83,6 +119,13 @@ class LoginScreen extends React.Component {
           </TouchableOpacity>
           <Image style={styles.logo} source={logoImage}/>
         </View>
+        {this.props.newAccount ? 
+          <View style={styles.verifyContainer}>
+              <Text style={styles.verifyText}>{"Did not receive email? "}
+              <Text onPress={() => this.handleVerifyClick()} style={styles.verifyLink}>{"Click here"}</Text>
+              {" to resend it."}</Text>
+          </View>
+          : null}
         <LoginInput
           ref={ref => (this.loginInputName = ref)}
           setText={this.setUserTextInput.bind(this)}
@@ -110,6 +153,8 @@ class LoginScreen extends React.Component {
 function mapStateToProps(state) {
   return {
     token: state.home.token,
+    newAccount: state.reg.newAccount,
+    email: state.reg.email,
   };
 }
 

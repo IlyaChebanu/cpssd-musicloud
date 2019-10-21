@@ -36,5 +36,15 @@ export default StyleSheet.create({
     signInButton: {
       position: 'absolute',
       bottom: height > 600 ? 100 : 50,
-    }
+    },
+    verifyContainer: {
+      paddingLeft: 20,
+      paddingBottom: 5,
+    },
+    verifyLink: {
+      textDecorationLine: 'underline'
+    },
+    verifyText: {
+      color: '#FFF',
+    },
 })

@@ -36,8 +36,10 @@ class RegisterScreen extends React.Component {
   handleRegisterClick() {
     let invalidFields = getInvalidRegisterDetails(this.state.username.trim(), this.state.email.trim(), this.state.password, this.state.passwordRepeat)
     if (invalidFields.length === 0) {
-      registerUser(this.state.username, this.state.email, this.state.password).then(response => {
+      registerUser(this.state.username.trim(), this.state.email.trim(), this.state.password).then(response => {
         if (response.message == "User created!") {
+          this.props.setEmail(this.state.email.trim())
+          this.props.setNewAccount(true)
           this.props.navigateToLoginScreen()
         } else {
           this.showAlert('User Already Exists')
