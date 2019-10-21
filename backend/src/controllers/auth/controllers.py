@@ -48,9 +48,9 @@ def login():
     }
     try:
         validate(request.json, schema=expected_body)
-    except ValidationError:
-        log("warning", "Request validation failed.", traceback.format_exc())
-        return {"message": "Some info is missing from your request."}, 422
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
 
     try:
         user = get_user(request.json.get("username"))
@@ -101,9 +101,9 @@ def logout():
     # Check req body is correctly formed.
     try:
         validate(request.json, schema=expected_body)
-    except ValidationError:
-        log("error", "Request validation failed.", traceback.format_exc())
-        return {"message": "Some info is missing from your request."}, 422
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
 
     try:
         delete_login(request.json.get("access_token"))

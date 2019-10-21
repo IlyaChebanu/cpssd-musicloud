@@ -28,9 +28,9 @@ def register():
     }
     try:
         validate(request.json, schema=expected_body)
-    except ValidationError:
-        log("warning", "Request validation failed.", traceback.format_exc())
-        return {"message": "Some info is missing from your request."}, 422
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
 
     try:
         password_hash = argon2.hash(request.json.get("password"))
@@ -86,9 +86,9 @@ def reverify():
     }
     try:
         validate(request.json, schema=expected_body)
-    except ValidationError:
-        log("warning", "Request validation failed.", traceback.format_exc())
-        return {"message": "Some info is missing from your request."}, 422
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
 
     # Verify that the email field is a valid email address str.
     if not re.match(r"[^@]+@[^@]+\.[^@]+", request.json.get("email")):
