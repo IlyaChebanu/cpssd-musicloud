@@ -7,7 +7,7 @@ from flask import Blueprint
 from flask import request
 from jsonschema import validate, ValidationError
 
-from ...config import SMTP_CONFIG, HOST
+from ...config import HOST
 from ...utils.logger import log
 from ...utils import random_string, send_mail
 from ...models.users import insert_user, get_user, get_user_via_email
