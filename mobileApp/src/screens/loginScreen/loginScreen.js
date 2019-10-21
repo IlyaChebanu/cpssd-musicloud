@@ -10,6 +10,7 @@ import MultiPurposeButton from "../../components/multiPurposeButton/multiPurpose
 import { loginUser, reVerifyEmail } from "../../api/usersAPI";
 import { writeDataToStorage, TOKEN_DATA_KEY } from "../../utils/localStorage";
 import { getInvalidLoginDetails } from "../../utils/helpers";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 // import { loginUser } from "../../api/usersAPI";
 
 class LoginScreen extends React.Component {
@@ -111,6 +112,7 @@ class LoginScreen extends React.Component {
     var arrowback = require("../../assets/images/back_arrow.png");
     return (
       <View style={styles.container}>
+        <KeyboardAwareScrollView>
         {/* <Text style={styles.mandatoryErrorText}>{GLOBALS.DUMMY_SCREEN_TITLE}</Text> */}
 
         <View style={styles.logoContainer}>
@@ -139,7 +141,8 @@ class LoginScreen extends React.Component {
         <TouchableOpacity style={styles.forgotButton} onPress={() => this.handleForgotClick()}>
           <Text style={styles.forgotText}>{'Forgot Password?'}</Text>
         </TouchableOpacity>
-
+        </KeyboardAwareScrollView>
+        
         <MultiPurposeButton 
           handleButtonClick={this.handleLoginClick.bind(this)}
           style={styles.signInButton}

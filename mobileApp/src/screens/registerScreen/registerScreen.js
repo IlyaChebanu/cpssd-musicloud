@@ -9,6 +9,7 @@ import LoginInput from "../../components/loginInput/loginInput";
 import MultiPurposeButton from "../../components/multiPurposeButton/multiPurposeButton";
 import { getInvalidRegisterDetails } from "../../utils/helpers";
 import { registerUser } from "../../api/usersAPI";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 class RegisterScreen extends React.Component {
   constructor(props) {
@@ -79,6 +80,7 @@ class RegisterScreen extends React.Component {
     var arrowback = require("../../assets/images/back_arrow.png");
     return (
       <View style={styles.container}>
+        <KeyboardAwareScrollView>
         {/* <Text style={styles.mandatoryErrorText}>{GLOBALS.DUMMY_SCREEN_TITLE}</Text> */}
 
         <View style={styles.logoContainer}>
@@ -106,12 +108,14 @@ class RegisterScreen extends React.Component {
           ref={ref => (this.loginInputName = ref)}
           setText={this.setPasswordRepeatTextInput.bind(this)}
           labelName={"Repeat Password"} />
-
+        </KeyboardAwareScrollView>
+        
         <MultiPurposeButton 
           handleButtonClick={this.handleRegisterClick.bind(this)}
           style={styles.signInButton}
           buttonName={"Create Account"}
         />
+        
       </View>
     )
   }
