@@ -7,12 +7,12 @@ from flask import request
 from passlib.hash import argon2
 from jsonschema import validate, ValidationError
 
-from backend.src.config import JWT_SECRET
-from backend.src.utils.logger import log
-from backend.src.utils import random_string, query
-from backend.src.models.verification import get_verification_by_code, delete_verification
-from backend.src.models.users import verify_user, get_user
-from backend.src.models.auth import insert_login, delete_login
+from ...config import JWT_SECRET
+from ...utils.logger import log
+from ...utils import random_string
+from ...models.verification import get_verification_by_code, delete_verification
+from ...models.users import verify_user, get_user
+from ...models.auth import insert_login, delete_login
 
 auth = Blueprint('auth', __name__)
 

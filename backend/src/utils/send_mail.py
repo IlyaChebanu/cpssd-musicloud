@@ -1,6 +1,6 @@
 import smtplib
 
-from ..config import GMAIL_CONFIG
+from ..config import SMTP_CONFIG
 
 
 def send_mail(sent_from, to, email_text):
@@ -12,7 +12,7 @@ def send_mail(sent_from, to, email_text):
     smtp.connect(server, port)
     smtp.ehlo()
     smtp.starttls()
-    smtp.login(GMAIL_CONFIG.get("user"), GMAIL_CONFIG.get("password"))
+    smtp.login(SMTP_CONFIG.get("user"), SMTP_CONFIG.get("password"))
 
     # Send email & close connection.
     smtp.sendmail(sent_from, to, email_text)

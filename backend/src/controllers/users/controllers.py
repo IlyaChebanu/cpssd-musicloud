@@ -7,11 +7,11 @@ from flask import Blueprint
 from flask import request
 from jsonschema import validate, ValidationError
 
-from backend.src.config import GMAIL_CONFIG, HOST
-from backend.src.utils.logger import log
-from backend.src.utils import random_string, send_mail
-from backend.src.models.users import insert_user, get_user, get_user_via_email
-from backend.src.models.verification import insert_verification, get_verification
+from ...config import GMAIL_CONFIG, HOST
+from ...utils.logger import log
+from ...utils import random_string, send_mail
+from ...models.users import insert_user, get_user, get_user_via_email
+from ...models.verification import insert_verification, get_verification
 
 users = Blueprint("users", __name__)
 
