@@ -12,12 +12,13 @@ MYSQL_CONFIG = {
 
 # user & password field should be populated with the
 # username & password for Gmail located in the Password.kdbx file.
-GMAIL_CONFIG = {
+SMTP_CONFIG = {
     'user': '',
-    'password': ''
+    'password': '',
+    'server': 'smtp.gmail.com'
 }
 
-HOST = "localhost:5000"
+HOST = "dcumusicloud.com:5000"
 
 # This should be set to the 'JWT_SECRET' value available in the Password.kdbx file.
 JWT_SECRET = (

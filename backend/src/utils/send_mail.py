@@ -7,7 +7,7 @@ def send_mail(sent_from, to, email_text):
     """Sends an email to the provided address"""
     # Connect to SMTP server.
     smtp = smtplib.SMTP()
-    server = "smtp.gmail.com"
+    server = SMTP_CONFIG.get("server")
     port = 587
     smtp.connect(server, port)
     smtp.ehlo()
