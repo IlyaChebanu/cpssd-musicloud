@@ -2,12 +2,9 @@ import React from "react"
 import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity } from "react-native"
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
-import HeaderComponent from "../../components/headerComponent/headerComponent";
-import { SafeAreaView } from "react-navigation";
-import SearchComponent from "../../components/searchComponent/searchComponent";
-import songsData from "./sampleData";
+import songsData from "../../screens/homeScreen/sampleData";
 
-export default class HomeScreen extends React.Component {
+export default class ProfileSongs extends React.Component {
 
   handleSongClick(item, index) {
 
@@ -33,24 +30,16 @@ export default class HomeScreen extends React.Component {
 
   render() {
     return (
-      <SafeAreaView forceInset={{ bottom: 'never'}} style={{ 'backgroundColor': '#3D4044', 'flex': 1 }}>
-        <View style={{ 'backgroundColor': '#1B1E23', 'flex': 1 }}>
-          <HeaderComponent navigation={this.props.navigation} />
           <View style={styles.container}>
-            <Text style={styles.titleText}>{"DISCOVER"}</Text>
-            <SearchComponent />
+            <Text style={styles.titleText}>{"Songs"}</Text>
             <FlatList 
-              style={styles.discoverFlatList}
+              style={styles.songFlatList}
               data={songsData}
               renderItem={this.renderSong.bind(this)}
               keyExtractor={item => String(item.id)}
               extraData={songsData}
             />
           </View>
-          {/* <Text>{JSON.stringify(this.props, null, 2)}</Text> */}
-
-        </View>
-      </SafeAreaView>
     )
   }
 }

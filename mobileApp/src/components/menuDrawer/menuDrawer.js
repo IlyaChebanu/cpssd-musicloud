@@ -1,7 +1,6 @@
 import React from "react"
-import { StyleSheet, Text, View, Image, Dimensions, Platform } from "react-native"
+import { StyleSheet, Text, View, Image, Dimensions, Platform, TouchableOpacity } from "react-native"
 import styles from "./styles";
-import { TouchableOpacity } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-navigation";
 
 export default class MenuDrawer extends React.Component {
