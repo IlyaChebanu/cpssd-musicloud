@@ -50,9 +50,9 @@ const Login = memo(props => {
           }
           dispatch(setToken(res.data.access_token));
           history.push('/discover');
-        } else if (res.status === 400) {
-          setErrorText('Invalid credentails');
         } else if (res.status === 401) {
+          setErrorText('Invalid credentails');
+        } else if (res.status === 403) {
           setErrorText(<>
             Email not verified.{' '}
             <Link to='/verify' className={styles.resend}>Resend email</Link>
