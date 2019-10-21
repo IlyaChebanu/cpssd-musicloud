@@ -15,7 +15,7 @@ MYSQL_CONFIG = {
 SMTP_CONFIG = {
     'user': '',
     'password': '',
-    'server': 'smtp.gmail.com'
+    'server': 'email-smtp.eu-west-1.amazonaws.com'
 }
 
 HOST = "dcumusicloud.com:5000"

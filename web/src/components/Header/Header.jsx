@@ -11,9 +11,9 @@ const Header = props => {
       <Logo className={styles.logo}/>
       <span>
         <nav>
-          <button>Studio</button>
-          <button className={styles.selected}>Discover</button>
-          <button>Profile</button>
+          <button className={props.selected === 0 ? styles.selected : ''}>Studio</button>
+          <button className={props.selected === 1 ? styles.selected : ''}>Discover</button>
+          <button className={props.selected === 2 ? styles.selected : ''}>Profile</button>
         </nav>
         <CircularImage src={ProfilePicture}/>
       </span>

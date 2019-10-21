@@ -13,7 +13,7 @@ for (let i = 0; i < 10; i++) {
 const Discover = props => {
   return (
     <div className={styles.wrapper}>
-      <Header />
+      <Header selected={1}/>
       <div className={styles.contentWrapper}>
         <MusicSearch className={styles.musicSearch}/>
         <div className={styles.songs}>
