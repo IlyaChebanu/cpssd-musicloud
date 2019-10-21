@@ -1,4 +1,4 @@
-from backend.src.utils import query
+from ..utils import query
 
 
 def insert_user(email, username, password):
