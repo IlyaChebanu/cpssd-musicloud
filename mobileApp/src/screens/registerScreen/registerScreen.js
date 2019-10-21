@@ -2,16 +2,53 @@ import React from "react";
 import { connect } from 'react-redux';
 import { ActionCreators } from '../../actions/index';
 import { bindActionCreators } from 'redux';
-import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native"
+import { StyleSheet, Text, View, Image, TouchableOpacity, Alert } from "react-native"
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import LoginInput from "../../components/loginInput/loginInput";
 import MultiPurposeButton from "../../components/multiPurposeButton/multiPurposeButton";
+import { getInvalidRegisterDetails } from "../../utils/helpers";
+import { registerUser } from "../../api/usersAPI";
 
 class RegisterScreen extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      email: '',
+      username: '',
+      password: '',
+      passwordRepeat: '',
+    }
+  }
+
+  showAlert() {
+    Alert.alert(
+      'Error',
+      'Some fields are invalid',
+      [
+        {text: 'OK', onPress: () => console.log('OK Pressed')},
+      ],
+      {cancelable: false},
+    );
+  }
 
   handleRegisterClick() {
-    this.props.navigateToHomeScreen()
+    let invalidFields = getInvalidRegisterDetails(this.state.username.trim(), this.state.username.trim(), this.state.password, this.state.passwordRepeat)
+    if (invalidFields.length === 0) {
+      registerUser(this.state.username, this.state.email, this.state.password).then(response => {
+        if (response.message == "User created!") {
+          console.warn('yes')
+          this.props.navigateToLoginScreen()
+        } else {
+          console.warn('no')
+          this.showAlert()
+        }
+      })
+    } else {
+      console.warn('fields')
+      this.showAlert()
+    }
   }
 
   handleForgotClick() {
@@ -20,6 +57,22 @@ class RegisterScreen extends React.Component {
 
   handleBackClick() {
     this.props.navigateBack()
+  }
+
+  setEmailTextInput(text) {
+    this.setState({ email: text});
+  }
+
+  setUsernameTextInput(text) {
+    this.setState({ username: text});
+  }
+
+  setPasswordTextInput(text) {
+    this.setState({ password: text});
+  }
+
+  setPasswordRepeatTextInput(text) {
+    this.setState({ passwordRepeat: text});
   }
 
   render() {
@@ -37,18 +90,22 @@ class RegisterScreen extends React.Component {
         </View>
         <LoginInput
           ref={ref => (this.loginInputName = ref)}
+          setText={this.setEmailTextInput.bind(this)}
           style={{"marginBottom": 1}}
           labelName={"Email"} />
         <LoginInput
           ref={ref => (this.loginInputName = ref)}
+          setText={this.setUsernameTextInput.bind(this)}
           style={{"marginBottom": 1}}
           labelName={"Username"} />
         <LoginInput
           ref={ref => (this.loginInputName = ref)}
+          setText={this.setPasswordTextInput.bind(this)}
           style={{"marginBottom": 1}}
           labelName={"Password"} />
         <LoginInput
           ref={ref => (this.loginInputName = ref)}
+          setText={this.setPasswordRepeatTextInput.bind(this)}
           labelName={"Repeat Password"} />
 
         <MultiPurposeButton 

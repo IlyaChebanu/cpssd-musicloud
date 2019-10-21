@@ -2,17 +2,56 @@ import React from "react";
 import { connect } from 'react-redux';
 import { ActionCreators } from '../../actions/index';
 import { bindActionCreators } from 'redux';
-import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native"
+import { StyleSheet, Text, View, Image, TouchableOpacity, Alert } from "react-native"
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import LoginInput from "../../components/loginInput/loginInput";
 import MultiPurposeButton from "../../components/multiPurposeButton/multiPurposeButton";
+import { loginUser } from "../../api/usersAPI";
+import { writeDataToStorage, TOKEN_DATA_KEY } from "../../utils/localStorage";
+import { getInvalidLoginDetails } from "../../utils/helpers";
 // import { loginUser } from "../../api/usersAPI";
 
 class LoginScreen extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      username: '',
+      password: '',
+    }
+  }
+
+  showAlert() {
+    Alert.alert(
+      'Error',
+      'Invalid Credentials',
+      [
+        {text: 'OK', onPress: () => console.log('OK Pressed')},
+      ],
+      {cancelable: false},
+    );
+  }
+
+  saveLoginDetails(token) {
+    // this.props.setAuthToken(token)
+    writeDataToStorage(token, TOKEN_DATA_KEY)
+  }
 
   handleLoginClick() {
-    this.props.navigateToHomeScreen()
+    let invalidFields = getInvalidLoginDetails(this.state.username.trim(), this.state.password)
+    if (invalidFields.length == 0) {
+      loginUser(this.state.username, this.state.password).then(response => {
+        if (response.access_token) {
+          this.saveLoginDetails(response)
+          this.props.navigateToHomeScreen()
+        } else {
+          this.showAlert()
+        }
+      })
+    } else {
+      this.showAlert()
+    }
   }
 
   handleForgotClick() {
@@ -21,6 +60,14 @@ class LoginScreen extends React.Component {
 
   handleBackClick() {
     this.props.navigateBack()
+  }
+
+  setUserTextInput(text) {
+    this.setState({ username: text})
+  }
+
+  setPasswordTextInput(text) {
+    this.setState({ password: text})
   }
 
   render() {
@@ -38,10 +85,12 @@ class LoginScreen extends React.Component {
         </View>
         <LoginInput
           ref={ref => (this.loginInputName = ref)}
+          setText={this.setUserTextInput.bind(this)}
           style={{"marginBottom": 1}}
-          labelName={"Email"} />
+          labelName={"Username"} />
         <LoginInput
           ref={ref => (this.loginInputName = ref)}
+          setText={this.setPasswordTextInput.bind(this)}
           labelName={"Password"} />
 
         <TouchableOpacity style={styles.forgotButton} onPress={() => this.handleForgotClick()}>
