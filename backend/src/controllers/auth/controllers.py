@@ -17,7 +17,7 @@ from ...models.auth import insert_login, delete_login
 auth = Blueprint('auth', __name__)
 
 
-@auth.route('/verify', methods=["GET", "OPTIONS"])
+@auth.route('/verify', methods=["GET"])
 def verify():
     code = request.args.get('code')
     if len(code) != 64:
@@ -37,7 +37,7 @@ def verify():
     return {"message": "Verified."}, 200
 
 
-@auth.route('/login', methods=["POST", "OPTIONS"])
+@auth.route('/login', methods=["POST"])
 def login():
     expected_body = {
         "type": "object",
@@ -90,7 +90,7 @@ def login():
     return {"access_token": access_token.decode('utf-8')}, 200
 
 
-@auth.route('/logout', methods=["POST", "OPTIONS"])
+@auth.route('/logout', methods=["POST"])
 def logout():
     expected_body = {
         "type": "object",

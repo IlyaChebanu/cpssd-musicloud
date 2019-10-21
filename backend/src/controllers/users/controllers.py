@@ -16,7 +16,7 @@ from ...models.verification import insert_verification, get_verification
 users = Blueprint("users", __name__)
 
 
-@users.route("/", methods=["POST", "OPTIONS"])
+@users.route("/", methods=["POST"])
 def register():
     expected_body = {
         "type": "object",
@@ -75,7 +75,7 @@ def register():
     return {"message": "User created!"}, 200
 
 
-@users.route("/reverify", methods=["POST", "OPTIONS"])
+@users.route("/reverify", methods=["POST"])
 def reverify():
     expected_body = {
         "type": "object",
