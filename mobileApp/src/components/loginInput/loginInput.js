@@ -25,6 +25,7 @@ export default class LoginInput extends Component {
 
     setTextInput(text) {
         this.setState({ inputText: text });
+        this.props.setText(text)
     }
 
     getTextInput() {
