@@ -72,7 +72,7 @@ def register():
     except Exception:
         log("error", "Failed to send email.", traceback.format_exc())
 
-    return {"message": "User created!"}
+    return {"message": "User created!"}, 200
 
 
 @users.route("/reverify", methods=["POST"])
@@ -127,4 +127,4 @@ def reverify():
     except Exception:
         log("error", "Failed to send email.", traceback.format_exc())
 
-    return {"message": "Verification email sent."}
+    return {"message": "Verification email sent."}, 200
