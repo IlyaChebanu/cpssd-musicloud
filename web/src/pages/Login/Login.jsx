@@ -23,13 +23,6 @@ const Login = memo(props => {
   const [errorText, setErrorText] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
 
-  // useEffect(() => {
-  //   if (props.user.token) {
-  //     // TODO: Verify token not expired
-  //     props.history.push('/discover');
-  //   }
-  // }, [props.user.token]);
-
   const usernameBorder = useMemo(() => {
     return submitted && !username ? '#b90539' : 'white';
   }, [username, submitted]);
