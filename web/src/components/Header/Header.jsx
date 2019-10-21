@@ -5,7 +5,7 @@ import styles from './Header.module.scss';
 import { deleteToken } from '../../actions/userActions';
 import { deleteToken as deleteTokenAPI } from '../../helpers/api';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
+import { withRouter, Link } from 'react-router-dom';
 import { ReactComponent as Logo } from '../../assets/logo.svg';
 import { ReactComponent as SignOutIcon } from '../../assets/icons/sign-out-alt-light.svg';
 import ProfilePicture from '../../assets/profiler.jpg';
@@ -30,9 +30,9 @@ const Header = props => {
       <Logo className={styles.logo}/>
       <span>
         <nav>
-          <button className={props.selected === 0 ? styles.selected : ''}>Studio</button>
-          <button className={props.selected === 1 ? styles.selected : ''}>Discover</button>
-          <button className={props.selected === 2 ? styles.selected : ''}>Profile</button>
+          <Link to='/studio' className={props.selected === 0 ? styles.selected : ''}>Studio</Link>
+          <Link to='/discover' className={props.selected === 1 ? styles.selected : ''}>Discover</Link>
+          <Link to='/profile' className={props.selected === 2 ? styles.selected : ''}>Profile</Link>
         </nav>
         <div className={styles.pictureWrapper}>
           <CircularImage src={ProfilePicture}/>
