@@ -11,6 +11,7 @@ import { loginUser, reVerifyEmail } from "../../api/usersAPI";
 import { writeDataToStorage, TOKEN_DATA_KEY } from "../../utils/localStorage";
 import { getInvalidLoginDetails } from "../../utils/helpers";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import PasswordInput from "../../components/passwordInput/passwordInput";
 // import { loginUser } from "../../api/usersAPI";
 
 class LoginScreen extends React.Component {
@@ -20,18 +21,19 @@ class LoginScreen extends React.Component {
     this.state = {
       username: '',
       password: '',
+      maskPassword: true,
     }
   }
 
   componentDidMount() {
-    if(this.props.newAccount) {
+    if (this.props.newAccount) {
       Alert.alert(
         'Account Created',
         'Verify the email first before login',
         [
-          {text: 'OK', onPress: () => console.log('OK Pressed')},
+          { text: 'OK', onPress: () => console.log('OK Pressed') },
         ],
-        {cancelable: false},
+        { cancelable: false },
       );
     }
   }
@@ -41,9 +43,9 @@ class LoginScreen extends React.Component {
       'Error',
       text,
       [
-        {text: 'OK', onPress: () => console.log('OK Pressed')},
+        { text: 'OK', onPress: () => console.log('OK Pressed') },
       ],
-      {cancelable: false},
+      { cancelable: false },
     );
   }
 
@@ -52,9 +54,9 @@ class LoginScreen extends React.Component {
       'Verication email resent',
       'Verification email sent to: ' + this.props.email,
       [
-        {text: 'OK', onPress: () => console.log('OK Pressed')},
+        { text: 'OK', onPress: () => console.log('OK Pressed') },
       ],
-      {cancelable: false},
+      { cancelable: false },
     );
   }
 
@@ -100,11 +102,15 @@ class LoginScreen extends React.Component {
   }
 
   setUserTextInput(text) {
-    this.setState({ username: text})
+    this.setState({ username: text })
   }
 
   setPasswordTextInput(text) {
-    this.setState({ password: text})
+    this.setState({ password: text })
+  }
+
+  togglePasswordMask() {
+    this.setState({ maskPassword: !this.state.maskPassword });
   }
 
   render() {
@@ -113,37 +119,39 @@ class LoginScreen extends React.Component {
     return (
       <View style={styles.container}>
         <KeyboardAwareScrollView>
-        {/* <Text style={styles.mandatoryErrorText}>{GLOBALS.DUMMY_SCREEN_TITLE}</Text> */}
+          {/* <Text style={styles.mandatoryErrorText}>{GLOBALS.DUMMY_SCREEN_TITLE}</Text> */}
 
-        <View style={styles.logoContainer}>
-          <TouchableOpacity onPress={() => this.handleBackClick()}>
-            <Image style={styles.arrowback} source={arrowback}/>
-          </TouchableOpacity>
-          <Image style={styles.logo} source={logoImage}/>
-        </View>
-        {this.props.newAccount ? 
-          <View style={styles.verifyContainer}>
-              <Text style={styles.verifyText}>{"Did not receive email? "}
-              <Text onPress={() => this.handleVerifyClick()} style={styles.verifyLink}>{"Click here"}</Text>
-              {" to resend it."}</Text>
+          <View style={styles.logoContainer}>
+            <TouchableOpacity onPress={() => this.handleBackClick()}>
+              <Image style={styles.arrowback} source={arrowback} />
+            </TouchableOpacity>
+            <Image style={styles.logo} source={logoImage} />
           </View>
-          : null}
-        <LoginInput
-          ref={ref => (this.loginInputName = ref)}
-          setText={this.setUserTextInput.bind(this)}
-          style={{"marginBottom": 1}}
-          labelName={"Username"} />
-        <LoginInput
-          ref={ref => (this.loginInputName = ref)}
-          setText={this.setPasswordTextInput.bind(this)}
-          labelName={"Password"} />
+          {this.props.newAccount ?
+            <View style={styles.verifyContainer}>
+              <Text style={styles.verifyText}>{"Did not receive email? "}
+                <Text onPress={() => this.handleVerifyClick()} style={styles.verifyLink}>{"Click here"}</Text>
+                {" to resend it."}</Text>
+            </View>
+            : null}
+          <LoginInput
+            ref={ref => (this.loginInputName = ref)}
+            setText={this.setUserTextInput.bind(this)}
+            style={{ "marginBottom": 1 }}
+            labelName={"Username"} />
+          <PasswordInput
+            ref={ref => (this.loginInputName = ref)}
+            togglePassword={this.togglePasswordMask.bind(this)}
+            maskPassword={this.state.maskPassword}
+            setText={this.setPasswordTextInput.bind(this)}
+            labelName={"Password"} />
 
-        <TouchableOpacity style={styles.forgotButton} onPress={() => this.handleForgotClick()}>
-          <Text style={styles.forgotText}>{'Forgot Password?'}</Text>
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.forgotButton} onPress={() => this.handleForgotClick()}>
+            <Text style={styles.forgotText}>{'Forgot Password?'}</Text>
+          </TouchableOpacity>
         </KeyboardAwareScrollView>
-        
-        <MultiPurposeButton 
+
+        <MultiPurposeButton
           handleButtonClick={this.handleLoginClick.bind(this)}
           style={styles.signInButton}
           buttonName={"Sign in"}

@@ -10,6 +10,7 @@ import MultiPurposeButton from "../../components/multiPurposeButton/multiPurpose
 import { getInvalidRegisterDetails } from "../../utils/helpers";
 import { registerUser } from "../../api/usersAPI";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import PasswordInput from "../../components/passwordInput/passwordInput";
 
 class RegisterScreen extends React.Component {
   constructor(props) {
@@ -20,6 +21,8 @@ class RegisterScreen extends React.Component {
       username: '',
       password: '',
       passwordRepeat: '',
+      maskPassword: true,
+      maskPasswordRepeat: true,
     }
   }
 
@@ -75,6 +78,14 @@ class RegisterScreen extends React.Component {
     this.setState({ passwordRepeat: text});
   }
 
+  togglePasswordMask() {
+    this.setState({ maskPassword: !this.state.maskPassword });
+  }
+
+  togglePasswordRepeatMask() {
+    this.setState({ maskPasswordRepeat: !this.state.maskPasswordRepeat });
+  }
+
   render() {
     var logoImage = require("../../assets/images/logo.png");
     var arrowback = require("../../assets/images/back_arrow.png");
@@ -99,13 +110,17 @@ class RegisterScreen extends React.Component {
           setText={this.setUsernameTextInput.bind(this)}
           style={{"marginBottom": 1}}
           labelName={"Username"} />
-        <LoginInput
+        <PasswordInput
           ref={ref => (this.loginInputName = ref)}
+          togglePassword={this.togglePasswordMask.bind(this)}
+          maskPassword={this.state.maskPassword}
           setText={this.setPasswordTextInput.bind(this)}
           style={{"marginBottom": 1}}
           labelName={"Password"} />
-        <LoginInput
+        <PasswordInput
           ref={ref => (this.loginInputName = ref)}
+          togglePassword={this.togglePasswordRepeatMask.bind(this)}
+          maskPassword={this.state.maskPasswordRepeat}
           setText={this.setPasswordRepeatTextInput.bind(this)}
           labelName={"Repeat Password"} />
         </KeyboardAwareScrollView>
