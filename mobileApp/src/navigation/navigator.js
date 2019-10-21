@@ -8,13 +8,14 @@ import StartScreen from "../screens/startScreen/startScreen"
 import LoginScreen from "../screens/loginScreen/loginScreen"
 import RegisterScreen from "../screens/registerScreen/registerScreen"
 import HomeScreen from "../screens/homeScreen/homeScreen"
+import { DrawerNavigator } from "./drawerNavigator";
 import * as screenNames from "./screenNames";
 
 export const AppNavigator = createStackNavigator({
     [screenNames.START_SCREEN]: { screen: StartScreen },
     [screenNames.LOGIN_SCREEN]: { screen: LoginScreen},
     [screenNames.REGISTER_SCREEN]: { screen: RegisterScreen},
-    [screenNames.HOME_SCREEN]: { screen: HomeScreen},
+    [screenNames.HOME_SCREEN]: { screen: DrawerNavigator},
 }, {
         initialRouteName: [screenNames.START_SCREEN],
         // Default config for all screens
