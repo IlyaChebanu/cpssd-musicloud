@@ -50,7 +50,7 @@ def login():
         validate(request.json, schema=expected_body)
     except ValidationError:
         log("warning", "Request validation failed.", traceback.format_exc())
-        return {"message": "Some info is missing from your request."}, 400
+        return {"message": "Some info is missing from your request."}, 422
 
     try:
         user = get_user(request.json.get("username"))
@@ -59,15 +59,15 @@ def login():
         return {"message": "MySQL unavailable."}, 503
 
     if not user:
-        return {"message": "Bad login credentials."}, 400
+        return {"message": "Bad login credentials."}, 401
 
     # Check the user's password against the provided one
     if not argon2.verify(request.json.get("password"), user[0][3]):
-        return {"message": "Bad login credentials."}, 400
+        return {"message": "Bad login credentials."}, 401
 
     # Check the user is verified
     if user[0][4] == 0:
-        return {"message": "Account not verified."}, 401
+        return {"message": "Account not verified."}, 403
 
     time_issued = datetime.datetime.now()
 
@@ -103,7 +103,7 @@ def logout():
         validate(request.json, schema=expected_body)
     except ValidationError:
         log("error", "Request validation failed.", traceback.format_exc())
-        return {"message": "Some info is missing from your request."}, 400
+        return {"message": "Some info is missing from your request."}, 422
 
     try:
         delete_login(request.json.get("access_token"))
