@@ -35,6 +35,9 @@ export default StyleSheet.create({
     logoutText: {
         color: '#FFF',
         fontSize: 20,
+        textShadowOffset: { width: 2, height: 2 },
+        textShadowRadius: 1,
+        textShadowColor: '#333',
     },
 
 })
