@@ -1,15 +1,32 @@
 import React from "react"
+import { connect } from 'react-redux';
+import { ActionCreators } from '../../actions/index';
+import { bindActionCreators } from 'redux';
 import { StyleSheet, Text, View, Image, Dimensions, Platform, TouchableOpacity } from "react-native"
 import styles from "./styles";
-import { SafeAreaView } from "react-navigation";
+import { SafeAreaView, NavigationActions } from "react-navigation";
+import { clearAllStorage } from "../../utils/localStorage";
+import * as screenNames from "../../navigation/screenNames";
+import { logoutUser } from "../../api/usersAPI";
 
-export default class MenuDrawer extends React.Component {
+class MenuDrawer extends React.Component {
+
+  async handleLogoutClick() {
+    // logoutUser(token)
+    await clearAllStorage()
+    // this.props.clearReduxState()
+    const navigateAction = NavigationActions.navigate({
+      routeName: screenNames.START_SCREEN,
+      type: 'PopStack',
+    })
+    this.props.navigation.dispatch(navigateAction);
+  }
 
   handleNavigation(nav) {
         this.props.navigation.navigate(nav)
         this.props.navigation.closeDrawer()
-
   }
+  
   navLink(nav, text) {
       return (
           <TouchableOpacity style={styles.linkButton} onPress={() => this.handleNavigation(nav)}>
@@ -26,8 +43,25 @@ export default class MenuDrawer extends React.Component {
                 {this.navLink('Home', 'Discover')}
                 {this.navLink('Profile', 'Profile')}
             </View>
+            <View style={styles.logoutContainer}>
+              <TouchableOpacity style={styles.logoutClick} onPress={() => this.handleLogoutClick()}>
+                <Text style={styles.logoutText}>{"LOGOUT"}</Text>
+              </TouchableOpacity>
+            </View>
         </View>
       </SafeAreaView>
     )
   }
 }
+
+function mapStateToProps(state) {
+  return {
+
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators(ActionCreators, dispatch);
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(MenuDrawer);
