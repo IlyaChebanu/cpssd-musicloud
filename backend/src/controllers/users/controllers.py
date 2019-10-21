@@ -59,7 +59,7 @@ def register():
         log("error", "MySQL query failed", traceback.format_exc())
         return {"message": "MySQL unavailable."}, 503
 
-    sent_from = SMTP_CONFIG.get("user")
+    sent_from = "dcumusicloud@gmail.com"
     to = request.json.get("email")
     subject = "MusiCloud Email Verification"
     url = "http://" + HOST + "/api/v1/auth/verify?code=" + code
@@ -115,7 +115,7 @@ def reverify():
         log("error", "MySQL query failed", traceback.format_exc())
         return {"message": "MySQL unavailable."}, 503
 
-    sent_from = SMTP_CONFIG.get("user")
+    sent_from = "dcumusicloud@gmail.com"
     to = request.json.get("email")
     subject = "MusiCloud Email Verification"
     url = "http://" + HOST + "/api/v1/auth/verify?code=" + code
