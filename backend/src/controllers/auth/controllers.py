@@ -4,7 +4,6 @@ import traceback
 import jwt
 from flask import Blueprint
 from flask import request
-from flask import jsonify
 from passlib.hash import argon2
 from jsonschema import validate, ValidationError
 
@@ -35,9 +34,7 @@ def verify():
         log("error", "MySQL query failed", traceback.format_exc())
         return {"message": "MySQL unavailable."}, 503
 
-    response = jsonify({"message": "Verified."})
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    return response
+    return {"message": "Verified."}, 200
 
 
 @auth.route('/login', methods=["POST"])
@@ -90,9 +87,7 @@ def login():
         log("error", "MySQL query failed", traceback.format_exc())
         return {"message": "MySQL unavailable."}, 503
 
-    response = jsonify({"access_token": access_token})
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    return response
+    return {"access_token": access_token}, 200
 
 
 @auth.route('/logout', methods=["POST"])
@@ -116,6 +111,4 @@ def logout():
         log("error", "MySQL query failed", traceback.format_exc())
         return {"message": "MySQL unavailable."}, 503
 
-    response = jsonify({"message": "User has been successfully logged out!"})
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    return response
+    return {"message": "User has been successfully logged out!"}, 200

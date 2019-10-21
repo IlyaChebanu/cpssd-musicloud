@@ -5,7 +5,6 @@ import mysql.connector
 from passlib.hash import argon2
 from flask import Blueprint
 from flask import request
-from flask import jsonify
 from jsonschema import validate, ValidationError
 
 from ...config import HOST
@@ -68,15 +67,12 @@ def register():
     email_text = """From: %s\nTo: %s\nSubject: %s\n\n%s
     """ % (sent_from, to, subject, body)
 
-    response = jsonify({"message": "User created!"})
-    response.headers.add('Access-Control-Allow-Origin', '*')
-
     try:
         send_mail(sent_from, to, email_text)
     except Exception:
         log("error", "Failed to send email.", traceback.format_exc())
 
-    return response
+    return {"message": "User created!"}
 
 
 @users.route("/reverify", methods=["POST"])
@@ -126,12 +122,9 @@ def reverify():
     email_text = """From: %s\nTo: %s\nSubject: %s\n\n%s
     """ % (sent_from, to, subject, body)
 
-    response = jsonify({"message": "Verification email sent."})
-    response.headers.add('Access-Control-Allow-Origin', '*')
-
     try:
         send_mail(sent_from, to, email_text)
     except Exception:
         log("error", "Failed to send email.", traceback.format_exc())
 
-    return response
+    return {"message": "Verification email sent."}
