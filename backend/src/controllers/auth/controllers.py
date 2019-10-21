@@ -47,6 +47,7 @@ def login():
         }
     }
     try:
+        print(request.json)
         validate(request.json, schema=expected_body)
     except ValidationError:
         log("warning", "Request validation failed.", traceback.format_exc())
