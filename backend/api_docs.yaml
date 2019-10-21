@@ -1,0 +1,286 @@
+swagger: '2.0'
+info:
+  version: "1"
+  title: "MusiCloud API"
+  description: >-
+    This is the REST API documentation for the MusiCloud music mixing platform.
+host: "musicloud.bounceme.net"
+basePath: "/api/v1"
+tags:
+  - name: "users"
+    description: "User operations"
+  - name: "auth"
+    description: "Authentication operations"
+schemes:
+  - "http"
+paths:
+  /auth/verify/{code}:
+    get:
+      tags:
+      - "auth"
+      summary: "Verify new user's email"
+      description: "When the user clicks the link sent to their email, there account will be verified."
+      produces:
+      - "application/json"
+      parameters:
+        - in: "path"
+          name: "code"
+          required: true
+          type: "string"
+          description: "The randomly generated code emailed to the user on account creation."
+      responses:
+        200:
+          description: "successful query"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Verified."
+        400:
+          description: "Bad info sent, or info missing."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Invalid code."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable"
+                    
+  /auth/login:
+    post:
+      tags:
+      - "auth"
+      summary: "Login using a username and a password"
+      description: "By passing a user's username along with their password to this request as part of the request body, if the user exists in the database, an access token will be returned to them. The user should be verified in order to log in."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "User to be logged in."
+        required: true
+        schema:
+          type: "object"
+          properties:
+            username:
+              type: "string"
+              example: "Herman"
+            password:
+              type: "string"
+              example: "SecurePassword"
+      responses:
+        200:
+          description: "Logged in"
+          schema:
+            type: "object"
+            properties:
+              access_token:
+                type: "string"
+                example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MywidXNlcm5hbWUiOiJFZGRpZSBNdXJwaHkiLCJzdHVkZW50X2lkIjoiMTQ1Nzc4MDAiLCJmaXJzdF9uYW1lIjoiRW1pbHkiLCJzdXJuYW1lIjoiTWNHaXZlcm4iLCJ2ZXJpZmllZCI6MSwiZW1haWwiOiJlbWlseS5tY2dpdmVybjRAbWFpbC5kY3UuaWUiLCJwYXNzd3JkIjoiJDJhJDEwJERJSElubVBTWVJvNjhqUUd6TC9HVWU2cUxQaWtNSVY2VGtyc29PTzhaTXU4Z2hSZlJBTE95In0.fPZVIxg5a77bm08ErdWtxgYw3B_IgfNxO8BAsWAimyo"
+        400:
+          description: "Bad info sent, or info missing."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Bad login credentials."
+        401:
+          description: "The account has yet to be verified."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Account not verified."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable"
+                
+  /auth/logout:
+    post:
+      tags:
+      - "auth"
+      summary: "Deauthorise a token"
+      description: "By passing an access_token to this endpoint in the request body, the corrisponding token will be removed the Logins table. This means that the passed token will no longer be valid for use with access_token protected endpoints."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "A valid access_token"
+          required: true
+          schema:
+            type: "object"
+            properties:
+              access_token:
+                type: "string"
+                example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MywidXNlcm5hbWUiOiJFZGRpZSBNdXJwaHkiLCJzdHVkZW50X2lkIjoiMTQ1Nzc4MDAiLCJmaXJzdF9uYW1lIjoiRW1pbHkiLCJzdXJuYW1lIjoiTWNHaXZlcm4iLCJ2ZXJpZmllZCI6MSwiZW1haWwiOiJlbWlseS5tY2dpdmVybjRAbWFpbC5kY3UuaWUiLCJwYXNzd3JkIjoiJDJhJDEwJERJSElubVBTWVJvNjhqUUd6TC9HVWU2cUxQaWtNSVY2VGtyc29PTzhaTXU4Z2hSZlJBTE95In0.fPZVIxg5a77bm08ErdWtxgYw3B_IgfNxO8BAsWAimyo"
+      responses:
+        200:
+          description: "successful query"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "User has been successfully logged out!"
+        400:
+          description: "Missing access token"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Missing access token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+
+  /users:
+    post:
+      tags:
+      - "users"
+      summary: "Register a new user"
+      description: "Creates a new user entry in the Users table. This is step 1 in the authentication process."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "New user's info."
+        required: true
+        schema:
+          type: "object"
+          properties:
+            username:
+              type: "string"
+              example: "newUser"
+            email:
+              type: "string"
+              example: "newUser@gmail.com"
+            password:
+              type: "string"
+              example: "securePassword1234!"
+      responses:
+        200:
+          description: "User created"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "User created!"
+        400:
+          description: "Some info is bad, already exists in the DB or is missing!"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Some info is missing or already exists in the DB."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Error while hashing password."
+                
+  /users/reverify:
+    post:
+      tags:
+      - "users"
+      summary: "Resend verification email"
+      description: "Checks if a given user is in the process of being verified and resends the verification email if they are."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Email of the user looking for a new verification email"
+        required: true
+        schema:
+          type: "object"
+          properties:
+            email:
+              type: "string"
+              example: "newUser@gmail.com"
+      responses:
+        200:
+          description: "Resent verification email."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Verification email sent."
+        400:
+          description: "Some info is bad or is missing!"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Bad request."
+        403:
+          description: "Request forbidden as the user is already verified."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Already verified."
+        500:
+          description: "Failed to send verification email."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Verification mail failed to send."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+
+x-aws-api-id: 'fvg2nhhlzk'
