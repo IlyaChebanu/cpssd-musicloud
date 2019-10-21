@@ -1,0 +1,64 @@
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    transition: height 1s;
+  }
+
+  .topWrapper {
+    border-radius: 20px;
+    display: flex;
+    flex-direction: row;
+    transition: height 1s;
+  }
+
+  
+  .profilePicture {
+    background: url('../../assets/profiler.jpg');
+    background-size: cover;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
+    height: 235px;
+    width: 376px;
+  }
+
+  .stats {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 235px;
+    margin-left: 20px;
+
+    .num {
+        text-decoration: none;
+        font-size: 36px;
+        color: white;
+    }
+
+    p {
+      margin: 0px;
+      display: inline;
+    }
+
+    .class {
+        padding-left: 5px;
+        color: #AAAAAA;
+        font-size: 24px;
+    }
+
+    .stat {
+        display: block;
+    }
+  }
+
+  .username {
+      color: white;
+      font-size: 36px;
+      margin-top: 10px;
+      margin-bottom: 0px;
+      font-weight: 555;
+  }
+
+  .followButton {
+    margin-left: auto;
+    width: 150px;
+  }
