@@ -4,6 +4,7 @@ import traceback
 import jwt
 from flask import Blueprint
 from flask import request
+from flask import send_file
 from passlib.hash import argon2
 from jsonschema import validate, ValidationError
 
@@ -34,7 +35,7 @@ def verify():
         log("error", "MySQL query failed", traceback.format_exc())
         return {"message": "MySQL unavailable."}, 503
 
-    return {"message": "Verified."}, 200
+    return send_file('controllers/auth/success.html'), 200
 
 
 @auth.route('/login', methods=["POST"])
