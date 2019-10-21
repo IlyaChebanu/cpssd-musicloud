@@ -7,7 +7,7 @@ from flask import Blueprint
 from flask import request
 from jsonschema import validate, ValidationError
 
-from ...config import GMAIL_CONFIG, HOST
+from ...config import SMTP_CONFIG, HOST
 from ...utils.logger import log
 from ...utils import random_string, send_mail
 from ...models.users import insert_user, get_user, get_user_via_email
@@ -59,7 +59,7 @@ def register():
         log("error", "MySQL query failed", traceback.format_exc())
         return {"message": "MySQL unavailable."}, 503
 
-    sent_from = GMAIL_CONFIG.get("user")
+    sent_from = SMTP_CONFIG.get("user")
     to = request.form.get("email")
     subject = "MusiCloud Email Verification"
     url = "http://" + HOST + "/api/v1/auth/verify?code=" + code
@@ -115,7 +115,7 @@ def reverify():
         log("error", "MySQL query failed", traceback.format_exc())
         return {"message": "MySQL unavailable."}, 503
 
-    sent_from = GMAIL_CONFIG.get("user")
+    sent_from = SMTP_CONFIG.get("user")
     to = request.form.get("email")
     subject = "MusiCloud Email Verification"
     url = "http://" + HOST + "/api/v1/auth/verify?code=" + code
