@@ -34,7 +34,7 @@ class RegisterScreen extends React.Component {
   }
 
   handleRegisterClick() {
-    let invalidFields = getInvalidRegisterDetails(this.state.username.trim(), this.state.username.trim(), this.state.password, this.state.passwordRepeat)
+    let invalidFields = getInvalidRegisterDetails(this.state.username.trim(), this.state.email.trim(), this.state.password, this.state.passwordRepeat)
     if (invalidFields.length === 0) {
       registerUser(this.state.username, this.state.email, this.state.password).then(response => {
         if (response.message == "User created!") {
@@ -44,7 +44,7 @@ class RegisterScreen extends React.Component {
         }
       })
     } else {
-      this.showAlert('Some fields are invalid')
+      this.showAlert("Invalid: " + invalidFields.join(', '))
     }
   }
 
