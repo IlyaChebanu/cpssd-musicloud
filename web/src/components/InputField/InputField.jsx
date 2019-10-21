@@ -32,7 +32,7 @@ const InputField = memo(props => {
 
   return (
     <div
-      className={styles.wrapper + (hover ? ` ${styles.hover}` : '')}
+      className={styles.wrapper + (hover && props.animate ? ` ${styles.hover}` : '')}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >

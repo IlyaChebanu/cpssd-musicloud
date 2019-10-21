@@ -5,7 +5,7 @@ const API_URL = `http://dcumusicloud.com:5000/api`;
 export const login = (username, password) => {
   return axios.post(
     `${API_URL}/v1/auth/login`,
-    { username, password },
+    { username, password }
   ).catch(e => e.response);
 };
 

@@ -81,8 +81,8 @@ const Login = memo(props => {
           <h1>Sign in</h1>
           <p className={styles.credentialsError}>{errorText}</p>
           <form onSubmit={handleSubmit}>
-            <InputField onChange={setUsername} name='username' placeholder='Username' borderColour={usernameBorder}/>
-            <InputField onChange={setPassword} name='password' placeholder='Password' borderColour={passwordBorder} password={true}/>
+            <InputField animate={true} onChange={setUsername} name='username' placeholder='Username' borderColour={usernameBorder}/>
+            <InputField animate={true} onChange={setPassword} name='password' placeholder='Password' borderColour={passwordBorder} password={true}/>
             <span>
               <Checkbox className={styles.checkbox} onChange={setRememberMe} value={rememberMe}>Remember me</Checkbox>
               <Link to='/'>Forgot password?</Link>

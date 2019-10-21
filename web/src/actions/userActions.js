@@ -4,3 +4,9 @@ export const setToken = token => dispatch => {
     payload: token
   });
 };
+
+export const deleteToken = dispatch => {
+  dispatch({
+    type: 'DELETE_TOKEN'
+  });
+};

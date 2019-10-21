@@ -75,10 +75,10 @@ const Registration = memo(props => {
           <h1>Sign up</h1>
           <p className={styles.registrationError}>{errorText}</p>
           <form onSubmit={handleSubmit}>
-            <InputField onChange={setEmail} name='email' placeholder='Email' borderColour={emailBorder}/>
-            <InputField onChange={setUsername} name='username' placeholder='Username' borderColour={usernameBorder}/>
-            <InputField onChange={setPassword} name='password' placeholder='Password' borderColour={passwordBorder} password={true} sideContent={passwordStrength}/>
-            <InputField onChange={setRepeatPassword} name='passwordRepeat' placeholder='Repeat password' borderColour={repeatPasswordBorder} password={true}/>
+            <InputField animate={true} onChange={setEmail} name='email' placeholder='Email' borderColour={emailBorder}/>
+            <InputField animate={true} onChange={setUsername} name='username' placeholder='Username' borderColour={usernameBorder}/>
+            <InputField animate={true} onChange={setPassword} name='password' placeholder='Password' borderColour={passwordBorder} password={true} sideContent={passwordStrength}/>
+            <InputField animate={true} onChange={setRepeatPassword} name='passwordRepeat' placeholder='Repeat password' borderColour={repeatPasswordBorder} password={true}/>
             <SubmitButton text='Sign up'/>
             <p>Already have an account? <Link to='/login'>Sign in!</Link></p>
           </form>
