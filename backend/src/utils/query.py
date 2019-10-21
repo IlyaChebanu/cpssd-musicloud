@@ -2,7 +2,7 @@ import traceback
 
 import mysql.connector
 
-from backend.src.utils.logger import log
+from .logger import log
 from ..config import MYSQL_CONFIG
 
 
