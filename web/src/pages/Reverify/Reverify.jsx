@@ -31,7 +31,7 @@ const Reverify = memo(() => {
           setErrorText('Unknown error has occurred');
           console.error(res);
         } else {
-          setErrorText(<p style={{ color: 'white' }}>Verification email sent!</p>)
+          setErrorText(<span style={{ color: 'white' }}>Verification email sent!</span>)
         }
       } catch (e) {
         setErrorText('Fatal error');

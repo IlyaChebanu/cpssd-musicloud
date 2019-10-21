@@ -11,4 +11,8 @@
     transform: scaleX(1.05);
     cursor: pointer;
   }
+
+  &:focus {
+    outline: none;
+  }
 }
