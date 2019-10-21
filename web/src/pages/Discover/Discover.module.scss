@@ -1,0 +1,26 @@
+.wrapper {
+}
+
+.contentWrapper {
+  max-width: 840px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 40px;
+}
+
+.musicSearch {
+  width: 100%;
+}
+
+.songs {
+  margin-top: 80px;
+  display: grid;
+  grid-gap: 80px;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  align-content: space-around;
+}
+
+.songCard {
+  // margin: 20px;
+  justify-self: center;
+}
