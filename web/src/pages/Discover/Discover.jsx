@@ -18,7 +18,6 @@ const Discover = props => {
         <MusicSearch className={styles.musicSearch}/>
         <div className={styles.songs}>
           {songCards}
-          <div className={styles.final}/>
         </div>
       </div>
     </div>

@@ -9,6 +9,7 @@ import Discover from './pages/Discover';
 import Registration from './pages/Registration';
 import Reverify from './pages/Reverify';
 import Studio from './pages/Studio';
+import Profile from './pages/Profile'
 
 
 const App = () => {
@@ -23,6 +24,7 @@ const App = () => {
         <Route path='/verify' component={Reverify}/>
         <Route path='/discover' component={Discover}/>
         <Route path='/studio' component={Studio}/>
+        <Route path='/profile'component={Profile}/>
       </Switch>
     </Router>
   );

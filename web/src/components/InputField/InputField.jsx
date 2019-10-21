@@ -37,7 +37,7 @@ const InputField = memo(props => {
       onMouseLeave={handleMouseLeave}
     >
       <input
-        className={styles.input}
+        className={styles.input + (props.className ? ` ${props.className}` : '')}
         type={props.password ? 'password' : 'text'}
         name={props.name} placeholder={props.placeholder}
         onChange={handleChange}
@@ -57,8 +57,8 @@ InputField.propTypes = {
   onChange: PropTypes.func,
   placeholder: PropTypes.string,
   password: PropTypes.bool,
-  sideContent: PropTypes.node
+  sideContent: PropTypes.node,
+  className: PropTypes.string
 }
 
 export default InputField
-

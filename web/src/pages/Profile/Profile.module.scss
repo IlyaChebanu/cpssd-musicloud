@@ -1,0 +1,48 @@
+.wrapper {
+}
+
+.contentWrapper {
+  max-width: 840px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 40px;
+  margin-bottom: 40px;
+}
+
+.sectionTitle {
+  font-size: 24px;
+  color: white;
+  display: block;
+  align-self: left;
+}
+
+.songs {
+  margin-top: 20px;
+  // Added margin-bottom as extra to songs defined in 'Discovery.module.scss'
+  margin-bottom: 20px;
+  display: grid;
+  grid-gap: 80px;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  align-content: space-around;
+}
+
+.songCard {
+  // margin: 20px;
+  justify-self: center;
+}
+
+.blogs {
+  margin-top: 20px;
+  display: block;
+  align-content: space-around;
+}
+
+.blogCard {
+  margin-bottom: 30px;
+}
+
+.link {
+  text-decoration: none;
+  color: #97C1D0;
+  font-size: 19px;
+}
