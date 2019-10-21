@@ -47,7 +47,7 @@ def login():
         }
     }
     try:
-        validate(dict(request.form), schema=expected_body)
+        validate(request.json, schema=expected_body)
     except ValidationError:
         log("warning", "Request validation failed.", traceback.format_exc())
         return {"message": "Some info is missing from your request."}, 400
@@ -100,7 +100,7 @@ def logout():
     }
     # Check req body is correctly formed.
     try:
-        validate(dict(request.form), schema=expected_body)
+        validate(request.json, schema=expected_body)
     except ValidationError:
         log("error", "Request validation failed.", traceback.format_exc())
         return {"message": "Some info is missing from your request."}, 400

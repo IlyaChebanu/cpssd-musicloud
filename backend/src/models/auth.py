@@ -6,7 +6,7 @@ def insert_login(uid, access_token, time_issued):
         sql = (
             "INSERT INTO Logins "
             "(uid, access_token, time_issued) "
-            "VALUES (%d, %s, %s)"
+            "VALUES (%s, %s, %s)"
         )
         args = (
             uid,

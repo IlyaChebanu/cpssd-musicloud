@@ -27,7 +27,7 @@ def register():
         }
     }
     try:
-        validate(dict(request.form), schema=expected_body)
+        validate(request.json, schema=expected_body)
     except ValidationError:
         log("warning", "Request validation failed.", traceback.format_exc())
         return {"message": "Some info is missing from your request."}, 400
@@ -85,7 +85,7 @@ def reverify():
         }
     }
     try:
-        validate(dict(request.form), schema=expected_body)
+        validate(request.json, schema=expected_body)
     except ValidationError:
         log("warning", "Request validation failed.", traceback.format_exc())
         return {"message": "Some info is missing from your request."}, 400

@@ -52,7 +52,7 @@ def verify_user(uid):
         sql = (
             "UPDATE Users "
             "SET verified = 1 "
-            "WHERE uid = %d"
+            "WHERE uid = %s"
         )
         args = (
             uid,
