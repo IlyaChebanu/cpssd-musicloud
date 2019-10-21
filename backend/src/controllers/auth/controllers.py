@@ -87,7 +87,7 @@ def login():
         log("error", "MySQL query failed", traceback.format_exc())
         return {"message": "MySQL unavailable."}, 503
 
-    return {"access_token": access_token}, 200
+    return {"access_token": access_token.decode('utf-8')}, 200
 
 
 @auth.route('/logout', methods=["POST"])
