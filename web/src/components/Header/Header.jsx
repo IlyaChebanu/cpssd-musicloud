@@ -3,6 +3,7 @@ import cookie from 'js-cookie';
 import PropTypes from 'prop-types';
 import styles from './Header.module.scss';
 import { deleteToken } from '../../actions/userActions';
+import { deleteToken as deleteTokenAPI } from '../../helpers/api';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { ReactComponent as Logo } from '../../assets/logo.svg';
@@ -12,14 +13,16 @@ import CircularImage from '../CircularImage';
 
 const Header = props => {
   const { dispatch, history } = props;
+  const { token } = props.user;
 
   const handleSignout = useCallback(
     () => {
       cookie.remove('token');
       dispatch(deleteToken);
+      deleteTokenAPI(token);
       history.push('/login');
     },
-    [dispatch, history],
+    [dispatch, history, token],
   );
 
   return (
@@ -46,5 +49,7 @@ Header.propTypes = {
 
 };
 
-export default withRouter(connect()(Header));
+const mapStateToProps = ({ user }) => ({ user });
+
+export default withRouter(connect(mapStateToProps)(Header));
 

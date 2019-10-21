@@ -22,3 +22,10 @@ export const reverify = email => {
     { email }
   ).catch(e => e.response);
 }
+
+export const deleteToken = token => {
+  return axios.post(
+    `${API_URL}/v1/auth/logout`,
+    { access_token: token }
+  ).catch(e => e.response);
+}
