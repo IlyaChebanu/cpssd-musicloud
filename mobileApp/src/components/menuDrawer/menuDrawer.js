@@ -12,7 +12,7 @@ import { logoutUser } from "../../api/usersAPI";
 class MenuDrawer extends React.Component {
 
   async handleLogoutClick() {
-    // logoutUser(token)
+    logoutUser(this.props.token)
     await clearAllStorage()
     // this.props.clearReduxState()
     const navigateAction = NavigationActions.navigate({
@@ -56,7 +56,7 @@ class MenuDrawer extends React.Component {
 
 function mapStateToProps(state) {
   return {
-
+    token: state.home.token,
   };
 }
 

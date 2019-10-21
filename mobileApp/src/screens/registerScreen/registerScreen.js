@@ -22,10 +22,10 @@ class RegisterScreen extends React.Component {
     }
   }
 
-  showAlert() {
+  showAlert(text) {
     Alert.alert(
       'Error',
-      'Some fields are invalid',
+      text,
       [
         {text: 'OK', onPress: () => console.log('OK Pressed')},
       ],
@@ -38,16 +38,13 @@ class RegisterScreen extends React.Component {
     if (invalidFields.length === 0) {
       registerUser(this.state.username, this.state.email, this.state.password).then(response => {
         if (response.message == "User created!") {
-          console.warn('yes')
           this.props.navigateToLoginScreen()
         } else {
-          console.warn('no')
-          this.showAlert()
+          this.showAlert('User Already Exists')
         }
       })
     } else {
-      console.warn('fields')
-      this.showAlert()
+      this.showAlert('Some fields are invalid')
     }
   }
 

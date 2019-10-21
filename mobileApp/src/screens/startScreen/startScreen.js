@@ -21,7 +21,7 @@ class StartScreen extends React.Component {
   async loadCorrectFlow() {
     let token = await readStorageData(TOKEN_DATA_KEY)
     if (token != null) {
-      // this.props.setAuthToken(token)
+      this.props.setAuthToken(token)
       this.props.navigateToHomeScreen()
     } else {
 
@@ -64,7 +64,7 @@ class StartScreen extends React.Component {
 
 function mapStateToProps(state) {
   return {
-
+    token: state.home.token,
   };
 }
 

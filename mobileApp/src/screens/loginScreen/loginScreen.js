@@ -34,7 +34,7 @@ class LoginScreen extends React.Component {
   }
 
   saveLoginDetails(token) {
-    // this.props.setAuthToken(token)
+    this.props.setAuthToken(token)
     writeDataToStorage(token, TOKEN_DATA_KEY)
   }
 
@@ -43,7 +43,7 @@ class LoginScreen extends React.Component {
     if (invalidFields.length == 0) {
       loginUser(this.state.username, this.state.password).then(response => {
         if (response.access_token) {
-          this.saveLoginDetails(response)
+          this.saveLoginDetails(response.access_token)
           this.props.navigateToHomeScreen()
         } else {
           this.showAlert()
@@ -109,7 +109,7 @@ class LoginScreen extends React.Component {
 
 function mapStateToProps(state) {
   return {
-
+    token: state.home.token,
   };
 }
 
