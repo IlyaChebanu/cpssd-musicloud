@@ -80,7 +80,6 @@ def login():
         'random_value': random_string(255)
     }
     access_token = jwt.encode(jwt_payload, JWT_SECRET, algorithm='HS256')
-    print(access_token)
 
     try:
         insert_login(user[0][0], access_token.decode('utf-8'), time_issued)
