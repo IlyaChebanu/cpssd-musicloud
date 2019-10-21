@@ -1,9 +1,9 @@
 from .query import query
-from .verify_req_body import verify_req_body
 from .random_string import random_string
 from .send_mail import send_mail
+from .logger import log
 
 query = query
-verify_req_body = verify_req_body
 random_string = random_string
 send_mail = send_mail
+log = log

@@ -5,52 +5,31 @@ import jwt
 from flask import Blueprint
 from flask import request
 from passlib.hash import argon2
+from jsonschema import validate, ValidationError
 
-from ..config import JWT_SECRET
-from ..logger.logger import log
-from ..utils import random_string, verify_req_body, query
+from backend.src.config import JWT_SECRET
+from backend.src.utils.logger import log
+from backend.src.utils import random_string, query
+from backend.src.models.verification import get_verification_by_code, delete_verification
+from backend.src.models.users import verify_user, get_user
+from backend.src.models.auth import insert_login, delete_login
 
 auth = Blueprint('auth', __name__)
 
 
 @auth.route('/verify', methods=["GET"])
 def verify():
-    # Check the code is a valid length
     code = request.args.get('code')
     if len(code) != 64:
         return {"message": "Invalid code."}, 400
 
     try:
-        # Check the code against the verification table.
-        query_1 = (
-            "SELECT * FROM Verification "
-            "WHERE code = '%s'"
-        ) % (
-            code
-        )
-        user = query(query_1, True)
+        user = get_verification_by_code(code)
         if not user:
             return {"message": "Invalid code."}, 400
 
-        # Update the user's verification status.
-        query_2 = (
-            "UPDATE Users "
-            "SET verified = 1 "
-            "WHERE uid = %d"
-        ) % (
-            user[0][1]
-        )
-        query(query_2)
-
-        # Delete the entry in the verification table.
-        query_3 = (
-            "DELETE FROM Verification "
-            "WHERE code = '%s' AND uid = %d"
-        ) % (
-            code,
-            user[0][1]
-        )
-        query(query_3)
+        verify_user(user[0][1])
+        delete_verification(code, user[0][1])
     except Exception:
         log("error", "MySQL query failed", traceback.format_exc())
         return {"message": "MySQL unavailable."}, 503
@@ -60,20 +39,21 @@ def verify():
 
 @auth.route('/login', methods=["POST"])
 def login():
-    expected_keys = ["username", "password"]
-    # Check req body is correctly formed.
-    if not verify_req_body(request.form, expected_keys):
-        return {"message": "Bad login credentials."}, 400
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "username": {"type": "string"},
+            "password": {"type": "string"},
+        }
+    }
+    try:
+        validate(dict(request.form), schema=expected_body)
+    except ValidationError:
+        log("warning", "Request validation failed.", traceback.format_exc())
+        return {"message": "Some info is missing from your request."}, 400
 
     try:
-        # Check the code against the verification table.
-        query_1 = (
-            "SELECT * FROM Users "
-            "WHERE username = '%s'"
-        ) % (
-            request.form.get("username")
-        )
-        user = query(query_1, True)
+        user = get_user(request.form.get("username"))
     except Exception:
         log("error", "MySQL query failed", traceback.format_exc())
         return {"message": "MySQL unavailable."}, 503
@@ -102,17 +82,7 @@ def login():
     access_token = jwt.encode(jwt_payload, JWT_SECRET, algorithm='HS256')
 
     try:
-        # Check the code against the verification table.
-        query_2 = (
-            "INSERT INTO Logins "
-            "(uid, access_token, time_issued)"
-            "VALUES ('%d', '%s', '%s')"
-        ) % (
-            user[0][0],
-            access_token.decode('utf-8'),
-            time_issued
-        )
-        query(query_2)
+        insert_login(user[0][0], access_token.decode('utf-8'), time_issued)
     except Exception:
         log("error", "MySQL query failed", traceback.format_exc())
         return {"message": "MySQL unavailable."}, 503
@@ -122,20 +92,21 @@ def login():
 
 @auth.route('/logout', methods=["POST"])
 def logout():
-    expected_keys = ["access_token"]
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "access_token": {"type": "string"},
+        }
+    }
     # Check req body is correctly formed.
-    if not verify_req_body(request.form, expected_keys):
-        return {"message": "Missing access token."}, 400
+    try:
+        validate(dict(request.form), schema=expected_body)
+    except ValidationError:
+        log("error", "Request validation failed.", traceback.format_exc())
+        return {"message": "Some info is missing from your request."}, 400
 
     try:
-        # Check the code against the verification table.
-        query_1 = (
-            "DELETE FROM Logins "
-            "WHERE access_token = '%s'"
-        ) % (
-            request.form.get("access_token")
-        )
-        query(query_1)
+        delete_login(request.form.get("access_token"))
     except Exception:
         log("error", "MySQL query failed", traceback.format_exc())
         return {"message": "MySQL unavailable."}, 503

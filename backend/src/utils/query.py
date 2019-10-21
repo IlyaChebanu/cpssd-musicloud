@@ -2,11 +2,11 @@ import traceback
 
 import mysql.connector
 
-from ..logger.logger import log
+from backend.src.utils.logger import log
 from ..config import MYSQL_CONFIG
 
 
-def query(query_string, args, get_row=False):
+def query(query_string, query_args, get_row=False):
     """Connects to the DB & executes the provided query."""
     res = []
     try:
@@ -15,7 +15,7 @@ def query(query_string, args, get_row=False):
         cursor = cnx.cursor()
 
         # Execute the query.
-        cursor.execute(query_string, args)
+        cursor.execute(query_string, query_args)
 
         # Get rows if SELECT query otherwise commit changes.
         if get_row:
