@@ -1,8 +1,8 @@
-const API_URL = 'http://dcumusicloud.com:5000/api'
+const API_URL = 'http://dcumusicloud.com:5000/'
 
 export function loginUser(username, password) {
 
-    let url = `${API_URL}/v1/auth/login`;
+    let url = `${API_URL}api/v1/auth/login`;
     var request = new Request(url, {
         method: "POST",
         headers: new Headers({
@@ -41,7 +41,7 @@ export function loginUser(username, password) {
 
 export function registerUser(username, email, password) {
 
-    let url = `${API_URL}/v1/users`;
+    let url = `${API_URL}api/v1/users`;
     var request = new Request(url, {
         method: "POST",
         headers: new Headers({
@@ -81,7 +81,7 @@ export function registerUser(username, email, password) {
 
 export function logoutUser(token) {
 
-    let url = `${API_URL}/v1/auth/logout`;
+    let url = `${API_URL}api/v1/auth/logout`;
     var request = new Request(url, {
         method: "POST",
         headers: new Headers({
