@@ -4,6 +4,7 @@ import history from '../history';
 let token = cookie.get('token');
 if (token) {
   // TODO: Test token, and set to '' if wrong
+  if (['/', '/login'].includes(window.location.pathname))
   history.push('/discover');
 }
 
