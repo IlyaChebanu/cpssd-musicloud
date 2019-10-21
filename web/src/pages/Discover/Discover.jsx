@@ -13,11 +13,7 @@ for (let i = 0; i < 10; i++) {
 const Discover = props => {
   return (
     <div className={styles.wrapper}>
-<<<<<<< HEAD
       <Header selected={1}/>
-=======
-      <Header />
->>>>>>> 02d90f5df66e8f4fe19c8f0e9022afdf89e06379
       <div className={styles.contentWrapper}>
         <MusicSearch className={styles.musicSearch}/>
         <div className={styles.songs}>
