@@ -4,16 +4,15 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>10</x>
+      <x>20</x>
       <y>10</y>
-      <w>250</w>
-      <h>80</h>
+      <w>280</w>
+      <h>70</h>
     </coordinates>
-    <panel_attributes>Posts
+    <panel_attributes>Verification
 --
-uid: INT NOT NULL;
-message: MEDIUMTEXT NOT NULL;
-time: DATETIME NOT NULL;</panel_attributes>
+code: VARCHAR(64) UNIQUE NOT NULL;
+uid: INT NOT NULL;</panel_attributes>
     <additional_attributes/>
   </element>
 </diagram>
