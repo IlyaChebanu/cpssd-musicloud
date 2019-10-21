@@ -53,7 +53,7 @@ def login():
         return {"message": "Some info is missing from your request."}, 400
 
     try:
-        user = get_user(request.form.get("username"))
+        user = get_user(request.json.get("username"))
     except Exception:
         log("error", "MySQL query failed", traceback.format_exc())
         return {"message": "MySQL unavailable."}, 503
@@ -62,7 +62,7 @@ def login():
         return {"message": "Bad login credentials."}, 400
 
     # Check the user's password against the provided one
-    if not argon2.verify(request.form.get("password"), user[0][3]):
+    if not argon2.verify(request.json.get("password"), user[0][3]):
         return {"message": "Bad login credentials."}, 400
 
     # Check the user is verified
@@ -106,7 +106,7 @@ def logout():
         return {"message": "Some info is missing from your request."}, 400
 
     try:
-        delete_login(request.form.get("access_token"))
+        delete_login(request.json.get("access_token"))
     except Exception:
         log("error", "MySQL query failed", traceback.format_exc())
         return {"message": "MySQL unavailable."}, 503

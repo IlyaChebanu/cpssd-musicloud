@@ -33,18 +33,18 @@ def register():
         return {"message": "Some info is missing from your request."}, 400
 
     try:
-        password_hash = argon2.hash(request.form.get("password"))
+        password_hash = argon2.hash(request.json.get("password"))
     except Exception:
         log("error", "Failed to hash password", traceback.format_exc())
         return {"message": "Error while hashing password."}, 500
 
     # Verify that the email field is a valid email address str.
-    if not re.match(r"[^@]+@[^@]+\.[^@]+", request.form.get("email")):
+    if not re.match(r"[^@]+@[^@]+\.[^@]+", request.json.get("email")):
         return {"message": "Invalid email address."}, 400
 
     try:
-        insert_user(request.form.get("email"), request.form.get("username"), password_hash)
-        uid = int(get_user(request.form.get("username"))[0][0])
+        insert_user(request.json.get("email"), request.json.get("username"), password_hash)
+        uid = int(get_user(request.json.get("username"))[0][0])
         while True:
             try:
                 code = random_string(64)
@@ -60,7 +60,7 @@ def register():
         return {"message": "MySQL unavailable."}, 503
 
     sent_from = SMTP_CONFIG.get("user")
-    to = request.form.get("email")
+    to = request.json.get("email")
     subject = "MusiCloud Email Verification"
     url = "http://" + HOST + "/api/v1/auth/verify?code=" + code
     body = "Welcome to MusiCloud. Please click on this URL to verify your account:\n" + url
@@ -91,11 +91,11 @@ def reverify():
         return {"message": "Some info is missing from your request."}, 400
 
     # Verify that the email field is a valid email address str.
-    if not re.match(r"[^@]+@[^@]+\.[^@]+", request.form.get("email")):
+    if not re.match(r"[^@]+@[^@]+\.[^@]+", request.json.get("email")):
         return {"message": "Bad request."}, 400
 
     try:
-        user = get_user_via_email(request.form.get("email"))
+        user = get_user_via_email(request.json.get("email"))
         if not user:
             return {"message": "Bad request."}, 400
         elif user[0][4] == 1:
@@ -116,7 +116,7 @@ def reverify():
         return {"message": "MySQL unavailable."}, 503
 
     sent_from = SMTP_CONFIG.get("user")
-    to = request.form.get("email")
+    to = request.json.get("email")
     subject = "MusiCloud Email Verification"
     url = "http://" + HOST + "/api/v1/auth/verify?code=" + code
     body = "Welcome to MusiCloud. Please click on this URL to verify your account:\n" + url
