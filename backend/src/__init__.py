@@ -1,7 +1,7 @@
 from flask import Flask
 
-from backend.src.controllers.users.controllers import users
-from backend.src.controllers.auth.controllers import auth
+from .controllers.users.controllers import users
+from .controllers.auth.controllers import auth
 
 
 app = Flask(__name__)
