@@ -71,7 +71,6 @@ def register():
         send_mail(sent_from, to, email_text)
     except Exception:
         log("error", "Failed to send email.", traceback.format_exc())
-        return {"message": "Verification mail failed to send."}, 500
 
     return {"message": "User created!"}
 
@@ -127,6 +126,5 @@ def reverify():
         send_mail(sent_from, to, email_text)
     except Exception:
         log("error", "Failed to send email.", traceback.format_exc())
-        return {"message": "Verification mail failed to send."}, 500
 
     return {"message": "Verification email sent."}
