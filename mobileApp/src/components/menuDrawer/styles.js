@@ -24,6 +24,17 @@ export default StyleSheet.create({
     linkContainer: {
         flex: 1,
         paddingTop: 50,
-    }
+    },
+    logoutContainer: {
+        paddingBottom: 40,
+        alignItems: 'center',
+    },
+    logoutClick: {
+        padding: 15,
+    },
+    logoutText: {
+        color: '#FFF',
+        fontSize: 20,
+    },
 
 })
