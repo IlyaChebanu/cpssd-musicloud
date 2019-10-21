@@ -5,4 +5,14 @@
   color: white;
   font-size: 18px;
   height: 40px;
+  transition: transform 100ms;
+
+  &:hover {
+    transform: scaleX(1.05);
+    cursor: pointer;
+  }
+
+  &:focus {
+    outline: none;
+  }
 }

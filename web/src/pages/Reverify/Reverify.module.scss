@@ -40,13 +40,17 @@
     text-decoration: none;
   }
 
+  .resend {
+    font-size: 12px;
+  }
+
   p {
     color: white;
     font-size: 18px;
     margin: 11px 0px 11px 0px;
   }
 
-  .registrationError {
+  .verifyError, .verifyError p {
     margin: 0;
     color: #b90539;
     height: 22px;
@@ -65,6 +69,16 @@
     flex-direction: column;
     input {
       margin: 10px 0px 10px 0px;
+
+      &:first-child {
+        margin-top: 0;
+      }
+    }
+
+    span {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
   }
 }
