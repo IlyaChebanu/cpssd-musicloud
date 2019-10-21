@@ -54,7 +54,7 @@ def register():
                 continue
     except mysql.connector.errors.IntegrityError:
         log("warning", "Attempted to create a duplicate user.", traceback.format_exc())
-        return {"message": "User already exists!"}, 400
+        return {"message": "User already exists!"}, 409
     except Exception:
         log("error", "MySQL query failed", traceback.format_exc())
         return {"message": "MySQL unavailable."}, 503

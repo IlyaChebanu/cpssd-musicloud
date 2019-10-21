@@ -1,6 +1,5 @@
 import traceback
-
-from waitress import serve
+from wsgiref.simple_server import make_server
 
 from src import app
 from src.utils import log
@@ -8,7 +7,8 @@ from src.utils import log
 
 if __name__ == "__main__":
     try:
-        log("info", "Server startup", "Starting the API server.")
-        serve(app, host="0.0.0.0", port="5000")
+        with make_server('', 5000, app) as httpd:
+            log("info", "Server startup", "Starting the API server.")
+            httpd.serve_forever()
     except Exception:
         log("critical", "Server startup failed", traceback.format_exc())

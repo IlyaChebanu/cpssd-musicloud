@@ -4,7 +4,6 @@ mysql-connector
 argon2_cffi
 PyJWT
 flask
-waitress
 mock
 jsonschema
 flask-cors
