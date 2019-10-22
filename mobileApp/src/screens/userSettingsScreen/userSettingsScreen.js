@@ -7,6 +7,7 @@ import { SafeAreaView } from "react-navigation";
 import PasswordInput from "../../components/passwordInput/passwordInput";
 import MultiPurposeButton from "../../components/multiPurposeButton/multiPurposeButton";
 import HeaderComponent from "../../components/headerComponent/headerComponent";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 export default class UserSettingsScreen extends React.Component {
     constructor(props) {
@@ -61,6 +62,7 @@ export default class UserSettingsScreen extends React.Component {
                 <View style={{ 'backgroundColor': '#1B1E23', 'flex': 1 }}>
                     <HeaderComponent navigation={this.props.navigation} />
                     <View style={styles.container}>
+                        <KeyboardAwareScrollView>
                         <Text style={styles.titleText}>{"USER SETTINGS"}</Text>
                         <LoginInput
                             ref={ref => (this.loginInputName = ref)}
@@ -89,8 +91,10 @@ export default class UserSettingsScreen extends React.Component {
                             togglePassword={this.toggleNewPasswordRepeatMask.bind(this)}
                             maskPassword={this.state.maskNewPasswordRepeat}
                             setText={this.setNewPasswordRepeatTextInput.bind(this)}
-                            style={{ "marginBottom": 40 }}
+                            style={{ "marginBottom": 20 }}
                             labelName={"New Password Repeat"} />
+                        
+                        </KeyboardAwareScrollView>
 
                         <MultiPurposeButton
                             handleButtonClick={this.handleSaveChangesClick.bind(this)}
