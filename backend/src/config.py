@@ -24,3 +24,9 @@ HOST = "dcumusicloud.com:5000"
 JWT_SECRET = (
     ""
 )
+
+AWS_CREDS = {
+   'AWSAccessKeyId':'',
+   'AWSSecretKey': '',
+   'Bucket':''
+}

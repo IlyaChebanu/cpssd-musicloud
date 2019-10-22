@@ -7,3 +7,6 @@ flask
 mock
 jsonschema
 flask-cors
+
+# accessing s3 bucket
+boto3
