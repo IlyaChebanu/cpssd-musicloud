@@ -9,6 +9,8 @@ import LoginInput from "../../components/loginInput/loginInput";
 import MultiPurposeButton from "../../components/multiPurposeButton/multiPurposeButton";
 import { getInvalidRegisterDetails } from "../../utils/helpers";
 import { registerUser } from "../../api/usersAPI";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import PasswordInput from "../../components/passwordInput/passwordInput";
 
 class RegisterScreen extends React.Component {
   constructor(props) {
@@ -19,13 +21,15 @@ class RegisterScreen extends React.Component {
       username: '',
       password: '',
       passwordRepeat: '',
+      maskPassword: true,
+      maskPasswordRepeat: true,
     }
   }
 
-  showAlert() {
+  showAlert(text) {
     Alert.alert(
       'Error',
-      'Some fields are invalid',
+      text,
       [
         {text: 'OK', onPress: () => console.log('OK Pressed')},
       ],
@@ -34,20 +38,19 @@ class RegisterScreen extends React.Component {
   }
 
   handleRegisterClick() {
-    let invalidFields = getInvalidRegisterDetails(this.state.username.trim(), this.state.username.trim(), this.state.password, this.state.passwordRepeat)
+    let invalidFields = getInvalidRegisterDetails(this.state.username.trim(), this.state.email.trim(), this.state.password, this.state.passwordRepeat)
     if (invalidFields.length === 0) {
-      registerUser(this.state.username, this.state.email, this.state.password).then(response => {
+      registerUser(this.state.username.trim(), this.state.email.trim(), this.state.password).then(response => {
         if (response.message == "User created!") {
-          console.warn('yes')
+          this.props.setEmail(this.state.email.trim())
+          this.props.setNewAccount(true)
           this.props.navigateToLoginScreen()
         } else {
-          console.warn('no')
-          this.showAlert()
+          this.showAlert('User Already Exists')
         }
       })
     } else {
-      console.warn('fields')
-      this.showAlert()
+      this.showAlert("Invalid: " + invalidFields.join(', '))
     }
   }
 
@@ -75,11 +78,23 @@ class RegisterScreen extends React.Component {
     this.setState({ passwordRepeat: text});
   }
 
+  togglePasswordMask() {
+    this.setState({ maskPassword: !this.state.maskPassword });
+  }
+
+  togglePasswordRepeatMask() {
+    this.setState({ maskPasswordRepeat: !this.state.maskPasswordRepeat });
+  }
+
   render() {
     var logoImage = require("../../assets/images/logo.png");
     var arrowback = require("../../assets/images/back_arrow.png");
+    var topVector = require("../../assets/images/topVector.png");
+    var bottomVector = require("../../assets/images/bottomVector.png");
     return (
       <View style={styles.container}>
+        <Image style={styles.topVector} source={topVector} />
+        <KeyboardAwareScrollView>
         {/* <Text style={styles.mandatoryErrorText}>{GLOBALS.DUMMY_SCREEN_TITLE}</Text> */}
 
         <View style={styles.logoContainer}>
@@ -98,21 +113,27 @@ class RegisterScreen extends React.Component {
           setText={this.setUsernameTextInput.bind(this)}
           style={{"marginBottom": 1}}
           labelName={"Username"} />
-        <LoginInput
+        <PasswordInput
           ref={ref => (this.loginInputName = ref)}
+          togglePassword={this.togglePasswordMask.bind(this)}
+          maskPassword={this.state.maskPassword}
           setText={this.setPasswordTextInput.bind(this)}
           style={{"marginBottom": 1}}
           labelName={"Password"} />
-        <LoginInput
+        <PasswordInput
           ref={ref => (this.loginInputName = ref)}
+          togglePassword={this.togglePasswordRepeatMask.bind(this)}
+          maskPassword={this.state.maskPasswordRepeat}
           setText={this.setPasswordRepeatTextInput.bind(this)}
           labelName={"Repeat Password"} />
-
+        </KeyboardAwareScrollView>
+        <Image style={styles.bottomVector}source={bottomVector} />
         <MultiPurposeButton 
           handleButtonClick={this.handleRegisterClick.bind(this)}
           style={styles.signInButton}
           buttonName={"Create Account"}
         />
+        
       </View>
     )
   }

@@ -13,14 +13,13 @@ export default StyleSheet.create({
     paddingTop: 20,
   },
   discoverFlatList: {
-    marginTop: 20,
+    // marginTop: 20,
   },
   songContainer: {
     width: width - 40,
     height: 220,
     marginBottom: 20,
     marginLeft: 20,
-    backgroundColor: 'green',
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',

@@ -3,11 +3,22 @@ import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity } from "react
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import songsData from "../../screens/homeScreen/sampleData";
+import ProfileComponent from "../profileComponent/profileComponent";
 
 export default class ProfileSongs extends React.Component {
 
   handleSongClick(item, index) {
 
+  }
+
+  renderheader() {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.profileTitleText}>{"PROFILE"}</Text>
+        <ProfileComponent />
+        <Text style={styles.titleText}>{"Songs"}</Text>
+      </View>
+    )
   }
 
   renderSong({ item, index }) {
@@ -30,16 +41,17 @@ export default class ProfileSongs extends React.Component {
 
   render() {
     return (
-          <View style={styles.container}>
-            <Text style={styles.titleText}>{"Songs"}</Text>
-            <FlatList 
-              style={styles.songFlatList}
-              data={songsData}
-              renderItem={this.renderSong.bind(this)}
-              keyExtractor={item => String(item.id)}
-              extraData={songsData}
-            />
-          </View>
+      <View style={styles.container}>
+        {/* <Text style={styles.titleText}>{"Songs"}</Text> */}
+        <FlatList
+          ListHeaderComponent={this.renderheader()}
+          style={styles.songFlatList}
+          data={songsData}
+          renderItem={this.renderSong.bind(this)}
+          keyExtractor={item => String(item.id)}
+          extraData={songsData}
+        />
+      </View>
     )
   }
 }

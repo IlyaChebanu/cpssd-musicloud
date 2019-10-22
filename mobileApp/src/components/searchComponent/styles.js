@@ -5,6 +5,7 @@ export default StyleSheet.create({
     container: {
         paddingLeft: 20,
         paddingRight: 20,
+        marginBottom: 20,
     },
     searchText: {
         color: '#FFF',

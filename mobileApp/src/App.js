@@ -14,6 +14,7 @@ import { Platform, StyleSheet, Text, View } from "react-native";
 type Props = {};
 export default class App extends Component<Props> {
   render() {
+    console.disableYellowBox = true;
     return (
       <Provider store={store}>
         <Navigator />

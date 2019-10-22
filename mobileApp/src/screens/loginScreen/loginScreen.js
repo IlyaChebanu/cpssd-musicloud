@@ -7,9 +7,11 @@ import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import LoginInput from "../../components/loginInput/loginInput";
 import MultiPurposeButton from "../../components/multiPurposeButton/multiPurposeButton";
-import { loginUser } from "../../api/usersAPI";
+import { loginUser, reVerifyEmail } from "../../api/usersAPI";
 import { writeDataToStorage, TOKEN_DATA_KEY } from "../../utils/localStorage";
 import { getInvalidLoginDetails } from "../../utils/helpers";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import PasswordInput from "../../components/passwordInput/passwordInput";
 // import { loginUser } from "../../api/usersAPI";
 
 class LoginScreen extends React.Component {
@@ -19,22 +21,47 @@ class LoginScreen extends React.Component {
     this.state = {
       username: '',
       password: '',
+      maskPassword: true,
     }
   }
 
-  showAlert() {
+  componentDidMount() {
+    if (this.props.newAccount) {
+      Alert.alert(
+        'Account Created',
+        'Verify the email first before login',
+        [
+          { text: 'OK', onPress: () => console.log('OK Pressed') },
+        ],
+        { cancelable: false },
+      );
+    }
+  }
+
+  showAlert(text) {
     Alert.alert(
       'Error',
-      'Invalid Credentials',
+      text,
       [
-        {text: 'OK', onPress: () => console.log('OK Pressed')},
+        { text: 'OK', onPress: () => console.log('OK Pressed') },
       ],
-      {cancelable: false},
+      { cancelable: false },
+    );
+  }
+
+  reverifyAlert() {
+    Alert.alert(
+      'Verication email resent',
+      'Verification email sent to: ' + this.props.email,
+      [
+        { text: 'OK', onPress: () => console.log('OK Pressed') },
+      ],
+      { cancelable: false },
     );
   }
 
   saveLoginDetails(token) {
-    // this.props.setAuthToken(token)
+    this.props.setAuthToken(token)
     writeDataToStorage(token, TOKEN_DATA_KEY)
   }
 
@@ -43,15 +70,26 @@ class LoginScreen extends React.Component {
     if (invalidFields.length == 0) {
       loginUser(this.state.username, this.state.password).then(response => {
         if (response.access_token) {
-          this.saveLoginDetails(response)
+          this.saveLoginDetails(response.access_token)
+          this.props.setNewAccount(false)
           this.props.navigateToHomeScreen()
         } else {
-          this.showAlert()
+          this.showAlert('Invalid Credentials')
         }
       })
     } else {
-      this.showAlert()
+      this.showAlert("Invalid: " + invalidFields.join(', '))
     }
+  }
+
+  handleVerifyClick() {
+    reVerifyEmail(this.props.email).then(response => {
+      if (response.message == "Verification email sent.") {
+        this.reverifyAlert()
+      } else {
+        this.showAlert('Failed to resent verification email')
+      }
+    })
   }
 
   handleForgotClick() {
@@ -60,44 +98,63 @@ class LoginScreen extends React.Component {
 
   handleBackClick() {
     this.props.navigateBack()
+    this.props.setNewAccount(false)
   }
 
   setUserTextInput(text) {
-    this.setState({ username: text})
+    this.setState({ username: text })
   }
 
   setPasswordTextInput(text) {
-    this.setState({ password: text})
+    this.setState({ password: text })
+  }
+
+  togglePasswordMask() {
+    this.setState({ maskPassword: !this.state.maskPassword });
   }
 
   render() {
     var logoImage = require("../../assets/images/logo.png");
     var arrowback = require("../../assets/images/back_arrow.png");
+    var topVector = require("../../assets/images/topVector.png");
+    var bottomVector = require("../../assets/images/bottomVector.png");
     return (
       <View style={styles.container}>
-        {/* <Text style={styles.mandatoryErrorText}>{GLOBALS.DUMMY_SCREEN_TITLE}</Text> */}
+        <Image style={styles.topVector} source={topVector} />
+        <KeyboardAwareScrollView>
+          {/* <Text style={styles.mandatoryErrorText}>{GLOBALS.DUMMY_SCREEN_TITLE}</Text> */}
 
-        <View style={styles.logoContainer}>
-          <TouchableOpacity onPress={() => this.handleBackClick()}>
-            <Image style={styles.arrowback} source={arrowback}/>
+          <View style={styles.logoContainer}>
+            <TouchableOpacity onPress={() => this.handleBackClick()}>
+              <Image style={styles.arrowback} source={arrowback} />
+            </TouchableOpacity>
+            <Image style={styles.logo} source={logoImage} />
+          </View>
+          {this.props.newAccount ?
+            <View style={styles.verifyContainer}>
+              <Text style={styles.verifyText}>{"Did not receive email? "}
+                <Text onPress={() => this.handleVerifyClick()} style={styles.verifyLink}>{"Click here"}</Text>
+                {" to resend it."}</Text>
+            </View>
+            : null}
+          <LoginInput
+            ref={ref => (this.loginInputName = ref)}
+            setText={this.setUserTextInput.bind(this)}
+            style={{ "marginBottom": 1 }}
+            labelName={"Username"} />
+          <PasswordInput
+            ref={ref => (this.loginInputName = ref)}
+            togglePassword={this.togglePasswordMask.bind(this)}
+            maskPassword={this.state.maskPassword}
+            setText={this.setPasswordTextInput.bind(this)}
+            labelName={"Password"} />
+
+          <TouchableOpacity style={styles.forgotButton} onPress={() => this.handleForgotClick()}>
+            <Text style={styles.forgotText}>{'Forgot Password?'}</Text>
           </TouchableOpacity>
-          <Image style={styles.logo} source={logoImage}/>
-        </View>
-        <LoginInput
-          ref={ref => (this.loginInputName = ref)}
-          setText={this.setUserTextInput.bind(this)}
-          style={{"marginBottom": 1}}
-          labelName={"Username"} />
-        <LoginInput
-          ref={ref => (this.loginInputName = ref)}
-          setText={this.setPasswordTextInput.bind(this)}
-          labelName={"Password"} />
-
-        <TouchableOpacity style={styles.forgotButton} onPress={() => this.handleForgotClick()}>
-          <Text style={styles.forgotText}>{'Forgot Password?'}</Text>
-        </TouchableOpacity>
-
-        <MultiPurposeButton 
+        </KeyboardAwareScrollView>
+        <Image style={styles.bottomVector}source={bottomVector} />
+        <MultiPurposeButton
           handleButtonClick={this.handleLoginClick.bind(this)}
           style={styles.signInButton}
           buttonName={"Sign in"}
@@ -109,7 +166,9 @@ class LoginScreen extends React.Component {
 
 function mapStateToProps(state) {
   return {
-
+    token: state.home.token,
+    newAccount: state.reg.newAccount,
+    email: state.reg.email,
   };
 }
 

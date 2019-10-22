@@ -35,8 +35,8 @@ export function getInvalidRegisterDetails(username, email, password, passwordRep
     if (password < 1) {
         invalidFields.push(GLOBALS.REGISTER_PASSWORD)
     }
-    if (passwordRepeat < 1) {
-        invalidFields.push(GLOBALS.REGISTER_PASSWORD_REPEAT)
+    if (password !== passwordRepeat) {
+        invalidFields.push(GLOBALS.REGISTER_PASSWORD_NOT_MATCH)
     }
     return invalidFields
 }

@@ -3,12 +3,12 @@ export default {
     DUMMY_SCREEN_TITLE: "Dummy screen",
 
     //Login Screen
-    LOGIN_USERNAME: "USERNAME",
-    LOGIN_PASSWORD: "PASSWORD",
+    LOGIN_USERNAME: "Username",
+    LOGIN_PASSWORD: "Password",
 
     //Register Screen
-    REGISTER_USERNAME: "USERNAME",
-    REGISTER_EMAIL: "EMAIL",
-    REGISTER_PASSWORD: "PASSWORD",
-    REGISTER_PASSWORD_REPEAT: "PASSWORD REPEAT",
+    REGISTER_USERNAME: "Username",
+    REGISTER_EMAIL: "Email",
+    REGISTER_PASSWORD: "Password",
+    REGISTER_PASSWORD_NOT_MATCH: "Passwords do not match",
   };

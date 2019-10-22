@@ -6,11 +6,12 @@ import ProfileScreen from "../screens/profileScreen/profileScreen"
 import MenuDrawer from "../components/menuDrawer/menuDrawer"
 import * as screenNames from "./screenNames";
 import { createStackNavigator } from 'react-navigation-stack';
+import UserSettingsScreen from '../screens/userSettingsScreen/userSettingsScreen';
 
 const DrawerConfig = {
     drawerPosition: 'right',
     contentComponent: ({ navigation }) => {
-        return(<MenuDrawer navigation={navigation}/>)
+        return (<MenuDrawer navigation={navigation} />)
     }
 }
 
@@ -20,7 +21,10 @@ export const DrawerNavigator = createDrawerNavigator({
     },
     Profile: {
         screen: ProfileScreen
-    }
     },
-        DrawerConfig
-    );
+    Settings: {
+        screen: UserSettingsScreen
+    },
+},
+    DrawerConfig
+);

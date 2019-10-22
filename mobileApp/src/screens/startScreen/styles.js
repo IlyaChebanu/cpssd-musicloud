@@ -26,4 +26,18 @@ export default StyleSheet.create({
       position: 'absolute',
       bottom: height > 600 ? 190 : 140,
     },
+    topVector: {
+      position: 'absolute',
+      top: 0,
+      width: width,
+      resizeMode: 'cover',
+      zIndex: -1,
+    },
+    bottomVector: {
+      position: 'absolute',
+      bottom: -20,
+      width: width,
+      resizeMode: 'cover',
+      zIndex: -1,
+    },
 })

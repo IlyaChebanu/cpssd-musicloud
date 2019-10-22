@@ -21,7 +21,7 @@ class StartScreen extends React.Component {
   async loadCorrectFlow() {
     let token = await readStorageData(TOKEN_DATA_KEY)
     if (token != null) {
-      // this.props.setAuthToken(token)
+      this.props.setAuthToken(token)
       this.props.navigateToHomeScreen()
     } else {
 
@@ -39,10 +39,12 @@ class StartScreen extends React.Component {
   render() {
     var logoImage = require("../../assets/images/logo.png");
     var arrowback = require("../../assets/images/back_arrow.png");
+    var topVector = require("../../assets/images/topVector.png");
+    var bottomVector = require("../../assets/images/bottomVector.png");
     return (
       <View style={{ 'paddingTop': 70, 'backgroundColor': '#1B1E23', 'flex': 1 }}>
+        <Image style={styles.topVector} source={topVector} />
         {/* <Text style={styles.mandatoryErrorText}>{GLOBALS.DUMMY_SCREEN_TITLE}</Text> */}
-
         <View style={styles.logoContainer}>
           <Image style={styles.logo} source={logoImage}/>
         </View>
@@ -57,6 +59,7 @@ class StartScreen extends React.Component {
           style={styles.signInButton}
           buttonName={"Sign in"}
         />
+        <Image style={styles.bottomVector}source={bottomVector} />
       </View>
     )
   }
@@ -64,7 +67,7 @@ class StartScreen extends React.Component {
 
 function mapStateToProps(state) {
   return {
-
+    token: state.home.token,
   };
 }
 

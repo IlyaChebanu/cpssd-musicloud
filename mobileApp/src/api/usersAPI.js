@@ -117,3 +117,42 @@ export function logoutUser(token) {
             return error
         });
 }
+
+export function reVerifyEmail(email) {
+
+    let url = `${API_URL}api/v1/users/reverify`;
+    var request = new Request(url, {
+        method: "POST",
+        headers: new Headers({
+            "Content-Type": "application/json",
+        }),
+        body: JSON.stringify({
+            "email": email,
+        })
+    });
+    if (__DEV__) {
+        console.log("reVerifyEmail : request " + JSON.stringify(request))
+    }
+
+    return fetch(request)
+        // .then(response => response.json())
+        .then(response => {
+            if (response.status === 200) {
+                return response.json()
+            } else {
+                return response.status
+            }
+        })
+        .then(responseJson => {
+            if (__DEV__) {
+                console.log("reVerifyEmail : response " + JSON.stringify(responseJson))
+            }
+            return responseJson;
+        })
+        .catch(error => {
+            if (__DEV__) {
+                console.log("reVerifyEmail : error " + JSON.stringify(error))
+            }
+            return error
+        });
+}

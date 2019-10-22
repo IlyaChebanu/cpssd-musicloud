@@ -4,12 +4,14 @@ import * as actionsTypes from '../actions/actionTypes';
 import { DummyReducer } from "./dummyReducer";
 import { NavReducer } from "./navReducers";
 import HomeReducer from "./homeReducer";
+import RegistrationReducer from "./registrationReducer";
 //Here you import all your different reducers and combine them into ONE
 
 const appReducer = combineReducers({
     dummy: DummyReducer,
     nav: NavReducer,
     home: HomeReducer,
+    reg: RegistrationReducer,
   });
 
 const rootReducer = (state, action) => {
