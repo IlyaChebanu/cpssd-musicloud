@@ -14,6 +14,7 @@ export default StyleSheet.create({
     paddingBottom: 20,
   },
   saveButton: {
-    
+    marginBottom: 20,
+    paddingTop: 20,
   },
 })
