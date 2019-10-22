@@ -42,6 +42,7 @@ class MenuDrawer extends React.Component {
             <View style={styles.linkContainer}>
                 {this.navLink('Home', 'Discover')}
                 {this.navLink('Profile', 'Profile')}
+                {this.navLink('Settings', 'User Settings')}
             </View>
             <View style={styles.logoutContainer}>
               <TouchableOpacity style={styles.logoutClick} onPress={() => this.handleLogoutClick()}>
