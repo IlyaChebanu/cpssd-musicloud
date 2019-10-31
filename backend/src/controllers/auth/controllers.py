@@ -12,7 +12,7 @@ from ...config import JWT_SECRET
 from ...utils.logger import log
 from ...utils import random_string
 from ...models.verification import get_verification_by_code, delete_verification
-from ...models.users import verify_user, get_user
+from ...models.users import verify_user, get_user_via_username
 from ...models.auth import insert_login, delete_login
 
 auth = Blueprint('auth', __name__)
@@ -54,7 +54,7 @@ def login():
         return {"message": str(exc)}, 422
 
     try:
-        user = get_user(request.json.get("username"))
+        user = get_user_via_username(request.json.get("username"))
     except Exception:
         log("error", "MySQL query failed", traceback.format_exc())
         return {"message": "MySQL unavailable."}, 503
@@ -70,14 +70,13 @@ def login():
     if user[0][4] == 0:
         return {"message": "Account not verified."}, 403
 
-    time_issued = datetime.datetime.now()
+    time_issued = datetime.datetime.utcnow()
 
     jwt_payload = {
         'uid': user[0][0],
         'email': user[0][1],
         'username': user[0][2],
         'verified': user[0][4],
-        'time_issued': str(time_issued),
         'random_value': random_string(255)
     }
     access_token = jwt.encode(jwt_payload, JWT_SECRET, algorithm='HS256')
