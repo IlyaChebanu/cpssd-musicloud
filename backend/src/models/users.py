@@ -77,3 +77,35 @@ def make_post(uid, message, time_of_post):
         query(sql, args)
     except Exception as exc:
         raise exc
+
+
+def get_number_of_posts(uid):
+    try:
+        sql = (
+            "SELECT COUNT(*) FROM Posts "
+            "WHERE uid = %s"
+        )
+        args = (
+            uid,
+        )
+        return query(sql, args, True)[0][0]
+    except Exception as exc:
+        raise exc
+
+
+def get_posts(uid, start_index, posts_per_page):
+    try:
+        sql = (
+            "SELECT message, time FROM Posts "
+            "WHERE uid = %s "
+            "ORDER BY time DESC "
+            "LIMIT %s, %s"
+        )
+        args = (
+            uid,
+            start_index,
+            posts_per_page,
+        )
+        return query(sql, args, True)
+    except Exception as exc:
+        raise exc
