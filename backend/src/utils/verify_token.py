@@ -4,6 +4,7 @@ import datetime
 from ..config import JWT_SECRET
 from ..models.auth import get_login
 
+
 def verify_token(access_token):
     encoded_token = access_token
 
