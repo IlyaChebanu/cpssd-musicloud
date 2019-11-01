@@ -4,7 +4,7 @@ info:
   title: "MusiCloud API"
   description: >-
     This is the REST API documentation for the MusiCloud music mixing platform.
-host: "musicloud.bounceme.net"
+host: "dcumusicloud.com"
 basePath: "/api/v1"
 tags:
   - name: "users"

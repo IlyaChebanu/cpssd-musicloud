@@ -18,6 +18,38 @@ def insert_login(uid, access_token, time_issued):
         raise exc
 
 
+def get_login(uid, access_token):
+    try:
+        sql = (
+            "SELECT * FROM Logins "
+            "WHERE uid = %s AND access_token = %s"
+        )
+        args = (
+            uid,
+            access_token,
+        )
+        return query(sql, args, True)
+    except Exception as exc:
+        raise exc
+
+
+def refresh_login(new_issue_time, uid, access_token):
+    try:
+        sql = (
+            "UPDATE Logins "
+            "SET time_issued = %s "
+            "WHERE uid = %s AND access_token = %s"
+        )
+        args = (
+            new_issue_time,
+            uid,
+            access_token,
+        )
+        query(sql, args)
+    except Exception as exc:
+        raise exc
+
+
 def delete_login(access_token):
     try:
         sql = (

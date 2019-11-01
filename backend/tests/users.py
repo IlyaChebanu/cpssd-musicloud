@@ -1,6 +1,8 @@
 import unittest
+import mock
 
 from ..src import app
+from ..src.controllers.users.controllers import post
 from ..src.utils import random_string, query
 
 
@@ -51,7 +53,7 @@ class UserTests(unittest.TestCase):
         }
         res = self.test_client.post(
             "/api/v1/users",
-            data=test_req_data,
+            json=test_req_data,
             follow_redirects=True
         )
         self.assertEqual(b'{"message":"User created!"}\n', res.data)
@@ -68,7 +70,7 @@ class UserTests(unittest.TestCase):
         }
         res = self.test_client.post(
             "/api/v1/users",
-            data=test_req_data,
+            json=test_req_data,
             follow_redirects=True
         )
         self.assertEqual(b'{"message":"Some info is missing from your request."}\n', res.data)
@@ -79,7 +81,7 @@ class UserTests(unittest.TestCase):
         }
         res = self.test_client.post(
             "/api/v1/users",
-            data=test_req_data,
+            json=test_req_data,
             follow_redirects=True
         )
         self.assertEqual(b'{"message":"Some info is missing from your request."}\n', res.data)
@@ -95,7 +97,7 @@ class UserTests(unittest.TestCase):
         }
         res = self.test_client.post(
             "/api/v1/users",
-            data=test_req_data,
+            json=test_req_data,
             follow_redirects=True
         )
         self.assertEqual(b'{"message":"Some info is missing from your request."}\n', res.data)
@@ -106,7 +108,7 @@ class UserTests(unittest.TestCase):
         }
         res = self.test_client.post(
             "/api/v1/users",
-            data=test_req_data,
+            json=test_req_data,
             follow_redirects=True
         )
         self.assertEqual(b'{"message":"Some info is missing from your request."}\n', res.data)
@@ -122,7 +124,7 @@ class UserTests(unittest.TestCase):
         }
         res = self.test_client.post(
             "/api/v1/users",
-            data=test_req_data,
+            json=test_req_data,
             follow_redirects=True
         )
         self.assertEqual(b'{"message":"Some info is missing from your request."}\n', res.data)
@@ -133,7 +135,7 @@ class UserTests(unittest.TestCase):
         }
         res = self.test_client.post(
             "/api/v1/users",
-            data=test_req_data,
+            json=test_req_data,
             follow_redirects=True
         )
         self.assertEqual(b'{"message":"Some info is missing from your request."}\n', res.data)
@@ -150,7 +152,7 @@ class UserTests(unittest.TestCase):
         }
         res = self.test_client.post(
             "/api/v1/users",
-            data=test_req_data,
+            json=test_req_data,
             follow_redirects=True
         )
         self.assertEqual(b'{"message":"Invalid email address."}\n', res.data)
@@ -167,13 +169,13 @@ class UserTests(unittest.TestCase):
         }
         res = self.test_client.post(
             "/api/v1/users",
-            data=test_req_data,
+            json=test_req_data,
             follow_redirects=True
         )
         self.assertEqual(b'{"message":"User created!"}\n', res.data)
         res = self.test_client.post(
             "/api/v1/users",
-            data=test_req_data,
+            json=test_req_data,
             follow_redirects=True
         )
         self.assertEqual(b'{"message":"User already exists!"}\n', res.data)
@@ -191,7 +193,7 @@ class UserTests(unittest.TestCase):
         }
         res = self.test_client.post(
             "/api/v1/users",
-            data=test_req_data,
+            json=test_req_data,
             follow_redirects=True
         )
         self.assertEqual(b'{"message":"User created!"}\n', res.data)
@@ -200,7 +202,7 @@ class UserTests(unittest.TestCase):
         }
         res = self.test_client.post(
             "/api/v1/users/reverify",
-            data=test_req_data,
+            json=test_req_data,
             follow_redirects=True
         )
         self.assertEqual(b'{"message":"Verification email sent."}\n', res.data)
@@ -214,7 +216,7 @@ class UserTests(unittest.TestCase):
         }
         res = self.test_client.post(
             "/api/v1/users/reverify",
-            data=test_req_data,
+            json=test_req_data,
             follow_redirects=True
         )
         self.assertEqual(b'{"message":"Some info is missing from your request."}\n', res.data)
@@ -223,7 +225,7 @@ class UserTests(unittest.TestCase):
         }
         res = self.test_client.post(
             "/api/v1/users/reverify",
-            data=test_req_data,
+            json=test_req_data,
             follow_redirects=True
         )
         self.assertEqual(b'{"message":"Some info is missing from your request."}\n', res.data)
@@ -237,7 +239,7 @@ class UserTests(unittest.TestCase):
         }
         res = self.test_client.post(
             "/api/v1/users/reverify",
-            data=test_req_data,
+            json=test_req_data,
             follow_redirects=True
         )
         self.assertEqual(b'{"message":"Bad request."}\n', res.data)

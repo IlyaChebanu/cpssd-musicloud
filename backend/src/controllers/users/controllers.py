@@ -1,6 +1,8 @@
 import re
 import traceback
+import datetime
 
+import jwt
 import mysql.connector
 from passlib.hash import argon2
 from flask import Blueprint
@@ -9,8 +11,8 @@ from jsonschema import validate, ValidationError
 
 from ...config import HOST
 from ...utils.logger import log
-from ...utils import random_string, send_mail
-from ...models.users import insert_user, get_user, get_user_via_email
+from ...utils import random_string, send_mail, verify_token, refresh_token
+from ...models.users import insert_user, get_user_via_username, get_user_via_email, make_post
 from ...models.verification import insert_verification, get_verification
 
 users = Blueprint("users", __name__)
@@ -44,7 +46,7 @@ def register():
 
     try:
         insert_user(request.json.get("email"), request.json.get("username"), password_hash)
-        uid = int(get_user(request.json.get("username"))[0][0])
+        uid = int(get_user_via_username(request.json.get("username"))[0][0])
         while True:
             try:
                 code = random_string(64)
@@ -128,3 +130,40 @@ def reverify():
         log("error", "Failed to send email.", traceback.format_exc())
 
     return {"message": "Verification email sent."}, 200
+
+
+@users.route("/post", methods=["POST"])
+def post():
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "access_token": {"type": "string"},
+            "message": {"type": "string"},
+        }
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    try:
+        user = verify_token(request.json.get("access_token"))
+        refresh_token(request.json.get("access_token"))
+    except ValueError:
+        return {"message": "Token expired."}, 401
+    except jwt.exceptions.InvalidSignatureError:
+        return {"message": "Server failed to decode token."}, 500
+    except Exception:
+        log("error", "MySQL query failed", traceback.format_exc())
+        return {"message": "MySQL unavailable."}, 503
+
+    time_issued = datetime.datetime.utcnow()
+
+    try:
+        make_post(user.get("uid"), request.json.get("message"), time_issued)
+    except Exception:
+        log("error", "MySQL query failed", traceback.format_exc())
+        return {"message": "MySQL unavailable."}, 503
+
+    return {"message": "Message posted."}, 200

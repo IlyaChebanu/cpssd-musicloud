@@ -19,7 +19,7 @@ def insert_user(email, username, password):
         raise exc
 
 
-def get_user(username):
+def get_user_via_username(username):
     try:
         sql = (
             "SELECT * FROM Users "
@@ -56,6 +56,23 @@ def verify_user(uid):
         )
         args = (
             uid,
+        )
+        query(sql, args)
+    except Exception as exc:
+        raise exc
+
+
+def make_post(uid, message, time_of_post):
+    try:
+        sql = (
+            "INSERT INTO Posts "
+            "(uid, message, time) "
+            "VALUES (%s, %s, %s)"
+        )
+        args = (
+            uid,
+            message,
+            time_of_post,
         )
         query(sql, args)
     except Exception as exc:
