@@ -12,7 +12,10 @@ from jsonschema import validate, ValidationError
 from ...config import HOST
 from ...utils.logger import log
 from ...utils import random_string, send_mail, verify_token, refresh_token
-from ...models.users import insert_user, get_user_via_username, get_user_via_email, make_post
+from ...models.users import (
+    insert_user, get_user_via_username, get_user_via_email, make_post, get_follower_count, get_following_count,
+    get_number_of_likes, get_number_of_posts, get_song_count
+)
 from ...models.verification import insert_verification, get_verification
 
 users = Blueprint("users", __name__)
@@ -130,6 +133,49 @@ def reverify():
         log("error", "Failed to send email.", traceback.format_exc())
 
     return {"message": "Verification email sent."}, 200
+
+
+@users.route("/", methods=["GET"])
+def user():
+    username = request.args.get('username')
+    if not username:
+        return {"message": "Username param can't be empty!"}, 422
+
+    access_token = request.args.get('access_token')
+    if not access_token:
+        return {"message": "Username param can't be empty!"}, 422
+
+    try:
+        verify_token(access_token)
+        refresh_token(access_token)
+    except ValueError:
+        return {"message": "Token expired."}, 401
+    except jwt.exceptions.InvalidSignatureError:
+        return {"message": "Server failed to decode token."}, 500
+    except Exception:
+        log("error", "MySQL query failed", traceback.format_exc())
+        return {"message": "MySQL unavailable."}, 503
+
+    try:
+        user = get_user_via_username(username)
+        followers = get_follower_count(user[0][0])
+        following = get_following_count(user[0][0])
+        songs = get_song_count(user[0][0])
+        posts = get_number_of_posts(user[0][0])
+        likes = get_number_of_likes(user[0][0])
+    except Exception:
+        log("error", "MySQL query failed", traceback.format_exc())
+        return {"message": "MySQL unavailable."}, 503
+
+    return {
+        "profile_pic_url": "NOT IMPLEMENTED",
+        "username": user[0][2],
+        "followers": followers,
+        "following": following,
+        "songs": songs,
+        "posts": posts,
+        "likes": likes
+    }, 200
 
 
 @users.route("/post", methods=["POST"])

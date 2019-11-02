@@ -77,3 +77,74 @@ def make_post(uid, message, time_of_post):
         query(sql, args)
     except Exception as exc:
         raise exc
+
+
+def get_follower_count(uid):
+    try:
+        sql = (
+            "SELECT COUNT(*) FROM Followers "
+            "WHERE following = %s"
+        )
+        args = (
+            uid,
+        )
+        return query(sql, args, True)[0][0]
+    except Exception as exc:
+        raise exc
+
+
+def get_following_count(uid):
+    try:
+        sql = (
+            "SELECT COUNT(*) FROM Followers "
+            "WHERE follower = %s"
+        )
+        args = (
+            uid,
+        )
+        return query(sql, args, True)[0][0]
+    except Exception as exc:
+        raise exc
+
+
+def get_song_count(uid):
+    try:
+        # Does not include songs the user has edit permission for.
+        sql = (
+            "SELECT COUNT(*) FROM Songs "
+            "WHERE uid = %s"
+        )
+        args = (
+            uid,
+        )
+        return query(sql, args, True)[0][0]
+    except Exception as exc:
+        raise exc
+
+
+def get_number_of_posts(uid):
+    try:
+        sql = (
+            "SELECT COUNT(*) FROM Posts "
+            "WHERE uid = %s"
+        )
+        args = (
+            uid,
+        )
+        return query(sql, args, True)[0][0]
+    except Exception as exc:
+        raise exc
+
+
+def get_number_of_likes(uid):
+    try:
+        sql = (
+            "SELECT COUNT(*) FROM Song_Likes "
+            "WHERE uid = %s"
+        )
+        args = (
+            uid,
+        )
+        return query(sql, args, True)[0][0]
+    except Exception as exc:
+        raise exc
