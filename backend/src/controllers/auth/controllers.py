@@ -92,21 +92,12 @@ def login():
 
 @auth.route('/logout', methods=["POST"])
 def logout():
-    expected_body = {
-        "type": "object",
-        "properties": {
-            "access_token": {"type": "string"},
-        }
-    }
-    # Check req body is correctly formed.
-    try:
-        validate(request.json, schema=expected_body)
-    except ValidationError as exc:
-        log("warning", "Request validation failed.", str(exc))
-        return {"message": str(exc)}, 422
+    access_token = request.headers.get("Authorization").split(" ")[1]
+    if not access_token:
+        return {"message": "Request missing access_token."}, 422
 
     try:
-        delete_login(request.json.get("access_token"))
+        delete_login(access_token)
     except Exception:
         log("error", "MySQL query failed", traceback.format_exc())
         return {"message": "MySQL unavailable."}, 503

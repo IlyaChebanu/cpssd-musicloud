@@ -141,9 +141,9 @@ def user():
     if not username:
         return {"message": "Username param can't be empty!"}, 422
 
-    access_token = request.args.get('access_token')
+    access_token = request.headers.get("Authorization").split(" ")[1]
     if not access_token:
-        return {"message": "Username param can't be empty!"}, 422
+        return {"message": "Request missing access_token."}, 422
 
     try:
         verify_and_refresh(access_token)
