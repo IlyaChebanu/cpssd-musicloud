@@ -125,22 +125,17 @@ paths:
       tags:
       - "auth"
       summary: "Deauthorise a token"
-      description: "By passing an access_token to this endpoint in the request body, the corrisponding token will be removed the Logins table. This means that the passed token will no longer be valid for use with access_token protected endpoints."
+      description: "By passing an access_token to this endpoint in the request header, the corrisponding token will be removed the Logins table. This means that the passed token will no longer be valid for use with access_token protected endpoints."
       consumes:
       - "application/json"
       produces:
       - "application/json"
       parameters:
-        - in: "body"
-          name: "body"
-          description: "A valid access_token"
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
           required: true
-          schema:
-            type: "object"
-            properties:
-              access_token:
-                type: "string"
-                example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MywidXNlcm5hbWUiOiJFZGRpZSBNdXJwaHkiLCJzdHVkZW50X2lkIjoiMTQ1Nzc4MDAiLCJmaXJzdF9uYW1lIjoiRW1pbHkiLCJzdXJuYW1lIjoiTWNHaXZlcm4iLCJ2ZXJpZmllZCI6MSwiZW1haWwiOiJlbWlseS5tY2dpdmVybjRAbWFpbC5kY3UuaWUiLCJwYXNzd3JkIjoiJDJhJDEwJERJSElubVBTWVJvNjhqUUd6TC9HVWU2cUxQaWtNSVY2VGtyc29PTzhaTXU4Z2hSZlJBTE95In0.fPZVIxg5a77bm08ErdWtxgYw3B_IgfNxO8BAsWAimyo"
+          type: "string"
       responses:
         200:
           description: "successful query"
@@ -168,6 +163,85 @@ paths:
                 example: "MySQL unavailable."
 
   /users:
+    get:
+      tags:
+      - "users"
+      summary: "Get a user's publicly available information."
+      description: "By passing the username of the user who's information you want to see, along with your access_token, you will receive back a JSON object with a user's basic profile information."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "query"
+          name: "username"
+          type: "string"
+          required: false
+          description: "The username of the user who's info you wish to view."
+      responses:
+        200:
+          description: "User's Info"
+          schema:
+            type: "object"
+            properties:
+              followers:
+                type: "integer"
+                example: 200
+              following:
+                type: "integer"
+                example: 500
+              likes:
+                type: "integer"
+                example: 123
+              posts:
+                type: "integer"
+                example: 100
+              profile_pic_url:
+                type: "string"
+                example: "NOT IMPLEMENTED"
+              songs:
+                type: "integer"
+                example: 321
+              username:
+                type: "string"
+                example: "TestUser"
+        401:
+          description: "Access_token expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
     post:
       tags:
       - "users"
@@ -318,16 +392,18 @@ paths:
       produces:
       - "application/json"
       parameters:
+      - in: "header"
+        name: "Authorization Header"
+        description: "This is where you should set your access_token."
+        required: true
+        type: "string"
       - in: "body"
         name: "body"
-        description: "Access_token of the user and the message they wish to post. "
+        description: "The message you wish to post."
         required: true
         schema:
           type: "object"
           properties:
-            access_token:
-              type: "string"
-              example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MywidXNlcm5hbWUiOiJFZGRpZSBNdXJwaHkiLCJzdHVkZW50X2lkIjoiMTQ1Nzc4MDAiLCJmaXJzdF9uYW1lIjoiRW1pbHkiLCJzdXJuYW1lIjoiTWNHaXZlcm4iLCJ2ZXJpZmllZCI6MSwiZW1haWwiOiJlbWlseS5tY2dpdmVybjRAbWFpbC5kY3UuaWUiLCJwYXNzd3JkIjoiJDJhJDEwJERJSElubVBTWVJvNjhqUUd6TC9HVWU2cUxQaWtNSVY2VGtyc29PTzhaTXU4Z2hSZlJBTE95In0.fPZVIxg5a77bm08ErdWtxgYw3B_IgfNxO8BAsWAimyo"
             message:
               type: "string"
               example: "Hi my amazing fans!"
@@ -378,22 +454,22 @@ paths:
       tags:
       - "users"
       summary: "Get all of the posts made by a particular user."
-      description: "This endpoint takes several arguments and returns a subset of posts, ordered chronologically from newest to oldest, made by a particular user. The arguments that can be provided are as follows:\n\n \"username\" = If a 'next_page' or 'back_page' argument is not sent, then this argument is mandatory. This should be set to the username of the user who's posts you are trying to view.\n\n \"access_token\" = If a 'next_page' or 'back_page' argument is not sent, then this argument is mandatory. This should be set to the access_token of the currently signed in user.\n\n \"posts_per_page\" = If a 'next_page' or 'back_page' argument is not sent, then this an optional argument you may send. This is used to adjust the number of posts you will get back per page of results.\n\n \"current_page\" = If a 'next_page' or 'back_page' argument is not sent, then this is an optional argument you may send. This is used to navigate through each of the pages of results. If this argument is not sent, the default page of results returned will be page 1.\n\n \"next_page\" = If this value is sent, then a back_page value should not be sent. This value should be set to a 'next_page' token. These tokens are returned by standard requests to support infinited scrolling. Making a request with this token requires no other value to be passed as it encodes the user's access token, the page value we want and the number of posts we want per page.\n\n \"back_page\" = If this value is sent, then a next_page value should not be sent. This value should be set to a 'back_page' token. These tokens are returned by standard requests to support infinited scrolling. Making a request with this token requires no other value to be passed as it encodes the user's access token, the page value we want and the number of posts we want per page."
+      description: "This endpoint takes several arguments and returns a subset of posts, ordered chronologically from newest to oldest, made by a particular user. The arguments that can be provided are as follows:\n\n \"username\" = If a 'next_page' or 'back_page' argument is not sent, then this argument is mandatory. This should be set to the username of the user who's posts you are trying to view.\n\n \"posts_per_page\" = If a 'next_page' or 'back_page' argument is not sent, then this an optional argument you may send. This is used to adjust the number of posts you will get back per page of results.\n\n \"current_page\" = If a 'next_page' or 'back_page' argument is not sent, then this is an optional argument you may send. This is used to navigate through each of the pages of results. If this argument is not sent, the default page of results returned will be page 1.\n\n \"next_page\" = If this value is sent, then a back_page value should not be sent. This value should be set to a 'next_page' token. These tokens are returned by standard requests to support infinited scrolling. Making a request with this token requires no other value to be passed as it encodes the user's access token, the page value we want and the number of posts we want per page.\n\n \"back_page\" = If this value is sent, then a next_page value should not be sent. This value should be set to a 'back_page' token. These tokens are returned by standard requests to support infinited scrolling. Making a request with this token requires no other value to be passed as it encodes the user's access token, the page value we want and the number of posts we want per page."
       consumes:
       - "application/json"
       produces:
       - "application/json"
       parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
         - in: "query"
           name: "username"
           type: "string"
           required: false
           description: "The username of the user who's posts you wish to view."
-        - in: "query"
-          name: "access_token"
-          type: "string"
-          required: false
-          description: "Your access_token."
         - in: "query"
           name: "current_page"
           type: "string"
@@ -593,6 +669,142 @@ paths:
               message:
                 type: "string"
                 example: "Error while hashing password."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+                
+  /users/follow:
+    post:
+      tags:
+      - "users"
+      summary: "Follow a user"
+      description: "By passing an access_token to this endpoint in the request header, along with the username of the user you wish to follow in the request body, you will then be following that user."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "username of the user you wish to follow."
+          required: true
+          schema:
+            type: "object"
+            properties:
+              username:
+                type: "string"
+                example: "testUser"
+      responses:
+        200:
+          description: "successful query"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "You are now following: testUser"
+        401:
+          description: "Access_token expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+                
+  /users/unfollow:
+    post:
+      tags:
+      - "users"
+      summary: "Unfollow a user"
+      description: "By passing an access_token to this endpoint in the request header, along with the username of the user you wish to unfollow in the request body, you will then be no longer following that user."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "username of the user you wish to unfollow."
+          required: true
+          schema:
+            type: "object"
+            properties:
+              username:
+                type: "string"
+                example: "testUser"
+      responses:
+        200:
+          description: "successful query"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "You are now no longer following: testUser"
+        401:
+          description: "Access_token expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
         503:
           description: "Server is unavailable"
           schema:
