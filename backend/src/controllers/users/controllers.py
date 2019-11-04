@@ -21,6 +21,23 @@ from ...models.verification import insert_verification, get_verification
 users = Blueprint("users", __name__)
 
 
+@users.route("/follow", methods=["POST"])
+def follow():
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "username": {"type": "string"},
+        }
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    return {"message": "You are now following: " + request.json.get("username")}, 200
+
+
 @users.route("", methods=["POST"])
 def register():
     expected_body = {
