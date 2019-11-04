@@ -145,7 +145,7 @@ def user():
 
     access_token = request.headers.get("Authorization").split(" ")[1]
     if not access_token:
-        return {"message": "Request missing access_token."}, 422
+        return {"message": "Request missing access_token."}, 401
 
     try:
         verify_and_refresh(access_token)
@@ -312,7 +312,7 @@ def post():
 
     access_token = request.headers.get("Authorization").split(" ")[1]
     if not access_token:
-        return {"message": "Request missing access_token."}, 422
+        return {"message": "Request missing access_token."}, 401
 
     user = verify_and_refresh(access_token)
     if "uid" not in user:
@@ -345,7 +345,7 @@ def posts():
 
         access_token = request.headers.get("Authorization").split(" ")[1]
         if not access_token:
-            return {"message": "Request missing access_token."}, 422
+            return {"message": "Request missing access_token."}, 401
 
         user = verify_and_refresh(access_token)
         if "uid" not in user:
