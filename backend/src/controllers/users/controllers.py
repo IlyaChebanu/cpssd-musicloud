@@ -139,7 +139,6 @@ def post():
     expected_body = {
         "type": "object",
         "properties": {
-            "access_token": {"type": "string"},
             "message": {"type": "string"},
         }
     }
@@ -149,7 +148,11 @@ def post():
         log("warning", "Request validation failed.", str(exc))
         return {"message": str(exc)}, 422
 
-    user = verify_and_refresh(request.json.get("access_token"))
+    access_token = request.headers.get("Authorization").split(" ")[1]
+    if not access_token:
+        return {"message": "Request missing access_token."}, 422
+
+    user = verify_and_refresh(access_token)
     if "uid" not in user:
         return user
 
@@ -172,13 +175,17 @@ def posts():
         username = request.args.get('username')
         if not username:
             return {"message": "Request missing username."}, 422
-        uid = get_user_via_username(username)[0][0]
+        try:
+            uid = get_user_via_username(username)[0][0]
+        except Exception:
+            log("error", "MySQL query failed", traceback.format_exc())
+            return {"message": "MySQL unavailable."}, 503
 
-        access_token = request.args.get('access_token')
+        access_token = request.headers.get("Authorization").split(" ")[1]
         if not access_token:
             return {"message": "Request missing access_token."}, 422
 
-        user = verify_and_refresh(request.args.get('access_token'))
+        user = verify_and_refresh(access_token)
         if "uid" not in user:
             return user
 
@@ -247,11 +254,11 @@ def posts():
         uid = token.get("uid")
         current_page = token.get("current_page")
         posts_per_page = token.get("posts_per_page")
-        access_token = token.get("access_token")
         total_pages = token.get("total_pages")
         start_index = (current_page * posts_per_page) - posts_per_page
+        access_token = request.headers.get("Authorization").split(" ")[1].encode()
 
-        user = verify_and_refresh(token.get('access_token'))
+        user = verify_and_refresh(access_token)
         if "uid" not in user:
             return user
 
@@ -265,7 +272,6 @@ def posts():
             "uid": uid,
             "total_pages": total_pages,
             "posts_per_page": posts_per_page,
-            "access_token": access_token
         }
 
         back_page = None
