@@ -14,7 +14,7 @@ from ...utils.logger import log
 from ...utils import random_string, send_mail, verify_and_refresh
 from ...models.users import (
     insert_user, get_user_via_username, get_user_via_email, make_post, get_number_of_posts, get_posts,
-    get_follower_count, get_following_count, get_number_of_likes, get_song_count
+    get_follower_count, get_following_count, get_number_of_likes, get_song_count, post_follow, post_unfollow
 )
 from ...models.verification import insert_verification, get_verification
 
@@ -35,7 +35,86 @@ def follow():
         log("warning", "Request validation failed.", str(exc))
         return {"message": str(exc)}, 422
 
+    access_token = request.headers.get("Authorization").split(" ")[1]
+    if not access_token:
+        return {"message": "Request missing access_token."}, 422
+
+    try:
+        user = verify_and_refresh(access_token)
+    except ValueError:
+        return {"message": "Token expired."}, 401
+    except jwt.exceptions.InvalidSignatureError:
+        return {"message": "Server failed to decode token."}, 500
+    except Exception:
+        log("error", "MySQL query failed", traceback.format_exc())
+        return {"message": "MySQL unavailable."}, 503
+
+    try:
+        other_user = get_user_via_username(request.json.get("username"))[0]
+    except Exception:
+        log("error", "MySQL query failed", traceback.format_exc())
+        return {"message": "MySQL unavailable."}, 503
+    if not other_user:
+        return {"message": "Invalid username"}, 422
+
+    if other_user[2] == user.get("username"):
+        return {"message": "You cannot follow your self"}, 422
+
+    try:
+        post_follow(user.get("uid"), other_user[0])
+    except Exception:
+        log("error", "MySQL query failed", traceback.format_exc())
+        return {"message": "MySQL unavailable."}, 503
+
     return {"message": "You are now following: " + request.json.get("username")}, 200
+
+
+@users.route("/unfollow", methods=["POST"])
+def unfollow():
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "username": {"type": "string"},
+        }
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    access_token = request.headers.get("Authorization").split(" ")[1]
+    if not access_token:
+        return {"message": "Request missing access_token."}, 422
+
+    try:
+        user = verify_and_refresh(access_token)
+    except ValueError:
+        return {"message": "Token expired."}, 401
+    except jwt.exceptions.InvalidSignatureError:
+        return {"message": "Server failed to decode token."}, 500
+    except Exception:
+        log("error", "MySQL query failed", traceback.format_exc())
+        return {"message": "MySQL unavailable."}, 503
+
+    try:
+        other_user = get_user_via_username(request.json.get("username"))[0]
+    except Exception:
+        log("error", "MySQL query failed", traceback.format_exc())
+        return {"message": "MySQL unavailable."}, 503
+    if not other_user:
+        return {"message": "Invalid username"}, 422
+
+    if other_user[2] == user.get("username"):
+        return {"message": "You cannot unfollow your self"}, 422
+
+    try:
+        post_unfollow(user.get("uid"), other_user[0])
+    except Exception:
+        log("error", "MySQL query failed", traceback.format_exc())
+        return {"message": "MySQL unavailable."}, 503
+
+    return {"message": "You are now no longer following: " + request.json.get("username")}, 200
 
 
 @users.route("", methods=["POST"])
@@ -152,7 +231,7 @@ def reverify():
     return {"message": "Verification email sent."}, 200
 
 
-@users.route("/", methods=["GET"])
+@users.route("", methods=["GET"])
 def user():
     username = request.args.get('username')
     if not username:
@@ -212,7 +291,15 @@ def post():
     if not access_token:
         return {"message": "Request missing access_token."}, 422
 
-    user = verify_and_refresh(access_token)
+    try:
+        user = verify_and_refresh(access_token)
+    except ValueError:
+        return {"message": "Token expired."}, 401
+    except jwt.exceptions.InvalidSignatureError:
+        return {"message": "Server failed to decode token."}, 500
+    except Exception:
+        log("error", "MySQL query failed", traceback.format_exc())
+        return {"message": "MySQL unavailable."}, 503
     if "uid" not in user:
         return user
 
@@ -245,7 +332,15 @@ def posts():
         if not access_token:
             return {"message": "Request missing access_token."}, 422
 
-        user = verify_and_refresh(access_token)
+        try:
+            user = verify_and_refresh(access_token)
+        except ValueError:
+            return {"message": "Token expired."}, 401
+        except jwt.exceptions.InvalidSignatureError:
+            return {"message": "Server failed to decode token."}, 500
+        except Exception:
+            log("error", "MySQL query failed", traceback.format_exc())
+            return {"message": "MySQL unavailable."}, 503
         if "uid" not in user:
             return user
 
@@ -318,7 +413,15 @@ def posts():
         start_index = (current_page * posts_per_page) - posts_per_page
         access_token = request.headers.get("Authorization").split(" ")[1].encode()
 
-        user = verify_and_refresh(access_token)
+        try:
+            user = verify_and_refresh(access_token)
+        except ValueError:
+            return {"message": "Token expired."}, 401
+        except jwt.exceptions.InvalidSignatureError:
+            return {"message": "Server failed to decode token."}, 500
+        except Exception:
+            log("error", "MySQL query failed", traceback.format_exc())
+            return {"message": "MySQL unavailable."}, 503
         if "uid" not in user:
             return user
 

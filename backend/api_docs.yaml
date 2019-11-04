@@ -125,22 +125,17 @@ paths:
       tags:
       - "auth"
       summary: "Deauthorise a token"
-      description: "By passing an access_token to this endpoint in the request body, the corrisponding token will be removed the Logins table. This means that the passed token will no longer be valid for use with access_token protected endpoints."
+      description: "By passing an access_token to this endpoint in the request header, the corrisponding token will be removed the Logins table. This means that the passed token will no longer be valid for use with access_token protected endpoints."
       consumes:
       - "application/json"
       produces:
       - "application/json"
       parameters:
-        - in: "body"
-          name: "body"
-          description: "A valid access_token"
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
           required: true
-          schema:
-            type: "object"
-            properties:
-              access_token:
-                type: "string"
-                example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MywidXNlcm5hbWUiOiJFZGRpZSBNdXJwaHkiLCJzdHVkZW50X2lkIjoiMTQ1Nzc4MDAiLCJmaXJzdF9uYW1lIjoiRW1pbHkiLCJzdXJuYW1lIjoiTWNHaXZlcm4iLCJ2ZXJpZmllZCI6MSwiZW1haWwiOiJlbWlseS5tY2dpdmVybjRAbWFpbC5kY3UuaWUiLCJwYXNzd3JkIjoiJDJhJDEwJERJSElubVBTWVJvNjhqUUd6TC9HVWU2cUxQaWtNSVY2VGtyc29PTzhaTXU4Z2hSZlJBTE95In0.fPZVIxg5a77bm08ErdWtxgYw3B_IgfNxO8BAsWAimyo"
+          type: "string"
       responses:
         200:
           description: "successful query"
@@ -178,16 +173,16 @@ paths:
       produces:
       - "application/json"
       parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
         - in: "query"
           name: "username"
           type: "string"
           required: false
           description: "The username of the user who's info you wish to view."
-        - in: "query"
-          name: "access_token"
-          type: "string"
-          required: false
-          description: "Your access_token."
       responses:
         200:
           description: "User's Info"
@@ -674,6 +669,142 @@ paths:
               message:
                 type: "string"
                 example: "Error while hashing password."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+                
+  /users/follow:
+    post:
+      tags:
+      - "users"
+      summary: "Follow a user"
+      description: "By passing an access_token to this endpoint in the request header, along with the username of the user you wish to follow in the request body, you will then be following that user."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "username of the user you wish to follow."
+          required: true
+          schema:
+            type: "object"
+            properties:
+              username:
+                type: "string"
+                example: "testUser"
+      responses:
+        200:
+          description: "successful query"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "You are now following: testUser"
+        401:
+          description: "Access_token expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+                
+  /users/unfollow:
+    post:
+      tags:
+      - "users"
+      summary: "Unfollow a user"
+      description: "By passing an access_token to this endpoint in the request header, along with the username of the user you wish to unfollow in the request body, you will then be no longer following that user."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "username of the user you wish to unfollow."
+          required: true
+          schema:
+            type: "object"
+            properties:
+              username:
+                type: "string"
+                example: "testUser"
+      responses:
+        200:
+          description: "successful query"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "You are now no longer following: testUser"
+        401:
+          description: "Access_token expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
         503:
           description: "Server is unavailable"
           schema:

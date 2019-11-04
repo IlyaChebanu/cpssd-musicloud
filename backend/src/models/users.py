@@ -166,3 +166,34 @@ def get_posts(uid, start_index, posts_per_page):
         return query(sql, args, True)
     except Exception as exc:
         raise exc
+
+
+def post_follow(follower_uid, following_uid):
+    try:
+        sql = (
+            "INSERT INTO Followers "
+            "(follower, following) "
+            "VALUES (%s, %s)"
+        )
+        args = (
+            follower_uid,
+            following_uid,
+        )
+        query(sql, args)
+    except Exception as exc:
+        raise exc
+
+
+def post_unfollow(follower_uid, following_uid):
+    try:
+        sql = (
+            "DELETE FROM Followers "
+            "WHERE follower=%s AND following=%s"
+        )
+        args = (
+            follower_uid,
+            following_uid,
+        )
+        query(sql, args)
+    except Exception as exc:
+        raise exc
