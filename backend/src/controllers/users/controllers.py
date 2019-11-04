@@ -15,7 +15,8 @@ from ...utils.logger import log
 from ...utils import random_string, send_mail, verify_and_refresh
 from ...models.users import (
     insert_user, get_user_via_username, get_user_via_email, make_post, create_reset, get_reset_request, delete_reset,
-    reset_password, update_reset, get_number_of_posts, get_posts
+    get_follower_count, get_following_count, get_song_count, get_number_of_likes, reset_password, update_reset,
+    get_number_of_posts, get_posts
 )
 from ...models.verification import insert_verification, get_verification
 
@@ -134,6 +135,45 @@ def reverify():
         log("error", "Failed to send email.", traceback.format_exc())
 
     return {"message": "Verification email sent."}, 200
+
+
+@users.route("", methods=["GET"])
+def user():
+    username = request.args.get('username')
+    if not username:
+        return {"message": "Username param can't be empty!"}, 422
+
+    access_token = request.headers.get("Authorization").split(" ")[1]
+    if not access_token:
+        return {"message": "Request missing access_token."}, 401
+
+    try:
+        verify_and_refresh(access_token)
+    except ValueError:
+        return {"message": "Token expired."}, 401
+    except jwt.exceptions.InvalidSignatureError:
+        return {"message": "Server failed to decode token."}, 500
+
+    try:
+        user = get_user_via_username(username)
+        followers = get_follower_count(user[0][0])
+        following = get_following_count(user[0][0])
+        songs = get_song_count(user[0][0])
+        posts = get_number_of_posts(user[0][0])
+        likes = get_number_of_likes(user[0][0])
+    except Exception:
+        log("error", "MySQL query failed", traceback.format_exc())
+        return {"message": "MySQL unavailable."}, 503
+
+    return {
+        "profile_pic_url": "NOT IMPLEMENTED",
+        "username": user[0][2],
+        "followers": followers,
+        "following": following,
+        "songs": songs,
+        "posts": posts,
+        "likes": likes
+    }, 200
 
 
 @users.route("/reset", methods=["GET"])
@@ -255,6 +295,7 @@ def reset():
     return {"message": "Password reset."}, 200
 
 
+
 @users.route("/post", methods=["POST"])
 def post():
     expected_body = {
@@ -271,7 +312,7 @@ def post():
 
     access_token = request.headers.get("Authorization").split(" ")[1]
     if not access_token:
-        return {"message": "Request missing access_token."}, 422
+        return {"message": "Request missing access_token."}, 401
 
     user = verify_and_refresh(access_token)
     if "uid" not in user:
@@ -304,7 +345,7 @@ def posts():
 
         access_token = request.headers.get("Authorization").split(" ")[1]
         if not access_token:
-            return {"message": "Request missing access_token."}, 422
+            return {"message": "Request missing access_token."}, 401
 
         user = verify_and_refresh(access_token)
         if "uid" not in user:
