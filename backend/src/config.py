@@ -26,7 +26,11 @@ JWT_SECRET = (
 )
 
 AWS_CREDS = {
-   'AWSAccessKeyId':'',
+   'AWSAccessKeyId': '',
    'AWSSecretKey': '',
-   'Bucket':''
+   'Bucket': ''
 }
+
+# This option controls how long users have to enter a password reset code before it is deemed expired.
+# The unit of time is minutes
+RESET_TIMEOUT = 30
