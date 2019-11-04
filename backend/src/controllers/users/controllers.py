@@ -15,8 +15,8 @@ from ...utils.logger import log
 from ...utils import random_string, send_mail, verify_and_refresh
 from ...models.users import (
     insert_user, get_user_via_username, get_user_via_email, make_post, create_reset, get_reset_request, delete_reset,
-    reset_password, update_reset, get_posts, post_follow, post_unfollow,
-    get_follower_count, get_following_count, get_song_count, get_number_of_posts, get_number_of_likes
+    post_follow, post_unfollow, reset_password, update_reset, get_number_of_posts, get_posts, get_follower_count,
+    get_song_count, get_number_of_likes, get_following_count
 )
 from ...models.verification import insert_verification, get_verification
 
@@ -241,7 +241,7 @@ def user():
 
     access_token = request.headers.get("Authorization").split(" ")[1]
     if not access_token:
-        return {"message": "Request missing access_token."}, 422
+        return {"message": "Request missing access_token."}, 401
 
     try:
         verify_and_refresh(access_token)
@@ -410,7 +410,7 @@ def post():
 
     access_token = request.headers.get("Authorization").split(" ")[1]
     if not access_token:
-        return {"message": "Request missing access_token."}, 422
+        return {"message": "Request missing access_token."}, 401
 
     try:
         user = verify_and_refresh(access_token)
@@ -451,7 +451,7 @@ def posts():
 
         access_token = request.headers.get("Authorization").split(" ")[1]
         if not access_token:
-            return {"message": "Request missing access_token."}, 422
+            return {"message": "Request missing access_token."}, 401
 
         try:
             user = verify_and_refresh(access_token)

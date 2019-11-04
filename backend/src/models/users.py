@@ -263,6 +263,7 @@ def post_unfollow(follower_uid, following_uid):
     except Exception as exc:
         raise exc
 
+
 def delete_reset(uid):
     try:
         sql = (

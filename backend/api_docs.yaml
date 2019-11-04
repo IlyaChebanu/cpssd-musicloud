@@ -1,0 +1,817 @@
+swagger: '2.0'
+info:
+  version: "1"
+  title: "MusiCloud API"
+  description: >-
+    This is the REST API documentation for the MusiCloud music mixing platform.
+host: "dcumusicloud.com"
+basePath: "/api/v1"
+tags:
+  - name: "users"
+    description: "User operations"
+  - name: "auth"
+    description: "Authentication operations"
+schemes:
+  - "http"
+paths:
+  /auth/verify/{code}:
+    get:
+      tags:
+      - "auth"
+      summary: "Verify new user's email"
+      description: "When the user clicks the link sent to their email, there account will be verified."
+      produces:
+      - "application/json"
+      parameters:
+        - in: "path"
+          name: "code"
+          required: true
+          type: "string"
+          description: "The randomly generated code emailed to the user on account creation."
+      responses:
+        200:
+          description: "successful query"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Verified."
+        400:
+          description: "Bad info sent, or info missing."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Invalid code."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable"
+                    
+  /auth/login:
+    post:
+      tags:
+      - "auth"
+      summary: "Login using a username and a password"
+      description: "By passing a user's username along with their password to this request as part of the request body, if the user exists in the database, an access token will be returned to them. The user should be verified in order to log in."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "User to be logged in."
+        required: true
+        schema:
+          type: "object"
+          properties:
+            username:
+              type: "string"
+              example: "Herman"
+            password:
+              type: "string"
+              example: "SecurePassword"
+      responses:
+        200:
+          description: "Logged in"
+          schema:
+            type: "object"
+            properties:
+              access_token:
+                type: "string"
+                example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MywidXNlcm5hbWUiOiJFZGRpZSBNdXJwaHkiLCJzdHVkZW50X2lkIjoiMTQ1Nzc4MDAiLCJmaXJzdF9uYW1lIjoiRW1pbHkiLCJzdXJuYW1lIjoiTWNHaXZlcm4iLCJ2ZXJpZmllZCI6MSwiZW1haWwiOiJlbWlseS5tY2dpdmVybjRAbWFpbC5kY3UuaWUiLCJwYXNzd3JkIjoiJDJhJDEwJERJSElubVBTWVJvNjhqUUd6TC9HVWU2cUxQaWtNSVY2VGtyc29PTzhaTXU4Z2hSZlJBTE95In0.fPZVIxg5a77bm08ErdWtxgYw3B_IgfNxO8BAsWAimyo"
+        401:
+          description: "Bad info sent, or info missing."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Bad login credentials."
+        403:
+          description: "The account has yet to be verified."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Account not verified."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable"
+                
+  /auth/logout:
+    post:
+      tags:
+      - "auth"
+      summary: "Deauthorise a token"
+      description: "By passing an access_token to this endpoint in the request header, the corrisponding token will be removed the Logins table. This means that the passed token will no longer be valid for use with access_token protected endpoints."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+      responses:
+        200:
+          description: "successful query"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "User has been successfully logged out!"
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+
+  /users:
+    get:
+      tags:
+      - "users"
+      summary: "Get a user's publicly available information."
+      description: "By passing the username of the user who's information you want to see, along with your access_token, you will receive back a JSON object with a user's basic profile information."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "query"
+          name: "username"
+          type: "string"
+          required: false
+          description: "The username of the user who's info you wish to view."
+      responses:
+        200:
+          description: "User's Info"
+          schema:
+            type: "object"
+            properties:
+              followers:
+                type: "integer"
+                example: 200
+              following:
+                type: "integer"
+                example: 500
+              likes:
+                type: "integer"
+                example: 123
+              posts:
+                type: "integer"
+                example: 100
+              profile_pic_url:
+                type: "string"
+                example: "NOT IMPLEMENTED"
+              songs:
+                type: "integer"
+                example: 321
+              username:
+                type: "string"
+                example: "TestUser"
+        401:
+          description: "Access_token expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+    post:
+      tags:
+      - "users"
+      summary: "Register a new user"
+      description: "Creates a new user entry in the Users table. This is step 1 in the authentication process."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "New user's info."
+        required: true
+        schema:
+          type: "object"
+          properties:
+            username:
+              type: "string"
+              example: "newUser"
+            email:
+              type: "string"
+              example: "newUser@gmail.com"
+            password:
+              type: "string"
+              example: "securePassword1234!"
+      responses:
+        200:
+          description: "User created"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "User created!"
+        400:
+          description: "Invalid email address format."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Invalid email address."
+        409:
+          description: "User already exists."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "User already exists!"
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Error while hashing password."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+                
+  /users/reverify:
+    post:
+      tags:
+      - "users"
+      summary: "Resend verification email"
+      description: "Checks if a given user is in the process of being verified and resends the verification email if they are."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Email of the user looking for a new verification email"
+        required: true
+        schema:
+          type: "object"
+          properties:
+            email:
+              type: "string"
+              example: "newUser@gmail.com"
+      responses:
+        200:
+          description: "Resent verification email."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Verification email sent."
+        400:
+          description: "Some info is bad or is missing!"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Bad request."
+        403:
+          description: "Request forbidden as the user is already verified."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Already verified."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+                
+  /users/post:
+    post:
+      tags:
+      - "users"
+      summary: "Post a new status update."
+      description: "Takes the text and access_token of a given user and makes a post on there account."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "Authorization Header"
+        description: "This is where you should set your access_token."
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "The message you wish to post."
+        required: true
+        schema:
+          type: "object"
+          properties:
+            message:
+              type: "string"
+              example: "Hi my amazing fans!"
+      responses:
+        200:
+          description: "Post made successfully"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Message posted."
+        401:
+          description: "User's token has expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Failed to decode token."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+                
+  /users/posts:
+    get:
+      tags:
+      - "users"
+      summary: "Get all of the posts made by a particular user."
+      description: "This endpoint takes several arguments and returns a subset of posts, ordered chronologically from newest to oldest, made by a particular user. The arguments that can be provided are as follows:\n\n \"username\" = If a 'next_page' or 'back_page' argument is not sent, then this argument is mandatory. This should be set to the username of the user who's posts you are trying to view.\n\n \"posts_per_page\" = If a 'next_page' or 'back_page' argument is not sent, then this an optional argument you may send. This is used to adjust the number of posts you will get back per page of results.\n\n \"current_page\" = If a 'next_page' or 'back_page' argument is not sent, then this is an optional argument you may send. This is used to navigate through each of the pages of results. If this argument is not sent, the default page of results returned will be page 1.\n\n \"next_page\" = If this value is sent, then a back_page value should not be sent. This value should be set to a 'next_page' token. These tokens are returned by standard requests to support infinited scrolling. Making a request with this token requires no other value to be passed as it encodes the user's access token, the page value we want and the number of posts we want per page.\n\n \"back_page\" = If this value is sent, then a next_page value should not be sent. This value should be set to a 'back_page' token. These tokens are returned by standard requests to support infinited scrolling. Making a request with this token requires no other value to be passed as it encodes the user's access token, the page value we want and the number of posts we want per page."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "query"
+          name: "username"
+          type: "string"
+          required: false
+          description: "The username of the user who's posts you wish to view."
+        - in: "query"
+          name: "current_page"
+          type: "string"
+          required: false
+          description: "The page of results you wish to view."
+        - in: "query"
+          name: "posts_per_page"
+          type: "string"
+          required: false
+          description: "The number of posts you wish to have per page of results."
+        - in: "query"
+          name: "next_page"
+          type: "string"
+          required: false
+          description: "A next page token to get the next page of results."
+        - in: "query"
+          name: "back_page"
+          type: "string"
+          required: false
+          description: "A back_page token to get the previous page of results."
+      responses:
+        200:
+          description: "Post made successfully"
+          schema:
+            type: "object"
+            properties:
+              back_page:
+                type: "string"
+                example: "will be null or a token"
+              current_page:
+                type: "integer"
+                example: 1
+              next_page:
+                type: "string"
+                example: "will be null or a token"
+              posts:
+                type: "array"
+                items:
+                  type: "array"
+                  items:
+                    type: "string"
+                  example:
+                    - "test message"
+                    - "Fri, 01 Nov 2019 19:12:27 GMT"
+              posts_per_page:
+                type: "integer"
+                example: 50
+              total_pages:
+                type: "integer"
+                example: 2
+        401:
+          description: "User's token has expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Failed to decode token."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+                
+  /users/reset:
+    get:
+      tags:
+      - "users"
+      summary: "Get a password reset code emailed to you."
+      description: "This endpoint takes the email address of the user who has forgotten there password, and email's them an 8-digit code they can use to reset there password. This code is valid for up to 30 minutes. This endpoint can be hit again for a new code."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "query"
+          name: "email"
+          type: "string"
+          required: false
+          description: "The email address of the user who has forgotten there password."
+      responses:
+        200:
+          description: "Password reset code sent"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Email sent."
+        400:
+          description: "Bad request"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Bad request."
+        422:
+          description: "Malformed request parameters."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Email param can't be empty!"
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+    post:
+      tags:
+      - "users"
+      summary: "Get a password reset code emailed to you."
+      description: "This endpoint takes the email address of the user who has forgotten there password, and email's them an 8-digit code they can use to reset there password. This code is valid for up to 30 minutes. This endpoint can be hit again for a new code."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "The request body should contain, the reset code emailed to the user, the user's email address and the new password they wish to set."
+        required: true
+        schema:
+          type: "object"
+          properties:
+            code:
+              type: "integer"
+              example: 12345678
+            email:
+              type: "string"
+              example: "test@email.com"
+            password:
+              type: "string"
+              example: "newPassword"
+      responses:
+        200:
+          description: "Password reset."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Password reset."
+        400:
+          description: "Bad request"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Bad request."
+        401:
+          description: "Reset code expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "The reset code has expired. Please request a new one."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Error while hashing password."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+                
+  /users/follow:
+    post:
+      tags:
+      - "users"
+      summary: "Follow a user"
+      description: "By passing an access_token to this endpoint in the request header, along with the username of the user you wish to follow in the request body, you will then be following that user."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "username of the user you wish to follow."
+          required: true
+          schema:
+            type: "object"
+            properties:
+              username:
+                type: "string"
+                example: "testUser"
+      responses:
+        200:
+          description: "successful query"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "You are now following: testUser"
+        401:
+          description: "Access_token expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+                
+  /users/unfollow:
+    post:
+      tags:
+      - "users"
+      summary: "Unfollow a user"
+      description: "By passing an access_token to this endpoint in the request header, along with the username of the user you wish to unfollow in the request body, you will then be no longer following that user."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "username of the user you wish to unfollow."
+          required: true
+          schema:
+            type: "object"
+            properties:
+              username:
+                type: "string"
+                example: "testUser"
+      responses:
+        200:
+          description: "successful query"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "You are now no longer following: testUser"
+        401:
+          description: "Access_token expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+
+x-aws-api-id: 'fvg2nhhlzk'
