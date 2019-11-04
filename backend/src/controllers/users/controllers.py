@@ -135,7 +135,7 @@ def reverify():
     return {"message": "Verification email sent."}, 200
 
 
-@users.route("/", methods=["GET"])
+@users.route("", methods=["GET"])
 def user():
     username = request.args.get('username')
     if not username:
