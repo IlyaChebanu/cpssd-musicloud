@@ -8,6 +8,8 @@ def refresh_token(access_token):
     encoded_token = access_token
 
     try:
+        if isinstance(access_token, str):
+            access_token.encode()
         access_token = jwt.decode(access_token, JWT_SECRET, algorithms=['HS256'])
     except Exception as e:
         raise e
