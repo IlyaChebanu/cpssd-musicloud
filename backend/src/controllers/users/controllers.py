@@ -15,8 +15,8 @@ from ...utils.logger import log
 from ...utils import random_string, send_mail, verify_and_refresh
 from ...models.users import (
     insert_user, get_user_via_username, get_user_via_email, make_post, create_reset, get_reset_request, delete_reset,
-    reset_password, update_reset,  get_number_of_posts, get_posts, get_follower_count, get_following_count,
-    get_song_count, get_number_of_likes
+    get_follower_count, get_following_count, get_song_count, get_number_of_likes, reset_password, update_reset,
+    get_number_of_posts, get_posts
 )
 from ...models.verification import insert_verification, get_verification
 
