@@ -14,6 +14,7 @@ from ...utils import random_string
 from ...models.verification import get_verification_by_code, delete_verification
 from ...models.users import verify_user, get_user_via_username
 from ...models.auth import insert_login, delete_login
+from ...middleware.auth_required import auth_required
 
 auth = Blueprint('auth', __name__)
 
@@ -91,11 +92,8 @@ def login():
 
 
 @auth.route('/logout', methods=["POST"])
-def logout():
-    access_token = request.headers.get("Authorization").split(" ")[1]
-    if not access_token:
-        return {"message": "Request missing access_token."}, 422
-
+@auth_required(return_token=True)
+def logout(access_token):
     try:
         delete_login(access_token)
     except Exception:

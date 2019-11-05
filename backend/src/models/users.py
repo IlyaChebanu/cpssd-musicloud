@@ -109,6 +109,35 @@ def get_follower_count(uid):
         raise exc
 
 
+def get_followers(uid):
+    try:
+        sql = (
+            "SELECT * FROM Followers "
+            "WHERE following = %s"
+        )
+        args = (
+            uid,
+        )
+        return query(sql, args, True)
+    except Exception as exc:
+        raise exc
+
+
+def get_following_pair(uid_a, uid_b):
+    try:
+        sql = (
+            "SELECT * FROM Followers "
+            "WHERE follower = %s AND following = %s"
+        )
+        args = (
+            uid_a,
+            uid_b,
+        )
+        return query(sql, args, True)
+    except Exception as exc:
+        raise exc
+
+
 def get_following_count(uid):
     try:
         sql = (
