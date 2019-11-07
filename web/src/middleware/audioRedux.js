@@ -16,17 +16,17 @@ export default store => {
           url: kick
         },
         {
-          id: 1,
+          id: 2,
           time: 2,
           url: kick
         },
         {
-          id: 1,
+          id: 3,
           time: 3,
           url: kick
         },
         {
-          id: 1,
+          id: 4,
           time: 4,
           url: kick
         },
@@ -65,7 +65,7 @@ export default store => {
     }
   }
 
-  const scheduledSamples = new Set();
+  const scheduledSamples = {};
 
   let scheduler = setInterval(() => {
     const state = store.getState().studio;
@@ -79,9 +79,10 @@ export default store => {
       const currentBeat = state.currentBeat;
 
       // Delete played samples
-      scheduledSamples.forEach(sample => {
-        if (currentBeat > sample.time) {
-          scheduledSamples.delete(sample);
+      Object.entries(scheduledSamples).forEach(([id, sample]) => {
+        const endTime = audioCtx.currentTime + sample.duration + (sample.time - currentBeat) * secondsPerBeat;
+        if (endTime < audioCtx.currentTime) {
+          delete scheduledSamples[id];
         }
       });
 
@@ -93,17 +94,17 @@ export default store => {
       });
 
       schedulableSamples.forEach(sample => {
-        if (!scheduledSamples.has(sample)) {
+        if (!(sample.id in scheduledSamples)) {
           const startTime = audioCtx.currentTime + (sample.time - currentBeat) * secondsPerBeat;
           const endTime = audioCtx.currentTime + sample.duration + (sample.time - currentBeat) * secondsPerBeat;
-          console.log('Scheduling sample', sample, 'at', audioCtx.currentTime, 'for', startTime, 'ending at', endTime);
+          // console.log('Scheduling sample', sample, 'at', audioCtx.currentTime, 'for', startTime, 'ending at', endTime);
           const src = audioCtx.createBufferSource();
           src.buffer = buffers[sample.url];
           src.connect(audioCtx.destination);
           src.start(startTime);
           src.stop(endTime);
+          scheduledSamples[sample.id] = { ...sample, source: src };
         }
-        scheduledSamples.add(sample);
       });
     }
   }, LOOKAHEAD);
@@ -127,24 +128,36 @@ export default store => {
         });
 
         schedulableSamples.forEach(sample => {
-          if (!scheduledSamples.has(sample)) {
+          if (!(sample.id in scheduledSamples)) {
             const startTime = audioCtx.currentTime + (sample.time - currentBeat) * secondsPerBeat;
+            const offset = (currentBeat - sample.time) * secondsPerBeat;
             const endTime = audioCtx.currentTime + sample.duration + (sample.time - currentBeat) * secondsPerBeat;
-            console.log('Scheduling old sample', sample, 'at', audioCtx.currentTime, 'for', startTime, 'ending at', endTime);
+            // console.log('Scheduling old sample', sample, 'at', audioCtx.currentTime, 'offset', startTime, 'ending at', endTime, sample.time, currentBeat);
             const src = audioCtx.createBufferSource();
             src.buffer = buffers[sample.url];
             src.connect(audioCtx.destination);
-            src.start(startTime);
+            src.start(startTime, offset);
             src.stop(endTime);
+            scheduledSamples[sample.id] = { ...sample, source: src };
           }
-          scheduledSamples.add(sample);
         });
+        break;
       case 'STUDIO_PAUSE':
         state = store.getState().studio;
         store.dispatch(playingStartBeat(state.currentBeat));
+        Object.entries(scheduledSamples).forEach(([id, sample]) => {
+          sample.source.stop();
+          delete scheduledSamples[id];
+        });
+        break;
       case 'STUDIO_STOP':
         store.dispatch(playingStartBeat(1));
         store.dispatch(setCurrentBeat(1));
+        Object.entries(scheduledSamples).forEach(([id, sample]) => {
+          sample.source.stop();
+          delete scheduledSamples[id];
+        });
+        break;
       default:
         break;
       };
