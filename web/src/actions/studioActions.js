@@ -43,3 +43,10 @@ export const setTempo = tempo => dispatch => {
     tempo
   });
 };
+
+export const setTracks = tracks => dispatch => {
+  dispatch({
+    type: 'SET_TRACKS',
+    tracks
+  });
+};

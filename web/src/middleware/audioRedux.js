@@ -1,11 +1,56 @@
-import { playingStartTime, setCurrentBeat, playingStartBeat } from '../actions/studioActions';
+import { playingStartTime, setCurrentBeat, playingStartBeat, setTracks } from '../actions/studioActions';
+import kick from '../assets/samples/kick23.wav';
+import axios from 'axios';
 
 const LOOKAHEAD = 25; //ms
 const OVERLAP = 100/*ms*/ / 1000;
 
 export default store => {
 
+  const tracks = [
+    {
+      samples: [
+        {
+          id: 1,
+          time: 1,
+          url: kick
+        },
+        {
+          id: 1,
+          time: 2,
+          url: kick
+        },
+        {
+          id: 1,
+          time: 3,
+          url: kick
+        },
+        {
+          id: 1,
+          time: 4,
+          url: kick
+        },
+      ]
+    }
+  ];
+
+  const buffers = {};
+
+
   let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+  Promise.all(tracks.map(async track => {
+    await Promise.all(track.samples.map(async sample => {
+      if (!buffers[sample.url]) {
+        const res = await axios.get(sample.url, { responseType: 'arraybuffer' });
+        const buffer = await audioCtx.decodeAudioData(res.data);
+        buffers[sample.url] = buffer;
+      }
+      sample.duration = buffers[sample.url].duration;
+    }));
+  })).then(() => {
+    store.dispatch(setTracks(tracks));
+  });
 
   let beatStateUpdate;
 
@@ -52,10 +97,11 @@ export default store => {
           const startTime = audioCtx.currentTime + (sample.time - currentBeat) * secondsPerBeat;
           const endTime = audioCtx.currentTime + sample.duration + (sample.time - currentBeat) * secondsPerBeat;
           console.log('Scheduling sample', sample, 'at', audioCtx.currentTime, 'for', startTime, 'ending at', endTime);
-          const osc = audioCtx.createOscillator();
-          osc.connect(audioCtx.destination);
-          osc.start(startTime);
-          osc.stop(endTime);
+          const src = audioCtx.createBufferSource();
+          src.buffer = buffers[sample.url];
+          src.connect(audioCtx.destination);
+          src.start(startTime);
+          src.stop(endTime);
         }
         scheduledSamples.add(sample);
       });
@@ -85,10 +131,11 @@ export default store => {
             const startTime = audioCtx.currentTime + (sample.time - currentBeat) * secondsPerBeat;
             const endTime = audioCtx.currentTime + sample.duration + (sample.time - currentBeat) * secondsPerBeat;
             console.log('Scheduling old sample', sample, 'at', audioCtx.currentTime, 'for', startTime, 'ending at', endTime);
-            const osc = audioCtx.createOscillator();
-            osc.connect(audioCtx.destination);
-            osc.start(startTime);
-            osc.stop(endTime);
+            const src = audioCtx.createBufferSource();
+            src.buffer = buffers[sample.url];
+            src.connect(audioCtx.destination);
+            src.start(startTime);
+            src.stop(endTime);
           }
           scheduledSamples.add(sample);
         });

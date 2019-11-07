@@ -5,56 +5,7 @@ export default (
     playingStartTime: 0,
     playing: false,
     currentBeat: 1,
-    tracks: [
-      {
-        samples: [
-          {
-            id: 9238412, // Random, unique
-            time: 1, // In beats
-            duration: 0.5, // In seconds
-          },
-          {
-            id: 7278845,
-            time: 3,
-            duration: 0.5,
-          },
-          {
-            id: 35234234,
-            time: 5,
-            duration: 0.5,
-          },
-          {
-            id: 7843784,
-            time: 7,
-            duration: 0.5,
-          }
-        ]
-      },
-      {
-        samples: [
-          {
-            id: 9238412,
-            time: 2,
-            duration: 0.25,
-          },
-          {
-            id: 7278845,
-            time: 4,
-            duration: 0.75,
-          },
-          {
-            id: 35234234,
-            time: 6,
-            duration: 0.25,
-          },
-          {
-            id: 7843784,
-            time: 8,
-            duration: 0.75,
-          }
-        ]
-      }
-    ]
+    tracks: []
   },
   action
 ) => {
@@ -93,6 +44,11 @@ export default (
       return {
         ...state,
         tempo: action.tempo
+      }
+    case 'SET_TRACKS':
+      return {
+        ...state,
+        tracks: action.tracks
       }
     default:
       return state
