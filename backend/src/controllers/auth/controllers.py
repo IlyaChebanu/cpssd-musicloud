@@ -1,5 +1,4 @@
 import datetime
-import traceback
 
 import jwt
 from flask import Blueprint
@@ -15,31 +14,27 @@ from ...models.verification import get_verification_by_code, delete_verification
 from ...models.users import verify_user, get_user_via_username
 from ...models.auth import insert_login, delete_login
 from ...middleware.auth_required import auth_required
+from ...middleware.sql_err_catcher import sql_err_catcher
 
 auth = Blueprint('auth', __name__)
 
 
 @auth.route('/verify', methods=["GET"])
+@sql_err_catcher()
 def verify():
     code = request.args.get('code')
     if len(code) != 64:
         return {"message": "Invalid code."}, 400
 
-    try:
-        user = get_verification_by_code(code)
-        if not user:
-            return {"message": "Invalid code."}, 400
-
-        verify_user(user[0][1])
-        delete_verification(code, user[0][1])
-    except Exception:
-        log("error", "MySQL query failed", traceback.format_exc())
-        return {"message": "MySQL unavailable."}, 503
+    user = get_verification_by_code(code)
+    verify_user(user[0][1])
+    delete_verification(code, user[0][1])
 
     return send_file('controllers/auth/success.html'), 200
 
 
 @auth.route('/login', methods=["POST"])
+@sql_err_catcher()
 def login():
     expected_body = {
         "type": "object",
@@ -54,14 +49,7 @@ def login():
         log("warning", "Request validation failed.", str(exc))
         return {"message": str(exc)}, 422
 
-    try:
-        user = get_user_via_username(request.json.get("username"))
-    except Exception:
-        log("error", "MySQL query failed", traceback.format_exc())
-        return {"message": "MySQL unavailable."}, 503
-
-    if not user:
-        return {"message": "Bad login credentials."}, 401
+    user = get_user_via_username(request.json.get("username"))
 
     # Check the user's password against the provided one
     if not argon2.verify(request.json.get("password"), user[0][3]):
@@ -82,22 +70,14 @@ def login():
     }
     access_token = jwt.encode(jwt_payload, JWT_SECRET, algorithm='HS256')
 
-    try:
-        insert_login(user[0][0], access_token.decode('utf-8'), time_issued)
-    except Exception:
-        log("error", "MySQL query failed", traceback.format_exc())
-        return {"message": "MySQL unavailable."}, 503
+    insert_login(user[0][0], access_token.decode('utf-8'), time_issued)
 
     return {"access_token": access_token.decode('utf-8')}, 200
 
 
 @auth.route('/logout', methods=["POST"])
+@sql_err_catcher()
 @auth_required(return_token=True)
 def logout(access_token):
-    try:
-        delete_login(access_token)
-    except Exception:
-        log("error", "MySQL query failed", traceback.format_exc())
-        return {"message": "MySQL unavailable."}, 503
-
+    delete_login(access_token)
     return {"message": "User has been successfully logged out!"}, 200

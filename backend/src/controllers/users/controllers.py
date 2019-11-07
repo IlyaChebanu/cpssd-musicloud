@@ -20,11 +20,13 @@ from ...models.users import (
 )
 from ...models.verification import insert_verification, get_verification
 from ...middleware.auth_required import auth_required
+from ...middleware.sql_err_catcher import sql_err_catcher
 
 users = Blueprint("users", __name__)
 
 
 @users.route("/follow", methods=["POST"])
+@sql_err_catcher()
 @auth_required(return_user=True)
 def follow(user):
     expected_body = {
@@ -39,34 +41,21 @@ def follow(user):
         log("warning", "Request validation failed.", str(exc))
         return {"message": str(exc)}, 422
 
-    try:
-        other_user = get_user_via_username(request.json.get("username"))[0]
-    except Exception:
-        log("error", "MySQL query failed", traceback.format_exc())
-        return {"message": "MySQL unavailable."}, 503
-    if not other_user:
-        return {"message": "Invalid username"}, 422
+    other_user = get_user_via_username(request.json.get("username"))[0]
 
     if other_user[0] == user.get("uid"):
         return {"message": "You cannot follow your self"}, 422
 
-    try:
-        other_user_followers = get_following_pair(user.get("uid"), other_user[0])
-    except Exception:
-        log("error", "MySQL query failed", traceback.format_exc())
-        return {"message": "MySQL unavailable."}, 503
+    other_user_followers = get_following_pair(user.get("uid"), other_user[0])
 
     if (user.get("uid"), other_user[0]) not in other_user_followers:
-        try:
-            post_follow(user.get("uid"), other_user[0])
-        except Exception:
-            log("error", "MySQL query failed", traceback.format_exc())
-            return {"message": "MySQL unavailable."}, 503
+        post_follow(user.get("uid"), other_user[0])
 
     return {"message": "You are now following: " + request.json.get("username")}, 200
 
 
 @users.route("/unfollow", methods=["POST"])
+@sql_err_catcher()
 @auth_required(return_user=True)
 def unfollow(user):
     expected_body = {
@@ -81,27 +70,18 @@ def unfollow(user):
         log("warning", "Request validation failed.", str(exc))
         return {"message": str(exc)}, 422
 
-    try:
-        other_user = get_user_via_username(request.json.get("username"))[0]
-    except Exception:
-        log("error", "MySQL query failed", traceback.format_exc())
-        return {"message": "MySQL unavailable."}, 503
-    if not other_user:
-        return {"message": "Invalid username"}, 422
+    other_user = get_user_via_username(request.json.get("username"))[0]
 
     if other_user[2] == user.get("username"):
         return {"message": "You cannot unfollow your self"}, 422
 
-    try:
-        post_unfollow(user.get("uid"), other_user[0])
-    except Exception:
-        log("error", "MySQL query failed", traceback.format_exc())
-        return {"message": "MySQL unavailable."}, 503
+    post_unfollow(user.get("uid"), other_user[0])
 
     return {"message": "You are now no longer following: " + request.json.get("username")}, 200
 
 
 @users.route("", methods=["POST"])
+@sql_err_catcher()
 def register():
     expected_body = {
         "type": "object",
@@ -127,22 +107,15 @@ def register():
     if not re.match(r"[^@]+@[^@]+\.[^@]+", request.json.get("email")):
         return {"message": "Invalid email address."}, 400
 
-    try:
-        insert_user(request.json.get("email"), request.json.get("username"), password_hash)
-        uid = int(get_user_via_username(request.json.get("username"))[0][0])
-        while True:
-            try:
-                code = random_string(64)
-                insert_verification(code, uid)
-                break
-            except mysql.connector.errors.IntegrityError:
-                continue
-    except mysql.connector.errors.IntegrityError:
-        log("warning", "Attempted to create a duplicate user.", traceback.format_exc())
-        return {"message": "User already exists!"}, 409
-    except Exception:
-        log("error", "MySQL query failed", traceback.format_exc())
-        return {"message": "MySQL unavailable."}, 503
+    insert_user(request.json.get("email"), request.json.get("username"), password_hash)
+    uid = int(get_user_via_username(request.json.get("username"))[0][0])
+    while True:
+        try:
+            code = random_string(64)
+            insert_verification(code, uid)
+            break
+        except mysql.connector.errors.IntegrityError:
+            continue
 
     sent_from = "dcumusicloud@gmail.com"
     to = request.json.get("email")
@@ -161,6 +134,7 @@ def register():
 
 
 @users.route("/reverify", methods=["POST"])
+@sql_err_catcher()
 def reverify():
     expected_body = {
         "type": "object",
@@ -178,26 +152,20 @@ def reverify():
     if not re.match(r"[^@]+@[^@]+\.[^@]+", request.json.get("email")):
         return {"message": "Bad request."}, 400
 
-    try:
-        user = get_user_via_email(request.json.get("email"))
-        if not user:
-            return {"message": "Bad request."}, 400
-        elif user[0][4] == 1:
-            return {"message": "Already verified."}, 403
-        code = get_verification(user[0][0])
-        if not code:
-            while True:
-                try:
-                    code = random_string(64)
-                    insert_verification(code, user[0][0])
-                    break
-                except mysql.connector.errors.IntegrityError:
-                    continue
-        else:
-            code = code[0][0]
-    except Exception:
-        log("error", "MySQL query failed", traceback.format_exc())
-        return {"message": "MySQL unavailable."}, 503
+    user = get_user_via_email(request.json.get("email"))
+    if user[0][4] == 1:
+        return {"message": "Already verified."}, 403
+    code = get_verification(user[0][0])
+    if not code:
+        while True:
+            try:
+                code = random_string(64)
+                insert_verification(code, user[0][0])
+                break
+            except mysql.connector.errors.IntegrityError:
+                continue
+    else:
+        code = code[0][0]
 
     sent_from = "dcumusicloud@gmail.com"
     to = request.json.get("email")
@@ -216,22 +184,19 @@ def reverify():
 
 
 @users.route("", methods=["GET"])
+@sql_err_catcher()
 @auth_required()
 def user():
     username = request.args.get('username')
     if not username:
         return {"message": "Username param can't be empty!"}, 422
 
-    try:
-        user = get_user_via_username(username)
-        followers = get_follower_count(user[0][0])
-        following = get_following_count(user[0][0])
-        songs = get_song_count(user[0][0])
-        posts = get_number_of_posts(user[0][0])
-        likes = get_number_of_likes(user[0][0])
-    except Exception:
-        log("error", "MySQL query failed", traceback.format_exc())
-        return {"message": "MySQL unavailable."}, 503
+    user = get_user_via_username(username)
+    followers = get_follower_count(user[0][0])
+    following = get_following_count(user[0][0])
+    songs = get_song_count(user[0][0])
+    posts = get_number_of_posts(user[0][0])
+    likes = get_number_of_likes(user[0][0])
 
     return {
         "profile_pic_url": "NOT IMPLEMENTED",
@@ -245,6 +210,7 @@ def user():
 
 
 @users.route("/reset", methods=["GET"])
+@sql_err_catcher()
 def get_reset():
     email = request.args.get('email')
     if not email:
@@ -257,14 +223,7 @@ def get_reset():
     reset_code = random.randint(10000000, 99999999)
     time_issued = datetime.datetime.utcnow()
 
-    try:
-        user = get_user_via_email(email)
-        if not user:
-            return {"message": "Bad request."}, 400
-        uid = user[0][0]
-    except Exception:
-        log("error", "MySQL query failed", traceback.format_exc())
-        return {"message": "MySQL unavailable."}, 503
+    uid = get_user_via_email(email)[0][0]
 
     reset_sent = False
     try:
@@ -272,16 +231,9 @@ def get_reset():
         reset_sent = True
     except mysql.connector.errors.IntegrityError:
         pass
-    except Exception:
-        log("error", "MySQL query failed", traceback.format_exc())
-        return {"message": "MySQL unavailable."}, 503
 
     if not reset_sent:
-        try:
-            update_reset(time_issued, reset_code, uid)
-        except Exception:
-            log("error", "MySQL query failed", traceback.format_exc())
-            return {"message": "MySQL unavailable."}, 503
+        update_reset(time_issued, reset_code, uid)
 
     sent_from = "dcumusicloud@gmail.com"
     to = email
@@ -301,6 +253,7 @@ def get_reset():
 
 
 @users.route("/reset", methods=["POST"])
+@sql_err_catcher()
 def reset():
     expected_body = {
         "type": "object",
@@ -329,41 +282,24 @@ def reset():
     if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
         return {"message": "Bad request."}, 400
 
-    try:
-        user = get_user_via_email(email)
-        if not user:
-            return {"message": "Bad request."}, 400
-        uid = user[0][0]
-    except Exception:
-        log("error", "MySQL query failed", traceback.format_exc())
-        return {"message": "MySQL unavailable."}, 503
-
-    try:
-        reset_request = get_reset_request(uid, code)
-        if not reset_request:
-            return {"message": "Bad request."}, 400
-        time_issued = reset_request[0][2]
-    except Exception:
-        log("error", "MySQL query failed", traceback.format_exc())
-        return {"message": "MySQL unavailable."}, 503
+    uid = get_user_via_email(email)[0][0]
+    reset_request = get_reset_request(uid, code)
+    time_issued = reset_request[0][2]
 
     time_expired = time_issued + datetime.timedelta(minutes=RESET_TIMEOUT)
     now = datetime.datetime.utcnow()
 
     if (now < time_issued) or (now > time_expired):
-            return {"message": "The reset code has expired. Please request a new one."}, 401
+        return {"message": "The reset code has expired. Please request a new one."}, 401
 
-    try:
-        reset_password(uid, password_hash)
-        delete_reset(uid)
-    except Exception:
-        log("error", "MySQL query failed", traceback.format_exc())
-        return {"message": "MySQL unavailable."}, 503
+    reset_password(uid, password_hash)
+    delete_reset(uid)
 
     return {"message": "Password reset."}, 200
 
 
 @users.route("/post", methods=["POST"])
+@sql_err_catcher()
 @auth_required(return_user=True)
 def post():
     expected_body = {
@@ -379,17 +315,13 @@ def post():
         return {"message": str(exc)}, 422
 
     time_issued = datetime.datetime.utcnow()
-
-    try:
-        make_post(user.get("uid"), request.json.get("message"), time_issued)
-    except Exception:
-        log("error", "MySQL query failed", traceback.format_exc())
-        return {"message": "MySQL unavailable."}, 503
+    make_post(user.get("uid"), request.json.get("message"), time_issued)
 
     return {"message": "Message posted."}, 200
 
 
 @users.route("/posts", methods=["GET"])
+@sql_err_catcher()
 @auth_required(return_user=True)
 def posts():
     next_page = request.args.get('next_page')
@@ -398,11 +330,7 @@ def posts():
         username = request.args.get('username')
         if not username:
             return {"message": "Request missing username."}, 422
-        try:
-            uid = get_user_via_username(username)[0][0]
-        except Exception:
-            log("error", "MySQL query failed", traceback.format_exc())
-            return {"message": "MySQL unavailable."}, 503
+        uid = get_user_via_username(username)[0][0]
 
         posts_per_page = request.args.get('posts_per_page')
         if not posts_per_page:
@@ -414,11 +342,7 @@ def posts():
             current_page = 1
         current_page = int(current_page)
 
-        try:
-            total_posts = get_number_of_posts(uid)
-        except Exception:
-            log("error", "MySQL query failed", traceback.format_exc())
-            return {"message": "MySQL unavailable."}, 503
+        total_posts = get_number_of_posts(uid)
 
         total_pages = (total_posts // posts_per_page) + 1
         if current_page > total_pages:
@@ -427,11 +351,7 @@ def posts():
             }, 422
 
         start_index = (current_page * posts_per_page) - posts_per_page
-        try:
-            user_posts = get_posts(uid, start_index, posts_per_page)
-        except Exception:
-            log("error", "MySQL query failed", traceback.format_exc())
-            return {"message": "MySQL unavailable."}, 503
+        user_posts = get_posts(uid, start_index, posts_per_page)
 
         jwt_payload = {
             "uid": uid,
@@ -471,11 +391,7 @@ def posts():
         total_pages = token.get("total_pages")
         start_index = (current_page * posts_per_page) - posts_per_page
 
-        try:
-            user_posts = get_posts(uid, start_index, posts_per_page)
-        except Exception:
-            log("error", "MySQL query failed", traceback.format_exc())
-            return {"message": "MySQL unavailable."}, 503
+        user_posts = get_posts(uid, start_index, posts_per_page)
 
         jwt_payload = {
             "uid": uid,
