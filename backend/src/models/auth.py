@@ -1,4 +1,5 @@
 from ..utils import query
+from .errors import NoResults
 
 
 def insert_login(uid, access_token, time_issued):
@@ -28,7 +29,10 @@ def get_login(uid, access_token):
             uid,
             access_token,
         )
-        return query(sql, args, True)
+        login = query(sql, args, True)
+        if not login:
+            raise NoResults
+        return login
     except Exception as exc:
         raise exc
 
