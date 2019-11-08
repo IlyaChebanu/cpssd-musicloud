@@ -32,8 +32,12 @@ def follow(user):
     expected_body = {
         "type": "object",
         "properties": {
-            "username": {"type": "string"},
-        }
+            "username": {
+                "type": "string",
+                "minLength": 1
+            }
+        },
+        "required": ["username"]
     }
     try:
         validate(request.json, schema=expected_body)
@@ -61,8 +65,12 @@ def unfollow(user):
     expected_body = {
         "type": "object",
         "properties": {
-            "username": {"type": "string"},
-        }
+            "username": {
+                "type": "string",
+                "minLength": 1
+            }
+        },
+        "required": ["username"]
     }
     try:
         validate(request.json, schema=expected_body)
@@ -86,10 +94,20 @@ def register():
     expected_body = {
         "type": "object",
         "properties": {
-            "username": {"type": "string"},
-            "email": {"type": "string"},
-            "password": {"type": "string"},
-        }
+            "username": {
+                "type": "string",
+                "minLength": 1
+            },
+            "email": {
+                "type": "string",
+                "minLength": 1
+            },
+            "password": {
+                "type": "string",
+                "minLength": 1
+            }
+        },
+        "required": ["username", "email", "password"]
     }
     try:
         validate(request.json, schema=expected_body)
@@ -139,8 +157,12 @@ def reverify():
     expected_body = {
         "type": "object",
         "properties": {
-            "email": {"type": "string"},
-        }
+            "email": {
+                "type": "string",
+                "minLength": 1
+            }
+        },
+        "required": ["email"]
     }
     try:
         validate(request.json, schema=expected_body)
@@ -258,10 +280,20 @@ def reset():
     expected_body = {
         "type": "object",
         "properties": {
-            "email": {"type": "string"},
-            "code": {"type": "integer"},
-            "password": {"type": "string"},
-        }
+            "email": {
+                "type": "string",
+                "minLength": 1
+            },
+            "code": {
+                "type": "integer",
+                "minLength": 1
+            },
+            "password": {
+                "type": "string",
+                "minLength": 1
+            }
+        },
+        "required": ["email", "code", "password"]
     }
     try:
         validate(request.json, schema=expected_body)
@@ -305,8 +337,12 @@ def post():
     expected_body = {
         "type": "object",
         "properties": {
-            "message": {"type": "string"},
-        }
+            "message": {
+                "type": "string",
+                "minLength": 1
+            }
+        },
+        "required": ["message"]
     }
     try:
         validate(request.json, schema=expected_body)
@@ -426,8 +462,12 @@ def password(user):
     expected_body = {
         "type": "object",
         "properties": {
-            "password": {"type": "string"}
-        }
+            "password": {
+                "type": "string",
+                "minLength": 1
+            }
+        },
+        "required": ["password"]
     }
     try:
         validate(request.json, schema=expected_body)
@@ -441,6 +481,6 @@ def password(user):
         log("error", "Failed to hash password", traceback.format_exc())
         return {"message": "Error while hashing password."}, 500
 
-    reset_password(user[0][0], password_hash)
+    reset_password(user.get("uid"), password_hash)
 
     return {"message": "Password reset."}, 200
