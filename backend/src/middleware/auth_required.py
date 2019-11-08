@@ -24,8 +24,6 @@ def auth_required(return_user=False, return_token=False):
             except Exception:
                 log("error", "MySQL query failed", traceback.format_exc())
                 return {"message": "MySQL unavailable."}, 503
-            if "uid" not in user:
-                return user
             if return_user:
                 kwargs["user"] = user
             elif return_token:

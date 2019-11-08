@@ -315,8 +315,7 @@ def reset():
         return {"message": "Bad request."}, 400
 
     uid = get_user_via_email(email)[0][0]
-    reset_request = get_reset_request(uid, code)
-    time_issued = reset_request[0][2]
+    time_issued = get_reset_request(uid, code)[0][2]
 
     time_expired = time_issued + datetime.timedelta(minutes=RESET_TIMEOUT)
     now = datetime.datetime.utcnow()
@@ -333,7 +332,7 @@ def reset():
 @users.route("/post", methods=["POST"])
 @sql_err_catcher()
 @auth_required(return_user=True)
-def post():
+def post(user):
     expected_body = {
         "type": "object",
         "properties": {
@@ -358,7 +357,7 @@ def post():
 
 @users.route("/posts", methods=["GET"])
 @sql_err_catcher()
-@auth_required(return_user=True)
+@auth_required()
 def posts():
     next_page = request.args.get('next_page')
     back_page = request.args.get('back_page')
@@ -380,7 +379,9 @@ def posts():
 
         total_posts = get_number_of_posts(uid)
 
-        total_pages = (total_posts // posts_per_page) + 1
+        total_pages = (total_posts // posts_per_page)
+        if total_pages == 0:
+            total_pages = 1
         if current_page > total_pages:
             return {
                 "message": "current_page exceeds the total number of pages available(" + str(total_pages) + ")."
