@@ -417,3 +417,30 @@ def posts():
             "back_page": back_page,
             "posts": user_posts
         }, 200
+
+
+@users.route("/password", methods=["PATCH"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def password(user):
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "password": {"type": "string"}
+        }
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    try:
+        password_hash = argon2.hash(request.json.get("password"))
+    except Exception:
+        log("error", "Failed to hash password", traceback.format_exc())
+        return {"message": "Error while hashing password."}, 500
+
+    reset_password(user[0][0], password_hash)
+
+    return {"message": "Password reset."}, 200
