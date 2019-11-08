@@ -16,7 +16,7 @@ from ...utils import random_string, send_mail
 from ...models.users import (
     insert_user, get_user_via_username, get_user_via_email, make_post, create_reset, get_reset_request, delete_reset,
     post_follow, post_unfollow, reset_password, update_reset, get_number_of_posts, get_posts, get_follower_count,
-    get_song_count, get_number_of_likes, get_following_count, get_following_pair
+    get_song_count, get_number_of_likes, get_following_count, get_following_pair, reset_user_verification, reset_email
 )
 from ...models.verification import insert_verification, get_verification
 from ...middleware.auth_required import auth_required
@@ -455,19 +455,22 @@ def posts():
         }, 200
 
 
-@users.route("/password", methods=["PATCH"])
+@users.route("", methods=["PATCH"])
 @sql_err_catcher()
 @auth_required(return_user=True)
-def password(user):
+def patch_user(user):
     expected_body = {
         "type": "object",
         "properties": {
             "password": {
                 "type": "string",
                 "minLength": 1
+            },
+            "email": {
+                "type": "string",
+                "minLength": 1
             }
-        },
-        "required": ["password"]
+        }
     }
     try:
         validate(request.json, schema=expected_body)
@@ -475,12 +478,49 @@ def password(user):
         log("warning", "Request validation failed.", str(exc))
         return {"message": str(exc)}, 422
 
-    try:
-        password_hash = argon2.hash(request.json.get("password"))
-    except Exception:
-        log("error", "Failed to hash password", traceback.format_exc())
-        return {"message": "Error while hashing password."}, 500
+    if not request.json.get("email") and not request.json.get("password"):
+        return {"message": "You must send either an email address or password"}, 422
 
-    reset_password(user.get("uid"), password_hash)
+    res_string = ""
 
-    return {"message": "Password reset."}, 200
+    if request.json.get("email"):
+        # Verify that the email field is a valid email address str.
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", request.json.get("email")):
+            return {"message": "Bad request."}, 400
+
+        reset_user_verification(user.get("uid"))
+        while True:
+            try:
+                code = random_string(64)
+                insert_verification(code, user.get("uid"))
+                break
+            except mysql.connector.errors.IntegrityError:
+                continue
+
+        sent_from = "dcumusicloud@gmail.com"
+        to = request.json.get("email")
+        subject = "MusiCloud Email Verification"
+        url = "http://" + HOST + "/api/v1/auth/verify?code=" + code
+        body = "Welcome to MusiCloud. Please click on this URL to verify your account:\n" + url
+        email_text = """From: %s\nTo: %s\nSubject: %s\n\n%s
+        """ % (sent_from, to, subject, body)
+
+        try:
+            send_mail(sent_from, to, email_text)
+        except Exception:
+            log("error", "Failed to send email.", traceback.format_exc())
+
+        reset_email(user.get("uid"), request.json.get("email"))
+        res_string += "Email reset, and verification mail sent. "
+
+    if request.json.get("password"):
+        try:
+            password_hash = argon2.hash(request.json.get("password"))
+        except Exception:
+            log("error", "Failed to hash password", traceback.format_exc())
+            return {"message": "Error while hashing password."}, 500
+
+        reset_password(user.get("uid"), password_hash)
+        res_string += "Password reset."
+
+    return {"message": res_string}, 200
