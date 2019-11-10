@@ -992,11 +992,11 @@ class UserTests(unittest.TestCase):
         Ensure password resets are completed successfully.
         """
         mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0]]
-        mocked_reset.return_value = [["-1", 666, datetime.datetime.utcnow()]]
+        mocked_reset.return_value = [["-1", 10000000, datetime.datetime.utcnow()]]
         test_req_data = {
             "email": "username@fakemail.noshow",
             "password": "1234",
-            "code": 666
+            "code": 10000000
         }
         with mock.patch('backend.src.controllers.users.controllers.reset_password'):
             with mock.patch('backend.src.controllers.users.controllers.delete_reset'):
@@ -1013,7 +1013,7 @@ class UserTests(unittest.TestCase):
         """
         test_req_data = {
             "password": "1234",
-            "code": 666
+            "code": 10000000
         }
         res = self.test_client.post(
             "/api/v1/users/reset",
@@ -1021,15 +1021,17 @@ class UserTests(unittest.TestCase):
             follow_redirects=True
         )
         self.assertEqual((b'{"message":"\'email\' is a required property\\n\\nFailed validating \'req'
-                          b"uired' in schema:\\n    {'properties': {'code': {'minLength': 1, 'type': "
-                          b"'integer'},\\n                    'email': {'minLength': 1, 'type': 'stri"
-                          b"ng'},\\n                    'password': {'minLength': 1, 'type': 'string'"
-                          b"}},\\n     'required': ['email', 'code', 'password'],\\n     'type': 'obje"
-                          b'ct\'}\\n\\nOn instance:\\n    {\'code\': 666, \'password\': \'1234\'}"}\n'), res.data)
+                          b"uired' in schema:\\n    {'properties': {'code': {'maximum': 99999999,\\n  "
+                          b"                           'minimum': 10000000,\\n                       "
+                          b"      'type': 'integer'},\\n                    'email': {'minLength': 1,"
+                          b" 'type': 'string'},\\n                    'password': {'minLength': 1, 't"
+                          b"ype': 'string'}},\\n     'required': ['email', 'code', 'password'],\\n    "
+                          b" 'type': 'object'}\\n\\nOn instance:\\n    {'code': 10000000, 'password': '"
+                          b'1234\'}"}\n'), res.data)
         test_req_data = {
             "email": "",
             "password": "1234",
-            "code": 666
+            "code": 10000000
         }
         res = self.test_client.post(
             "/api/v1/users/reset",
@@ -1046,7 +1048,7 @@ class UserTests(unittest.TestCase):
         """
         test_req_data = {
             "email": "username@fakemail.noshow",
-            "code": 666
+            "code": 10000000
         }
         res = self.test_client.post(
             "/api/v1/users/reset",
@@ -1054,16 +1056,17 @@ class UserTests(unittest.TestCase):
             follow_redirects=True
         )
         self.assertEqual((b'{"message":"\'password\' is a required property\\n\\nFailed validating \''
-                          b"required' in schema:\\n    {'properties': {'code': {'minLength': 1, 'type"
-                          b"': 'integer'},\\n                    'email': {'minLength': 1, 'type': 's"
-                          b"tring'},\\n                    'password': {'minLength': 1, 'type': 'stri"
-                          b"ng'}},\\n     'required': ['email', 'code', 'password'],\\n     'type': 'o"
-                          b"bject'}\\n\\nOn instance:\\n    {'code': 666, 'email': 'username@fakemail.n"
-                          b'oshow\'}"}\n'), res.data)
+                          b"required' in schema:\\n    {'properties': {'code': {'maximum': 99999999,\\"
+                          b"n                             'minimum': 10000000,\\n                    "
+                          b"         'type': 'integer'},\\n                    'email': {'minLength':"
+                          b" 1, 'type': 'string'},\\n                    'password': {'minLength': 1,"
+                          b" 'type': 'string'}},\\n     'required': ['email', 'code', 'password'],\\n "
+                          b"    'type': 'object'}\\n\\nOn instance:\\n    {'code': 10000000, 'email': '"
+                          b'username@fakemail.noshow\'}"}\n'), res.data)
         test_req_data = {
             "email": "username@fakemail.noshow",
             "password": "",
-            "code": 666
+            "code": 10000000
         }
         res = self.test_client.post(
             "/api/v1/users/reset",
@@ -1088,12 +1091,13 @@ class UserTests(unittest.TestCase):
             follow_redirects=True
         )
         self.assertEqual((b'{"message":"\'code\' is a required property\\n\\nFailed validating \'requ'
-                          b"ired' in schema:\\n    {'properties': {'code': {'minLength': 1, 'type': '"
-                          b"integer'},\\n                    'email': {'minLength': 1, 'type': 'strin"
-                          b"g'},\\n                    'password': {'minLength': 1, 'type': 'string'}"
-                          b"},\\n     'required': ['email', 'code', 'password'],\\n     'type': 'objec"
-                          b"t'}\\n\\nOn instance:\\n    {'email': 'username@fakemail.noshow', 'password"
-                          b'\': \'1234\'}"}\n'), res.data)
+                          b"ired' in schema:\\n    {'properties': {'code': {'maximum': 99999999,\\n   "
+                          b"                          'minimum': 10000000,\\n                        "
+                          b"     'type': 'integer'},\\n                    'email': {'minLength': 1, "
+                          b"'type': 'string'},\\n                    'password': {'minLength': 1, 'ty"
+                          b"pe': 'string'}},\\n     'required': ['email', 'code', 'password'],\\n     "
+                          b"'type': 'object'}\\n\\nOn instance:\\n    {'email': 'username@fakemail.nosh"
+                          b'ow\', \'password\': \'1234\'}"}\n'), res.data)
         test_req_data = {
             "email": "username@fakemail.noshow",
             "password": "1234",
@@ -1105,15 +1109,16 @@ class UserTests(unittest.TestCase):
             follow_redirects=True
         )
         self.assertEqual((b'{"message":"None is not of type \'integer\'\\n\\nFailed validating \'type'
-                          b"' in schema['properties']['code']:\\n    {'minLength': 1, 'type': 'intege"
-                          b'r\'}\\n\\nOn instance[\'code\']:\\n    None"}\n'), res.data)
+                          b"' in schema['properties']['code']:\\n    {'maximum': 99999999, 'minimum':"
+                          b' 10000000, \'type\': \'integer\'}\\n\\nOn instance[\'code\']:\\n    None"'
+                          b'}\n'), res.data)
 
     def test_password_reset_fail_missing_email_and_password(self):
         """
         Ensure password resets fail if an eamil & password are not sent.
         """
         test_req_data = {
-            "code": 666
+            "code": 10000000
         }
         res = self.test_client.post(
             "/api/v1/users/reset",
@@ -1121,15 +1126,16 @@ class UserTests(unittest.TestCase):
             follow_redirects=True
         )
         self.assertEqual((b'{"message":"\'email\' is a required property\\n\\nFailed validating \'req'
-                          b"uired' in schema:\\n    {'properties': {'code': {'minLength': 1, 'type': "
-                          b"'integer'},\\n                    'email': {'minLength': 1, 'type': 'stri"
-                          b"ng'},\\n                    'password': {'minLength': 1, 'type': 'string'"
-                          b"}},\\n     'required': ['email', 'code', 'password'],\\n     'type': 'obje"
-                          b'ct\'}\\n\\nOn instance:\\n    {\'code\': 666}"}\n'), res.data)
+                          b"uired' in schema:\\n    {'properties': {'code': {'maximum': 99999999,\\n  "
+                          b"                           'minimum': 10000000,\\n                       "
+                          b"      'type': 'integer'},\\n                    'email': {'minLength': 1,"
+                          b" 'type': 'string'},\\n                    'password': {'minLength': 1, 't"
+                          b"ype': 'string'}},\\n     'required': ['email', 'code', 'password'],\\n    "
+                          b' \'type\': \'object\'}\\n\\nOn instance:\\n    {\'code\': 10000000}"}\n'), res.data)
         test_req_data = {
             "email": "",
             "password": "",
-            "code": 666
+            "code": 10000000
         }
         res = self.test_client.post(
             "/api/v1/users/reset",
@@ -1153,11 +1159,12 @@ class UserTests(unittest.TestCase):
             follow_redirects=True
         )
         self.assertEqual((b'{"message":"\'email\' is a required property\\n\\nFailed validating \'req'
-                          b"uired' in schema:\\n    {'properties': {'code': {'minLength': 1, 'type': "
-                          b"'integer'},\\n                    'email': {'minLength': 1, 'type': 'stri"
-                          b"ng'},\\n                    'password': {'minLength': 1, 'type': 'string'"
-                          b"}},\\n     'required': ['email', 'code', 'password'],\\n     'type': 'obje"
-                          b'ct\'}\\n\\nOn instance:\\n    {\'password\': \'1234\'}"}\n'), res.data)
+                          b"uired' in schema:\\n    {'properties': {'code': {'maximum': 99999999,\\n  "
+                          b"                           'minimum': 10000000,\\n                       "
+                          b"      'type': 'integer'},\\n                    'email': {'minLength': 1,"
+                          b" 'type': 'string'},\\n                    'password': {'minLength': 1, 't"
+                          b"ype': 'string'}},\\n     'required': ['email', 'code', 'password'],\\n    "
+                          b' \'type\': \'object\'}\\n\\nOn instance:\\n    {\'password\': \'1234\'}"}\n'), res.data)
         test_req_data = {
             "email": "",
             "password": "1234",
@@ -1185,11 +1192,13 @@ class UserTests(unittest.TestCase):
             follow_redirects=True
         )
         self.assertEqual((b'{"message":"\'code\' is a required property\\n\\nFailed validating \'requ'
-                          b"ired' in schema:\\n    {'properties': {'code': {'minLength': 1, 'type': '"
-                          b"integer'},\\n                    'email': {'minLength': 1, 'type': 'strin"
-                          b"g'},\\n                    'password': {'minLength': 1, 'type': 'string'}"
-                          b"},\\n     'required': ['email', 'code', 'password'],\\n     'type': 'objec"
-                          b't\'}\\n\\nOn instance:\\n    {\'email\': \'username@fakemail.noshow\'}"}\n'), res.data)
+                          b"ired' in schema:\\n    {'properties': {'code': {'maximum': 99999999,\\n   "
+                          b"                          'minimum': 10000000,\\n                        "
+                          b"     'type': 'integer'},\\n                    'email': {'minLength': 1, "
+                          b"'type': 'string'},\\n                    'password': {'minLength': 1, 'ty"
+                          b"pe': 'string'}},\\n     'required': ['email', 'code', 'password'],\\n     "
+                          b"'type': 'object'}\\n\\nOn instance:\\n    {'email': 'username@fakemail.nosh"
+                          b'ow\'}"}\n'), res.data)
         test_req_data = {
             "email": "username@fakemail.noshow",
             "password": "",
@@ -1201,8 +1210,9 @@ class UserTests(unittest.TestCase):
             follow_redirects=True
         )
         self.assertEqual((b'{"message":"None is not of type \'integer\'\\n\\nFailed validating \'type'
-                          b"' in schema['properties']['code']:\\n    {'minLength': 1, 'type': 'intege"
-                          b'r\'}\\n\\nOn instance[\'code\']:\\n    None"}\n'), res.data)
+                          b"' in schema['properties']['code']:\\n    {'maximum': 99999999, 'minimum':"
+                          b' 10000000, \'type\': \'integer\'}\\n\\nOn instance[\'code\']:\\n    None"'
+                          b'}\n'), res.data)
 
     def test_password_reset_fail_failed_password_hashing(self):
         """
@@ -1211,7 +1221,7 @@ class UserTests(unittest.TestCase):
         test_req_data = {
             "email": "username@fakemail.noshow",
             "password": "1234",
-            "code": 666
+            "code": 10000000
         }
         with mock.patch('backend.src.controllers.users.controllers.argon2.hash') as f:
             f.side_effect = Exception()
@@ -1229,7 +1239,7 @@ class UserTests(unittest.TestCase):
         test_req_data = {
             "email": "username",
             "password": "1234",
-            "code": 666
+            "code": 10000000
         }
         res = self.test_client.post(
             "/api/v1/users/reset",
@@ -1247,7 +1257,7 @@ class UserTests(unittest.TestCase):
         test_req_data = {
             "email": "username@deffoNotAnEmail.fake",
             "password": "1234",
-            "code": 666
+            "code": 10000000
         }
         res = self.test_client.post(
             "/api/v1/users/reset",
@@ -1267,7 +1277,7 @@ class UserTests(unittest.TestCase):
         test_req_data = {
             "email": "username@deffoNotAnEmail.fake",
             "password": "1234",
-            "code": 666
+            "code": 10000000
         }
         res = self.test_client.post(
             "/api/v1/users/reset",
@@ -1283,11 +1293,11 @@ class UserTests(unittest.TestCase):
         Ensure password reset fails if the user sends an expired reset code.
         """
         mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0]]
-        mocked_reset.return_value = [["-1", 666, datetime.datetime(1970, 1, 1, 1, 1, 1)]]
+        mocked_reset.return_value = [["-1", 10000000, datetime.datetime(1970, 1, 1, 1, 1, 1)]]
         test_req_data = {
             "email": "username@deffoNotAnEmail.fake",
             "password": "1234",
-            "code": 666
+            "code": 10000000
         }
         res = self.test_client.post(
             "/api/v1/users/reset",

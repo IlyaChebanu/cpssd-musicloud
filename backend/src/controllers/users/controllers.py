@@ -286,7 +286,8 @@ def reset():
             },
             "code": {
                 "type": "integer",
-                "minLength": 1
+                "minimum": 10000000,
+                "maximum": 99999999
             },
             "password": {
                 "type": "string",
