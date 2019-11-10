@@ -132,16 +132,13 @@ def register():
         except mysql.connector.errors.IntegrityError:
             continue
 
-    sent_from = "dcumusicloud@gmail.com"
-    to = request.json.get("email")
+
     subject = "MusiCloud Email Verification"
     url = "http://" + HOST + "/api/v1/auth/verify?code=" + code
     body = "Welcome to MusiCloud. Please click on this URL to verify your account:\n" + url
-    email_text = """From: %s\nTo: %s\nSubject: %s\n\n%s
-    """ % (sent_from, to, subject, body)
 
     try:
-        send_mail(sent_from, to, email_text)
+        send_mail(request.json.get("email"), subject, body)
     except Exception:
         log("error", "Failed to send email.", traceback.format_exc())
 
@@ -183,16 +180,12 @@ def reverify():
     else:
         code = code[0][0]
 
-    sent_from = "dcumusicloud@gmail.com"
-    to = request.json.get("email")
     subject = "MusiCloud Email Verification"
     url = "http://" + HOST + "/api/v1/auth/verify?code=" + code
     body = "Welcome to MusiCloud. Please click on this URL to verify your account:\n" + url
-    email_text = """From: %s\nTo: %s\nSubject: %s\n\n%s
-    """ % (sent_from, to, subject, body)
 
     try:
-        send_mail(sent_from, to, email_text)
+        send_mail(request.json.get("email"), subject, body)
     except Exception:
         log("error", "Failed to send email.", traceback.format_exc())
 
@@ -251,17 +244,13 @@ def get_reset():
     if not reset_sent:
         update_reset(time_issued, reset_code, uid)
 
-    sent_from = "dcumusicloud@gmail.com"
-    to = email
     subject = "MusiCloud Password Reset"
     body = """
     To reset your MusiCloud password, please enter the following code in the forgot password section of our app:\n
     """ + str(reset_code)
-    email_text = """From: %s\nTo: %s\nSubject: %s\n\n%s
-        """ % (sent_from, to, subject, body)
 
     try:
-        send_mail(sent_from, to, email_text)
+        send_mail(request.json.get("email"), subject, body)
     except Exception:
         log("error", "Failed to send email.", traceback.format_exc())
 
@@ -485,16 +474,12 @@ def patch_user(user):
             except mysql.connector.errors.IntegrityError:
                 continue
 
-        sent_from = "dcumusicloud@gmail.com"
-        to = request.json.get("email")
         subject = "MusiCloud Email Verification"
         url = "http://" + HOST + "/api/v1/auth/verify?code=" + code
         body = "Welcome to MusiCloud. Please click on this URL to verify your account:\n" + url
-        email_text = """From: %s\nTo: %s\nSubject: %s\n\n%s
-        """ % (sent_from, to, subject, body)
 
         try:
-            send_mail(sent_from, to, email_text)
+            send_mail(request.json.get("email"), subject, body)
         except Exception:
             log("error", "Failed to send email.", traceback.format_exc())
 

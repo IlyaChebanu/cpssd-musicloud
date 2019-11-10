@@ -3,9 +3,12 @@ import smtplib
 from ..config import SMTP_CONFIG
 
 
-def send_mail(sent_from, to, email_text):
+def send_mail(to, subject, body):
     """Sends an email to the provided address"""
     # Connect to SMTP server.
+    sent_from = "dcumusicloud@gmail.com"
+    email_text = """From: %s\nTo: %s\nSubject: %s\n\n%s
+        """ % (sent_from, to, subject, body)
     smtp = smtplib.SMTP()
     server = SMTP_CONFIG.get("server")
     port = 587
