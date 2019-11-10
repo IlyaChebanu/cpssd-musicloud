@@ -1,6 +1,9 @@
 import { playingStartTime, setCurrentBeat, playingStartBeat, setTracks } from '../actions/studioActions';
 import kick from '../assets/samples/kick23.wav';
 import axios from 'axios';
+import scheduleSample from '../helpers/scheduleSample';
+import bufferStore from '../bufferStore';
+import getSampleTimes from '../helpers/getSampleTimes';
 
 const LOOKAHEAD = 25; //ms
 const OVERLAP = 100/*ms*/ / 1000;
@@ -34,38 +37,35 @@ export default store => {
     }
   ];
 
-  const buffers = {};
-
 
   let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  const scheduledSamples = {};
 
+
+  // Download all tracks and store buffers into the bufferStore
   Promise.all(tracks.map(async track => {
     await Promise.all(track.samples.map(async sample => {
-      if (!buffers[sample.url]) {
+      if (!bufferStore[sample.url]) {
         const res = await axios.get(sample.url, { responseType: 'arraybuffer' });
         const buffer = await audioCtx.decodeAudioData(res.data);
-        buffers[sample.url] = buffer;
+        bufferStore[sample.url] = buffer;
       }
-      sample.duration = buffers[sample.url].duration;
+      sample.duration = bufferStore[sample.url].duration;
     }));
   })).then(() => {
     store.dispatch(setTracks(tracks));
   });
 
-  let beatStateUpdate;
-
   // Update currentBeat in redux to animate seek bar
   const beatUpdate = () => {
     const state = store.getState().studio;
     if (state.playing) {
-      beatStateUpdate = requestAnimationFrame(beatUpdate);
+      requestAnimationFrame(beatUpdate);
       const secondsPerBeat = 60 / state.tempo;
       const currentBeat = state.playingStartBeat + (audioCtx.currentTime - state.playingStartTime) / secondsPerBeat;
       store.dispatch(setCurrentBeat(currentBeat));
     }
   }
-
-  const scheduledSamples = {};
 
   let scheduler = setInterval(() => {
     const state = store.getState().studio;
@@ -74,36 +74,28 @@ export default store => {
         audioCtx.resume();
       }
 
-      const secondsPerBeat = 60 / state.tempo;
-
-      const currentBeat = state.currentBeat;
-
       // Delete played samples
       Object.entries(scheduledSamples).forEach(([id, sample]) => {
-        const endTime = audioCtx.currentTime + sample.duration + (sample.time - currentBeat) * secondsPerBeat;
+        const [_, endTime] = getSampleTimes(audioCtx, state, sample);
         if (endTime < audioCtx.currentTime) {
           delete scheduledSamples[id];
         }
       });
 
+      // Find schedulable samples
       const schedulableSamples = [];
       state.tracks.forEach(track => {
         schedulableSamples.push(...track.samples.filter(sample => {
-          return sample.time >= currentBeat && (sample.time - currentBeat) * secondsPerBeat < OVERLAP;
+          const [startTime] = getSampleTimes(audioCtx, state, sample);
+          return startTime >= audioCtx.currentTime && startTime < startTime + OVERLAP;
         }));
       });
 
+      // Schedule samples
       schedulableSamples.forEach(sample => {
         if (!(sample.id in scheduledSamples)) {
-          const startTime = audioCtx.currentTime + (sample.time - currentBeat) * secondsPerBeat;
-          const endTime = audioCtx.currentTime + sample.duration + (sample.time - currentBeat) * secondsPerBeat;
-          // console.log('Scheduling sample', sample, 'at', audioCtx.currentTime, 'for', startTime, 'ending at', endTime);
-          const src = audioCtx.createBufferSource();
-          src.buffer = buffers[sample.url];
-          src.connect(audioCtx.destination);
-          src.start(startTime);
-          src.stop(endTime);
-          scheduledSamples[sample.id] = { ...sample, source: src };
+          const source = scheduleSample(audioCtx, state, sample, bufferStore[sample.url]);
+          scheduledSamples[sample.id] = { ...sample, source };
         }
       });
     }
@@ -116,32 +108,22 @@ export default store => {
         store.dispatch(playingStartTime(audioCtx.currentTime));
         requestAnimationFrame(beatUpdate);
         state = store.getState().studio;
-        const secondsPerBeat = 60 / state.tempo;
-        const currentBeat = state.currentBeat;
         const schedulableSamples = [];
         state.tracks.forEach(track => {
           schedulableSamples.push(...track.samples.filter(sample => {
-            const startTime = audioCtx.currentTime + (sample.time - currentBeat) * secondsPerBeat;
-            const endTime = audioCtx.currentTime + sample.duration + (sample.time - currentBeat) * secondsPerBeat;
+            const [startTime, endTime] = getSampleTimes(audioCtx, state, sample);
             return endTime > audioCtx.currentTime && startTime <= audioCtx.currentTime;
           }));
         });
 
         schedulableSamples.forEach(sample => {
           if (!(sample.id in scheduledSamples)) {
-            const startTime = audioCtx.currentTime + (sample.time - currentBeat) * secondsPerBeat;
-            const offset = (currentBeat - sample.time) * secondsPerBeat;
-            const endTime = audioCtx.currentTime + sample.duration + (sample.time - currentBeat) * secondsPerBeat;
-            // console.log('Scheduling old sample', sample, 'at', audioCtx.currentTime, 'offset', startTime, 'ending at', endTime, sample.time, currentBeat);
-            const src = audioCtx.createBufferSource();
-            src.buffer = buffers[sample.url];
-            src.connect(audioCtx.destination);
-            src.start(startTime, offset);
-            src.stop(endTime);
-            scheduledSamples[sample.id] = { ...sample, source: src };
+            const source = scheduleSample(audioCtx, state, sample, bufferStore[sample.url]);
+            scheduledSamples[sample.id] = { ...sample, source };
           }
         });
         break;
+
       case 'STUDIO_PAUSE':
         state = store.getState().studio;
         store.dispatch(playingStartBeat(state.currentBeat));
@@ -150,6 +132,7 @@ export default store => {
           delete scheduledSamples[id];
         });
         break;
+
       case 'STUDIO_STOP':
         store.dispatch(playingStartBeat(1));
         store.dispatch(setCurrentBeat(1));
@@ -158,6 +141,7 @@ export default store => {
           delete scheduledSamples[id];
         });
         break;
+
       default:
         break;
       };
