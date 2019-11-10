@@ -7,6 +7,7 @@ import kick from '../../assets/samples/kick23.wav';
 import bass from '../../assets/samples/bass.wav';
 import Timeline from '../../components/Timeline';
 
+
 const Studio = memo(props => {
   const { dispatch } = props;
 
