@@ -100,6 +100,7 @@ def register():
             },
             "email": {
                 "type": "string",
+                "pattern": "[^@]+@[^@]+\.[^@]+",
                 "minLength": 1
             },
             "password": {
@@ -120,10 +121,6 @@ def register():
     except Exception:
         log("error", "Failed to hash password", traceback.format_exc())
         return {"message": "Error while hashing password."}, 500
-
-    # Verify that the email field is a valid email address str.
-    if not re.match(r"[^@]+@[^@]+\.[^@]+", request.json.get("email")):
-        return {"message": "Invalid email address."}, 400
 
     insert_user(request.json.get("email"), request.json.get("username"), password_hash)
     uid = int(get_user_via_username(request.json.get("username"))[0][0])
@@ -159,6 +156,7 @@ def reverify():
         "properties": {
             "email": {
                 "type": "string",
+                "pattern": "[^@]+@[^@]+\.[^@]+",
                 "minLength": 1
             }
         },
@@ -169,10 +167,6 @@ def reverify():
     except ValidationError as exc:
         log("warning", "Request validation failed.", str(exc))
         return {"message": str(exc)}, 422
-
-    # Verify that the email field is a valid email address str.
-    if not re.match(r"[^@]+@[^@]+\.[^@]+", request.json.get("email")):
-        return {"message": "Bad request."}, 400
 
     user = get_user_via_email(request.json.get("email"))
     if user[0][4] == 1:
@@ -282,6 +276,7 @@ def reset():
         "properties": {
             "email": {
                 "type": "string",
+                "pattern": "[^@]+@[^@]+\.[^@]+",
                 "minLength": 1
             },
             "code": {
@@ -310,10 +305,6 @@ def reset():
     except Exception:
         log("error", "Failed to hash password", traceback.format_exc())
         return {"message": "Error while hashing password."}, 500
-
-    # Verify that the email field is a valid email address str.
-    if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
-        return {"message": "Bad request."}, 400
 
     uid = get_user_via_email(email)[0][0]
     time_issued = get_reset_request(uid, code)[0][2]
@@ -470,6 +461,7 @@ def patch_user(user):
             },
             "email": {
                 "type": "string",
+                "pattern": "[^@]+@[^@]+\.[^@]+",
                 "minLength": 1
             }
         },
@@ -484,10 +476,6 @@ def patch_user(user):
     res_string = ""
 
     if request.json.get("email"):
-        # Verify that the email field is a valid email address str.
-        if not re.match(r"[^@]+@[^@]+\.[^@]+", request.json.get("email")):
-            return {"message": "Bad request."}, 400
-
         reset_user_verification(user.get("uid"))
         while True:
             try:
