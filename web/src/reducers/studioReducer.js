@@ -5,6 +5,8 @@ export default (
     playingStartTime: 0,
     playing: false,
     currentBeat: 1,
+    volume: 1,
+    sampleLoading: false,
     tracks: []
   },
   action
@@ -49,6 +51,16 @@ export default (
       return {
         ...state,
         tracks: action.tracks
+      }
+    case 'SET_SAMPLE_LOADING':
+      return {
+        ...state,
+        sampleLoading: action.bool
+      }
+    case 'SET_VOLUME':
+      return {
+        ...state,
+        volume: action.volume
       }
     default:
       return state

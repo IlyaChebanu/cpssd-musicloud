@@ -50,3 +50,17 @@ export const setTracks = tracks => dispatch => {
     tracks
   });
 };
+
+export const setSampleLoading = bool => dispatch => {
+  dispatch({
+    type: 'SET_SAMPLE_LOADING',
+    bool
+  });
+};
+
+export const setVolume = volume => dispatch => {
+  dispatch({
+    type: 'SET_VOLUME',
+    volume
+  });
+};

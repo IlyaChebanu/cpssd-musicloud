@@ -1,9 +1,10 @@
-import { playingStartTime, setCurrentBeat, playingStartBeat, setTracks } from '../actions/studioActions';
+import { playingStartTime, setCurrentBeat, playingStartBeat, setTracks, setSampleLoading } from '../actions/studioActions';
 import kick from '../assets/samples/kick23.wav';
+import bass from '../assets/samples/bass.wav';
 import axios from 'axios';
 import scheduleSample from '../helpers/scheduleSample';
-import bufferStore from '../bufferStore';
 import getSampleTimes from '../helpers/getSampleTimes';
+import { globalSongGain, audioContext, bufferStore } from '../helpers/constants';
 
 const LOOKAHEAD = 25; //ms
 const OVERLAP = 100/*ms*/ / 1000;
@@ -12,49 +13,44 @@ export default store => {
 
   const tracks = [
     {
+      volume: 0.25,
       samples: [
         {
           id: 1,
           time: 1,
-          url: kick
-        },
-        {
-          id: 2,
-          time: 2,
-          url: kick
+          url: bass
         },
         {
           id: 3,
           time: 3,
-          url: kick
+          url: bass
+        },
+      ]
+    },
+    {
+      volume: 1,
+      samples: [
+        {
+          id: 2,
+          time: 2,
+          url: bass
         },
         {
           id: 4,
           time: 4,
-          url: kick
+          url: bass
         },
       ]
     }
   ];
 
+  // Only for testing purposes
+  setTimeout(() => {
+    store.dispatch(setTracks(tracks));
+  }, 0);
 
-  let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   const scheduledSamples = {};
 
-
-  // Download all tracks and store buffers into the bufferStore
-  Promise.all(tracks.map(async track => {
-    await Promise.all(track.samples.map(async sample => {
-      if (!bufferStore[sample.url]) {
-        const res = await axios.get(sample.url, { responseType: 'arraybuffer' });
-        const buffer = await audioCtx.decodeAudioData(res.data);
-        bufferStore[sample.url] = buffer;
-      }
-      sample.duration = bufferStore[sample.url].duration;
-    }));
-  })).then(() => {
-    store.dispatch(setTracks(tracks));
-  });
 
   // Update currentBeat in redux to animate seek bar
   const beatUpdate = () => {
@@ -62,7 +58,7 @@ export default store => {
     if (state.playing) {
       requestAnimationFrame(beatUpdate);
       const secondsPerBeat = 60 / state.tempo;
-      const currentBeat = state.playingStartBeat + (audioCtx.currentTime - state.playingStartTime) / secondsPerBeat;
+      const currentBeat = state.playingStartBeat + (audioContext.currentTime - state.playingStartTime) / secondsPerBeat;
       store.dispatch(setCurrentBeat(currentBeat));
     }
   }
@@ -70,56 +66,62 @@ export default store => {
   let scheduler = setInterval(() => {
     const state = store.getState().studio;
     if (state.playing) {
-      if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
+      if (audioContext.state === 'suspended') {
+        audioContext.resume();
       }
 
       // Delete played samples
       Object.entries(scheduledSamples).forEach(([id, sample]) => {
-        const [_, endTime] = getSampleTimes(audioCtx, state, sample);
-        if (endTime < audioCtx.currentTime) {
+        const [_, endTime] = getSampleTimes(audioContext, state, sample);
+        if (endTime < audioContext.currentTime) {
           delete scheduledSamples[id];
         }
       });
 
       // Find schedulable samples
       const schedulableSamples = [];
-      state.tracks.forEach(track => {
+      state.tracks.forEach((track, i) => {
         schedulableSamples.push(...track.samples.filter(sample => {
-          const [startTime] = getSampleTimes(audioCtx, state, sample);
-          return startTime >= audioCtx.currentTime && startTime < startTime + OVERLAP;
+          const [startTime] = getSampleTimes(audioContext, state, sample);
+          sample.volume = track.volume;
+          sample.track = i;
+          sample.buffer = bufferStore[sample.url];
+          return startTime >= audioContext.currentTime && startTime < startTime + OVERLAP;
         }));
       });
 
       // Schedule samples
       schedulableSamples.forEach(sample => {
         if (!(sample.id in scheduledSamples)) {
-          const source = scheduleSample(audioCtx, state, sample, bufferStore[sample.url]);
-          scheduledSamples[sample.id] = { ...sample, source };
+          const source = scheduleSample(sample);
+          scheduledSamples[sample.id] = { ...sample, ...source };
         }
       });
     }
   }, LOOKAHEAD);
 
-  return next => action => {
+  return next => async action => {
     let state;
     switch (action.type) {
       case 'STUDIO_PLAY':
-        store.dispatch(playingStartTime(audioCtx.currentTime));
+        store.dispatch(playingStartTime(audioContext.currentTime));
         requestAnimationFrame(beatUpdate);
         state = store.getState().studio;
         const schedulableSamples = [];
-        state.tracks.forEach(track => {
+        state.tracks.forEach((track, i) => {
           schedulableSamples.push(...track.samples.filter(sample => {
-            const [startTime, endTime] = getSampleTimes(audioCtx, state, sample);
-            return endTime > audioCtx.currentTime && startTime <= audioCtx.currentTime;
+            sample.volume = track.volume;
+            sample.track = i;
+            sample.buffer = bufferStore[sample.url];
+            const [startTime, endTime] = getSampleTimes(audioContext, state, sample);
+            return endTime > audioContext.currentTime && startTime <= audioContext.currentTime;
           }));
         });
 
         schedulableSamples.forEach(sample => {
           if (!(sample.id in scheduledSamples)) {
-            const source = scheduleSample(audioCtx, state, sample, bufferStore[sample.url]);
-            scheduledSamples[sample.id] = { ...sample, source };
+            const source = scheduleSample(sample);
+            scheduledSamples[sample.id] = { ...sample, ...source };
           }
         });
         break;
@@ -128,6 +130,7 @@ export default store => {
         state = store.getState().studio;
         store.dispatch(playingStartBeat(state.currentBeat));
         Object.entries(scheduledSamples).forEach(([id, sample]) => {
+          console.log(sample);
           sample.source.stop();
           delete scheduledSamples[id];
         });
@@ -140,6 +143,31 @@ export default store => {
           sample.source.stop();
           delete scheduledSamples[id];
         });
+        break;
+
+      case 'SET_TRACKS':
+        // React to volume change
+        Object.values(scheduledSamples).forEach(sample => {
+          sample.gain.gain.setValueAtTime(action.tracks[sample.track].volume, audioContext.currentTime);
+        });
+
+        // Verify that all the tracks have buffers
+        await store.dispatch(setSampleLoading(true));
+        await Promise.all(action.tracks.map(async track => {
+          await Promise.all(track.samples.map(async sample => {
+            if (!bufferStore[sample.url]) {
+              const res = await axios.get(sample.url, { responseType: 'arraybuffer' });
+              const buffer = await audioContext.decodeAudioData(res.data);
+              bufferStore[sample.url] = buffer;
+            }
+            sample.duration = bufferStore[sample.url].duration;
+          }));
+        }));
+        store.dispatch(setSampleLoading(false));
+        break;
+
+      case 'SET_VOLUME':
+        globalSongGain.gain.setValueAtTime(action.volume, audioContext.currentTime);
         break;
 
       default:
