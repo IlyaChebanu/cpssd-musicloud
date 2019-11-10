@@ -70,6 +70,19 @@ def reset_password(uid, password):
     query(sql, args)
 
 
+def reset_email(uid, email):
+    sql = (
+        "UPDATE Users "
+        "SET email = %s "
+        "WHERE uid = %s"
+    )
+    args = (
+        email,
+        uid,
+    )
+    query(sql, args)
+
+
 def make_post(uid, message, time_of_post):
     sql = (
         "INSERT INTO Posts "
@@ -250,6 +263,18 @@ def delete_reset(uid):
     sql = (
         "DELETE FROM Resets "
         "WHERE uid = %s "
+    )
+    args = (
+        uid,
+    )
+    query(sql, args)
+
+
+def reset_user_verification(uid):
+    sql = (
+        "UPDATE Users "
+        "SET verified = 0 "
+        "WHERE uid = %s"
     )
     args = (
         uid,

@@ -16,7 +16,7 @@ from ...utils import random_string, send_mail
 from ...models.users import (
     insert_user, get_user_via_username, get_user_via_email, make_post, create_reset, get_reset_request, delete_reset,
     post_follow, post_unfollow, reset_password, update_reset, get_number_of_posts, get_posts, get_follower_count,
-    get_song_count, get_number_of_likes, get_following_count, get_following_pair
+    get_song_count, get_number_of_likes, get_following_count, get_following_pair, reset_user_verification, reset_email
 )
 from ...models.verification import insert_verification, get_verification
 from ...middleware.auth_required import auth_required
@@ -32,8 +32,12 @@ def follow(user):
     expected_body = {
         "type": "object",
         "properties": {
-            "username": {"type": "string"},
-        }
+            "username": {
+                "type": "string",
+                "minLength": 1
+            }
+        },
+        "required": ["username"]
     }
     try:
         validate(request.json, schema=expected_body)
@@ -61,8 +65,12 @@ def unfollow(user):
     expected_body = {
         "type": "object",
         "properties": {
-            "username": {"type": "string"},
-        }
+            "username": {
+                "type": "string",
+                "minLength": 1
+            }
+        },
+        "required": ["username"]
     }
     try:
         validate(request.json, schema=expected_body)
@@ -86,10 +94,21 @@ def register():
     expected_body = {
         "type": "object",
         "properties": {
-            "username": {"type": "string"},
-            "email": {"type": "string"},
-            "password": {"type": "string"},
-        }
+            "username": {
+                "type": "string",
+                "minLength": 1
+            },
+            "email": {
+                "type": "string",
+                "pattern": "[^@]+@[^@]+\.[^@]+",
+                "minLength": 1
+            },
+            "password": {
+                "type": "string",
+                "minLength": 1
+            }
+        },
+        "required": ["username", "email", "password"]
     }
     try:
         validate(request.json, schema=expected_body)
@@ -103,10 +122,6 @@ def register():
         log("error", "Failed to hash password", traceback.format_exc())
         return {"message": "Error while hashing password."}, 500
 
-    # Verify that the email field is a valid email address str.
-    if not re.match(r"[^@]+@[^@]+\.[^@]+", request.json.get("email")):
-        return {"message": "Invalid email address."}, 400
-
     insert_user(request.json.get("email"), request.json.get("username"), password_hash)
     uid = int(get_user_via_username(request.json.get("username"))[0][0])
     while True:
@@ -117,16 +132,13 @@ def register():
         except mysql.connector.errors.IntegrityError:
             continue
 
-    sent_from = "dcumusicloud@gmail.com"
-    to = request.json.get("email")
+
     subject = "MusiCloud Email Verification"
     url = "http://" + HOST + "/api/v1/auth/verify?code=" + code
     body = "Welcome to MusiCloud. Please click on this URL to verify your account:\n" + url
-    email_text = """From: %s\nTo: %s\nSubject: %s\n\n%s
-    """ % (sent_from, to, subject, body)
 
     try:
-        send_mail(sent_from, to, email_text)
+        send_mail(request.json.get("email"), subject, body)
     except Exception:
         log("error", "Failed to send email.", traceback.format_exc())
 
@@ -139,18 +151,19 @@ def reverify():
     expected_body = {
         "type": "object",
         "properties": {
-            "email": {"type": "string"},
-        }
+            "email": {
+                "type": "string",
+                "pattern": "[^@]+@[^@]+\.[^@]+",
+                "minLength": 1
+            }
+        },
+        "required": ["email"]
     }
     try:
         validate(request.json, schema=expected_body)
     except ValidationError as exc:
         log("warning", "Request validation failed.", str(exc))
         return {"message": str(exc)}, 422
-
-    # Verify that the email field is a valid email address str.
-    if not re.match(r"[^@]+@[^@]+\.[^@]+", request.json.get("email")):
-        return {"message": "Bad request."}, 400
 
     user = get_user_via_email(request.json.get("email"))
     if user[0][4] == 1:
@@ -167,16 +180,12 @@ def reverify():
     else:
         code = code[0][0]
 
-    sent_from = "dcumusicloud@gmail.com"
-    to = request.json.get("email")
     subject = "MusiCloud Email Verification"
     url = "http://" + HOST + "/api/v1/auth/verify?code=" + code
     body = "Welcome to MusiCloud. Please click on this URL to verify your account:\n" + url
-    email_text = """From: %s\nTo: %s\nSubject: %s\n\n%s
-    """ % (sent_from, to, subject, body)
 
     try:
-        send_mail(sent_from, to, email_text)
+        send_mail(request.json.get("email"), subject, body)
     except Exception:
         log("error", "Failed to send email.", traceback.format_exc())
 
@@ -235,17 +244,13 @@ def get_reset():
     if not reset_sent:
         update_reset(time_issued, reset_code, uid)
 
-    sent_from = "dcumusicloud@gmail.com"
-    to = email
     subject = "MusiCloud Password Reset"
     body = """
     To reset your MusiCloud password, please enter the following code in the forgot password section of our app:\n
     """ + str(reset_code)
-    email_text = """From: %s\nTo: %s\nSubject: %s\n\n%s
-        """ % (sent_from, to, subject, body)
 
     try:
-        send_mail(sent_from, to, email_text)
+        send_mail(request.json.get("email"), subject, body)
     except Exception:
         log("error", "Failed to send email.", traceback.format_exc())
 
@@ -258,10 +263,22 @@ def reset():
     expected_body = {
         "type": "object",
         "properties": {
-            "email": {"type": "string"},
-            "code": {"type": "integer"},
-            "password": {"type": "string"},
-        }
+            "email": {
+                "type": "string",
+                "pattern": "[^@]+@[^@]+\.[^@]+",
+                "minLength": 1
+            },
+            "code": {
+                "type": "integer",
+                "minimum": 10000000,
+                "maximum": 99999999
+            },
+            "password": {
+                "type": "string",
+                "minLength": 1
+            }
+        },
+        "required": ["email", "code", "password"]
     }
     try:
         validate(request.json, schema=expected_body)
@@ -278,13 +295,8 @@ def reset():
         log("error", "Failed to hash password", traceback.format_exc())
         return {"message": "Error while hashing password."}, 500
 
-    # Verify that the email field is a valid email address str.
-    if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
-        return {"message": "Bad request."}, 400
-
     uid = get_user_via_email(email)[0][0]
-    reset_request = get_reset_request(uid, code)
-    time_issued = reset_request[0][2]
+    time_issued = get_reset_request(uid, code)[0][2]
 
     time_expired = time_issued + datetime.timedelta(minutes=RESET_TIMEOUT)
     now = datetime.datetime.utcnow()
@@ -301,12 +313,16 @@ def reset():
 @users.route("/post", methods=["POST"])
 @sql_err_catcher()
 @auth_required(return_user=True)
-def post():
+def post(user):
     expected_body = {
         "type": "object",
         "properties": {
-            "message": {"type": "string"},
-        }
+            "message": {
+                "type": "string",
+                "minLength": 1
+            }
+        },
+        "required": ["message"]
     }
     try:
         validate(request.json, schema=expected_body)
@@ -322,7 +338,7 @@ def post():
 
 @users.route("/posts", methods=["GET"])
 @sql_err_catcher()
-@auth_required(return_user=True)
+@auth_required()
 def posts():
     next_page = request.args.get('next_page')
     back_page = request.args.get('back_page')
@@ -344,7 +360,9 @@ def posts():
 
         total_posts = get_number_of_posts(uid)
 
-        total_pages = (total_posts // posts_per_page) + 1
+        total_pages = (total_posts // posts_per_page)
+        if total_pages == 0:
+            total_pages = 1
         if current_page > total_pages:
             return {
                 "message": "current_page exceeds the total number of pages available(" + str(total_pages) + ")."
@@ -417,3 +435,65 @@ def posts():
             "back_page": back_page,
             "posts": user_posts
         }, 200
+
+
+@users.route("", methods=["PATCH"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def patch_user(user):
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "password": {
+                "type": "string",
+                "minLength": 1
+            },
+            "email": {
+                "type": "string",
+                "pattern": "[^@]+@[^@]+\.[^@]+",
+                "minLength": 1
+            }
+        },
+        "minProperties": 1
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    res_string = ""
+
+    if request.json.get("email"):
+        reset_user_verification(user.get("uid"))
+        while True:
+            try:
+                code = random_string(64)
+                insert_verification(code, user.get("uid"))
+                break
+            except mysql.connector.errors.IntegrityError:
+                continue
+
+        subject = "MusiCloud Email Verification"
+        url = "http://" + HOST + "/api/v1/auth/verify?code=" + code
+        body = "Welcome to MusiCloud. Please click on this URL to verify your account:\n" + url
+
+        try:
+            send_mail(request.json.get("email"), subject, body)
+        except Exception:
+            log("error", "Failed to send email.", traceback.format_exc())
+
+        reset_email(user.get("uid"), request.json.get("email"))
+        res_string += "Email reset, and verification mail sent. "
+
+    if request.json.get("password"):
+        try:
+            password_hash = argon2.hash(request.json.get("password"))
+        except Exception:
+            log("error", "Failed to hash password", traceback.format_exc())
+            return {"message": "Error while hashing password."}, 500
+
+        reset_password(user.get("uid"), password_hash)
+        res_string += "Password reset."
+
+    return {"message": res_string}, 200

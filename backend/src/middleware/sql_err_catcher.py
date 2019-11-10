@@ -15,7 +15,7 @@ def sql_err_catcher():
                 res = f(*args, *kwargs)
                 return res
             except mysql.connector.errors.IntegrityError:
-                log("warning", "Attempted to create a duplicate user.", traceback.format_exc())
+                log("warning", "Attempted to create a duplicate entry.", traceback.format_exc())
                 return {"message": "Duplicate entry"}, 409
             except NoResults:
                 log("error", "Select query returned no results", traceback.format_exc())

@@ -39,9 +39,16 @@ def login():
     expected_body = {
         "type": "object",
         "properties": {
-            "username": {"type": "string"},
-            "password": {"type": "string"},
-        }
+            "username": {
+                "type": "string",
+                "minLength": 1
+            },
+            "password": {
+                "type": "string",
+                "minLength": 1
+            }
+        },
+        "required": ["username", "password"]
     }
     try:
         validate(request.json, schema=expected_body)
