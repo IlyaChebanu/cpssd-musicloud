@@ -92,4 +92,7 @@ Studio.propTypes = {
 
 };
 
-export default Studio;
+const mapStateToProps = ({ studio }) => ({ studio });
+
+export default connect(mapStateToProps)(Studio);
+

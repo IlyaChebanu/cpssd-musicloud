@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, memo } from 'react';
 import cookie from 'js-cookie';
 import PropTypes from 'prop-types';
 import styles from './Header.module.scss';
@@ -11,7 +11,7 @@ import { ReactComponent as SignOutIcon } from '../../assets/icons/sign-out-alt-l
 import ProfilePicture from '../../assets/profiler.jpg';
 import CircularImage from '../CircularImage';
 
-const Header = props => {
+const Header = memo(props => {
   const { dispatch, history } = props;
   const { token } = props.user;
 
@@ -43,7 +43,7 @@ const Header = props => {
       </span>
     </div>
   );
-};
+});
 
 Header.propTypes = {
 
