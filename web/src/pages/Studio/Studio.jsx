@@ -1,8 +1,10 @@
-import React, { useCallback, memo } from 'react';
+import React, { useCallback, memo, useEffect } from 'react';
 import styles from './Studio.module.scss';
 import Header from '../../components/Header';
-import { play, pause, stop, setTempo, setVolume } from '../../actions/studioActions';
+import { play, pause, stop, setTempo, setVolume, setTracks } from '../../actions/studioActions';
 import { connect } from 'react-redux';
+import kick from '../../assets/samples/kick23.wav';
+import bass from '../../assets/samples/bass.wav';
 
 const Studio = memo(props => {
   const { dispatch } = props;
@@ -25,6 +27,41 @@ const Studio = memo(props => {
 
   const handleVolume = useCallback(e => {
     props.dispatch(setVolume(Math.max(Number(e.target.value), 0)));
+  }, []);
+
+  useEffect(() => {
+    dispatch(setTracks([
+      {
+        volume: 0.25,
+        samples: [
+          {
+            id: 1,
+            time: 1,
+            url: bass
+          },
+          {
+            id: 3,
+            time: 3,
+            url: bass
+          },
+        ]
+      },
+      {
+        volume: 1,
+        samples: [
+          {
+            id: 2,
+            time: 2,
+            url: bass
+          },
+          {
+            id: 4,
+            time: 4,
+            url: bass
+          },
+        ]
+      }
+    ]));
   }, []);
 
   return (

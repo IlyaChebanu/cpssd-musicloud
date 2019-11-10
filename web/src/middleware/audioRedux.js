@@ -1,6 +1,4 @@
 import { playingStartTime, setCurrentBeat, playingStartBeat, setTracks, setSampleLoading } from '../actions/studioActions';
-import kick from '../assets/samples/kick23.wav';
-import bass from '../assets/samples/bass.wav';
 import axios from 'axios';
 import scheduleSample from '../helpers/scheduleSample';
 import getSampleTimes from '../helpers/getSampleTimes';
@@ -10,45 +8,6 @@ const LOOKAHEAD = 25; //ms
 const OVERLAP = 100/*ms*/ / 1000;
 
 export default store => {
-
-  const tracks = [
-    {
-      volume: 0.25,
-      samples: [
-        {
-          id: 1,
-          time: 1,
-          url: bass
-        },
-        {
-          id: 3,
-          time: 3,
-          url: bass
-        },
-      ]
-    },
-    {
-      volume: 1,
-      samples: [
-        {
-          id: 2,
-          time: 2,
-          url: bass
-        },
-        {
-          id: 4,
-          time: 4,
-          url: bass
-        },
-      ]
-    }
-  ];
-
-  // Only for testing purposes
-  setTimeout(() => {
-    store.dispatch(setTracks(tracks));
-  }, 0);
-
   const scheduledSamples = {};
 
 
