@@ -74,15 +74,15 @@ const Studio = memo(props => {
         <div className={styles.scrollableMain}>
           <div className={styles.mainContent}>
             <Timeline />
+            <button onClick={handlePlay}>Play</button>
+            <button onClick={handlePlause}>Pause</button>
+            <button onClick={handleStop}>Stop</button>
+            <p>BPM Input:<input type='text' defaultValue={90} onChange={handleTempo}/></p>
+            <p>Current BPM: {props.studio.tempo}</p>
+            <p>Beat number: {props.studio.currentBeat}</p>
+            <p>Volume:<input type='text' defaultValue={1} onChange={handleVolume}/></p>
           </div>
         </div>
-        {/* <button onClick={handlePlay}>Play</button>
-        <button onClick={handlePlause}>Pause</button>
-        <button onClick={handleStop}>Stop</button>
-        <p>BPM Input:<input type='text' defaultValue={90} onChange={handleTempo}/></p>
-        <p>Current BPM: {props.studio.tempo}</p>
-        <p>Beat number: {props.studio.currentBeat}</p>
-        <p>Volume:<input type='text' defaultValue={1} onChange={handleVolume}/></p> */}
       </div>
     </div>
   );
