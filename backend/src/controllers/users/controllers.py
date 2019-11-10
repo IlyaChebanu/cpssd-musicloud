@@ -472,16 +472,14 @@ def patch_user(user):
                 "type": "string",
                 "minLength": 1
             }
-        }
+        },
+        "minProperties": 1
     }
     try:
         validate(request.json, schema=expected_body)
     except ValidationError as exc:
         log("warning", "Request validation failed.", str(exc))
         return {"message": str(exc)}, 422
-
-    if not request.json.get("email") and not request.json.get("password"):
-        return {"message": "You must send either an email address or password"}, 422
 
     res_string = ""
 

@@ -1966,7 +1966,11 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(((b'{"message":"You must send either an email address or password"}\n')), res.data)
+            self.assertEqual((b'{"message":"{} does not have enough properties\\n\\nFailed validating \'min'
+                              b"Properties' in schema:\\n    {'minProperties': 1,\\n     'properties': {'e"
+                              b"mail': {'minLength': 1, 'type': 'string'},\\n                    'passwor"
+                              b"d': {'minLength': 1, 'type': 'string'}},\\n     'type': 'object'}\\n\\nOn i"
+                              b'nstance:\\n    {}"}\n'), res.data)
 
     def test_patch_user_fail_bad_email(self):
         """
