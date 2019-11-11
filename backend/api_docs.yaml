@@ -11,10 +11,268 @@ tags:
     description: "User operations"
   - name: "auth"
     description: "Authentication operations"
+  - name: "audio"
+    description: "Audio operations"
 schemes:
   - "http"
 paths:
-  /auth/verify/{code}:
+  /audio:
+    post:
+      tags:
+      - "audio"
+      summary: "Create a new song project"
+      description: "Create a blank song project you can then edit"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "Send the new songs' name and have a song project created, and it's sid returned."
+          required: true
+          schema:
+            type: "object"
+            properties:
+              title:
+                type: "string"
+                example: "A great song"
+      responses:
+        200:
+          description: "Song Created"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Your song project has been created"
+              sid:
+                type: "integer"
+                example: 1
+        401:
+          description: "Access_token missing or expired."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Request missing access_token."
+        404:
+          description: "Failed to get sid."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A result could not be found."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable"
+  /audio/state:
+    get:
+      tags:
+      - "audio"
+      summary: "Get the selected songs' state"
+      description: "Returns the song_state object for the requested sid if the user has edit permission."
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "query"
+          name: "sid"
+          type: "string"
+          required: false
+          description: "The sid of the sond you wish to edit."
+      responses:
+        200:
+          description: "Song loaded"
+          schema:
+            type: "object"
+            properties:
+              song_state:
+                type: "object"
+        401:
+          description: "Access_token missing or expired."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Request missing access_token."
+        403:
+          description: "Not permitted to edit"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "You are not permitted to edit song: 1"
+        422:
+          description: "Missing sid param"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "sid param can't be empty!"
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable"
+    post:
+      tags:
+      - "audio"
+      summary: "Update the current songs' state"
+      description: "By sending the access_token of an approved editor for a song, that editor may send a new song_state object for that song."
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "Send the new song_state object & the songs' ID here."
+          required: true
+          schema:
+            type: "object"
+            properties:
+              sid:
+                type: "integer"
+                example: 101
+              song_state:
+                type: "object"
+                properties:
+                  tracks:
+                    type: "array"
+                    items:
+                      type: "object"
+                      properties:
+                        track_effects:
+                          type: "object"
+                          properties:
+                            vol:
+                              type: "integer"
+                              example: 100
+                            pan:
+                              type: "integer"
+                              example: 50
+                            mute:
+                              type: "boolean"
+                              example: False
+                            solo:
+                              type: "boolean"
+                              example: False
+                        sounds:
+                          type: "array"
+                          items:
+                            type: "object"
+                            properties:
+                              src:
+                                type: "string"
+                                example: "http://music.ie"
+                              location:
+                                type: "integer"
+                                example: 10
+                              effect:
+                                type: "object"
+                                properties:
+                                  an_effect:
+                                    type: "string"
+                                    example: "placeholder"
+      responses:
+        200:
+          description: "State saved"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Song state saved."
+        401:
+          description: "Access_token missing or expired."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Request missing access_token."
+        403:
+          description: "Not permitted to edit"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "You are not permitted to edit song: 1"
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable"
+
+  /auth/verify:
     get:
       tags:
       - "auth"
@@ -23,7 +281,7 @@ paths:
       produces:
       - "application/json"
       parameters:
-        - in: "path"
+        - in: "query"
           name: "code"
           required: true
           type: "string"

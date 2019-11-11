@@ -36,7 +36,7 @@ class UserTests(unittest.TestCase):
                     json=test_req_data,
                     follow_redirects=True
                 )
-        self.assertEqual(b'{"message":"User created!"}\n', res.data)
+        self.assertEqual(200, res.status_code)
 
     def test_registration_fail_missing_username(self):
         """
@@ -51,14 +51,7 @@ class UserTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual((b'{"message":"\'username\' is a required property\\n\\nFailed validating \''
-                          b"required' in schema:\\n    {'properties': {'email': {'minLength': 1,\\n   "
-                          b"                           'pattern': '[^@]+@[^@]+\\\\\\\\.[^@]+',\\n    "
-                          b"                          'type': 'string'},\\n                    'passw"
-                          b"ord': {'minLength': 1, 'type': 'string'},\\n                    'username"
-                          b"': {'minLength': 1, 'type': 'string'}},\\n     'required': ['username', '"
-                          b"email', 'password'],\\n     'type': 'object'}\\n\\nOn instance:\\n    {'emai"
-                          b'l\': \'username@fakemail.noshow\', \'password\': \'1234\'}"}\n'), res.data)
+        self.assertEqual(422, res.status_code)
         test_req_data = {
             "username": "",
             "email": "username@fakemail.noshow",
@@ -69,9 +62,7 @@ class UserTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual((b'{"message":"\'\' is too short\\n\\nFailed validating \'minLength\' in sche'
-                          b"ma['properties']['username']:\\n    {'minLength': 1, 'type': 'string'}\\n\\"
-                          b'nOn instance[\'username\']:\\n    \'\'"}\n'), res.data)
+        self.assertEqual(422, res.status_code)
 
     def test_registration_fail_missing_email(self):
         """
@@ -86,14 +77,7 @@ class UserTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual((b'{"message":"\'email\' is a required property\\n\\nFailed validating \'req'
-                          b"uired' in schema:\\n    {'properties': {'email': {'minLength': 1,\\n      "
-                          b"                        'pattern': '[^@]+@[^@]+\\\\\\\\.[^@]+',\\n       "
-                          b"                       'type': 'string'},\\n                    'password"
-                          b"': {'minLength': 1, 'type': 'string'},\\n                    'username': "
-                          b"{'minLength': 1, 'type': 'string'}},\\n     'required': ['username', 'ema"
-                          b"il', 'password'],\\n     'type': 'object'}\\n\\nOn instance:\\n    {'passwor"
-                          b'd\': \'1234\', \'username\': \'username\'}"}\n'), res.data)
+        self.assertEqual(422, res.status_code)
         test_req_data = {
             "username": "username",
             "email": "",
@@ -104,10 +88,7 @@ class UserTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual((b'{"message":"\'\' does not match \'[^@]+@[^@]+\\\\\\\\.[^@]+\'\\n\\nFailed '
-                          b"validating 'pattern' in schema['properties']['email']:\\n    {'minLength'"
-                          b": 1, 'pattern': '[^@]+@[^@]+\\\\\\\\.[^@]+', 'type': 'string'}\\n\\nOn ins"
-                          b'tance[\'email\']:\\n    \'\'"}\n'), res.data)
+        self.assertEqual(422, res.status_code)
 
     def test_registration_fail_missing_password(self):
         """
@@ -122,14 +103,7 @@ class UserTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual((b'{"message":"\'password\' is a required property\\n\\nFailed validating \''
-                          b"required' in schema:\\n    {'properties': {'email': {'minLength': 1,\\n   "
-                          b"                           'pattern': '[^@]+@[^@]+\\\\\\\\.[^@]+',\\n    "
-                          b"                          'type': 'string'},\\n                    'passw"
-                          b"ord': {'minLength': 1, 'type': 'string'},\\n                    'username"
-                          b"': {'minLength': 1, 'type': 'string'}},\\n     'required': ['username', '"
-                          b"email', 'password'],\\n     'type': 'object'}\\n\\nOn instance:\\n    {'emai"
-                          b'l\': \'username@fakemail.noshow\', \'username\': \'username\'}"}\n'), res.data)
+        self.assertEqual(422, res.status_code)
         test_req_data = {
             "username": "username",
             "email": "username@fakemail.noshow",
@@ -140,9 +114,7 @@ class UserTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual((b'{"message":"\'\' is too short\\n\\nFailed validating \'minLength\' in sche'
-                          b"ma['properties']['password']:\\n    {'minLength': 1, 'type': 'string'}\\n\\"
-                          b'nOn instance[\'password\']:\\n    \'\'"}\n'), res.data)
+        self.assertEqual(422, res.status_code)
 
     def test_registration_fail_missing_password_and_email(self):
         """
@@ -156,14 +128,7 @@ class UserTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual((b'{"message":"\'email\' is a required property\\n\\nFailed validating \'req'
-                          b"uired' in schema:\\n    {'properties': {'email': {'minLength': 1,\\n      "
-                          b"                        'pattern': '[^@]+@[^@]+\\\\\\\\.[^@]+',\\n       "
-                          b"                       'type': 'string'},\\n                    'password"
-                          b"': {'minLength': 1, 'type': 'string'},\\n                    'username': "
-                          b"{'minLength': 1, 'type': 'string'}},\\n     'required': ['username', 'ema"
-                          b"il', 'password'],\\n     'type': 'object'}\\n\\nOn instance:\\n    {'usernam"
-                          b'e\': \'username\'}"}\n'), res.data)
+        self.assertEqual(422, res.status_code)
         test_req_data = {
             "username": "username",
             "email": "",
@@ -174,10 +139,7 @@ class UserTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual((b'{"message":"\'\' does not match \'[^@]+@[^@]+\\\\\\\\.[^@]+\'\\n\\nFailed '
-                          b"validating 'pattern' in schema['properties']['email']:\\n    {'minLength'"
-                          b": 1, 'pattern': '[^@]+@[^@]+\\\\\\\\.[^@]+', 'type': 'string'}\\n\\nOn ins"
-                          b'tance[\'email\']:\\n    \'\'"}\n'), res.data)
+        self.assertEqual(422, res.status_code)
 
     def test_registration_fail_missing_password_and_username(self):
         """
@@ -191,14 +153,7 @@ class UserTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual((b'{"message":"\'username\' is a required property\\n\\nFailed validating \''
-                          b"required' in schema:\\n    {'properties': {'email': {'minLength': 1,\\n   "
-                          b"                           'pattern': '[^@]+@[^@]+\\\\\\\\.[^@]+',\\n    "
-                          b"                          'type': 'string'},\\n                    'passw"
-                          b"ord': {'minLength': 1, 'type': 'string'},\\n                    'username"
-                          b"': {'minLength': 1, 'type': 'string'}},\\n     'required': ['username', '"
-                          b"email', 'password'],\\n     'type': 'object'}\\n\\nOn instance:\\n    {'emai"
-                          b'l\': \'username@fakemail.noshow\'}"}\n'), res.data)
+        self.assertEqual(422, res.status_code)
         test_req_data = {
             "username": "",
             "email": "username@fakemail.noshow",
@@ -209,9 +164,7 @@ class UserTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual((b'{"message":"\'\' is too short\\n\\nFailed validating \'minLength\' in sche'
-                          b"ma['properties']['username']:\\n    {'minLength': 1, 'type': 'string'}\\n\\"
-                          b'nOn instance[\'username\']:\\n    \'\'"}\n'), res.data)
+        self.assertEqual(422, res.status_code)
 
     def test_registration_fail_missing_username_and_email(self):
         """
@@ -225,14 +178,7 @@ class UserTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual((b'{"message":"\'username\' is a required property\\n\\nFailed validating \''
-                          b"required' in schema:\\n    {'properties': {'email': {'minLength': 1,\\n   "
-                          b"                           'pattern': '[^@]+@[^@]+\\\\\\\\.[^@]+',\\n    "
-                          b"                          'type': 'string'},\\n                    'passw"
-                          b"ord': {'minLength': 1, 'type': 'string'},\\n                    'username"
-                          b"': {'minLength': 1, 'type': 'string'}},\\n     'required': ['username', '"
-                          b"email', 'password'],\\n     'type': 'object'}\\n\\nOn instance:\\n    {'pass"
-                          b'word\': \'1234\'}"}\n'), res.data)
+        self.assertEqual(422, res.status_code)
         test_req_data = {
             "username": "",
             "email": "",
@@ -243,9 +189,7 @@ class UserTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual((b'{"message":"\'\' is too short\\n\\nFailed validating \'minLength\' in sche'
-                          b"ma['properties']['username']:\\n    {'minLength': 1, 'type': 'string'}\\n\\"
-                          b'nOn instance[\'username\']:\\n    \'\'"}\n'), res.data)
+        self.assertEqual(422, res.status_code)
 
     def test_registration_fail_missing_everything(self):
         """
@@ -257,14 +201,7 @@ class UserTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual((b'{"message":"\'username\' is a required property\\n\\nFailed validating \''
-                          b"required' in schema:\\n    {'properties': {'email': {'minLength': 1,\\n   "
-                          b"                           'pattern': '[^@]+@[^@]+\\\\\\\\.[^@]+',\\n    "
-                          b"                          'type': 'string'},\\n                    'passw"
-                          b"ord': {'minLength': 1, 'type': 'string'},\\n                    'username"
-                          b"': {'minLength': 1, 'type': 'string'}},\\n     'required': ['username', '"
-                          b"email', 'password'],\\n     'type': 'object'}\\n\\nOn instance:\\n    {}"
-                          b'"}\n'), res.data)
+        self.assertEqual(422, res.status_code)
         test_req_data = {
             "username": "",
             "email": "",
@@ -275,9 +212,7 @@ class UserTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual((b'{"message":"\'\' is too short\\n\\nFailed validating \'minLength\' in sche'
-                          b"ma['properties']['username']:\\n    {'minLength': 1, 'type': 'string'}\\n\\"
-                          b'nOn instance[\'username\']:\\n    \'\'"}\n'), res.data)
+        self.assertEqual(422, res.status_code)
 
     def test_registration_fail_failed_password_hashing(self):
         """
@@ -295,7 +230,7 @@ class UserTests(unittest.TestCase):
                 json=test_req_data,
                 follow_redirects=True
             )
-        self.assertEqual(b'{"message":"Error while hashing password."}\n', res.data)
+        self.assertEqual(500, res.status_code)
 
     def test_registration_fail_invalid_email(self):
         """
@@ -311,10 +246,7 @@ class UserTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual((b'{"message":"\'username\' does not match \'[^@]+@[^@]+\\\\\\\\.[^@]+\'\\n\\'
-                          b"nFailed validating 'pattern' in schema['properties']['email']:\\n    {'mi"
-                          b"nLength': 1, 'pattern': '[^@]+@[^@]+\\\\\\\\.[^@]+', 'type': 'string'}\\n"
-                          b'\\nOn instance[\'email\']:\\n    \'username\'"}\n'), res.data)
+        self.assertEqual(422, res.status_code)
 
     def test_registration_fail_user_exists(self):
         """
@@ -332,7 +264,7 @@ class UserTests(unittest.TestCase):
                 json=test_req_data,
                 follow_redirects=True
             )
-        self.assertEqual(b'{"message":"Duplicate entry"}\n', res.data)
+        self.assertEqual(409, res.status_code)
 
     @mock.patch('backend.src.controllers.users.controllers.get_user_via_email')
     def test_reverify_success(self, mocked_user):
@@ -350,7 +282,7 @@ class UserTests(unittest.TestCase):
                     json=test_req_data,
                     follow_redirects=True
                 )
-        self.assertEqual(b'{"message":"Verification email sent."}\n', res.data)
+        self.assertEqual(200, res.status_code)
 
     def test_reverify_fail_missing_email(self):
         """
@@ -362,11 +294,7 @@ class UserTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual((b'{"message":"\'email\' is a required property\\n\\nFailed validating \'req'
-                          b"uired' in schema:\\n    {'properties': {'email': {'minLength': 1,\\n      "
-                          b"                        'pattern': '[^@]+@[^@]+\\\\\\\\.[^@]+',\\n       "
-                          b"                       'type': 'string'}},\\n     'required': ['email'],\\"
-                          b'n     \'type\': \'object\'}\\n\\nOn instance:\\n    {}"}\n'), res.data)
+        self.assertEqual(422, res.status_code)
         test_req_data = {
             "email": ""
         }
@@ -375,10 +303,7 @@ class UserTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual((b'{"message":"\'\' does not match \'[^@]+@[^@]+\\\\\\\\.[^@]+\'\\n\\nFailed '
-                          b"validating 'pattern' in schema['properties']['email']:\\n    {'minLength'"
-                          b": 1, 'pattern': '[^@]+@[^@]+\\\\\\\\.[^@]+', 'type': 'string'}\\n\\nOn ins"
-                          b'tance[\'email\']:\\n    \'\'"}\n'), res.data)
+        self.assertEqual(422, res.status_code)
 
     def test_reverify_fail_invalid_email(self):
         """
@@ -392,10 +317,7 @@ class UserTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual((b'{"message":"\'1234\' does not match \'[^@]+@[^@]+\\\\\\\\.[^@]+\'\\n\\nFai'
-                          b"led validating 'pattern' in schema['properties']['email']:\\n    {'minLen"
-                          b"gth': 1, 'pattern': '[^@]+@[^@]+\\\\\\\\.[^@]+', 'type': 'string'}\\n\\nOn"
-                          b' instance[\'email\']:\\n    \'1234\'"}\n'), res.data)
+        self.assertEqual(422, res.status_code)
 
     @mock.patch('backend.src.controllers.users.controllers.get_user_via_email')
     def test_reverify_fail_already_verified(self, mocked_user):
@@ -411,7 +333,7 @@ class UserTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual(b'{"message":"Already verified."}\n', res.data)
+        self.assertEqual(403, res.status_code)
 
     @mock.patch('backend.src.controllers.users.controllers.get_user_via_username')
     @mock.patch('backend.src.controllers.users.controllers.get_following_pair')
@@ -445,7 +367,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-        self.assertEqual(b'{"message":"You are now following: username"}\n', res.data)
+        self.assertEqual(200, res.status_code)
 
     def test_follow_fail_missing_access_token(self):
         """
@@ -455,7 +377,7 @@ class UserTests(unittest.TestCase):
             "/api/v1/users/follow",
             follow_redirects=True
         )
-        self.assertEqual(b'{"message":"Request missing access_token."}\n', res.data)
+        self.assertEqual(401, res.status_code)
 
     def test_follow_fail_access_token_expired(self):
         """
@@ -468,7 +390,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(b'{"message":"Token expired."}\n', res.data)
+            self.assertEqual(401, res.status_code)
 
     def test_follow_fail_bad_access_token_signature(self):
         """
@@ -482,7 +404,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(b'{"message":"Server failed to decode token."}\n', res.data)
+            self.assertEqual(500, res.status_code)
 
     def test_follow_fail_unknown_access_token_issue(self):
         """
@@ -496,7 +418,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(b'{"message":"MySQL unavailable."}\n', res.data)
+            self.assertEqual(503, res.status_code)
 
     def test_follow_fail_missing_username(self):
         """
@@ -524,10 +446,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual((b'{"message":"\'username\' is a required property\\n\\nFailed validating \''
-                              b"required' in schema:\\n    {'properties': {'username': {'minLength': 1, '"
-                              b"type': 'string'}},\\n     'required': ['username'],\\n     'type': 'object"
-                              b'\'}\\n\\nOn instance:\\n    {}"}\n'), res.data)
+            self.assertEqual(422, res.status_code)
             test_req_data = {
                 "username": "",
             }
@@ -537,9 +456,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual((b'{"message":"\'\' is too short\\n\\nFailed validating \'minLength\' in sche'
-                              b"ma['properties']['username']:\\n    {'minLength': 1, 'type': 'string'}\\n\\"
-                              b'nOn instance[\'username\']:\\n    \'\'"}\n'), res.data)
+            self.assertEqual(422, res.status_code)
 
     @mock.patch('backend.src.controllers.users.controllers.get_user_via_username')
     def test_follow_fail_bad_username(self, mocked_user):
@@ -571,7 +488,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-        self.assertEqual(b'{"message":"A result could not be found."}\n', res.data)
+        self.assertEqual(404, res.status_code)
 
     @mock.patch('backend.src.controllers.users.controllers.get_user_via_username')
     def test_follow_fail_self_follow(self, mocked_user):
@@ -603,7 +520,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-        self.assertEqual(b'{"message":"You cannot follow your self"}\n', res.data)
+        self.assertEqual(422, res.status_code)
 
     @mock.patch('backend.src.controllers.users.controllers.get_user_via_username')
     @mock.patch('backend.src.controllers.users.controllers.get_following_pair')
@@ -637,7 +554,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-        self.assertEqual(b'{"message":"You are now no longer following: username"}\n', res.data)
+        self.assertEqual(200, res.status_code)
 
     def test_unfollow_fail_missing_access_token(self):
         """
@@ -647,7 +564,7 @@ class UserTests(unittest.TestCase):
             "/api/v1/users/unfollow",
             follow_redirects=True
         )
-        self.assertEqual(b'{"message":"Request missing access_token."}\n', res.data)
+        self.assertEqual(401, res.status_code)
 
     def test_unfollow_fail_access_token_expired(self):
         """
@@ -660,7 +577,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(b'{"message":"Token expired."}\n', res.data)
+            self.assertEqual(401, res.status_code)
 
     def test_unfollow_fail_bad_access_token_signature(self):
         """
@@ -674,7 +591,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(b'{"message":"Server failed to decode token."}\n', res.data)
+            self.assertEqual(500, res.status_code)
 
     def test_unfollow_fail_unknown_access_token_issue(self):
         """
@@ -688,7 +605,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(b'{"message":"MySQL unavailable."}\n', res.data)
+            self.assertEqual(503, res.status_code)
 
     def test_unfollow_fail_missing_username(self):
         """
@@ -716,10 +633,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual((b'{"message":"\'username\' is a required property\\n\\nFailed validating \''
-                              b"required' in schema:\\n    {'properties': {'username': {'minLength': 1, '"
-                              b"type': 'string'}},\\n     'required': ['username'],\\n     'type': 'object"
-                              b'\'}\\n\\nOn instance:\\n    {}"}\n'), res.data)
+            self.assertEqual(422, res.status_code)
             test_req_data = {
                 "username": "",
             }
@@ -729,9 +643,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual((b'{"message":"\'\' is too short\\n\\nFailed validating \'minLength\' in sche'
-                              b"ma['properties']['username']:\\n    {'minLength': 1, 'type': 'string'}\\n\\"
-                              b'nOn instance[\'username\']:\\n    \'\'"}\n'), res.data)
+            self.assertEqual(422, res.status_code)
 
     @mock.patch('backend.src.controllers.users.controllers.get_user_via_username')
     def test_unfollow_fail_bad_username(self, mocked_user):
@@ -763,7 +675,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-        self.assertEqual(b'{"message":"A result could not be found."}\n', res.data)
+        self.assertEqual(404, res.status_code)
 
     @mock.patch('backend.src.controllers.users.controllers.get_follower_count')
     @mock.patch('backend.src.controllers.users.controllers.get_following_count')
@@ -805,8 +717,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-        self.assertEqual((b'{"followers":1,"following":2,"likes":5,"posts":4,"profile_pic_url":"NOT IMPL'
-                          b'EMENTED","songs":3,"username":"username"}\n'), res.data)
+        self.assertEqual(200, res.status_code)
 
     def test_get_user_fail_missing_access_token(self):
         """
@@ -816,7 +727,7 @@ class UserTests(unittest.TestCase):
             "/api/v1/users",
             follow_redirects=True
         )
-        self.assertEqual(b'{"message":"Request missing access_token."}\n', res.data)
+        self.assertEqual(401, res.status_code)
 
     def test_get_user_fail_access_token_expired(self):
         """
@@ -829,7 +740,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(b'{"message":"Token expired."}\n', res.data)
+            self.assertEqual(401, res.status_code)
 
     def test_get_user_fail_bad_access_token_signature(self):
         """
@@ -843,7 +754,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(b'{"message":"Server failed to decode token."}\n', res.data)
+            self.assertEqual(500, res.status_code)
 
     def test_get_user_fail_unknown_access_token_issue(self):
         """
@@ -857,7 +768,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(b'{"message":"MySQL unavailable."}\n', res.data)
+            self.assertEqual(503, res.status_code)
 
     def test_get_user_fails_no_username(self,):
         """
@@ -885,7 +796,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual((b'{"message":"Username param can\'t be empty!"}\n'), res.data)
+            self.assertEqual(422, res.status_code)
             test_req_data = {
                 "username": ""
             }
@@ -895,7 +806,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual((b'{"message":"Username param can\'t be empty!"}\n'), res.data)
+            self.assertEqual(422, res.status_code)
 
     @mock.patch('backend.src.controllers.users.controllers.get_user_via_username')
     def test_get_user_fail_bad_username(self, mocked_user):
@@ -927,7 +838,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-        self.assertEqual(b'{"message":"A result could not be found."}\n', res.data)
+        self.assertEqual(404, res.status_code)
 
     @mock.patch('backend.src.controllers.users.controllers.get_user_via_email')
     def test_get_reset_success(self, mocked_user):
@@ -947,7 +858,7 @@ class UserTests(unittest.TestCase):
                         headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                         follow_redirects=True
                     )
-        self.assertEqual((b'{"message":"Email sent."}\n'), res.data)
+        self.assertEqual(200, res.status_code)
 
     def test_get_reset_fails_missing_email(self):
         """
@@ -960,7 +871,7 @@ class UserTests(unittest.TestCase):
             headers={'Authorization': 'Bearer ' + TEST_TOKEN},
             follow_redirects=True
         )
-        self.assertEqual((b'{"message":"Email param can\'t be empty!"}\n'), res.data)
+        self.assertEqual(422, res.status_code)
         test_req_data = {
             "email": "",
         }
@@ -970,7 +881,7 @@ class UserTests(unittest.TestCase):
             headers={'Authorization': 'Bearer ' + TEST_TOKEN},
             follow_redirects=True
         )
-        self.assertEqual((b'{"message":"Email param can\'t be empty!"}\n'), res.data)
+        self.assertEqual(422, res.status_code)
 
     def test_get_reset_fails_bad_email(self):
         """
@@ -986,7 +897,7 @@ class UserTests(unittest.TestCase):
             headers={'Authorization': 'Bearer ' + TEST_TOKEN},
             follow_redirects=True
         )
-        self.assertEqual((b'{"message":"Bad request."}\n'), res.data)
+        self.assertEqual(400, res.status_code)
 
     @mock.patch('backend.src.controllers.users.controllers.get_user_via_email')
     def test_get_reset_fail_bad_username(self, mocked_user):
@@ -1003,7 +914,7 @@ class UserTests(unittest.TestCase):
             query_string=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual(b'{"message":"A result could not be found."}\n', res.data)
+        self.assertEqual(404, res.status_code)
 
     @mock.patch('backend.src.controllers.users.controllers.get_reset_request')
     @mock.patch('backend.src.controllers.users.controllers.get_user_via_email')
@@ -1025,7 +936,7 @@ class UserTests(unittest.TestCase):
                     json=test_req_data,
                     follow_redirects=True
                 )
-        self.assertEqual((b'{"message":"Password reset."}\n'), res.data)
+        self.assertEqual(200, res.status_code)
 
     def test_password_reset_fail_missing_email(self):
         """
@@ -1040,15 +951,7 @@ class UserTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual((b'{"message":"\'email\' is a required property\\n\\nFailed validating \'req'
-                          b"uired' in schema:\\n    {'properties': {'code': {'maximum': 99999999,\\n  "
-                          b"                           'minimum': 10000000,\\n                       "
-                          b"      'type': 'integer'},\\n                    'email': {'minLength': 1,"
-                          b"\\n                              'pattern': '[^@]+@[^@]+\\\\\\\\.[^@]+',\\"
-                          b"n                              'type': 'string'},\\n                    '"
-                          b"password': {'minLength': 1, 'type': 'string'}},\\n     'required': ['emai"
-                          b"l', 'code', 'password'],\\n     'type': 'object'}\\n\\nOn instance:\\n    {'"
-                          b'code\': 10000000, \'password\': \'1234\'}"}\n'), res.data)
+        self.assertEqual(422, res.status_code)
         test_req_data = {
             "email": "",
             "password": "1234",
@@ -1059,10 +962,7 @@ class UserTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual((b'{"message":"\'\' does not match \'[^@]+@[^@]+\\\\\\\\.[^@]+\'\\n\\nFailed '
-                          b"validating 'pattern' in schema['properties']['email']:\\n    {'minLength'"
-                          b": 1, 'pattern': '[^@]+@[^@]+\\\\\\\\.[^@]+', 'type': 'string'}\\n\\nOn ins"
-                          b'tance[\'email\']:\\n    \'\'"}\n'), res.data)
+        self.assertEqual(422, res.status_code)
 
     def test_password_reset_fail_missing_password(self):
         """
@@ -1077,15 +977,7 @@ class UserTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual((b'{"message":"\'password\' is a required property\\n\\nFailed validating \''
-                          b"required' in schema:\\n    {'properties': {'code': {'maximum': 99999999,\\"
-                          b"n                             'minimum': 10000000,\\n                    "
-                          b"         'type': 'integer'},\\n                    'email': {'minLength':"
-                          b" 1,\\n                              'pattern': '[^@]+@[^@]+\\\\\\\\.[^@]+"
-                          b"',\\n                              'type': 'string'},\\n                  "
-                          b"  'password': {'minLength': 1, 'type': 'string'}},\\n     'required': ['e"
-                          b"mail', 'code', 'password'],\\n     'type': 'object'}\\n\\nOn instance:\\n   "
-                          b' {\'code\': 10000000, \'email\': \'username@fakemail.noshow\'}"}\n'), res.data)
+        self.assertEqual(422, res.status_code)
         test_req_data = {
             "email": "username@fakemail.noshow",
             "password": "",
@@ -1096,9 +988,7 @@ class UserTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual((b'{"message":"\'\' is too short\\n\\nFailed validating \'minLength\' in sche'
-                          b"ma['properties']['password']:\\n    {'minLength': 1, 'type': 'string'}\\n\\"
-                          b'nOn instance[\'password\']:\\n    \'\'"}\n'), res.data)
+        self.assertEqual(422, res.status_code)
 
     def test_password_reset_fail_missing_code(self):
         """
@@ -1113,15 +1003,7 @@ class UserTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual((b'{"message":"\'code\' is a required property\\n\\nFailed validating \'requ'
-                          b"ired' in schema:\\n    {'properties': {'code': {'maximum': 99999999,\\n   "
-                          b"                          'minimum': 10000000,\\n                        "
-                          b"     'type': 'integer'},\\n                    'email': {'minLength': 1,\\"
-                          b"n                              'pattern': '[^@]+@[^@]+\\\\\\\\.[^@]+',\\n"
-                          b"                              'type': 'string'},\\n                    'p"
-                          b"assword': {'minLength': 1, 'type': 'string'}},\\n     'required': ['email"
-                          b"', 'code', 'password'],\\n     'type': 'object'}\\n\\nOn instance:\\n    {'e"
-                          b'mail\': \'username@fakemail.noshow\', \'password\': \'1234\'}"}\n'), res.data)
+        self.assertEqual(422, res.status_code)
         test_req_data = {
             "email": "username@fakemail.noshow",
             "password": "1234",
@@ -1132,10 +1014,7 @@ class UserTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual((b'{"message":"None is not of type \'integer\'\\n\\nFailed validating \'type'
-                          b"' in schema['properties']['code']:\\n    {'maximum': 99999999, 'minimum':"
-                          b' 10000000, \'type\': \'integer\'}\\n\\nOn instance[\'code\']:\\n    None"'
-                          b'}\n'), res.data)
+        self.assertEqual(422, res.status_code)
 
     def test_password_reset_fail_missing_email_and_password(self):
         """
@@ -1149,15 +1028,7 @@ class UserTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual((b'{"message":"\'email\' is a required property\\n\\nFailed validating \'req'
-                          b"uired' in schema:\\n    {'properties': {'code': {'maximum': 99999999,\\n  "
-                          b"                           'minimum': 10000000,\\n                       "
-                          b"      'type': 'integer'},\\n                    'email': {'minLength': 1,"
-                          b"\\n                              'pattern': '[^@]+@[^@]+\\\\\\\\.[^@]+',\\"
-                          b"n                              'type': 'string'},\\n                    '"
-                          b"password': {'minLength': 1, 'type': 'string'}},\\n     'required': ['emai"
-                          b"l', 'code', 'password'],\\n     'type': 'object'}\\n\\nOn instance:\\n    {'"
-                          b'code\': 10000000}"}\n'), res.data)
+        self.assertEqual(422, res.status_code)
         test_req_data = {
             "email": "",
             "password": "",
@@ -1168,10 +1039,7 @@ class UserTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual((b'{"message":"\'\' does not match \'[^@]+@[^@]+\\\\\\\\.[^@]+\'\\n\\nFailed '
-                          b"validating 'pattern' in schema['properties']['email']:\\n    {'minLength'"
-                          b": 1, 'pattern': '[^@]+@[^@]+\\\\\\\\.[^@]+', 'type': 'string'}\\n\\nOn ins"
-                          b'tance[\'email\']:\\n    \'\'"}\n'), res.data)
+        self.assertEqual(422, res.status_code)
 
     def test_password_reset_fail_missing_email_and_code(self):
         """
@@ -1185,15 +1053,7 @@ class UserTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual((b'{"message":"\'email\' is a required property\\n\\nFailed validating \'req'
-                          b"uired' in schema:\\n    {'properties': {'code': {'maximum': 99999999,\\n  "
-                          b"                           'minimum': 10000000,\\n                       "
-                          b"      'type': 'integer'},\\n                    'email': {'minLength': 1,"
-                          b"\\n                              'pattern': '[^@]+@[^@]+\\\\\\\\.[^@]+',\\"
-                          b"n                              'type': 'string'},\\n                    '"
-                          b"password': {'minLength': 1, 'type': 'string'}},\\n     'required': ['emai"
-                          b"l', 'code', 'password'],\\n     'type': 'object'}\\n\\nOn instance:\\n    {'"
-                          b'password\': \'1234\'}"}\n'), res.data)
+        self.assertEqual(422, res.status_code)
         test_req_data = {
             "email": "",
             "password": "1234",
@@ -1204,10 +1064,7 @@ class UserTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual((b'{"message":"\'\' does not match \'[^@]+@[^@]+\\\\\\\\.[^@]+\'\\n\\nFailed '
-                          b"validating 'pattern' in schema['properties']['email']:\\n    {'minLength'"
-                          b": 1, 'pattern': '[^@]+@[^@]+\\\\\\\\.[^@]+', 'type': 'string'}\\n\\nOn ins"
-                          b'tance[\'email\']:\\n    \'\'"}\n'), res.data)
+        self.assertEqual(422, res.status_code)
 
     def test_password_reset_fail_missing_password_and_code(self):
         """
@@ -1221,15 +1078,7 @@ class UserTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual((b'{"message":"\'code\' is a required property\\n\\nFailed validating \'requ'
-                          b"ired' in schema:\\n    {'properties': {'code': {'maximum': 99999999,\\n   "
-                          b"                          'minimum': 10000000,\\n                        "
-                          b"     'type': 'integer'},\\n                    'email': {'minLength': 1,\\"
-                          b"n                              'pattern': '[^@]+@[^@]+\\\\\\\\.[^@]+',\\n"
-                          b"                              'type': 'string'},\\n                    'p"
-                          b"assword': {'minLength': 1, 'type': 'string'}},\\n     'required': ['email"
-                          b"', 'code', 'password'],\\n     'type': 'object'}\\n\\nOn instance:\\n    {'e"
-                          b'mail\': \'username@fakemail.noshow\'}"}\n'), res.data)
+        self.assertEqual(422, res.status_code)
         test_req_data = {
             "email": "username@fakemail.noshow",
             "password": "",
@@ -1240,10 +1089,7 @@ class UserTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual((b'{"message":"None is not of type \'integer\'\\n\\nFailed validating \'type'
-                          b"' in schema['properties']['code']:\\n    {'maximum': 99999999, 'minimum':"
-                          b' 10000000, \'type\': \'integer\'}\\n\\nOn instance[\'code\']:\\n    None"'
-                          b'}\n'), res.data)
+        self.assertEqual(422, res.status_code)
 
     def test_password_reset_fail_failed_password_hashing(self):
         """
@@ -1261,7 +1107,7 @@ class UserTests(unittest.TestCase):
                 json=test_req_data,
                 follow_redirects=True
             )
-        self.assertEqual(b'{"message":"Error while hashing password."}\n', res.data)
+        self.assertEqual(500, res.status_code)
 
     def test_password_reset_fail_invalid_email(self):
         """
@@ -1277,10 +1123,7 @@ class UserTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual((b'{"message":"\'username\' does not match \'[^@]+@[^@]+\\\\\\\\.[^@]+\'\\n\\'
-                          b"nFailed validating 'pattern' in schema['properties']['email']:\\n    {'mi"
-                          b"nLength': 1, 'pattern': '[^@]+@[^@]+\\\\\\\\.[^@]+', 'type': 'string'}\\n"
-                          b'\\nOn instance[\'email\']:\\n    \'username\'"}\n'), res.data)
+        self.assertEqual(422, res.status_code)
 
     @mock.patch('backend.src.controllers.users.controllers.get_user_via_email')
     def test_password_reset_fail_bad_username(self, mocked_user):
@@ -1298,7 +1141,7 @@ class UserTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual(b'{"message":"A result could not be found."}\n', res.data)
+        self.assertEqual(404, res.status_code)
 
     @mock.patch('backend.src.controllers.users.controllers.get_reset_request')
     @mock.patch('backend.src.controllers.users.controllers.get_user_via_email')
@@ -1318,7 +1161,7 @@ class UserTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual(b'{"message":"A result could not be found."}\n', res.data)
+        self.assertEqual(404, res.status_code)
 
     @mock.patch('backend.src.controllers.users.controllers.get_reset_request')
     @mock.patch('backend.src.controllers.users.controllers.get_user_via_email')
@@ -1338,7 +1181,7 @@ class UserTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual(b'{"message":"The reset code has expired. Please request a new one."}\n', res.data)
+        self.assertEqual(401, res.status_code)
 
     def test_post_success(self):
         """
@@ -1369,7 +1212,7 @@ class UserTests(unittest.TestCase):
                     headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                     follow_redirects=True
                 )
-                self.assertEqual(b'{"message":"Message posted."}\n', res.data)
+                self.assertEqual(200, res.status_code)
 
     def test_post_fail_missing_access_token(self):
         """
@@ -1379,7 +1222,7 @@ class UserTests(unittest.TestCase):
             "/api/v1/users/post",
             follow_redirects=True
         )
-        self.assertEqual(b'{"message":"Request missing access_token."}\n', res.data)
+        self.assertEqual(401, res.status_code)
 
     def test_post_fail_access_token_expired(self):
         """
@@ -1392,7 +1235,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(b'{"message":"Token expired."}\n', res.data)
+            self.assertEqual(401, res.status_code)
 
     def test_post_fail_bad_access_token_signature(self):
         """
@@ -1406,7 +1249,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(b'{"message":"Server failed to decode token."}\n', res.data)
+            self.assertEqual(500, res.status_code)
 
     def test_post_fail_unknown_access_token_issue(self):
         """
@@ -1420,7 +1263,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(b'{"message":"MySQL unavailable."}\n', res.data)
+            self.assertEqual(503, res.status_code)
 
     @mock.patch('backend.src.controllers.users.controllers.get_posts')
     @mock.patch('backend.src.controllers.users.controllers.get_number_of_posts')
@@ -1459,11 +1302,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual((b'{"back_page":null,"current_page":1,"next_page":"eyJ0eXAiOiJKV1QiLCJhbGciOiJI'
-                              b'UzI1NiJ9.eyJ1aWQiOi0xLCJ0b3RhbF9wYWdlcyI6MiwicG9zdHNfcGVyX3BhZ2UiOjEsImN1cnJ'
-                              b'lbnRfcGFnZSI6Mn0.rOexY_eF1nUjFJvpDbbbTTgpoVjxIh9ZbVs0Q6ggRuQ","posts":[["tes'
-                              b't_message1","Fri, 01 Nov 2019 19:12:27 GMT"]],"posts_per_page":1,"total_page'
-                              b's":2}\n'), res.data)
+            self.assertEqual(200, res.status_code)
 
     @mock.patch('backend.src.controllers.users.controllers.get_posts')
     def test_get_posts_success_next_scroll_token(self, mocked_posts):
@@ -1502,11 +1341,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual((b'{"back_page":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0xLCJ0b3RhbF9wY'
-                              b'WdlcyI6MiwicG9zdHNfcGVyX3BhZ2UiOjEsImN1cnJlbnRfcGFnZSI6MX0.pkQCRbBgvwuozzSG6'
-                              b'LK-kFGuxT8YYsYN3m9g-AzquyM","current_page":2,"next_page":null,"posts":[["tes'
-                              b't_message2","Fri, 01 Nov 2019 19:12:28 GMT"]],"posts_per_page":1,"total_page'
-                              b's":2}\n'), res.data)
+            self.assertEqual(200, res.status_code)
 
     @mock.patch('backend.src.controllers.users.controllers.get_posts')
     def test_get_posts_success_back_scroll_token(self, mocked_posts):
@@ -1545,11 +1380,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual((b'{"back_page":null,"current_page":1,"next_page":"eyJ0eXAiOiJKV1QiLCJhbGciOiJI'
-                              b'UzI1NiJ9.eyJ1aWQiOi0xLCJ0b3RhbF9wYWdlcyI6MiwicG9zdHNfcGVyX3BhZ2UiOjEsImN1cnJ'
-                              b'lbnRfcGFnZSI6Mn0.rOexY_eF1nUjFJvpDbbbTTgpoVjxIh9ZbVs0Q6ggRuQ","posts":[["tes'
-                              b't_message1","Fri, 01 Nov 2019 19:12:27 GMT"]],"posts_per_page":1,"total_page'
-                              b's":2}\n'), res.data)
+            self.assertEqual(200, res.status_code)
 
     def test_get_posts_fail_missing_access_token(self):
         """
@@ -1559,7 +1390,7 @@ class UserTests(unittest.TestCase):
             "/api/v1/users/posts",
             follow_redirects=True
         )
-        self.assertEqual(b'{"message":"Request missing access_token."}\n', res.data)
+        self.assertEqual(401, res.status_code)
 
     def test_get_posts_fail_access_token_expired(self):
         """
@@ -1572,7 +1403,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(b'{"message":"Token expired."}\n', res.data)
+            self.assertEqual(401, res.status_code)
 
     def test_get_posts_fail_bad_access_token_signature(self):
         """
@@ -1586,7 +1417,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(b'{"message":"Server failed to decode token."}\n', res.data)
+            self.assertEqual(500, res.status_code)
 
     def test_get_posts_fail_unknown_access_token_issue(self):
         """
@@ -1600,7 +1431,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(b'{"message":"MySQL unavailable."}\n', res.data)
+            self.assertEqual(503, res.status_code)
 
     def test_get_posts_fail_no_scroll_token_no_username(self):
         """
@@ -1630,7 +1461,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual((b'{"message":"Request missing username."}\n'), res.data)
+            self.assertEqual(422, res.status_code)
             test_req_data = {
                 "username": "",
                 "posts_per_page": 1
@@ -1641,7 +1472,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual((b'{"message":"Request missing username."}\n'), res.data)
+            self.assertEqual(422, res.status_code)
 
     @mock.patch('backend.src.controllers.users.controllers.get_user_via_username')
     def test_get_posts_fail_no_scroll_token_bad_username(self, mocked_user):
@@ -1674,7 +1505,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual((b'{"message":"A result could not be found."}\n'), res.data)
+            self.assertEqual(404, res.status_code)
 
     @mock.patch('backend.src.controllers.users.controllers.get_number_of_posts')
     @mock.patch('backend.src.controllers.users.controllers.get_user_via_username')
@@ -1710,7 +1541,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual((b'{"message":"current_page exceeds the total number of pages available(2)."}\n'), res.data)
+            self.assertEqual(422, res.status_code)
 
     def test_get_posts_fail_sent_both_tokens(self):
         """
@@ -1751,8 +1582,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual((b'{"message":"You can\'t send both a \'next_page\' token and a \'back_page\' token."}\n'),
-                             res.data)
+            self.assertEqual(422, res.status_code)
 
     @mock.patch('backend.src.controllers.users.controllers.get_user_via_email')
     def test_patch_user_success_email_only(self, mocked_user):
@@ -1788,7 +1618,7 @@ class UserTests(unittest.TestCase):
                                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                                 follow_redirects=True
                             )
-        self.assertEqual((b'{"message":"Email reset, and verification mail sent. "}\n'), res.data)
+        self.assertEqual(200, res.status_code)
 
     def test_patch_user_success_password_only(self):
         """
@@ -1819,7 +1649,7 @@ class UserTests(unittest.TestCase):
                     headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                     follow_redirects=True
                 )
-        self.assertEqual((b'{"message":"Password reset."}\n'), res.data)
+        self.assertEqual(200, res.status_code)
 
     @mock.patch('backend.src.controllers.users.controllers.get_user_via_email')
     def test_patch_user_success_email_and_password(self, mocked_user):
@@ -1857,7 +1687,7 @@ class UserTests(unittest.TestCase):
                                     headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                                     follow_redirects=True
                                 )
-        self.assertEqual((b'{"message":"Email reset, and verification mail sent. Password reset."}\n'), res.data)
+        self.assertEqual(200, res.status_code)
 
     def test_patch_user_fail_missing_access_token(self):
         """
@@ -1867,7 +1697,7 @@ class UserTests(unittest.TestCase):
             "/api/v1/users",
             follow_redirects=True
         )
-        self.assertEqual(b'{"message":"Request missing access_token."}\n', res.data)
+        self.assertEqual(401, res.status_code)
 
     def test_patch_user_fail_access_token_expired(self):
         """
@@ -1880,7 +1710,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(b'{"message":"Token expired."}\n', res.data)
+            self.assertEqual(401, res.status_code)
 
     def test_patch_user_fail_bad_access_token_signature(self):
         """
@@ -1894,7 +1724,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(b'{"message":"Server failed to decode token."}\n', res.data)
+            self.assertEqual(500, res.status_code)
 
     def test_patch_user_fail_unknown_access_token_issue(self):
         """
@@ -1908,7 +1738,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(b'{"message":"MySQL unavailable."}\n', res.data)
+            self.assertEqual(503, res.status_code)
 
     def test_patch_user_fail_email_empty(self):
         """
@@ -1938,10 +1768,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(((b'{"message":"\'\' does not match \'[^@]+@[^@]+\\\\\\\\.[^@]+\'\\n\\nFailed '
-                               b"validating 'pattern' in schema['properties']['email']:\\n    {'minLength'"
-                               b": 1, 'pattern': '[^@]+@[^@]+\\\\\\\\.[^@]+', 'type': 'string'}\\n\\nOn ins"
-                               b'tance[\'email\']:\\n    \'\'"}\n')), res.data)
+            self.assertEqual(422, res.status_code)
 
     def test_patch_user_fail_password_empty(self):
         """
@@ -1971,9 +1798,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(((b'{"message":"\'\' is too short\\n\\nFailed validating \'minLength\' in sche'
-                               b"ma['properties']['password']:\\n    {'minLength': 1, 'type': 'string'}\\n\\nOn"
-                               b' instance[\'password\']:\\n    \'\'"}\n')), res.data)
+            self.assertEqual(422, res.status_code)
 
     def test_patch_user_fail_email_and_password_missing(self):
         """
@@ -2001,12 +1826,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual((b'{"message":"{} does not have enough properties\\n\\nFailed validating \'min'
-                              b"Properties' in schema:\\n    {'minProperties': 1,\\n     'properties': {'e"
-                              b"mail': {'minLength': 1,\\n                              'pattern': '[^@]+"
-                              b"@[^@]+\\\\\\\\.[^@]+',\\n                              'type': 'string'},"
-                              b"\\n                    'password': {'minLength': 1, 'type': 'string'}},\\n"
-                              b'     \'type\': \'object\'}\\n\\nOn instance:\\n    {}"}\n'), res.data)
+            self.assertEqual(422, res.status_code)
 
     def test_patch_user_fail_bad_email(self):
         """
@@ -2036,10 +1856,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(((b'{"message":"\'username\' does not match \'[^@]+@[^@]+\\\\\\\\.[^@]+\'\\n\\'
-                               b"nFailed validating 'pattern' in schema['properties']['email']:\\n    {'mi"
-                               b"nLength': 1, 'pattern': '[^@]+@[^@]+\\\\\\\\.[^@]+', 'type': 'string'}\\n"
-                               b'\\nOn instance[\'email\']:\\n    \'username\'"}\n')), res.data)
+            self.assertEqual(422, res.status_code)
 
     def test_patch_user_fail_password_hashing(self):
         """
@@ -2071,4 +1888,4 @@ class UserTests(unittest.TestCase):
                     headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                     follow_redirects=True
                 )
-                self.assertEqual(((b'{"message":"Error while hashing password."}\n')), res.data)
+                self.assertEqual(500, res.status_code)
