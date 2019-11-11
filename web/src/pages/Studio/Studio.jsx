@@ -1,10 +1,12 @@
-import React, { useCallback, memo, useEffect } from 'react';
+import React, { memo, useCallback, useEffect } from 'react';
 import styles from './Studio.module.scss';
 import Header from '../../components/Header';
 import { play, pause, stop, setTempo, setVolume, setTracks } from '../../actions/studioActions';
 import { connect } from 'react-redux';
 import kick from '../../assets/samples/kick23.wav';
 import bass from '../../assets/samples/bass.wav';
+import Timeline from '../../components/Timeline';
+
 
 const Studio = memo(props => {
   const { dispatch } = props;
@@ -68,13 +70,20 @@ const Studio = memo(props => {
     <div className={styles.wrapper}>
       <Header selected={0}/>
       <div className={styles.contentWrapper}>
-        <button onClick={handlePlay}>Play</button>
-        <button onClick={handlePlause}>Pause</button>
-        <button onClick={handleStop}>Stop</button>
-        <p>BPM Input:<input type='text' defaultValue={90} onChange={handleTempo}/></p>
-        <p>Current BPM: {props.studio.tempo}</p>
-        <p>Beat number: {props.studio.currentBeat}</p>
-        <p>Volume:<input type='text' defaultValue={1} onChange={handleVolume}/></p>
+        <div className={styles.sidebar}>
+        </div>
+        <div className={styles.scrollableMain}>
+          <div className={styles.mainContent}>
+            <Timeline />
+            <button onClick={handlePlay}>Play</button>
+            <button onClick={handlePlause}>Pause</button>
+            <button onClick={handleStop}>Stop</button>
+            <p>BPM Input:<input type='text' defaultValue={90} onChange={handleTempo}/></p>
+            <p>Current BPM: {props.studio.tempo}</p>
+            <p>Beat number: {props.studio.currentBeat}</p>
+            <p>Volume:<input type='text' defaultValue={1} onChange={handleVolume}/></p>
+          </div>
+        </div>
       </div>
     </div>
   );

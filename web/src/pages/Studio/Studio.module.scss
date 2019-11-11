@@ -1,6 +1,21 @@
 .contentWrapper {
-  max-width: 840px;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 40px;
+  width: 100vw;
+  height: calc(100vh - 80px);
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 220px;
+  height: 100%;
+  float: left;
+}
+
+.scrollableMain {
+  width: calc(100% - 220px);
+  height: 100%;
+  overflow-x: scroll;
+}
+
+.mainContent {
+  width: 150%;
 }
