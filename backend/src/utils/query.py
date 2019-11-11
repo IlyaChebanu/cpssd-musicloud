@@ -6,7 +6,7 @@ from .logger import log
 from ..config import MYSQL_CONFIG
 
 
-def query(query_string, query_args, get_row=False):
+def query(query_string, query_args, get_row=False, get_insert_row_id=False):
     """Connects to the DB & executes the provided query."""
     res = []
     try:
@@ -20,6 +20,9 @@ def query(query_string, query_args, get_row=False):
         # Get rows if SELECT query otherwise commit changes.
         if get_row:
             res = cursor.fetchall()
+        elif get_insert_row_id:
+            res = cursor.lastrowid
+            cnx.commit()
         else:
             cnx.commit()
 

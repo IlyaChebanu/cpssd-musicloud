@@ -7,6 +7,7 @@ DROP TABLE `musicloud_db`.`Resets`;
 DROP TABLE `musicloud_db`.`Posts`;
 DROP TABLE `musicloud_db`.`Logins`;
 DROP TABLE `musicloud_db`.`Followers`;
+DROP TABLE `musicloud_db`.`Song_State`;
 
 CREATE TABLE `musicloud_db`.`Verification` (
     `code` VARCHAR(64) UNIQUE NOT NULL,
@@ -30,9 +31,7 @@ CREATE TABLE `musicloud_db`.`Songs` (
     `title` VARCHAR(255) NOT NULL,
     `duration` INT NOT NULL,
     `created` DATETIME NOT NULL,
-    `updated` DATETIME NOT NULL,
     `public` TINYINT NOT NULL DEFAULT 0,
-    `state` JSON NOT NULL,
     `url` VARCHAR(255),
     `cover` VARCHAR(255),
     `genre` VARCHAR(50),
@@ -71,4 +70,10 @@ CREATE TABLE `musicloud_db`.`Logins` (
 CREATE TABLE `musicloud_db`.`Followers` (
     `follower` INT NOT NULL,
     `following` INT NOT NULL
+);
+
+CREATE TABLE `musicloud_db`.`Song_State` (
+    `sid` INT NOT NULL,
+    `state` JSON NOT NULL,
+    `time_updated` DATETIME NOT NULL
 );
