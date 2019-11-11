@@ -1,5 +1,6 @@
 import unittest
 import mock
+import json
 
 from jwt.exceptions import InvalidSignatureError
 
@@ -35,6 +36,7 @@ class AuthTests(unittest.TestCase):
                 )
                 with open("backend/src/controllers/auth/success.html", "rb") as f:
                     expexcted_page = f.read()
+                    self.assertEqual(200, res.status_code)
                     self.assertEqual(expexcted_page, res.data)
 
     def test_verify_fail_bad_code(self):
@@ -50,7 +52,7 @@ class AuthTests(unittest.TestCase):
             query_string=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual(b'{"message":"Invalid code."}\n', res.data)
+        self.assertEqual(400, res.status_code)
 
     @mock.patch('backend.src.controllers.auth.controllers.random_string')
     @mock.patch('backend.src.controllers.auth.controllers.argon2.verify')
@@ -73,10 +75,9 @@ class AuthTests(unittest.TestCase):
                 json=test_req_data,
                 follow_redirects=True
             )
-            self.assertEqual((b'{"access_token":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0xLCJlbWFpbC'
-                              b'I6InVzZXJuYW1lQGZha2VtYWlsLm5vc2hvdyIsInVzZXJuYW1lIjoidXNlcm5hbWUiLCJ2ZXJpZm'
-                              b'llZCI6MSwicmFuZG9tX3ZhbHVlIjoxfQ.zoNW0kyNqQOo9_CU9F3qfkgEDu7X1gE9icqyqIJAUwU'
-                              b'"}\n'), res.data)
+            self.assertEqual(200, res.status_code)
+            expected_body = {'access_token': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0xLCJlbWFpbCI6InVzZXJuYW1lQGZha2VtYWlsLm5vc2hvdyIsInVzZXJuYW1lIjoidXNlcm5hbWUiLCJ2ZXJpZmllZCI6MSwicmFuZG9tX3ZhbHVlIjoxfQ.zoNW0kyNqQOo9_CU9F3qfkgEDu7X1gE9icqyqIJAUwU'}
+            self.assertEqual(expected_body, json.loads(res.data))
 
     def test_login_fail_missing_username(self):
         """
@@ -104,9 +105,7 @@ class AuthTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual((b'{"message":"\'\' is too short\\n\\nFailed validating \'minLength\' in sche'
-                          b"ma['properties']['username']:\\n    {'minLength': 1, 'type': 'string'}\\n\\"
-                          b'nOn instance[\'username\']:\\n    \'\'"}\n'), res.data)
+        self.assertEqual(422, res.status_code)
 
     def test_login_fail_missing_password(self):
         """
@@ -120,11 +119,7 @@ class AuthTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual((b'{"message":"\'password\' is a required property\\n\\nFailed validating \''
-                          b"required' in schema:\\n    {'properties': {'password': {'minLength': 1, '"
-                          b"type': 'string'},\\n                    'username': {'minLength': 1, 'typ"
-                          b"e': 'string'}},\\n     'required': ['username', 'password'],\\n     'type'"
-                          b': \'object\'}\\n\\nOn instance:\\n    {\'username\': \'username\'}"}\n'), res.data)
+        self.assertEqual(422, res.status_code)
         test_req_data = {
             "username": "username",
             "password": ""
@@ -134,9 +129,7 @@ class AuthTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual((b'{"message":"\'\' is too short\\n\\nFailed validating \'minLength\' in sche'
-                          b"ma['properties']['password']:\\n    {'minLength': 1, 'type': 'string'}\\n\\"
-                          b'nOn instance[\'password\']:\\n    \'\'"}\n'), res.data)
+        self.assertEqual(422, res.status_code)
 
     def test_login_fail_missing_username_and_password(self):
         """
@@ -148,11 +141,7 @@ class AuthTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual((b'{"message":"\'username\' is a required property\\n\\nFailed validating \''
-                          b"required' in schema:\\n    {'properties': {'password': {'minLength': 1, '"
-                          b"type': 'string'},\\n                    'username': {'minLength': 1, 'typ"
-                          b"e': 'string'}},\\n     'required': ['username', 'password'],\\n     'type'"
-                          b': \'object\'}\\n\\nOn instance:\\n    {}"}\n'), res.data)
+        self.assertEqual(422, res.status_code)
         test_req_data = {
             "username": "",
             "password": ""
@@ -162,10 +151,7 @@ class AuthTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual((b'{"message":"\'\' is too short\\n\\nFailed validating \'minLength\' in sche'
-                          b"ma['properties']['username']:\\n    {'minLength': 1, 'type': 'string'}\\n\\"
-                          b'nOn instance[\'username\']:\\n    \'\'"}\n'), res.data)
-
+        self.assertEqual(422, res.status_code)
     @mock.patch('backend.src.controllers.auth.controllers.argon2.verify')
     @mock.patch('backend.src.controllers.auth.controllers.get_user_via_username')
     def test_login_fail_bad_credentials(self, mocked_user, mocked_verify):
@@ -185,7 +171,7 @@ class AuthTests(unittest.TestCase):
                 json=test_req_data,
                 follow_redirects=True
             )
-            self.assertEqual((b'{"message":"Bad login credentials."}\n'), res.data)
+            self.assertEqual(401, res.status_code)
 
     @mock.patch('backend.src.controllers.auth.controllers.argon2.verify')
     @mock.patch('backend.src.controllers.auth.controllers.get_user_via_username')
@@ -206,7 +192,7 @@ class AuthTests(unittest.TestCase):
                 json=test_req_data,
                 follow_redirects=True
             )
-            self.assertEqual((b'{"message":"Account not verified."}\n'), res.data)
+            self.assertEqual(403, res.status_code)
 
     def test_logout_success(self):
         """
@@ -233,7 +219,9 @@ class AuthTests(unittest.TestCase):
                     headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                     follow_redirects=True
                 )
-                self.assertEqual((b'{"message":"User has been successfully logged out!"}\n'), res.data)
+                self.assertEqual(200, res.status_code)
+                expected_body = {'message': 'User has been successfully logged out!'}
+                self.assertEqual(expected_body, json.loads(res.data))
 
     def test_logout_fail_missing_access_token(self):
         """
@@ -243,7 +231,7 @@ class AuthTests(unittest.TestCase):
             "/api/v1/auth/logout",
             follow_redirects=True
         )
-        self.assertEqual(b'{"message":"Request missing access_token."}\n', res.data)
+        self.assertEqual(401, res.status_code)
 
     def test_logout_fail_access_token_expired(self):
         """
@@ -256,7 +244,7 @@ class AuthTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(b'{"message":"Token expired."}\n', res.data)
+            self.assertEqual(401, res.status_code)
 
     def test_logout_fail_bad_access_token_signature(self):
         """
@@ -270,7 +258,7 @@ class AuthTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(b'{"message":"Server failed to decode token."}\n', res.data)
+            self.assertEqual(500, res.status_code)
 
     def test_logout_fail_unknown_access_token_issue(self):
         """
@@ -284,4 +272,4 @@ class AuthTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(b'{"message":"MySQL unavailable."}\n', res.data)
+            self.assertEqual(503, res.status_code)
