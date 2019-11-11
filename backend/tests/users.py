@@ -1,6 +1,7 @@
 import unittest
 import mock
 import datetime
+import json
 
 from mysql.connector.errors import IntegrityError
 from jwt.exceptions import InvalidSignatureError
@@ -36,7 +37,9 @@ class UserTests(unittest.TestCase):
                     json=test_req_data,
                     follow_redirects=True
                 )
-        self.assertEqual(200, res.status_code)
+                self.assertEqual(200, res.status_code)
+                expected_body = {"message": "User created!"}
+                self.assertEqual(expected_body, json.loads(res.data))
 
     def test_registration_fail_missing_username(self):
         """
@@ -282,7 +285,9 @@ class UserTests(unittest.TestCase):
                     json=test_req_data,
                     follow_redirects=True
                 )
-        self.assertEqual(200, res.status_code)
+                self.assertEqual(200, res.status_code)
+                expected_body = {"message": "Verification email sent."}
+                self.assertEqual(expected_body, json.loads(res.data))
 
     def test_reverify_fail_missing_email(self):
         """
@@ -367,7 +372,9 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-        self.assertEqual(200, res.status_code)
+            self.assertEqual(200, res.status_code)
+            expected_body = {"message": "You are now following: username"}
+            self.assertEqual(expected_body, json.loads(res.data))
 
     def test_follow_fail_missing_access_token(self):
         """
@@ -554,7 +561,9 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-        self.assertEqual(200, res.status_code)
+            self.assertEqual(200, res.status_code)
+            expected_body = {"message": "You are now no longer following: username"}
+            self.assertEqual(expected_body, json.loads(res.data))
 
     def test_unfollow_fail_missing_access_token(self):
         """
@@ -717,7 +726,17 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-        self.assertEqual(200, res.status_code)
+            self.assertEqual(200, res.status_code)
+            expected_body = {
+                'followers': 1,
+                'following': 2,
+                'likes': 5,
+                'posts': 4,
+                'profile_pic_url': 'NOT IMPLEMENTED',
+                'songs': 3,
+                'username': 'username'
+            }
+            self.assertEqual(expected_body, json.loads(res.data))
 
     def test_get_user_fail_missing_access_token(self):
         """
@@ -858,7 +877,9 @@ class UserTests(unittest.TestCase):
                         headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                         follow_redirects=True
                     )
-        self.assertEqual(200, res.status_code)
+                    self.assertEqual(200, res.status_code)
+                    expected_body = {'message': 'Email sent.'}
+                    self.assertEqual(expected_body, json.loads(res.data))
 
     def test_get_reset_fails_missing_email(self):
         """
@@ -937,6 +958,8 @@ class UserTests(unittest.TestCase):
                     follow_redirects=True
                 )
         self.assertEqual(200, res.status_code)
+        expected_body = {'message': 'Password reset.'}
+        self.assertEqual(expected_body, json.loads(res.data))
 
     def test_password_reset_fail_missing_email(self):
         """
@@ -1213,6 +1236,8 @@ class UserTests(unittest.TestCase):
                     follow_redirects=True
                 )
                 self.assertEqual(200, res.status_code)
+                expected_body = {'message': 'Message posted.'}
+                self.assertEqual(expected_body, json.loads(res.data))
 
     def test_post_fail_missing_access_token(self):
         """
@@ -1303,6 +1328,15 @@ class UserTests(unittest.TestCase):
                 follow_redirects=True
             )
             self.assertEqual(200, res.status_code)
+            expected_body = {
+                'back_page': None,
+                'current_page': 1,
+                'next_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0xLCJ0b3RhbF9wYWdlcyI6MiwicG9zdHNfcGVyX3BhZ2UiOjEsImN1cnJlbnRfcGFnZSI6Mn0.rOexY_eF1nUjFJvpDbbbTTgpoVjxIh9ZbVs0Q6ggRuQ',
+                'posts': [['test_message1', 'Fri, 01 Nov 2019 19:12:27 GMT']],
+                'posts_per_page': 1,
+                'total_pages': 2
+            }
+            self.assertEqual(expected_body, json.loads(res.data))
 
     @mock.patch('backend.src.controllers.users.controllers.get_posts')
     def test_get_posts_success_next_scroll_token(self, mocked_posts):
@@ -1342,6 +1376,15 @@ class UserTests(unittest.TestCase):
                 follow_redirects=True
             )
             self.assertEqual(200, res.status_code)
+            expected_body = {
+                'back_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0xLCJ0b3RhbF9wYWdlcyI6MiwicG9zdHNfcGVyX3BhZ2UiOjEsImN1cnJlbnRfcGFnZSI6MX0.pkQCRbBgvwuozzSG6LK-kFGuxT8YYsYN3m9g-AzquyM',
+                'current_page': 2,
+                'next_page': None,
+                'posts': [['test_message2', 'Fri, 01 Nov 2019 19:12:28 GMT']],
+                'posts_per_page': 1,
+                'total_pages': 2
+            }
+            self.assertEqual(expected_body, json.loads(res.data))
 
     @mock.patch('backend.src.controllers.users.controllers.get_posts')
     def test_get_posts_success_back_scroll_token(self, mocked_posts):
@@ -1381,6 +1424,15 @@ class UserTests(unittest.TestCase):
                 follow_redirects=True
             )
             self.assertEqual(200, res.status_code)
+            expected_body = {
+                'back_page': None,
+                'current_page': 1,
+                'next_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0xLCJ0b3RhbF9wYWdlcyI6MiwicG9zdHNfcGVyX3BhZ2UiOjEsImN1cnJlbnRfcGFnZSI6Mn0.rOexY_eF1nUjFJvpDbbbTTgpoVjxIh9ZbVs0Q6ggRuQ',
+                'posts': [['test_message1', 'Fri, 01 Nov 2019 19:12:27 GMT']],
+                'posts_per_page': 1,
+                'total_pages': 2
+            }
+            self.assertEqual(expected_body, json.loads(res.data))
 
     def test_get_posts_fail_missing_access_token(self):
         """
@@ -1618,7 +1670,9 @@ class UserTests(unittest.TestCase):
                                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                                 follow_redirects=True
                             )
-        self.assertEqual(200, res.status_code)
+                            self.assertEqual(200, res.status_code)
+                            expected_body = {'message': 'Email reset, and verification mail sent. '}
+                            self.assertEqual(expected_body, json.loads(res.data))
 
     def test_patch_user_success_password_only(self):
         """
@@ -1649,7 +1703,9 @@ class UserTests(unittest.TestCase):
                     headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                     follow_redirects=True
                 )
-        self.assertEqual(200, res.status_code)
+                self.assertEqual(200, res.status_code)
+                expected_body = {'message': 'Password reset.'}
+                self.assertEqual(expected_body, json.loads(res.data))
 
     @mock.patch('backend.src.controllers.users.controllers.get_user_via_email')
     def test_patch_user_success_email_and_password(self, mocked_user):
@@ -1687,7 +1743,9 @@ class UserTests(unittest.TestCase):
                                     headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                                     follow_redirects=True
                                 )
-        self.assertEqual(200, res.status_code)
+                                self.assertEqual(200, res.status_code)
+                                expected_body = {'message': 'Email reset, and verification mail sent. Password reset.'}
+                                self.assertEqual(expected_body, json.loads(res.data))
 
     def test_patch_user_fail_missing_access_token(self):
         """

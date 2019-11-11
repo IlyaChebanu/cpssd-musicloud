@@ -1,5 +1,6 @@
 import unittest
 import mock
+import json
 
 from jwt.exceptions import InvalidSignatureError
 
@@ -36,6 +37,7 @@ class AuthTests(unittest.TestCase):
                 with open("backend/src/controllers/auth/success.html", "rb") as f:
                     expexcted_page = f.read()
                     self.assertEqual(200, res.status_code)
+                    self.assertEqual(expexcted_page, res.data)
 
     def test_verify_fail_bad_code(self):
         """
@@ -74,6 +76,8 @@ class AuthTests(unittest.TestCase):
                 follow_redirects=True
             )
             self.assertEqual(200, res.status_code)
+            expected_body = {'access_token': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0xLCJlbWFpbCI6InVzZXJuYW1lQGZha2VtYWlsLm5vc2hvdyIsInVzZXJuYW1lIjoidXNlcm5hbWUiLCJ2ZXJpZmllZCI6MSwicmFuZG9tX3ZhbHVlIjoxfQ.zoNW0kyNqQOo9_CU9F3qfkgEDu7X1gE9icqyqIJAUwU'}
+            self.assertEqual(expected_body, json.loads(res.data))
 
     def test_login_fail_missing_username(self):
         """
@@ -216,6 +220,8 @@ class AuthTests(unittest.TestCase):
                     follow_redirects=True
                 )
                 self.assertEqual(200, res.status_code)
+                expected_body = {'message': 'User has been successfully logged out!'}
+                self.assertEqual(expected_body, json.loads(res.data))
 
     def test_logout_fail_missing_access_token(self):
         """

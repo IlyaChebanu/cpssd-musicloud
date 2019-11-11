@@ -1,5 +1,6 @@
 import unittest
 import mock
+import json
 
 from jwt.exceptions import InvalidSignatureError
 
@@ -46,6 +47,8 @@ class AudioTests(unittest.TestCase):
                     follow_redirects=True
                 )
                 self.assertEqual(200, res.status_code)
+                expected_body = {'message': 'Your song project has been created', 'sid': 1}
+                self.assertEqual(expected_body, json.loads(res.data))
 
     def test_create_song_fail_missing_access_token(self):
         """
@@ -173,6 +176,8 @@ class AudioTests(unittest.TestCase):
                     follow_redirects=True
                 )
                 self.assertEqual(200, res.status_code)
+                expected_body = {'message': 'Song state saved.'}
+                self.assertEqual(expected_body, json.loads(res.data))
 
     def test_save_song_fail_missing_access_token(self):
         """
@@ -403,6 +408,8 @@ class AudioTests(unittest.TestCase):
                 follow_redirects=True
             )
             self.assertEqual(200, res.status_code)
+            expected_body = {'song_state': {}}
+            self.assertEqual(expected_body, json.loads(res.data))
 
     def test_load_song_fail_missing_access_token(self):
         """
