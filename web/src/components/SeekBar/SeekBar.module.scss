@@ -1,0 +1,14 @@
+.wrapper {
+  position: absolute;
+  svg {
+    transition: opacity 100ms;
+  }
+  .bar {
+    transition: opacity 100ms;
+    width: 1px;
+    position: absolute;
+    height: calc(100vh - 100px);
+    top: -40px;
+    background-color: #FE0A63;
+  }
+}

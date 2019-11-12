@@ -1,5 +1,6 @@
 export default (
   state = {
+    scroll: 0,
     tempo: 90.0,
     playingStartBeat: 1,
     playingStartTime: 0,
@@ -61,6 +62,11 @@ export default (
       return {
         ...state,
         volume: action.volume
+      }
+    case 'SET_SCROLL':
+      return {
+        ...state,
+        scroll: action.scroll
       }
     default:
       return state

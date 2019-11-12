@@ -64,3 +64,10 @@ export const setVolume = volume => dispatch => {
     volume
   });
 };
+
+export const setScroll = scroll => dispatch => {
+  dispatch({
+    type: 'SET_SCROLL',
+    scroll
+  });
+};

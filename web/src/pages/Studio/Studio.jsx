@@ -1,11 +1,12 @@
 import React, { memo, useCallback, useEffect } from 'react';
 import styles from './Studio.module.scss';
 import Header from '../../components/Header';
-import { play, pause, stop, setTempo, setVolume, setTracks } from '../../actions/studioActions';
+import { play, pause, stop, setTempo, setVolume, setTracks, setScroll } from '../../actions/studioActions';
 import { connect } from 'react-redux';
 import kick from '../../assets/samples/kick23.wav';
 import bass from '../../assets/samples/bass.wav';
 import Timeline from '../../components/Timeline';
+import SeekBar from '../../components/SeekBar';
 
 
 const Studio = memo(props => {
@@ -66,13 +67,18 @@ const Studio = memo(props => {
     ]));
   }, []);
 
+  const handleScroll = useCallback(e => {
+    props.dispatch(setScroll(e.target.scrollLeft));
+  }, []);
+
   return (
     <div className={styles.wrapper}>
       <Header selected={0}/>
       <div className={styles.contentWrapper}>
+        <SeekBar/>
         <div className={styles.sidebar}>
         </div>
-        <div className={styles.scrollableMain}>
+        <div className={styles.scrollableMain} onScroll={handleScroll}>
           <div className={styles.mainContent}>
             <Timeline />
             <button onClick={handlePlay}>Play</button>
