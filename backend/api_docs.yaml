@@ -461,7 +461,7 @@ paths:
                 example: 100
               profile_pic_url:
                 type: "string"
-                example: "NOT IMPLEMENTED"
+                example: "http://image.fake"
               songs:
                 type: "integer"
                 example: 321
