@@ -16,7 +16,8 @@ from ...utils import random_string, send_mail
 from ...models.users import (
     insert_user, get_user_via_username, get_user_via_email, make_post, create_reset, get_reset_request, delete_reset,
     post_follow, post_unfollow, reset_password, update_reset, get_number_of_posts, get_posts, get_follower_count,
-    get_song_count, get_number_of_likes, get_following_count, get_following_pair, reset_user_verification, reset_email
+    get_song_count, get_number_of_likes, get_following_count, get_following_pair, reset_user_verification, reset_email,
+    update_profiler_url
 )
 from ...models.verification import insert_verification, get_verification
 from ...middleware.auth_required import auth_required
@@ -208,7 +209,7 @@ def user():
     likes = get_number_of_likes(user[0][0])
 
     return {
-        "profile_pic_url": "NOT IMPLEMENTED",
+        "profile_pic_url": user[0][5],
         "username": user[0][2],
         "followers": followers,
         "following": following,
@@ -452,15 +453,25 @@ def patch_user(user):
                 "type": "string",
                 "pattern": "[^@]+@[^@]+\.[^@]+",
                 "minLength": 1
+            },
+            "current_password": {
+                "type": "string",
+                "minLength": 1
             }
         },
-        "minProperties": 1
+        "required": ["current_password"],
+        "minProperties": 2
     }
     try:
         validate(request.json, schema=expected_body)
     except ValidationError as exc:
         log("warning", "Request validation failed.", str(exc))
         return {"message": str(exc)}, 422
+
+    # Check the user's password against the provided one
+    user_password = get_user_via_username(user.get("username"))[0][3]
+    if not argon2.verify(request.json.get("current_password"), user_password):
+        return {"message": "Incorrect password!"}, 401
 
     res_string = ""
 
@@ -497,3 +508,29 @@ def patch_user(user):
         res_string += "Password reset."
 
     return {"message": res_string}, 200
+
+
+@users.route("/profiler", methods=["PATCH"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def profiler(user):
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "url": {
+                "type": "string",
+                "pattern": "http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+",
+                "minLength": 1
+            },
+        },
+        "required": ["url"],
+        "minProperties": 1
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    update_profiler_url(user.get("uid"), request.json.get("url"))
+    return {"message": "Profile picture URL updated."}, 200

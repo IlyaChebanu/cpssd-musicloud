@@ -73,6 +73,7 @@ def login():
         'email': user[0][1],
         'username': user[0][2],
         'verified': user[0][4],
+        'profiler': user[0][5],
         'random_value': random_string(255)
     }
     access_token = jwt.encode(jwt_payload, JWT_SECRET, algorithm='HS256')

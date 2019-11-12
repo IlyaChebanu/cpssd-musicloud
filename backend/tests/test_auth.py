@@ -62,7 +62,7 @@ class AuthTests(unittest.TestCase):
         Ensure user's can login correctly.
         """
         mocked_random_string.return_value = 1
-        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 1]]
+        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 1, "http://image.fake"]]
         mocked_verify.return_value = True
         test_req_data = {
             "username": "username",
@@ -76,7 +76,7 @@ class AuthTests(unittest.TestCase):
                 follow_redirects=True
             )
             self.assertEqual(200, res.status_code)
-            expected_body = {'access_token': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0xLCJlbWFpbCI6InVzZXJuYW1lQGZha2VtYWlsLm5vc2hvdyIsInVzZXJuYW1lIjoidXNlcm5hbWUiLCJ2ZXJpZmllZCI6MSwicmFuZG9tX3ZhbHVlIjoxfQ.zoNW0kyNqQOo9_CU9F3qfkgEDu7X1gE9icqyqIJAUwU'}
+            expected_body = {'access_token': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0xLCJlbWFpbCI6InVzZXJuYW1lQGZha2VtYWlsLm5vc2hvdyIsInVzZXJuYW1lIjoidXNlcm5hbWUiLCJ2ZXJpZmllZCI6MSwicHJvZmlsZXIiOiJodHRwOi8vaW1hZ2UuZmFrZSIsInJhbmRvbV92YWx1ZSI6MX0.J7fD3OLh-UI9KBLNZ32BGOaKNggZRo3DcwV30BkohFw'}
             self.assertEqual(expected_body, json.loads(res.data))
 
     def test_login_fail_missing_username(self):
@@ -158,7 +158,7 @@ class AuthTests(unittest.TestCase):
         """
         Ensure login attempt fails if bad credentials are provided.
         """
-        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 1]]
+        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 1, "http://image.fake"]]
         mocked_verify.return_value = False
         test_req_data = {
             "username": "username",

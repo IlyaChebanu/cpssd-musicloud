@@ -280,3 +280,16 @@ def reset_user_verification(uid):
         uid,
     )
     query(sql, args)
+
+
+def update_profiler_url(uid, url):
+    sql = (
+        "UPDATE Users "
+        "SET profiler = %s "
+        "WHERE uid = %s"
+    )
+    args = (
+        url,
+        uid,
+    )
+    query(sql, args)
