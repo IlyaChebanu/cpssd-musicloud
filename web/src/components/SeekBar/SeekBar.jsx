@@ -3,10 +3,34 @@ import PropTypes from 'prop-types';
 import styles from './SeekBar.module.scss';
 import { ReactComponent as SeekBarSvg } from '../../assets/seekbar.svg';
 import { connect } from 'react-redux';
+import { setCurrentBeat, play, pause } from '../../actions/studioActions';
+
 
 const SeekBar = memo(props => {
   const currentBeat = props.currentBeat;
   const scroll = props.scroll;
+  const playing = props.playing;
+
+  const handleDragStart = useCallback(() => {
+    if (playing) {
+      props.dispatch(pause);
+    }
+    const handleDragStop = () => {
+      if (playing) {
+        props.dispatch(play);
+      }
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleDragStop);
+    }
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleDragStop);
+  }, [playing]);
+
+  const handleMouseMove = useCallback(e => {
+    console.log(Math.max(1, (e.screenX - 220) / 40 + 1));
+    props.dispatch(setCurrentBeat(Math.max(1, (e.screenX - 220) / 40 + 1)));
+  }, []);
+
   const iconStyle = useMemo(() => {
     const pos = -7 + 220 + (currentBeat - 1) * 40 - scroll;
     return {
@@ -24,7 +48,7 @@ const SeekBar = memo(props => {
 
   return (
     <div className={styles.wrapper}>
-      <SeekBarSvg style={iconStyle} />
+      <SeekBarSvg style={iconStyle} onMouseDown={handleDragStart}/>
       <div className={styles.bar} style={barStyle}/>
     </div>
   );
@@ -36,7 +60,8 @@ SeekBar.propTypes = {
 
 const mapStateToProps = ({ studio }) => ({
   currentBeat: studio.currentBeat,
-  scroll: studio.scroll
+  scroll: studio.scroll,
+  playing: studio.playing
 });
 
 export default connect(mapStateToProps)(SeekBar);

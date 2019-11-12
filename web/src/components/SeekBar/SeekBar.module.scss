@@ -2,6 +2,10 @@
   position: absolute;
   svg {
     transition: opacity 100ms;
+
+    &:hover {
+      cursor: pointer;
+    }
   }
   .bar {
     transition: opacity 100ms;

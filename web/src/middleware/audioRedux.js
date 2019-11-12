@@ -66,6 +66,7 @@ export default store => {
         store.dispatch(playingStartTime(audioContext.currentTime));
         requestAnimationFrame(beatUpdate);
         state = store.getState().studio;
+        store.dispatch(playingStartBeat(state.currentBeat));
         const schedulableSamples = [];
         state.tracks.forEach((track, i) => {
           schedulableSamples.push(...track.samples.filter(sample => {
@@ -87,7 +88,6 @@ export default store => {
 
       case 'STUDIO_PAUSE':
         state = store.getState().studio;
-        store.dispatch(playingStartBeat(state.currentBeat));
         Object.entries(scheduledSamples).forEach(([id, sample]) => {
           console.log(sample);
           sample.source.stop();
