@@ -21,6 +21,7 @@ CREATE TABLE `musicloud_db`.`Users` (
     `username` VARCHAR(100) NOT NULL UNIQUE,
     `password` VARCHAR(100) NOT NULL,
     `verified` TINYINT DEFAULT 0,
+    `profiler` VARCHAR(255),
     PRIMARY KEY (`uid`),
     UNIQUE INDEX `uid_UNIQUE` (`uid` ASC)
 );
