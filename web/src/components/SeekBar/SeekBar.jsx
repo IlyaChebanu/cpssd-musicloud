@@ -13,20 +13,21 @@ const SeekBar = memo(props => {
   const playing = props.playing;
 
   const handleDragStart = useCallback(() => {
-    if (playing) {
-      props.dispatch(pause);
+    props.dispatch(pause);
+
+    const handleMouseMove = e => {
+      const scroll = store.getState().studio.scroll;
+      props.dispatch(setCurrentBeat(Math.max(scroll / 40 + 1, (scroll + e.screenX - 220) / 40 + 1)));
     }
     const handleDragStop = () => {
+      // Only plays if the music was playing when handleDragStart was called
       if (playing) {
         props.dispatch(play);
       }
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleDragStop);
     }
-    const handleMouseMove = e => {
-      const scroll = store.getState().studio.scroll;
-      props.dispatch(setCurrentBeat(Math.max(scroll / 40 + 1, (scroll + e.screenX - 220) / 40 + 1)));
-    }
+
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleDragStop);
   }, [playing]);
