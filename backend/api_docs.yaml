@@ -579,7 +579,7 @@ paths:
       tags:
       - "users"
       summary: "Change a user's info"
-      description: "Changes the email and or password for user who's access_token has been passed in."
+      description: "Changes the email and or password for user who's access_token has been passed in. This endpoint requires the user to sent there current_password."
       consumes:
       - "application/json"
       produces:
@@ -602,6 +602,9 @@ paths:
             email:
               type: "string"
               example: "fake@email.com"
+            current_password:
+              type: "string"
+              example: "1234"
       responses:
         200:
           description: "Details updated"
@@ -611,6 +614,14 @@ paths:
               message:
                 type: "string"
                 example: "Email reset, and verification mail sent. Password reset."
+        401:
+          description: "Bad credentials."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Incorrect password!"
         409:
           description: "Email address already in use"
           schema:
@@ -1107,6 +1118,74 @@ paths:
               message:
                 type: "string"
                 example: "You are now no longer following: testUser"
+        401:
+          description: "Access_token expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+  
+  /users/profiler:
+    patch:
+      tags:
+      - "users"
+      summary: "Update a user's profiler URL."
+      description: "Change a user's profile picture by sending there access_token and the picture URL to this endpoint."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "Send the profiler url."
+          required: true
+          schema:
+            type: "object"
+            properties:
+              url:
+                type: "string"
+                example: "http://image.fake"
+      responses:
+        200:
+          description: "successful query"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Profile picture URL updated."
         401:
           description: "Access_token expired"
           schema:

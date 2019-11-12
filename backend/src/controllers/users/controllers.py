@@ -460,7 +460,7 @@ def patch_user(user):
             }
         },
         "required": ["current_password"],
-        "minProperties": 1
+        "minProperties": 2
     }
     try:
         validate(request.json, schema=expected_body)
@@ -471,7 +471,7 @@ def patch_user(user):
     # Check the user's password against the provided one
     user_password = get_user_via_username(user.get("username"))[0][3]
     if not argon2.verify(request.json.get("current_password"), user_password):
-        return {"message": "Bad login credentials."}, 401
+        return {"message": "Incorrect password!"}, 401
 
     res_string = ""
 
@@ -510,7 +510,7 @@ def patch_user(user):
     return {"message": res_string}, 200
 
 
-@users.route("/profiler", methods=["POST"])
+@users.route("/profiler", methods=["PATCH"])
 @sql_err_catcher()
 @auth_required(return_user=True)
 def profiler(user):
@@ -519,6 +519,7 @@ def profiler(user):
         "properties": {
             "url": {
                 "type": "string",
+                "pattern": "http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+",
                 "minLength": 1
             },
         },

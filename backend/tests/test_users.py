@@ -274,7 +274,7 @@ class UserTests(unittest.TestCase):
         """
         Ensure resending of the verification email is working.
         """
-        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0]]
+        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake"]]
         test_req_data = {
             "email": "username@fakemail.noshow",
         }
@@ -329,7 +329,7 @@ class UserTests(unittest.TestCase):
         """
         Ensure verification emails aren't resent if the user is already verified.
         """
-        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 1]]
+        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 1, "http://image.fake"]]
         test_req_data = {
             "email": "username@fakemail.noshow",
         }
@@ -346,7 +346,7 @@ class UserTests(unittest.TestCase):
         """
         Ensure following is successful.
         """
-        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0]]
+        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake"]]
         mocked_followers.return_value = []
         test_req_data = {
             "username": "username",
@@ -502,7 +502,7 @@ class UserTests(unittest.TestCase):
         """
         Ensure following fails if a user attempts to follow themselves.
         """
-        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0]]
+        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake"]]
         test_req_data = {
             "username": "username",
         }
@@ -535,7 +535,7 @@ class UserTests(unittest.TestCase):
         """
         Ensure unfollowing is successful.
         """
-        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0]]
+        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake"]]
         mocked_followers.return_value = []
         test_req_data = {
             "username": "username",
@@ -701,7 +701,7 @@ class UserTests(unittest.TestCase):
         songs.return_value = 3
         following.return_value = 2
         follower.return_value = 1
-        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0]]
+        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake"]]
         test_req_data = {
             "username": "username",
         }
@@ -732,7 +732,7 @@ class UserTests(unittest.TestCase):
                 'following': 2,
                 'likes': 5,
                 'posts': 4,
-                'profile_pic_url': 'NOT IMPLEMENTED',
+                'profile_pic_url': 'http://image.fake',
                 'songs': 3,
                 'username': 'username'
             }
@@ -864,7 +864,7 @@ class UserTests(unittest.TestCase):
         """
         Ensure sending password reset email works successfully.
         """
-        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0]]
+        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake"]]
         test_req_data = {
             "email": "fakeemail@idontwork.biz",
         }
@@ -943,7 +943,7 @@ class UserTests(unittest.TestCase):
         """
         Ensure password resets are completed successfully.
         """
-        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0]]
+        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake"]]
         mocked_reset.return_value = [["-1", 10000000, datetime.datetime.utcnow()]]
         test_req_data = {
             "email": "username@fakemail.noshow",
@@ -1172,7 +1172,7 @@ class UserTests(unittest.TestCase):
         """
         Ensure password reset fails if the user never made a password reset request.
         """
-        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0]]
+        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake"]]
         mocked_reset.side_effect = NoResults
         test_req_data = {
             "email": "username@deffoNotAnEmail.fake",
@@ -1192,7 +1192,7 @@ class UserTests(unittest.TestCase):
         """
         Ensure password reset fails if the user sends an expired reset code.
         """
-        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0]]
+        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake"]]
         mocked_reset.return_value = [["-1", 10000000, datetime.datetime(1970, 1, 1, 1, 1, 1)]]
         test_req_data = {
             "email": "username@deffoNotAnEmail.fake",
@@ -1297,7 +1297,7 @@ class UserTests(unittest.TestCase):
         """
         Ensure getting posts is successful without scroll tokens.
         """
-        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0]]
+        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake"]]
         mocked_num_posts.return_value = 2
         mocked_posts.return_value = [
             ["test_message1", "Fri, 01 Nov 2019 19:12:27 GMT"]
@@ -1565,7 +1565,7 @@ class UserTests(unittest.TestCase):
         """
         Ensure getting posts fails if the user tries to access a page that doesn't exist.
         """
-        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0]]
+        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake"]]
         mocked_num_posts.return_value = 2
         test_req_data = {
             "username": "username",
@@ -1636,92 +1636,23 @@ class UserTests(unittest.TestCase):
             )
             self.assertEqual(422, res.status_code)
 
+    @mock.patch('backend.src.controllers.auth.controllers.argon2.verify')
     @mock.patch('backend.src.controllers.users.controllers.get_user_via_email')
-    def test_patch_user_success_email_only(self, mocked_user):
+    def test_patch_user_success_email_only(self, mocked_user, mocked_verify):
         """
         Ensure editing a user's email works.
         """
-        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0]]
+        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake"]]
+        mocked_verify.return_value = True
         test_req_data = {
             "email": "username@email.com",
+            "current_password": "1234"
         }
-        with mock.patch('backend.src.controllers.users.controllers.reset_user_verification'):
-            with mock.patch('backend.src.controllers.users.controllers.insert_verification'):
-                with mock.patch('backend.src.controllers.users.controllers.send_mail'):
-                    with mock.patch('backend.src.controllers.users.controllers.reset_email'):
-                        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-                            vr.return_value = {
-                                'uid': -1,
-                                'email': 'username2@fakemail.noshow',
-                                'username': 'username2',
-                                'verified': 1,
-                                'random_value': (
-                                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                                    'zeyvzkssMFUTdeEvzbKu'
-                                )
-                            }
-                            res = self.test_client.patch(
-                                "/api/v1/users",
-                                json=test_req_data,
-                                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
-                                follow_redirects=True
-                            )
-                            self.assertEqual(200, res.status_code)
-                            expected_body = {'message': 'Email reset, and verification mail sent. '}
-                            self.assertEqual(expected_body, json.loads(res.data))
-
-    def test_patch_user_success_password_only(self):
-        """
-        Ensure editing a user's password works.
-        """
-        test_req_data = {
-            "password": "1234"
-        }
-        with mock.patch('backend.src.controllers.users.controllers.reset_password'):
-            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-                vr.return_value = {
-                    'uid': -1,
-                    'email': 'username2@fakemail.noshow',
-                    'username': 'username2',
-                    'verified': 1,
-                    'random_value': (
-                        'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                        'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                        'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                        'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                        'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                        'zeyvzkssMFUTdeEvzbKu'
-                    )
-                }
-                res = self.test_client.patch(
-                    "/api/v1/users",
-                    json=test_req_data,
-                    headers={'Authorization': 'Bearer ' + TEST_TOKEN},
-                    follow_redirects=True
-                )
-                self.assertEqual(200, res.status_code)
-                expected_body = {'message': 'Password reset.'}
-                self.assertEqual(expected_body, json.loads(res.data))
-
-    @mock.patch('backend.src.controllers.users.controllers.get_user_via_email')
-    def test_patch_user_success_email_and_password(self, mocked_user):
-        """
-        Ensure editing a user's email & password works.
-        """
-        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0]]
-        test_req_data = {
-            "email": "username@email.com",
-            "password": "1234"
-        }
-        with mock.patch('backend.src.controllers.users.controllers.reset_user_verification'):
-            with mock.patch('backend.src.controllers.users.controllers.insert_verification'):
-                with mock.patch('backend.src.controllers.users.controllers.send_mail'):
-                    with mock.patch('backend.src.controllers.users.controllers.reset_email'):
-                        with mock.patch('backend.src.controllers.users.controllers.reset_password'):
+        with mock.patch('backend.src.controllers.users.controllers.get_user_via_username'):
+            with mock.patch('backend.src.controllers.users.controllers.reset_user_verification'):
+                with mock.patch('backend.src.controllers.users.controllers.insert_verification'):
+                    with mock.patch('backend.src.controllers.users.controllers.send_mail'):
+                        with mock.patch('backend.src.controllers.users.controllers.reset_email'):
                             with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
                                 vr.return_value = {
                                     'uid': -1,
@@ -1744,8 +1675,89 @@ class UserTests(unittest.TestCase):
                                     follow_redirects=True
                                 )
                                 self.assertEqual(200, res.status_code)
-                                expected_body = {'message': 'Email reset, and verification mail sent. Password reset.'}
+                                expected_body = {'message': 'Email reset, and verification mail sent. '}
                                 self.assertEqual(expected_body, json.loads(res.data))
+
+    @mock.patch('backend.src.controllers.auth.controllers.argon2.verify')
+    def test_patch_user_success_password_only(self, mocked_verify):
+        """
+        Ensure editing a user's password works.
+        """
+        mocked_verify.return_value = True
+        test_req_data = {
+            "password": "1234",
+            "current_password": "1234"
+        }
+        with mock.patch('backend.src.controllers.users.controllers.get_user_via_username'):
+            with mock.patch('backend.src.controllers.users.controllers.reset_password'):
+                with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+                    vr.return_value = {
+                        'uid': -1,
+                        'email': 'username2@fakemail.noshow',
+                        'username': 'username2',
+                        'verified': 1,
+                        'random_value': (
+                            'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                            'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                            'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                            'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                            'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                            'zeyvzkssMFUTdeEvzbKu'
+                        )
+                    }
+                    res = self.test_client.patch(
+                        "/api/v1/users",
+                        json=test_req_data,
+                        headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                        follow_redirects=True
+                    )
+                    self.assertEqual(200, res.status_code)
+                    expected_body = {'message': 'Password reset.'}
+                    self.assertEqual(expected_body, json.loads(res.data))
+
+    @mock.patch('backend.src.controllers.auth.controllers.argon2.verify')
+    @mock.patch('backend.src.controllers.users.controllers.get_user_via_email')
+    def test_patch_user_success_email_and_password(self, mocked_user, mocked_verify):
+        """
+        Ensure editing a user's email & password works.
+        """
+        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake"]]
+        mocked_verify.return_value = True
+        test_req_data = {
+            "email": "username@email.com",
+            "password": "1234",
+            "current_password": "1234"
+        }
+        with mock.patch('backend.src.controllers.users.controllers.get_user_via_username'):
+            with mock.patch('backend.src.controllers.users.controllers.reset_user_verification'):
+                with mock.patch('backend.src.controllers.users.controllers.insert_verification'):
+                    with mock.patch('backend.src.controllers.users.controllers.send_mail'):
+                        with mock.patch('backend.src.controllers.users.controllers.reset_email'):
+                            with mock.patch('backend.src.controllers.users.controllers.reset_password'):
+                                with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+                                    vr.return_value = {
+                                        'uid': -1,
+                                        'email': 'username2@fakemail.noshow',
+                                        'username': 'username2',
+                                        'verified': 1,
+                                        'random_value': (
+                                            'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                                            'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                                            'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                                            'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                                            'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                                            'zeyvzkssMFUTdeEvzbKu'
+                                        )
+                                    }
+                                    res = self.test_client.patch(
+                                        "/api/v1/users",
+                                        json=test_req_data,
+                                        headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                                        follow_redirects=True
+                                    )
+                                    self.assertEqual(200, res.status_code)
+                                    expected_body = {'message': 'Email reset, and verification mail sent. Password reset.'}
+                                    self.assertEqual(expected_body, json.loads(res.data))
 
     def test_patch_user_fail_missing_access_token(self):
         """
@@ -1803,7 +1815,8 @@ class UserTests(unittest.TestCase):
         Ensure patch user fails if the email sent is empty.
         """
         test_req_data = {
-            "email": ""
+            "email": "",
+            "current_password": "1234"
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
             vr.return_value = {
@@ -1833,7 +1846,8 @@ class UserTests(unittest.TestCase):
         Ensure patch user fails if the password sent is empty.
         """
         test_req_data = {
-            "password": ""
+            "password": "",
+            "current_password": "1234"
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
             vr.return_value = {
@@ -1862,7 +1876,9 @@ class UserTests(unittest.TestCase):
         """
         Ensure patch user fails if the email & password were not sent.
         """
-        test_req_data = {}
+        test_req_data = {
+            "current_password": "1234"
+        }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
             vr.return_value = {
                 'uid': -1,
@@ -1885,13 +1901,131 @@ class UserTests(unittest.TestCase):
                 follow_redirects=True
             )
             self.assertEqual(422, res.status_code)
+
+    def test_patch_user_fail_current_password_missing(self):
+        """
+        Ensure patch user fails if the user doesn't send there current password.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            test_req_data = {
+                "email": "username@email.com",
+                "password": "1234"
+            }
+            res = self.test_client.patch(
+                "/api/v1/users",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+            test_req_data = {
+                "email": "username@email.com",
+                "password": "1234",
+                "current_password": ""
+            }
+            res = self.test_client.patch(
+                "/api/v1/users",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    def test_patch_user_fail_missing_all_values(self):
+        """
+        Ensure patch user fails if the user doesn't send any valid values.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            test_req_data = {}
+            res = self.test_client.patch(
+                "/api/v1/users",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+            test_req_data = {
+                "email": "",
+                "password": "",
+                "current_password": ""
+            }
+            res = self.test_client.patch(
+                "/api/v1/users",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    @mock.patch('backend.src.controllers.auth.controllers.argon2.verify')
+    def test_patch_user_fail_bad_current_password(self, mocked_verify):
+        """
+        Ensure patch user fails if the user sends an invalid current_password.
+        """
+        mocked_verify.return_value = False
+        with mock.patch('backend.src.controllers.users.controllers.get_user_via_username'):
+            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+                vr.return_value = {
+                    'uid': -1,
+                    'email': 'username2@fakemail.noshow',
+                    'username': 'username2',
+                    'verified': 1,
+                    'random_value': (
+                        'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                        'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                        'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                        'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                        'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                        'zeyvzkssMFUTdeEvzbKu'
+                    )
+                }
+                test_req_data = {
+                    "email": "username@email.com",
+                    "current_password": "1234"
+                }
+                res = self.test_client.patch(
+                    "/api/v1/users",
+                    json=test_req_data,
+                    headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                    follow_redirects=True
+                )
+                self.assertEqual(401, res.status_code)
 
     def test_patch_user_fail_bad_email(self):
         """
         Ensure patch user fails if the email sent is not an email address.
         """
         test_req_data = {
-            "email": "username"
+            "email": "username",
+            "current_password": "1234"
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
             vr.return_value = {
@@ -1916,16 +2050,51 @@ class UserTests(unittest.TestCase):
             )
             self.assertEqual(422, res.status_code)
 
-    def test_patch_user_fail_password_hashing(self):
+    @mock.patch('backend.src.controllers.auth.controllers.argon2.verify')
+    def test_patch_user_fail_password_hashing(self, mocked_verify):
         """
         Ensure patch user fails if the password hashing fails.
         """
+        mocked_verify.return_value = True
         test_req_data = {
-            "password": "1234"
+            "password": "1234",
+            "current_password": "1234"
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            with mock.patch('backend.src.controllers.users.controllers.argon2.hash') as f:
-                f.side_effect = Exception()
+        with mock.patch('backend.src.controllers.users.controllers.get_user_via_username'):
+            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+                with mock.patch('backend.src.controllers.users.controllers.argon2.hash') as f:
+                    f.side_effect = Exception()
+                    vr.return_value = {
+                        'uid': -1,
+                        'email': 'username2@fakemail.noshow',
+                        'username': 'username2',
+                        'verified': 1,
+                        'random_value': (
+                            'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                            'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                            'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                            'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                            'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                            'zeyvzkssMFUTdeEvzbKu'
+                        )
+                    }
+                    res = self.test_client.patch(
+                        "/api/v1/users",
+                        json=test_req_data,
+                        headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                        follow_redirects=True
+                    )
+                    self.assertEqual(500, res.status_code)
+
+    def test_patch_profiler_success(self):
+        """
+        Ensure editing a user's profile picture URL works.
+        """
+        test_req_data = {
+            "url": "http://image.fake"
+        }
+        with mock.patch('backend.src.controllers.users.controllers.update_profiler_url'):
+            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
                 vr.return_value = {
                     'uid': -1,
                     'email': 'username2@fakemail.noshow',
@@ -1941,9 +2110,129 @@ class UserTests(unittest.TestCase):
                     )
                 }
                 res = self.test_client.patch(
-                    "/api/v1/users",
+                    "/api/v1/users/profiler",
                     json=test_req_data,
                     headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                     follow_redirects=True
                 )
-                self.assertEqual(500, res.status_code)
+                self.assertEqual(200, res.status_code)
+                expected_body = {'message': 'Profile picture URL updated.'}
+                self.assertEqual(expected_body, json.loads(res.data))
+
+    def test_patch_profiler_fail_missing_access_token(self):
+        """
+        Ensure patch a user's profile pic URL fails if no access_token is sent.
+        """
+        res = self.test_client.patch(
+            "/api/v1/users/profiler",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_patch_profiler_fail_access_token_expired(self):
+        """
+        Ensure patching user's profile pic URL fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.side_effect = ValueError
+            res = self.test_client.patch(
+                "/api/v1/users/profiler",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_patch_profiler_fail_bad_access_token_signature(self):
+        """
+        Ensure patching user's profile pic URL fails if the access_token signature does not match
+        the one configured on the server.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.side_effect = InvalidSignatureError
+            res = self.test_client.patch(
+                "/api/v1/users/profiler",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_patch_profiler_fail_unknown_access_token_issue(self):
+        """
+        Ensure patching a user's profile pic URL fails if some unknown error relating to the access_token
+        occurs.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.side_effect = Exception
+            res = self.test_client.patch(
+                "/api/v1/users/profiler",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(503, res.status_code)
+
+    def test_patch_profiler_fail_missing_url(self):
+        """
+        Ensure patching a user's profile pic URL fails if the user doesn't send a URL.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            test_req_data = {}
+            res = self.test_client.patch(
+                "/api/v1/users/profiler",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+            test_req_data = {
+                "url": ""
+            }
+            res = self.test_client.patch(
+                "/api/v1/users/profiler",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    def test_patch_profiler_fail_bad_url(self):
+        """
+        Ensure patching a user's profile pic URL fails if the user doesn't send a valid URL.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            test_req_data = {
+                "url": "not a url string"
+            }
+            res = self.test_client.patch(
+                "/api/v1/users/profiler",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
