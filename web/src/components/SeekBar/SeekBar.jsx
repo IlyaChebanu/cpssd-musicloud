@@ -4,6 +4,7 @@ import styles from './SeekBar.module.scss';
 import { ReactComponent as SeekBarSvg } from '../../assets/seekbar.svg';
 import { connect } from 'react-redux';
 import { setCurrentBeat, play, pause } from '../../actions/studioActions';
+import store from '../../store';
 
 
 const SeekBar = memo(props => {
@@ -22,14 +23,13 @@ const SeekBar = memo(props => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleDragStop);
     }
+    const handleMouseMove = e => {
+      const scroll = store.getState().studio.scroll;
+      props.dispatch(setCurrentBeat(Math.max(scroll / 40 + 1, (scroll + e.screenX - 220) / 40 + 1)));
+    }
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleDragStop);
   }, [playing]);
-
-  const handleMouseMove = useCallback(e => {
-    console.log(Math.max(1, (e.screenX - 220) / 40 + 1));
-    props.dispatch(setCurrentBeat(Math.max(1, (e.screenX - 220) / 40 + 1)));
-  }, []);
 
   const iconStyle = useMemo(() => {
     const pos = -7 + 220 + (currentBeat - 1) * 40 - scroll;
