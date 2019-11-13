@@ -6,7 +6,6 @@ from botocore.exceptions import NoCredentialsError
 from flask import Blueprint
 from flask import request
 from jsonschema import validate, ValidationError
-
 from ...config import AWS_CREDS
 from ...middleware.auth_required import auth_required
 from ...middleware.sql_err_catcher import sql_err_catcher
@@ -14,34 +13,59 @@ from ...utils.logger import log
 from ...utils import permitted_to_edit
 from ...models.audio import insert_song, insert_song_state, get_song_state
 
-
 audio = Blueprint('audio', __name__)
 
 
-# TODO - edit to provide the url with credentials to the client to directly store to s3
-@audio.route("/get_access", methods=["POST"])
-def get_access():
-    return AWS_CREDS
-
-
-# TODO - remove the endpoint, handle the logic on the client side 
-@audio.route("/upload", methods=["POST"])
-def audio_upload():
-    aws_access_key = AWS_CREDS['AWSAccessKeyId']
-    aws_secret = AWS_CREDS['AWSSecretKey']
-    s3 = boto3.client('s3', aws_access_key_id=aws_access_key, aws_secret_access_key=aws_secret)
-    try:
-        f = request.files["song_data"]
-        filename = f.filename
-        s3.upload_fileobj(f, AWS_CREDS['Bucket'], filename)
-        return {"message": "Upload successful"}
-    except FileNotFoundError:
-        return {"message": "File not found!"}
-    except NoCredentialsError:
-        return {"message": "Credentials not available"}
-    except Exception as e:
-        return {"message": str(e)}
-
+# TODO - edit to make use of conditions to allow usage of signed url without public
+# access to the bucket
+@audio.route("/signed-form-post", methods=["POST"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def signed_form_post(user):
+   expected_body = {
+      "type": "object",
+      "properties": {
+         "dir": {
+            "type": "string",
+            "pattern": "^(audio|profiler|compiled_audio)$",
+            "minLength": 1,
+         },
+         "fileName": {
+            "type": "string",
+            "minLength": 1
+         },
+         "fileType": {
+            "type": "string",
+            "minLength": 1,
+         }
+      },
+      "required": ["dir", "fileName", "fileType"]
+   }
+   try:
+      validate(request.json, schema=expected_body)
+   except ValidationError as exc:
+      log("warning", "Request validation failed.", str(exc))
+      return {"message": str(exc)}, 422
+   directory=request.json.get('dir')
+   file_name=request.json.get('fileName')
+   file_type=request.json.get('fileType')
+   aws_access_key_id=AWS_CREDS['AWSAccessKeyId']
+   aws_secret_access_key=AWS_CREDS['AWSSecretAccessKey']
+   s3 = boto3.client(
+        's3',
+        aws_access_key_id=aws_access_key_id,
+        aws_secret_access_key=aws_secret_access_key)
+   url = s3.generate_presigned_post(
+	Bucket='dcumusicloudbucket',
+	Key=directory + "/" + str(user.get('uid')) + "_" + file_name,
+	Fields={
+		'Content-Type': file_type,
+	},
+        # Conditions=[
+        #   {"acl": "public-read"},
+        # ],
+	ExpiresIn=120)
+   return {"message": "Signed url for file uploading has been provided", "signed_url": url}, 200
 
 @audio.route("", methods=["POST"])
 @sql_err_catcher()
