@@ -19,9 +19,6 @@ export default store => {
       const secondsPerBeat = 60 / state.tempo;
       let currentBeat = state.playingStartBeat + (audioContext.currentTime - state.playingStartTime) / secondsPerBeat;
       if (state.loopEnabled && currentBeat > state.loop.stop) {
-        Object.keys(scheduledSamples).forEach(id => {
-          delete scheduledSamples[id];
-        });
         currentBeat = state.loop.start;
         store.dispatch(playingStartBeat(state.loop.start));
         store.dispatch(playingStartTime(audioContext.currentTime));
@@ -60,6 +57,7 @@ export default store => {
       // Schedule samples
       schedulableSamples.forEach(sample => {
         if (!(sample.id in scheduledSamples)) {
+          console.log('scheduling', sample);
           const source = scheduleSample(sample);
           scheduledSamples[sample.id] = { ...sample, ...source };
         }
