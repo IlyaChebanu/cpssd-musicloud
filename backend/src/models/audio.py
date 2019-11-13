@@ -35,10 +35,10 @@ def insert_song_state(sid, state, time_updated):
     query(sql, args)
 
 
-def get_song(sid):
+def get_song_data(sid):
     sql = (
         "SELECT * FROM Songs "
-        "WHERE sid = %s "
+        "WHERE sid = %s AND public = 1"
     )
     args = (
         sid,

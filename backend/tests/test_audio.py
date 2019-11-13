@@ -5,6 +5,7 @@ import json
 from jwt.exceptions import InvalidSignatureError
 
 from ..src import app
+from ..src.models.errors import NoResults
 from .constants import TEST_TOKEN
 
 
@@ -1208,3 +1209,160 @@ class AudioTests(unittest.TestCase):
                 follow_redirects=True
             )
             self.assertEqual(422, res.status_code)
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_song_data')
+    def test_get_song_data_success(self, mocked_song):
+        """
+        Ensure user's can get a song's info successfully.
+        """
+        test_song = [[1, 1, "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, None]]
+        mocked_song.return_value = test_song
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            test_req_data = {
+                "sid": 1
+            }
+            res = self.test_client.get(
+                "/api/v1/audio/song",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(200, res.status_code)
+            expected_body = {'song': test_song}
+            self.assertEqual(expected_body, json.loads(res.data))
+
+    def test_get_song_data_fail_missing_sid(self):
+        """
+        Ensure user's can't get a song's info if they don't provide an sid.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            test_req_data = {}
+            res = self.test_client.get(
+                "/api/v1/audio/song",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+            test_req_data = {
+                "sid": ""
+            }
+            res = self.test_client.get(
+                "/api/v1/audio/song",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_song_data')
+    def test_get_song_data_fail_bad_sid(self, mocked_song):
+        """
+        Ensure user's can't get a song's info if they provide a bad sid.
+        """
+        mocked_song.side_effect = NoResults
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            test_req_data = {
+                "sid": "-1"
+            }
+            res = self.test_client.get(
+                "/api/v1/audio/song",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(404, res.status_code)
+
+    def test_get_song_data_fail_missing_access_token(self):
+        """
+        Ensure getting song data fails if no access_token is sent.
+        """
+        res = self.test_client.get(
+            "/api/v1/audio/song",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_get_song_data_fail_access_token_expired(self):
+        """
+        Ensure getting song data fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.side_effect = ValueError
+            res = self.test_client.get(
+                "/api/v1/audio/song",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_get_song_data_fail_bad_access_token_signature(self):
+        """
+        Ensure getting song data fails if the access_token signature does not match
+        the one configured on the server.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.side_effect = InvalidSignatureError
+            res = self.test_client.get(
+                "/api/v1/audio/song",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_get_song_data_fail_unknown_access_token_issue(self):
+        """
+        Ensure getting song data fails if some unknown error relating to the access_token
+        occurs.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.side_effect = Exception
+            res = self.test_client.get(
+                "/api/v1/audio/song",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(503, res.status_code)
+

@@ -16,7 +16,7 @@ from ...utils import permitted_to_edit, gen_scroll_tokens
 from ...models.audio import (
     insert_song, insert_song_state, get_song_state, get_all_compiled_songs,
     get_all_compiled_songs_by_uid, get_all_uncompiled_songs_by_uid, get_number_of_compiled_songs,
-    get_number_of_compiled_songs_by_uid, get_number_of_uncompiled_songs_by_uid
+    get_number_of_compiled_songs_by_uid, get_number_of_uncompiled_songs_by_uid, get_song_data
 )
 
 
@@ -295,3 +295,15 @@ def get_uncompiled_songs(user):
             "back_page": back_page,
             "uncompiled_songs": uncompiled_songs
         }, 200
+
+
+@audio.route("/song", methods=["GET"])
+@sql_err_catcher()
+@auth_required()
+def get_song():
+    sid = request.args.get('sid')
+    if not sid:
+        return {"message": "sid param can't be empty!"}, 422
+
+    res = get_song_data(sid)
+    return {"song": res}, 200
