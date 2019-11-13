@@ -29,3 +29,62 @@ export const deleteToken = token => {
     { access_token: token }
   ).catch(e => e.response);
 }
+
+const generatePresignedPost = (dir, filename, filetype, token) => {
+  return axios.post(
+    `${API_URL}/v1/audio/signed-form-post`,
+    {
+      dir: dir,
+      fileName: filename,
+      fileType: filetype,
+    },
+    {
+      headers: {Authorization: "Bearer " + token}
+    }
+  ).catch(e => e.response);
+}
+
+const putMedia = (signedUrl, file, options) => {
+  return axios.put(
+    signedUrl, file, options).catch( e => e.response);
+}
+
+export const uploadFile = async (dir, f, token, e) => {
+  const res = await generatePresignedPost(dir, f.meta.name, f.meta.type, token)
+  try {
+    console.log(res)
+    var options = {
+      headers: {
+        'Content-Type': f.meta.type,
+      }
+    }
+    if (res.status === 200) {
+      var data = new FormData();
+      data.append("file", f.file)
+        const putAudio = async e1 => {
+          const res2 = await putMedia(makeSignedUrl(res.data.signed_url), data, options)
+          try {
+            if (res.status === 200) {
+              // SUCCESS
+              console.log(res2)
+            }
+          } catch (e1) {
+            console.error(e1)
+          }
+        }
+        putAudio()
+    }
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+// TODO: make use of extra params
+const makeSignedUrl = (object) => {
+  let url = new URL(object.url + object.fields.key)
+  // url.searchParams.set("AWSAccessKeyId", object.fields.AWSAccessKeyId)
+  // url.searchParams.set("policy", object.fields.policy)
+  // url.searchParams.set("signature", object.fields.signature)
+  // console.log(url)
+  return url.href
+}

@@ -8,6 +8,7 @@ import bass from '../../assets/samples/bass.wav';
 import Timeline from '../../components/Timeline';
 import SeekBar from '../../components/SeekBar';
 
+import FileUploader from '../../components/FileUploader';
 
 const Studio = memo(props => {
   const { dispatch } = props;
