@@ -90,6 +90,9 @@ const Studio = memo(props => {
             <p>Beat number: {props.studio.currentBeat}</p>
             <p>Volume:<input type='text' defaultValue={1} onChange={handleVolume}/></p>
           </div>
+          <div style={{backgroundColor: "darkgrey"}}>
+            <FileUploader />
+          </div>
         </div>
       </div>
     </div>
@@ -103,4 +106,3 @@ Studio.propTypes = {
 const mapStateToProps = ({ studio }) => ({ studio });
 
 export default connect(mapStateToProps)(Studio);
-
