@@ -12,7 +12,7 @@ from jsonschema import validate, ValidationError
 
 from ...config import HOST, RESET_TIMEOUT, JWT_SECRET
 from ...utils.logger import log
-from ...utils import random_string, send_mail
+from ...utils import random_string, send_mail, gen_scroll_tokens
 from ...models.users import (
     insert_user, get_user_via_username, get_user_via_email, make_post, create_reset, get_reset_request, delete_reset,
     post_follow, post_unfollow, reset_password, update_reset, get_number_of_posts, get_posts, get_follower_count,
@@ -378,15 +378,7 @@ def posts():
             "posts_per_page": posts_per_page,
         }
 
-        back_page = None
-        if 1 < current_page <= total_pages:
-            jwt_payload["current_page"] = current_page - 1
-            back_page = jwt.encode(jwt_payload, JWT_SECRET, algorithm='HS256')
-
-        next_page = None
-        if current_page < total_pages:
-            jwt_payload["current_page"] = current_page + 1
-            next_page = jwt.encode(jwt_payload, JWT_SECRET, algorithm='HS256')
+        back_page, next_page = gen_scroll_tokens(current_page, total_pages, jwt_payload)
 
         return {
             "current_page": current_page,
@@ -418,15 +410,7 @@ def posts():
             "posts_per_page": posts_per_page,
         }
 
-        back_page = None
-        if 1 < current_page <= total_pages:
-            jwt_payload["current_page"] = current_page - 1
-            back_page = jwt.encode(jwt_payload, JWT_SECRET, algorithm='HS256')
-
-        next_page = None
-        if current_page < total_pages:
-            jwt_payload["current_page"] = current_page + 1
-            next_page = jwt.encode(jwt_payload, JWT_SECRET, algorithm='HS256')
+        back_page, next_page = gen_scroll_tokens(current_page, total_pages, jwt_payload)
 
         return {
             "current_page": current_page,
