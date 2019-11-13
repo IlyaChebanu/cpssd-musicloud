@@ -43,6 +43,46 @@ def audio_upload():
         return {"message": str(e)}
 
 
+@audio.route("/list-bucket-files", methods=["POST"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def list_bucket_files(user):
+   expected_body = {
+      "type": "object",
+      "properties": {
+         "dir": {
+            "type": "string",
+            "pattern": "^(audio|profiler|compiled_audio)$",
+             "minLength": 1,
+         },
+      },
+   }
+   try:
+      validate(request.json, schema=expected_body)
+   except ValidationError as exc:
+      log("warning", "Request validation failed.", str(exc))
+      return {"message": str(exc)}, 422
+   directory=request.json.get('dir')
+   aws_access_key_id=AWS_CREDS['AWSAccessKeyId']
+   aws_secret_access_key=AWS_CREDS['AWSSecretAccessKey']
+   bucket= AWS_CREDS['Bucket']
+   uid=str(user.get("uid"))
+   s3 = boto3.client(
+      's3',
+      aws_access_key_id=aws_access_key_id,
+      aws_secret_access_key=aws_secret_access_key)
+   result = s3.list_objects(Bucket=bucket, Prefix=directory+"/"+uid+"_")
+   if not 'Contents' in result:
+      return {"message": "No contents available for request"}, 200
+   bucket_location = s3.get_bucket_location(Bucket=bucket)
+   bucket_url= "https://s3-{0}.amazonaws.com/{1}/".format(
+      bucket_location['LocationConstraint'],
+      bucket)
+   file_list = []
+   for c in result['Contents']:
+      file_list.append(bucket_url+c['Key'])
+   return {"message": "List of file URLs has been provided", "file_list": file_list}, 200
+
 @audio.route("", methods=["POST"])
 @sql_err_catcher()
 @auth_required(return_user=True)
