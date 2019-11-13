@@ -1,4 +1,4 @@
-# MusiCloud
+# MusiCloud [![Build Status](https://travis-ci.com/CPSSD/MusiCloud.svg?token=VTsNQCkWWmZRNF9jfpa7&branch=master)](https://travis-ci.com/CPSSD/MusiCloud)
 This repo contains the code for the MusiCloud online music mixing service.
 
 ## Prerequisites 
