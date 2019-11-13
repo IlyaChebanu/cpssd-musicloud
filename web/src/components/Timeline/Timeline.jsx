@@ -1,6 +1,7 @@
 import React, { memo, useState, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import styles from './Timeline.module.scss';
+import Looper from '../Looper';
 
 const Timeline = memo(props => {
 
@@ -23,6 +24,7 @@ const Timeline = memo(props => {
         {ticks}
         {numbers}
       </svg>
+      <Looper />
     </div>
   );
 });

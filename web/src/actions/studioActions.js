@@ -71,3 +71,31 @@ export const setScroll = scroll => dispatch => {
     scroll
   });
 };
+
+export const setLoop = obj => dispatch => {
+  dispatch({
+    type: 'SET_LOOP',
+    obj
+  });
+};
+
+export const setLoopEnabled = bool => dispatch => {
+  dispatch({
+    type: 'SET_LOOP_ENABLED',
+    bool
+  });
+};
+
+export const setGridSize = gridSize => dispatch => {
+  dispatch({
+    type: 'SET_GRID_SIZE',
+    gridSize
+  });
+};
+
+export const setGridSnapEnabled = bool => dispatch => {
+  dispatch({
+    type: 'SET_GRID_SNAP_ENABLED',
+    bool
+  });
+};
