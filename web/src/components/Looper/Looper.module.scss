@@ -1,0 +1,35 @@
+.wrapper {
+  background-color: #44464B;
+  height: 30px;
+  width: 40px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  top: -4px;
+
+  &.loopEnabled {
+    background-color: #5F6165;
+  }
+
+  svg {
+    color: white;
+    height: 17.45px;
+    width: 13px;
+
+    &:hover {
+      cursor: pointer;
+    }
+
+    &:first-child {
+      margin-left: 5px;
+      transform: rotate(-90deg);
+    }
+
+    &:last-child {
+      margin-right: 5px;
+      transform: rotate(90deg);
+    }
+  }
+}

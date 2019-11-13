@@ -17,7 +17,15 @@ export default store => {
     if (state.playing) {
       requestAnimationFrame(beatUpdate);
       const secondsPerBeat = 60 / state.tempo;
-      const currentBeat = state.playingStartBeat + (audioContext.currentTime - state.playingStartTime) / secondsPerBeat;
+      let currentBeat = state.playingStartBeat + (audioContext.currentTime - state.playingStartTime) / secondsPerBeat;
+      if (state.loopEnabled && currentBeat > state.loop.stop) {
+        Object.keys(scheduledSamples).forEach(id => {
+          delete scheduledSamples[id];
+        });
+        currentBeat = state.loop.start;
+        store.dispatch(playingStartBeat(state.loop.start));
+        store.dispatch(playingStartTime(audioContext.currentTime));
+      }
       store.dispatch(setCurrentBeat(currentBeat));
     }
   }
@@ -31,8 +39,7 @@ export default store => {
 
       // Delete played samples
       Object.entries(scheduledSamples).forEach(([id, sample]) => {
-        const [_, endTime] = getSampleTimes(audioContext, state, sample);
-        if (endTime < audioContext.currentTime) {
+        if (sample.endTime < audioContext.currentTime) {
           delete scheduledSamples[id];
         }
       });
@@ -41,10 +48,11 @@ export default store => {
       const schedulableSamples = [];
       state.tracks.forEach((track, i) => {
         schedulableSamples.push(...track.samples.filter(sample => {
-          const [startTime] = getSampleTimes(audioContext, state, sample);
+          const [startTime, endTime] = getSampleTimes(audioContext, state, sample);
           sample.volume = track.volume;
           sample.track = i;
           sample.buffer = bufferStore[sample.url];
+          sample.endTime = endTime;
           return startTime >= audioContext.currentTime && startTime < startTime + OVERLAP;
         }));
       });
@@ -70,10 +78,11 @@ export default store => {
         const schedulableSamples = [];
         state.tracks.forEach((track, i) => {
           schedulableSamples.push(...track.samples.filter(sample => {
+            const [startTime, endTime] = getSampleTimes(audioContext, state, sample);
             sample.volume = track.volume;
             sample.track = i;
             sample.buffer = bufferStore[sample.url];
-            const [startTime, endTime] = getSampleTimes(audioContext, state, sample);
+            sample.endTime = endTime;
             return endTime > audioContext.currentTime && startTime <= audioContext.currentTime;
           }));
         });
@@ -96,8 +105,9 @@ export default store => {
         break;
 
       case 'STUDIO_STOP':
-        store.dispatch(playingStartBeat(1));
-        store.dispatch(setCurrentBeat(1));
+        state = store.getState().studio;
+        store.dispatch(playingStartBeat(state.loopEnabled ? state.loop.start : 1));
+        store.dispatch(setCurrentBeat(state.loopEnabled ? state.loop.start : 1));
         Object.entries(scheduledSamples).forEach(([id, sample]) => {
           sample.source.stop();
           delete scheduledSamples[id];
