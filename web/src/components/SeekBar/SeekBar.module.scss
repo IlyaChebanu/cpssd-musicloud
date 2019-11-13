@@ -1,5 +1,6 @@
 .wrapper {
   position: absolute;
+  z-index: 10;
   svg {
     transition: opacity 100ms;
 

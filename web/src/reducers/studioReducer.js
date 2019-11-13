@@ -1,5 +1,12 @@
 export default (
   state = {
+    loop: {
+      start: 1,
+      stop: 5
+    },
+    gridSize: 1,
+    gridSnapEnabled: true,
+    loopEnabled: true,
     scroll: 0,
     tempo: 90.0,
     playingStartBeat: 1,
@@ -67,6 +74,26 @@ export default (
       return {
         ...state,
         scroll: action.scroll
+      }
+    case 'SET_LOOP':
+      return {
+        ...state,
+        loop: action.obj
+      }
+    case 'SET_LOOP_ENABLED':
+      return {
+        ...state,
+        loopEnabled: action.bool
+      }
+    case 'SET_GRID_SIZE':
+      return {
+        ...state,
+        gridSize: action.gridSize
+      }
+    case 'SET_GRID_SNAP_ENABLED':
+      return {
+        ...state,
+        gridSnapEnabled: action.bool
       }
     default:
       return state
