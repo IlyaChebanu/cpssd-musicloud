@@ -5,6 +5,7 @@ import styles from "./styles";
 import postsData from "./samplePostData";
 import MultiPurposeButton from "../multiPurposeButton/multiPurposeButton";
 import ProfileComponent from "../profileComponent/profileComponent";
+import CreatePostComponent from "../createPostComponent/createPostComponent";
 
 export default class DummyScreen extends React.Component {
 
@@ -18,6 +19,7 @@ export default class DummyScreen extends React.Component {
         <Text style={styles.profileTitleText}>{"PROFILE"}</Text>
         <ProfileComponent />
         <Text style={styles.titleText}>{"Posts"}</Text>
+        <CreatePostComponent />
       </View>
     )
   }
