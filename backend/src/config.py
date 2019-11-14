@@ -37,3 +37,6 @@ AWS_CREDS = {
 RESET_TIMEOUT = 30
 
 BUCKET_URL = "https://dcumusicloudbucket.s3-eu-west-1.amazonaws.com/"
+
+# Toggle Logging
+LOGGING = True
