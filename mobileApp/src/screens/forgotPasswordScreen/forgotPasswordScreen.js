@@ -2,13 +2,14 @@ import React from "react";
 import { connect } from 'react-redux';
 import { ActionCreators } from '../../actions/index';
 import { bindActionCreators } from 'redux';
-import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native"
+import { StyleSheet, Text, View, Image, TouchableOpacity, Alert } from "react-native"
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import LoginInput from "../../components/loginInput/loginInput";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import MultiPurposeButton from "../../components/multiPurposeButton/multiPurposeButton";
 import PasswordInput from "../../components/passwordInput/passwordInput";
+import { passwordResetInitialize, passwordResetConfirm } from "../../api/usersAPI";
 
 const STATE_LOGIN_RESET_INITIAL = 1;
 const STATE_LOGIN_RESET_FINISH = 2;
@@ -21,10 +22,22 @@ class ForgotPasswordScreen extends React.Component {
       email: '',
       code: '',
       password: '',
+      passwordRepeat: '',
       maskPassword: true,
       maskPasswordRepeat: true,
       screenState: [STATE_LOGIN_RESET_INITIAL],
     }
+  }
+
+  showAlert(title, text, action) {
+    Alert.alert(
+      title,
+      text,
+      [
+        { text: 'OK', onPress: action },
+      ],
+      { cancelable: false },
+    );
   }
 
   handleBackClick() {
@@ -32,8 +45,29 @@ class ForgotPasswordScreen extends React.Component {
     this.props.setNewAccount(false)
   }
 
+  handleResetOkClick = () => {
+    this.props.navigateBack()
+  }
+
   handleResetClick() {
-    this.setState({ screenState: [STATE_LOGIN_RESET_FINISH] })
+    passwordResetInitialize(this.state.email).then(response => {
+      if (response.message === 'Email sent.') {
+        this.showAlert('Email Sent', `Please check your email: ${this.state.email} for verification code`)
+        this.setState({ screenState: [STATE_LOGIN_RESET_FINISH] })
+      } else {
+        this.showAlert('Error', 'A result could not be found.')
+      }
+    })
+  }
+
+  handleConfirmResetClick() {
+    passwordResetConfirm(this.state.email, this.state.code, this.state.password).then(response => {
+      if (response.message) {
+        this.showAlert('Password Sucessfully reset', 'Password succesfully reset. Press Ok to log in.', this.handleResetOkClick)
+      } else {
+        this.showAlert('Error', 'A result could not be found.')
+      }
+    })
   }
 
   setEmailTextInput(text) {
@@ -82,6 +116,7 @@ class ForgotPasswordScreen extends React.Component {
             ref={ref => (this.passwordInputName = ref)}
             togglePassword={this.togglePasswordMask.bind(this)}
             maskPassword={this.state.maskPassword}
+            style={{ "marginBottom": 1 }}
             setText={this.setPasswordTextInput.bind(this)}
             labelName={"New Password"} />
         <PasswordInput
@@ -117,7 +152,7 @@ class ForgotPasswordScreen extends React.Component {
         </KeyboardAwareScrollView>
         <Image style={styles.bottomVector}source={bottomVector} />
         <MultiPurposeButton
-          handleButtonClick={this.handleResetClick.bind(this)}
+          handleButtonClick={this.state.screenState.includes(STATE_LOGIN_RESET_INITIAL) ? this.handleResetClick.bind(this) : this.handleConfirmResetClick.bind(this)}
           style={styles.resetButton}
           buttonName={"Reset Password"}
         />
