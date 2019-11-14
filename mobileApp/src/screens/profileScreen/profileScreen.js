@@ -50,7 +50,7 @@ class ProfileScreen extends React.Component {
           </View>
             {this.state.activeTab === 1 ?
             <ProfileSongs />
-            : <ProfilePosts accessToken={this.props.token} />
+            : <ProfilePosts accessToken={this.props.token} username={this.props.username} />
             }
         </View>
       </SafeAreaView>
@@ -61,6 +61,7 @@ class ProfileScreen extends React.Component {
 function mapStateToProps(state) {
   return {
     token: state.home.token,
+    username: state.home.username,
   };
 }
 

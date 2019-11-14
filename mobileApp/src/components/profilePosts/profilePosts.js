@@ -6,8 +6,29 @@ import postsData from "./samplePostData";
 import MultiPurposeButton from "../multiPurposeButton/multiPurposeButton";
 import ProfileComponent from "../profileComponent/profileComponent";
 import CreatePostComponent from "../createPostComponent/createPostComponent";
+import { getUserPosts } from "../../api/usersAPI";
 
 export default class ProfilePosts extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      posts: [],
+    };
+  }
+
+  componentDidMount() {
+    this.getPosts()
+  }
+
+  getPosts() {
+    getUserPosts(this.props.username, this.props.accessToken).then(response => {
+      if (isNaN(response)) {
+        this.setState({
+          posts: response.posts
+        })
+      }
+    })
+  }
 
   setTextInput(text) {
     this.setState({ inputText: text });
@@ -25,9 +46,9 @@ export default class ProfilePosts extends React.Component {
   }
 
   renderPost({ item, index }) {
-    let postText = item.text
-    let postLikes = item.likes
-    let postTimeAgo = item.timeAgo
+    let postText = item[0] //item.text
+    let postLikes = 4 //item.likes
+    let postTimeAgo = item[1] //item.timeAgo
     let likeImg = require('../../assets/images/like.png')
     return (
       <View style={styles.postContainer}>
@@ -61,10 +82,10 @@ export default class ProfilePosts extends React.Component {
         <FlatList 
           ListHeaderComponent={this.renderheader()}
           style={styles.postFlatList}
-          data={postsData}
+          data={this.state.posts}
           renderItem={this.renderPost.bind(this)}
           keyExtractor={item => String(item.id)}
-          extraData={postsData}
+          extraData={this.state.posts}
         />
       </View>
     )
