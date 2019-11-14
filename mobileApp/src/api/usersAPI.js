@@ -86,10 +86,8 @@ export function logoutUser(token) {
         method: "POST",
         headers: new Headers({
             "Content-Type": "application/json",
+            "Authorization": 'Bearer ' + token,
         }),
-        body: JSON.stringify({
-            "access_token": token,
-        })
     });
     if (__DEV__) {
         console.log("logoutUser : request " + JSON.stringify(request))
