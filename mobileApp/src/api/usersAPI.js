@@ -156,3 +156,80 @@ export function reVerifyEmail(email) {
             return error
         });
 }
+
+export function passwordResetInitialize(email) {
+
+    let url = `${API_URL}api/v1/users/reset?email=${email}`;
+    var request = new Request(url, {
+        method: "GET",
+        headers: new Headers({
+            "Content-Type": "application/json",
+        }),
+    });
+    if (__DEV__) {
+        console.log("passwordResetInitialize : request " + JSON.stringify(request))
+    }
+
+    return fetch(request)
+        // .then(response => response.json())
+        .then(response => {
+            if (response.status === 200) {
+                return response.json()
+            } else {
+                return response.status
+            }
+        })
+        .then(responseJson => {
+            if (__DEV__) {
+                console.log("passwordResetInitialize : response " + JSON.stringify(responseJson))
+            }
+            return responseJson;
+        })
+        .catch(error => {
+            if (__DEV__) {
+                console.log("passwordResetInitialize : error " + JSON.stringify(error))
+            }
+            return error
+        });
+}
+
+export function passwordResetConfirm(email, code, password) {
+
+    let url = `${API_URL}api/v1/users/reset?email=${email}`;
+    var request = new Request(url, {
+        method: "POST",
+        headers: new Headers({
+            "Content-Type": "application/json",
+        }),
+        body: JSON.stringify({
+            "email": email,
+            "code": code,
+            "password": password
+        })
+    });
+    if (__DEV__) {
+        console.log("passwordResetInitiliaze : request " + JSON.stringify(request))
+    }
+
+    return fetch(request)
+        // .then(response => response.json())
+        .then(response => {
+            if (response.status === 200) {
+                return response.json()
+            } else {
+                return response.status
+            }
+        })
+        .then(responseJson => {
+            if (__DEV__) {
+                console.log("passwordResetInitiliaze : response " + JSON.stringify(responseJson))
+            }
+            return responseJson;
+        })
+        .catch(error => {
+            if (__DEV__) {
+                console.log("passwordResetInitiliaze : error " + JSON.stringify(error))
+            }
+            return error
+        });
+}
