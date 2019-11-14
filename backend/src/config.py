@@ -16,9 +16,9 @@ MYSQL_CONFIG = {
 # user & password field should be populated with the
 # username & password for Gmail located in the Password.kdbx file.
 SMTP_CONFIG = {
-    'user': os.environ['MUSICLOUD_SMTP_USER'],
-    'password': os.environ['MUSICLOUD_SMTP_PASSWORD'],
-    'server': os.environ['MUSICLOUD_SMTP_SERVER']
+    'user': 'AKIAQ6AXMYJ4ZNBXYUXU',
+    'password': 'BN4RQDDWAa8iVy267EV13lcb4IGprwtrar/Z5YIof+R1',
+    'server': 'email-smtp.eu-west-1.amazonaws.com'
 }
 
 HOST = "dcumusicloud.com:5000"
@@ -27,9 +27,9 @@ HOST = "dcumusicloud.com:5000"
 JWT_SECRET = os.environ['MUSICLOUD_JWT_SECRET']
 
 AWS_CREDS = {
-   'AWSAccessKeyId': os.environ['MUSICLOUD_AWS_ACCESS_KEY_ID'],
-   'AWSSecretKey': os.environ['MUSICLOUD_AWS_ACCESS_KEY'],
-   'Bucket': os.environ['MUSICLOUD_AWS_BUCKET']
+   'AWSAccessKeyId': 'AKIAJQLWCAHOITMBWRJA',
+   'AWSSecretKey': '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',
+   'Bucket': 'dcumusicloudbucket'
 }
 
 # This option controls how long users have to enter a password reset code before it is deemed expired.
