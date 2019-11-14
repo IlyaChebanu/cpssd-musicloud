@@ -182,3 +182,26 @@ def is_public(sid):
     )
     return query(sql, args, True)[0][0]
 
+
+def insert_full_song(sid, uid, title, duration, created, public, url, cover, genre):
+    sql = (
+        "INSERT INTO Songs "
+        "(sid, uid, title, duration, created, public, url, cover, genre) "
+        "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+    )
+    args = (
+        sid,
+        uid,
+        title,
+        duration,
+        created,
+        public,
+        url,
+        cover,
+        genre,
+    )
+    row_id = query(sql, args, get_insert_row_id=True)
+    if not row_id:
+        raise NoResults
+    return row_id
+  
