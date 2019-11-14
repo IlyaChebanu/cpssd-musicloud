@@ -62,6 +62,7 @@ class LoginScreen extends React.Component {
 
   saveLoginDetails(token) {
     this.props.setAuthToken(token)
+    this.props.setUsername(this.state.username.trim())
     writeDataToStorage(token, TOKEN_DATA_KEY)
   }
 

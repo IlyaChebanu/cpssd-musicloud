@@ -1,6 +1,6 @@
 import * as Actions from '../actions/actionTypes'
 
-let initialState = { token: '', };
+let initialState = { token: '', username: '', };
 
 const HomeReducer = (state = initialState, action) => {
 
@@ -8,6 +8,10 @@ const HomeReducer = (state = initialState, action) => {
         case Actions.SET_AUTH_TOKEN:
             return Object.assign({}, state, {
                 token: action.token
+            });
+        case Actions.SET_USERNAME:
+            return Object.assign({}, state, {
+                username: action.username
             });
         default:
             return state;
