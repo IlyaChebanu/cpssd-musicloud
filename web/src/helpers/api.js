@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = `http://dcumusicloud.com:5000/api`;
+const API_URL = `http://localhost:5000/api`;
 
 export const login = (username, password) => {
   return axios.post(
@@ -32,7 +32,7 @@ export const deleteToken = token => {
 
 const generatePresignedPost = (dir, filename, filetype, token) => {
   return axios.post(
-    `${API_URL}/v1/audio/signed-form-post`,
+    `${API_URL}/v1/s3/signed-form-post`,
     {
       dir: dir,
       fileName: filename,
@@ -50,9 +50,8 @@ const putMedia = (signedUrl, file, options) => {
 }
 
 export const uploadFile = async (dir, f, token, e) => {
-  const res = await generatePresignedPost(dir, f.meta.name, f.meta.type, token)
   try {
-    console.log(res)
+    const res = await generatePresignedPost(dir, f.meta.name, f.meta.type, token)
     var options = {
       headers: {
         'Content-Type': f.meta.type,
@@ -63,28 +62,16 @@ export const uploadFile = async (dir, f, token, e) => {
       data.append("file", f.file)
         const putAudio = async e1 => {
           const res2 = await putMedia(makeSignedUrl(res.data.signed_url), data, options)
-          try {
-            if (res.status === 200) {
-              // SUCCESS
-              console.log(res2)
-            }
-          } catch (e1) {
-            console.error(e1)
-          }
         }
         putAudio()
     }
   } catch (e) {
-    console.error(e)
+    return e.response
   }
 }
 
-// TODO: make use of extra params
+// TODO: use extra params to make use of signed url without public access to the bucket
 const makeSignedUrl = (object) => {
   let url = new URL(object.url + object.fields.key)
-  // url.searchParams.set("AWSAccessKeyId", object.fields.AWSAccessKeyId)
-  // url.searchParams.set("policy", object.fields.policy)
-  // url.searchParams.set("signature", object.fields.signature)
-  // console.log(url)
   return url.href
 }

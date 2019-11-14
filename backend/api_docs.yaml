@@ -13,6 +13,8 @@ tags:
     description: "Authentication operations"
   - name: "audio"
     description: "Audio operations"
+  - name: "s3"
+    description: "S3 Bucket operations"
 schemes:
   - "http"
 paths:
@@ -93,81 +95,6 @@ paths:
                 type: "string"
                 example: "MySQL unavailable"
 
-  /audio/signed-form-post:        
-    post:
-      tags:
-      - "audio"
-      summary: "Get signed s3 bucket url to directly upload the file from the client to the s3 bucket"
-      description: "The endpoint requires dir, fileName and fileType parameters and provides the signed_url object that contains 'url' parameter and 'fields' object that has 'key' parameter. The url can be put together by appending 'key' (filename) parameter to the 'url' parameter. The PUT request is to be used to upload a SINGLE file to s3 bucket by providing the URL, the file data as FormData named 'file' and options headers containing 'Content-Type': fileType."
-      produces:
-      - "application/json"
-      parameters:
-        - in: "header"
-          name: "Authorization Header"
-          description: "This is where you should set your access_token."
-          required: true
-          type: "string"
-        - in: "body"
-          name: "body"
-          description: "Send the new song_state object & the songs' ID here."
-          required: true
-          schema:
-            type: "object"
-            properties:
-              dir:
-                pattern: "^(audio|profiler|compiled_audio)$"
-                type: "string"
-                example: "audio"
-              fileName:
-                type: "string"
-                example: "clap.wav"
-              fileType:
-                type: "string"
-                example: "audio/wav"
-              
-      responses:
-        200:
-          description: "Signed url provided"
-          schema:
-            type: "object"
-            properties:
-              message:
-                type: "string"
-                example: "Signed url for file uploading has been provided"
-        401:
-          description: "Access_token missing or expired."
-          schema:
-            type: "object"
-            properties:
-              message:
-                type: "string"
-                example: "Request missing access_token."
-
-        422:
-          description: "Malformed request body."
-          schema:
-            type: "object"
-            properties:
-              message:
-                type: "string"
-                example: "A req validation traceback will be here."
-        500:
-          description: "Server error"
-          schema:
-            type: "object"
-            properties:
-              message:
-                type: "string"
-                example: "Server failed to decode token."
-        503:
-          description: "Server is unavailable"
-          schema:
-            type: "object"
-            properties:
-              message:
-                type: "string"
-                example: "MySQL unavailable"
-     
   /audio/state:
     get:
       tags:
@@ -323,6 +250,81 @@ paths:
               message:
                 type: "string"
                 example: "You are not permitted to edit song: 1"
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable"
+  
+  /s3/signed-form-post:
+    post:
+      tags:
+      - "s3"
+      summary: "Get signed s3 bucket url to directly upload the file from the client to the s3 bucket"
+      description: "The endpoint requires dir, fileName and fileType parameters and provides the signed_url object that contains 'url' parameter and 'fields' object that has 'key' parameter. The url can be put together by appending 'key' (filename) parameter to the 'url' parameter. The PUT request is to be used to upload a SINGLE file to s3 bucket by providing the URL, the file data as FormData named 'file' and options headers containing 'Content-Type': fileType."
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "Send the storage dir, desired fileName and fileType"
+          required: true
+          schema:
+            type: "object"
+            properties:
+              dir:
+                pattern: "^(audio|profiler|compiled_audio)$"
+                type: "string"
+                example: "audio"
+              fileName:
+                type: "string"
+                example: "clap.wav"
+              fileType:
+                type: "string"
+                example: "audio/wav"
+              
+      responses:
+        200:
+          description: "Signed url provided"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Signed url for file uploading has been provided"
+        401:
+          description: "Access_token missing or expired."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Request missing access_token."
+
         422:
           description: "Malformed request body."
           schema:
