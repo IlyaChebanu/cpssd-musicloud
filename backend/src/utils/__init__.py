@@ -6,6 +6,7 @@ from .verify_token import verify_token
 from .refresh_token import refresh_token
 from .verify_and_refresh import verify_and_refresh
 from .permitted_to_edit import permitted_to_edit
+from .gen_scroll_tokens import gen_scroll_tokens
 
 query = query
 random_string = random_string
@@ -15,3 +16,4 @@ verify_token = verify_token
 refresh_token = refresh_token
 verify_and_refresh = verify_and_refresh
 permitted_to_edit = permitted_to_edit
+gen_scroll_tokens = gen_scroll_tokens
