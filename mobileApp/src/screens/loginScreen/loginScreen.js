@@ -8,7 +8,7 @@ import styles from "./styles";
 import LoginInput from "../../components/loginInput/loginInput";
 import MultiPurposeButton from "../../components/multiPurposeButton/multiPurposeButton";
 import { loginUser, reVerifyEmail } from "../../api/usersAPI";
-import { writeDataToStorage, TOKEN_DATA_KEY } from "../../utils/localStorage";
+import { writeDataToStorage, TOKEN_DATA_KEY, USERNAME_DATA_KEY } from "../../utils/localStorage";
 import { getInvalidLoginDetails } from "../../utils/helpers";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import PasswordInput from "../../components/passwordInput/passwordInput";
@@ -61,9 +61,11 @@ class LoginScreen extends React.Component {
   }
 
   saveLoginDetails(token) {
+    let username = this.state.username.trim()
     this.props.setAuthToken(token)
-    this.props.setUsername(this.state.username.trim())
+    this.props.setUsername(username)
     writeDataToStorage(token, TOKEN_DATA_KEY)
+    writeDataToStorage(username, USERNAME_DATA_KEY)
   }
 
   handleLoginClick() {

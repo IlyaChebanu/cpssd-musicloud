@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-community/async-storage';
 export const TOKEN_DATA_KEY = '@musicloud:authToken';
+export const USERNAME_DATA_KEY = '@musicloud:username';
 
 export async function readStorageData(dataKey) {
     try {

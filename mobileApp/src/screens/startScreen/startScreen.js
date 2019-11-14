@@ -7,7 +7,7 @@ import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import LoginInput from "../../components/loginInput/loginInput";
 import MultiPurposeButton from "../../components/multiPurposeButton/multiPurposeButton";
-import { readStorageData, TOKEN_DATA_KEY } from "../../utils/localStorage";
+import { readStorageData, TOKEN_DATA_KEY, USERNAME_DATA_KEY } from "../../utils/localStorage";
 
 class StartScreen extends React.Component {
   constructor(props) {
@@ -20,8 +20,10 @@ class StartScreen extends React.Component {
 
   async loadCorrectFlow() {
     let token = await readStorageData(TOKEN_DATA_KEY)
+    let username = await readStorageData(USERNAME_DATA_KEY)
     if (token != null) {
       this.props.setAuthToken(token)
+      this.props.setUsername(username)
       this.props.navigateToHomeScreen()
     } else {
 
