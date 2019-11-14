@@ -1,7 +1,7 @@
 import getSampleTimes from '../helpers/getSampleTimes';
 import { audioContext, globalSongGain } from '../helpers/constants';
 import store from '../store';
-
+import _ from 'lodash';
 
 export default sample => {
   const state = store.getState().studio;
@@ -10,12 +10,19 @@ export default sample => {
   source.buffer = sample.buffer;
 
   const gain = audioContext.createGain();
-  source.connect(gain);
+  const pan = audioContext.createStereoPanner();
+  source.connect(pan);
+  pan.connect(gain);
   gain.connect(globalSongGain);
 
-  gain.gain.setValueAtTime(sample.volume, audioContext.currentTime);
+  const track = state.tracks[sample.track];
+  const soloTrack = _.findIndex(state.tracks, 'solo');
+  const solo = soloTrack !== -1 && soloTrack !== sample.track;
+  const volume = solo ? 0 : track.mute ? 0 : sample.volume;
+  gain.gain.setValueAtTime(volume, audioContext.currentTime);
+  pan.pan.setValueAtTime(track.pan, audioContext.currentTime);
 
   source.start(startTime, offset);
   source.stop(endTime);
-  return { source, gain };
+  return { source, gain, pan };
 }

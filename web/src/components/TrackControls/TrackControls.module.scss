@@ -1,0 +1,53 @@
+.wrapper {
+  width: 220px;
+  height: 100px;
+  background-color: #36393D;
+  display: flex;
+  flex-direction: column;
+
+  &.even {
+    background-color: #303237;
+  }
+
+  .title {
+    flex: 1;
+    color: white;
+    font-size: 18px;
+    margin: 15px 20px 10px 20px;
+    display: flex;
+    align-items: center;
+
+    p {
+      margin: 0;
+    }
+  }
+
+  .buttons {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    margin: 0px 20px 15px 20px;
+    color: white;
+
+    svg {
+      height: 25px;
+      width: auto;
+
+      &:hover {
+        cursor: pointer;
+      }
+    }
+
+    span {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      p {
+        margin: 5px 0 0 0;
+        color: white;
+        font-size: 10px;
+      }
+    }
+  }
+}
