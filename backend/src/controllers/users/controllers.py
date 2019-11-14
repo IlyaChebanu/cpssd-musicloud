@@ -251,7 +251,7 @@ def get_reset():
     """ + str(reset_code)
 
     try:
-        send_mail(request.json.get("email"), subject, body)
+        send_mail(email, subject, body)
     except Exception:
         log("error", "Failed to send email.", traceback.format_exc())
 
