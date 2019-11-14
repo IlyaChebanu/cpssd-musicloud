@@ -8,6 +8,8 @@ import ProfileComponent from "../profileComponent/profileComponent";
 import CreatePostComponent from "../createPostComponent/createPostComponent";
 import { getUserPosts } from "../../api/usersAPI";
 
+var moment = require('moment');
+
 export default class ProfilePosts extends React.Component {
   constructor(props) {
     super(props);
@@ -48,7 +50,7 @@ export default class ProfilePosts extends React.Component {
   renderPost({ item, index }) {
     let postText = item[0] //item.text
     let postLikes = 4 //item.likes
-    let postTimeAgo = item[1] //item.timeAgo
+    let postTimeAgo = moment(item[1]).fromNow() //item.timeAgo
     let likeImg = require('../../assets/images/like.png')
     return (
       <View style={styles.postContainer}>
@@ -84,7 +86,7 @@ export default class ProfilePosts extends React.Component {
           style={styles.postFlatList}
           data={this.state.posts}
           renderItem={this.renderPost.bind(this)}
-          keyExtractor={item => String(item.id)}
+          keyExtractor={item => String(item)}
           extraData={this.state.posts}
         />
       </View>
