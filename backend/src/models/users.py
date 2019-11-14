@@ -293,3 +293,20 @@ def update_profiler_url(uid, url):
         uid,
     )
     query(sql, args)
+
+
+def insert_full_user_data(uid, email, username, password, verified, profiler):
+    sql = (
+        "INSERT INTO Users "
+        "(uid, email, username, password, verified, profiler) "
+        "VALUES (%s, %s, %s, %s, %s, %s)"
+    )
+    args = (
+        uid,
+        email,
+        username,
+        password,
+        verified,
+        profiler,
+    )
+    query(sql, args)
