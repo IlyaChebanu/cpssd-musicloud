@@ -7,7 +7,7 @@ import MultiPurposeButton from "../multiPurposeButton/multiPurposeButton";
 import ProfileComponent from "../profileComponent/profileComponent";
 import CreatePostComponent from "../createPostComponent/createPostComponent";
 
-export default class DummyScreen extends React.Component {
+export default class ProfilePosts extends React.Component {
 
   setTextInput(text) {
     this.setState({ inputText: text });
@@ -19,7 +19,7 @@ export default class DummyScreen extends React.Component {
         <Text style={styles.profileTitleText}>{"PROFILE"}</Text>
         <ProfileComponent />
         <Text style={styles.titleText}>{"Posts"}</Text>
-        <CreatePostComponent />
+        <CreatePostComponent accessToken={this.props.accessToken}/>
       </View>
     )
   }

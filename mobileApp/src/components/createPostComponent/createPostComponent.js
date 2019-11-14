@@ -1,8 +1,9 @@
 import React, { Component } from "react";
-import { View, TouchableOpacity, Image, Text, TextInput, Platform } from 'react-native'
+import { View, TouchableOpacity, Alert, Text, TextInput, Platform } from 'react-native'
 import GLOBALS from '../../utils/globalStrings';
 import styles from './styles';
 import LinearGradient from "react-native-linear-gradient";
+import { createUserPost } from "../../api/usersAPI";
 
 export default class CreatePostComponent extends Component {
 
@@ -10,7 +11,7 @@ export default class CreatePostComponent extends Component {
         super(props)
 
         this.state = {
-            message: ''
+            postMessage: ''
         }
     }
 
@@ -22,12 +23,29 @@ export default class CreatePostComponent extends Component {
 
     }
 
-    setTextInput() {
+    showAlert(title, text, action) {
+        Alert.alert(
+          title,
+          text,
+          [
+            { text: 'OK', onPress: action },
+          ],
+          { cancelable: false },
+        );
+      }
 
+    setTextInput(text) {
+        this.setState({ postMessage: text})
     }
 
     handlePostButtonClick() {
-        
+        createUserPost(this.state.postMessage, this.props.accessToken).then(response => {
+            if (response.message === 'Message posted.') {
+                this.showAlert('Post created')
+            } else {
+                this.showAlert('Error', 'ops')
+            }
+        })
     }
 
     render() {
