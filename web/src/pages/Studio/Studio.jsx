@@ -89,7 +89,7 @@ const Studio = memo(props => {
         <div className={styles.sidebar}>
           <TimelineControls />
           {props.studio.tracks.map((track, i) => {
-            return <TrackControls key={i} even={i % 2 === 1} index={i}/>;
+            return <TrackControls key={i} track={track} index={i}/>;
           })}
         </div>
         <div className={styles.scrollableMain} onScroll={handleScroll}>

@@ -2,7 +2,7 @@ import React, { memo, useState, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import styles from './TrackControls.module.scss';
 import { connect } from 'react-redux';
-import { setTracks } from '../../actions/studioActions';
+import { setTracks, setTrackAtIndex } from '../../actions/studioActions';
 import { ReactComponent as Knob } from '../../assets/icons/Knob.svg';
 import { ReactComponent as Mute } from '../../assets/icons/volume-up-light.svg';
 import { ReactComponent as MuteActive } from '../../assets/icons/volume-slash-light.svg';
@@ -16,20 +16,17 @@ const TrackControls = memo(props => {
 
   const handleTrackVolume = useCallback(e => {
     e.preventDefault();
-    const tracks = [...store.getState().studio.tracks];
-    const thisTrack = tracks[props.index];
     const startPos = e.screenY;
-    const startVolume = thisTrack.volume;
+    const startVolume = props.track.volume;
     let lastVolume = startVolume;
     const handleMouseMove = e => {
-      const tracks = [...store.getState().studio.tracks];
-      const thisTrack = tracks[props.index];
+      const track = store.getState().studio.tracks[props.index];
       const pos = e.screenY;
       const volume = clamp(0, 1, startVolume - (pos - startPos) / 100);
       if (volume !== lastVolume) {
         lastVolume = volume;
-        thisTrack.volume = volume;
-        props.dispatch(setTracks(tracks));
+        track.volume = volume;
+        props.dispatch(setTrackAtIndex(track, props.index));
       }
     }
     const handleDragStop = () => {
@@ -38,24 +35,21 @@ const TrackControls = memo(props => {
     }
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleDragStop);
-  }, [props.index]);
+  }, [props.index, props.track.volume]);
 
   const handleTrackPan = useCallback(e => {
     e.preventDefault();
-    const tracks = [...store.getState().studio.tracks];
-    const thisTrack = tracks[props.index];
     const startPos = e.screenY;
-    const startPan = thisTrack.pan;
+    const startPan = props.track.pan;
     let lastPan = startPan;
     const handleMouseMove = e => {
-      const tracks = [...store.getState().studio.tracks];
-      const thisTrack = tracks[props.index];
+      const track = store.getState().studio.tracks[props.index];
       const pos = e.screenY;
       const pan = clamp(-1, 1, startPan - (pos - startPos) / 100);
       if (pan !== lastPan) {
         lastPan = pan;
-        thisTrack.pan = pan;
-        props.dispatch(setTracks(tracks));
+        track.pan = pan;
+        props.dispatch(setTrackAtIndex(track, props.index));
       }
     }
     const handleDragStop = () => {
@@ -64,14 +58,12 @@ const TrackControls = memo(props => {
     }
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleDragStop);
-  }, [props.index]);
+  }, [props.index, props.track.pan]);
 
   const handleTrackMute = useCallback(() => {
-    const tracks = [...store.getState().studio.tracks];
-    const thisTrack = tracks[props.index];
-    thisTrack.mute = !thisTrack.mute;
-    props.dispatch(setTracks(tracks));
-  }, [props.index]);
+    props.track.mute = !props.track.mute;
+    props.dispatch(setTrackAtIndex(props.track, props.index));
+  }, [props.index, props.track.mute]);
 
   const handleTrackSolo = useCallback(() => {
     const tracks = store.getState().studio.tracks.map((track, i) => {
@@ -81,7 +73,7 @@ const TrackControls = memo(props => {
     props.dispatch(setTracks(tracks));
   }, [props.index]);
 
-  const track = props.tracks[props.index];
+  const track = props.track;
   const volumeStyle = useMemo(() => ({
     transform: `rotate(${lerp(-140, 140, track.volume)}deg)`
   }), [track.volume]);
@@ -91,14 +83,12 @@ const TrackControls = memo(props => {
   }), [track.pan]);
 
   const handleTrackNameChange = useCallback(e => {
-    const tracks = [...store.getState().studio.tracks];
-    const thisTrack = tracks[props.index];
-    thisTrack.name = e.target.value;
-    props.dispatch(setTracks(tracks));
-  }, [props.index]);
+    props.track.name = e.target.value;
+    props.dispatch(setTracks(props.track, props.index));
+  }, [props.index, props.track]);
 
   return (
-    <div className={`${styles.wrapper} ${props.even ? styles.even : ''}`}>
+    <div className={`${styles.wrapper} ${props.index % 2 ? styles.even : ''}`}>
       <div className={styles.title}>
         <input type='text' value={track.name} onChange={handleTrackNameChange}/>
       </div>
@@ -112,13 +102,13 @@ const TrackControls = memo(props => {
           <p>Pan</p>
         </span>
         <span>
-          {props.tracks[props.index].mute || _.find(props.tracks, 'solo') ?
+          {props.track.mute || _.find(props.tracks, 'solo') ?
             <MuteActive onClick={handleTrackMute}/> :
             <Mute onClick={handleTrackMute}/>}
           <p>Mute</p>
         </span>
         <span>
-          {props.tracks[props.index].solo ?
+          {props.track.solo ?
             <SoloActive onClick={handleTrackSolo}/> :
             <Solo onClick={handleTrackSolo}/>}
           <p>Solo</p>
