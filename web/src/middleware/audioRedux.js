@@ -58,7 +58,6 @@ export default store => {
       // Schedule samples
       schedulableSamples.forEach(sample => {
         if (!(sample.id in scheduledSamples)) {
-          console.log('scheduling', sample);
           const source = scheduleSample(sample);
           scheduledSamples[sample.id] = { ...sample, ...source };
         }
@@ -97,7 +96,6 @@ export default store => {
       case 'STUDIO_PAUSE':
         state = store.getState().studio;
         Object.entries(scheduledSamples).forEach(([id, sample]) => {
-          console.log(sample);
           sample.source.stop();
           delete scheduledSamples[id];
         });

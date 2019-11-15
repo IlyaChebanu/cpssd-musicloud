@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import kick from '../../assets/samples/kick23.wav';
 import bass from '../../assets/samples/bass.wav';
 import Timeline from '../../components/Timeline';
+import TimelineControls from '../../components/TimelineControls';
 import SeekBar from '../../components/SeekBar';
 import TrackControls from '../../components/TrackControls';
 
@@ -86,6 +87,7 @@ const Studio = memo(props => {
       <div className={styles.contentWrapper}>
         <SeekBar/>
         <div className={styles.sidebar}>
+          <TimelineControls />
           {props.studio.tracks.map((track, i) => {
             return <TrackControls key={i} even={i % 2 === 1} index={i}/>;
           })}
