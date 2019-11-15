@@ -16,7 +16,7 @@ const TrackControls = memo(props => {
 
   const handleTrackVolume = useCallback(e => {
     e.preventDefault();
-    const tracks = [...props.tracks];
+    const tracks = [...store.getState().studio.tracks];
     const thisTrack = tracks[props.index];
     const startPos = e.screenY;
     const startVolume = thisTrack.volume;
@@ -42,7 +42,7 @@ const TrackControls = memo(props => {
 
   const handleTrackPan = useCallback(e => {
     e.preventDefault();
-    const tracks = [...props.tracks];
+    const tracks = [...store.getState().studio.tracks];
     const thisTrack = tracks[props.index];
     const startPos = e.screenY;
     const startPan = thisTrack.pan;
@@ -67,14 +67,14 @@ const TrackControls = memo(props => {
   }, [props.index]);
 
   const handleTrackMute = useCallback(() => {
-    const tracks = [...props.tracks];
+    const tracks = [...store.getState().studio.tracks];
     const thisTrack = tracks[props.index];
     thisTrack.mute = !thisTrack.mute;
     props.dispatch(setTracks(tracks));
   }, [props.index]);
 
   const handleTrackSolo = useCallback(() => {
-    const tracks = props.tracks.map((track, i) => {
+    const tracks = store.getState().studio.tracks.map((track, i) => {
       track.solo = !track.solo && i === props.index;
       return track;
     });
@@ -90,10 +90,17 @@ const TrackControls = memo(props => {
     transform: `rotate(${lerp(-140, 140, (track.pan + 1) / 2)}deg)`
   }), [track.pan]);
 
+  const handleTrackNameChange = useCallback(e => {
+    const tracks = [...store.getState().studio.tracks];
+    const thisTrack = tracks[props.index];
+    thisTrack.name = e.target.value;
+    props.dispatch(setTracks(tracks));
+  }, [props.index]);
+
   return (
     <div className={`${styles.wrapper} ${props.even ? styles.even : ''}`}>
       <div className={styles.title}>
-        <p>Track name</p>
+        <input type='text' value={track.name} onChange={handleTrackNameChange}/>
       </div>
       <div className={styles.buttons}>
         <span>

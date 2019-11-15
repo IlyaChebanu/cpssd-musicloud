@@ -40,6 +40,7 @@ const Studio = memo(props => {
         mute: false,
         solo: false,
         pan: 0,
+        name: 'Bass',
         samples: [
           {
             id: 1,
@@ -58,6 +59,7 @@ const Studio = memo(props => {
         mute: false,
         solo: false,
         pan: 0,
+        name: 'Kick',
         samples: [
           {
             id: 2,

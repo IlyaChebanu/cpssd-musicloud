@@ -17,8 +17,17 @@
     display: flex;
     align-items: center;
 
-    p {
+    input {
       margin: 0;
+      color: white;
+      font-size: 18px;
+      background: none;
+      border: none;
+      width: 100%;
+
+      &:focus {
+        outline: none;
+      }
     }
   }
 
