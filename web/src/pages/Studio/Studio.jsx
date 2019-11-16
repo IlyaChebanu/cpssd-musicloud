@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import kick from '../../assets/samples/kick23.wav';
 import bass from '../../assets/samples/bass.wav';
 import Timeline from '../../components/Timeline';
+import TimelineControls from '../../components/TimelineControls';
 import SeekBar from '../../components/SeekBar';
 
 
@@ -77,6 +78,7 @@ const Studio = memo(props => {
       <div className={styles.contentWrapper}>
         <SeekBar/>
         <div className={styles.sidebar}>
+          <TimelineControls />
         </div>
         <div className={styles.scrollableMain} onScroll={handleScroll}>
           <div className={styles.mainContent}>
