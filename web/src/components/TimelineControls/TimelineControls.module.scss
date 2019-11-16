@@ -5,12 +5,12 @@
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
+  justify-content: space-between;
 
   svg {
     color: white;
     height: 20px;
     width: auto;
-    margin: 7.5px;
 
     &:first-child {
       margin-left: 15px;
@@ -22,18 +22,16 @@
   }
 
   span {
-    flex: 1;
     display: flex;
     color: white;
     font-size: 18px;
-    width: 75px;
-    margin: 0 7.5px 0 15px;
+    margin: 0 0 0 15px;
     input {
       background: none;
       border: none;
       color: white;
       font-size: 18px;
-      width: 100%;
+      width: 37px;
       text-align: end;
       margin-right: 5px;
 
