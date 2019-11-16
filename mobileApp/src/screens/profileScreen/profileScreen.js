@@ -1,4 +1,7 @@
-import React from "react"
+import React from "react";
+import { connect } from 'react-redux';
+import { ActionCreators } from '../../actions/index';
+import { bindActionCreators } from 'redux';
 import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native"
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
@@ -8,7 +11,7 @@ import ProfileComponent from "../../components/profileComponent/profileComponent
 import ProfileSongs from "../../components/profileSongs/profileSongs";
 import ProfilePosts from "../../components/profilePosts/profilePosts";
 
-export default class ProfileScreen extends React.Component {
+class ProfileScreen extends React.Component {
   constructor(props) {
     super(props);
 
@@ -47,10 +50,23 @@ export default class ProfileScreen extends React.Component {
           </View>
             {this.state.activeTab === 1 ?
             <ProfileSongs />
-            : <ProfilePosts />
+            : <ProfilePosts accessToken={this.props.token} username={this.props.username} />
             }
         </View>
       </SafeAreaView>
     )
   }
 }
+
+function mapStateToProps(state) {
+  return {
+    token: state.home.token,
+    username: state.home.username,
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators(ActionCreators, dispatch);
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(ProfileScreen);

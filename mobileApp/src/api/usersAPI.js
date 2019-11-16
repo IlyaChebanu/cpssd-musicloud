@@ -86,10 +86,8 @@ export function logoutUser(token) {
         method: "POST",
         headers: new Headers({
             "Content-Type": "application/json",
+            "Authorization": 'Bearer ' + token,
         }),
-        body: JSON.stringify({
-            "access_token": token,
-        })
     });
     if (__DEV__) {
         console.log("logoutUser : request " + JSON.stringify(request))
@@ -225,6 +223,81 @@ export function passwordResetConfirm(email, code, password) {
         .catch(error => {
             if (__DEV__) {
                 console.log("passwordResetInitiliaze : error " + JSON.stringify(error))
+            }
+            return error
+        });
+}
+
+export function getUserPosts(username, token) {
+
+    let url = `${API_URL}api/v1/users/posts?username=${username}`;
+    var request = new Request(url, {
+        method: "GET",
+        headers: new Headers({
+            "Content-Type": "application/json",
+            "Authorization": 'Bearer ' + token,
+        }),
+    });
+    if (__DEV__) {
+        console.log("getUserPosts : request " + JSON.stringify(request))
+    }
+
+    return fetch(request)
+        .then(response => {
+            if (response.status === 200) {
+                return response.json()
+            } else {
+                return response.status
+            }
+        })
+        .then(responseJson => {
+            if (__DEV__) {
+                console.log("getUserPosts : response " + JSON.stringify(responseJson))
+            }
+            return responseJson;
+        })
+        .catch(error => {
+            if (__DEV__) {
+                console.log("getUserPosts : error " + JSON.stringify(error))
+            }
+            return error
+        });
+}
+
+export function createUserPost(message, token) {
+
+    let url = `${API_URL}api/v1/users/post`;
+    var request = new Request(url, {
+        method: "POST",
+        headers: new Headers({
+            "Content-Type": "application/json",
+            "Authorization": 'Bearer ' + token,
+        }),
+        body: JSON.stringify({
+            "message": message
+        })
+    });
+    if (__DEV__) {
+        console.log("createUserPost : request " + JSON.stringify(request))
+    }
+
+    return fetch(request)
+        .then(response => {
+            if (response.status === 200) {
+                return response.json()
+            } else {
+                return response.status
+            }
+        })
+        .then(responseJson => {
+            if (__DEV__) {
+                console.log("createUserPost : response " + JSON.stringify(responseJson))
+            }
+            return responseJson;
+        })
+        .catch(error => {
+            if (__DEV__) {
+                console.log("createUserPost : error " + JSON.stringify(error))
             }
             return error
         });
