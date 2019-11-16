@@ -3,12 +3,13 @@ import styles from './Studio.module.scss';
 import Header from '../../components/Header';
 import { play, pause, stop, setTempo, setVolume, setTracks, setScroll } from '../../actions/studioActions';
 import { connect } from 'react-redux';
-import kick from '../../assets/samples/kick23.wav';
+import kick from '../../assets/basic_sounds/kick.wav';
 import bass from '../../assets/samples/bass.wav';
 import Timeline from '../../components/Timeline';
 import TimelineControls from '../../components/TimelineControls';
 import SeekBar from '../../components/SeekBar';
 import TrackControls from '../../components/TrackControls';
+import Sample from '../../components/Sample/Sample';
 
 
 const Studio = memo(props => {
@@ -46,7 +47,7 @@ const Studio = memo(props => {
           {
             id: 1,
             time: 1,
-            url: bass
+            url: kick
           },
           {
             id: 3,
@@ -95,6 +96,7 @@ const Studio = memo(props => {
         <div className={styles.scrollableMain} onScroll={handleScroll}>
           <div className={styles.mainContent}>
             <Timeline />
+            {props.studio.tracks.length && <Sample sample={{...props.studio.tracks[0].samples[0], track: 0}}/>}
             <button onClick={handlePlay}>Play</button>
             <button onClick={handlePlause}>Pause</button>
             <button onClick={handleStop}>Stop</button>
