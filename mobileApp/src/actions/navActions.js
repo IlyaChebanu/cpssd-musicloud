@@ -33,3 +33,8 @@ export const navigateToHomeScreen = () =>
         routeName: screenNames.HOME_SCREEN
     });
 
+export const navigateToForgotPasswordScreen = () =>
+    NavigationActions.navigate({
+        routeName: screenNames.FORGOT_PASSWORD_SCREEN
+    });
+

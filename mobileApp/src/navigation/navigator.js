@@ -10,10 +10,12 @@ import RegisterScreen from "../screens/registerScreen/registerScreen"
 import HomeScreen from "../screens/homeScreen/homeScreen"
 import { DrawerNavigator } from "./drawerNavigator";
 import * as screenNames from "./screenNames";
+import ForgotPasswordScreen from "../screens/forgotPasswordScreen/forgotPasswordScreen";
 
 export const AppNavigator = createStackNavigator({
     [screenNames.START_SCREEN]: { screen: StartScreen },
     [screenNames.LOGIN_SCREEN]: { screen: LoginScreen},
+    [screenNames.FORGOT_PASSWORD_SCREEN]: { screen: ForgotPasswordScreen},
     [screenNames.REGISTER_SCREEN]: { screen: RegisterScreen},
     [screenNames.HOME_SCREEN]: { screen: DrawerNavigator},
 }, {

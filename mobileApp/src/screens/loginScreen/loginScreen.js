@@ -93,7 +93,7 @@ class LoginScreen extends React.Component {
   }
 
   handleForgotClick() {
-    // loginUser('Herman', 'SecurePassword')
+    this.props.navigateToForgotPasswordScreen()
   }
 
   handleBackClick() {
