@@ -31,3 +31,8 @@ Sprint start | Sprint end
 ---|---
 [Sprint 1 Start](https://docs.google.com/presentation/d/1nHhMDjFC2nuO9RaTrjN3yLTlmu7kZL6ef_p-Xfh5ETs/edit?usp=sharing)|[Sprint 1 End](https://docs.google.com/presentation/d/1-S9CH44S0XYHTo-oLQlmGt99yo7yInbsjSCJSH5wbcs/edit?usp=sharing)|
 [Sprint 2 Start](https://docs.google.com/presentation/d/1BjvWF_6WQabbuikUCCV2Urdyj9taUJPS3SOp89YqEZ4/edit?usp=sharing)
+
+# Files From Other Sources (Citation)
+- The names.txt file, which provided us with first names to create realistic dummy users,
+was take from @dominictarr's repo [random-name](https://github.com/dominictarr/random-name).
+This file is entirely his work and is simply used by us to populate our DB with realistic data.
