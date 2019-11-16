@@ -94,7 +94,6 @@ export function logoutUser(token) {
     }
 
     return fetch(request)
-        // .then(response => response.json())
         .then(response => {
             if (response.status === 200) {
                 return response.json()
@@ -133,7 +132,6 @@ export function reVerifyEmail(email) {
     }
 
     return fetch(request)
-        // .then(response => response.json())
         .then(response => {
             if (response.status === 200) {
                 return response.json()
@@ -169,7 +167,6 @@ export function passwordResetInitialize(email) {
     }
 
     return fetch(request)
-        // .then(response => response.json())
         .then(response => {
             if (response.status === 200) {
                 return response.json()
@@ -210,7 +207,6 @@ export function passwordResetConfirm(email, code, password) {
     }
 
     return fetch(request)
-        // .then(response => response.json())
         .then(response => {
             if (response.status === 200) {
                 return response.json()
