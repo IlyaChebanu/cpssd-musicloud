@@ -39,8 +39,6 @@ const Sample = memo(props => {
     }
   }, [buffer, props.tempo]);
 
-  console.log(props.sample);
-
   const wrapperStyle = useMemo(() => {
     const beatsPerSeconds = props.tempo / 60;
     return {
