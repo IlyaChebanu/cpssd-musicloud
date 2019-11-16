@@ -19,33 +19,7 @@ from ...models.audio import (
     get_number_of_compiled_songs_by_uid, get_number_of_uncompiled_songs_by_uid, get_song_data
 )
 
-
 audio = Blueprint('audio', __name__)
-
-
-# TODO - edit to provide the url with credentials to the client to directly store to s3
-@audio.route("/get_access", methods=["POST"])
-def get_access():
-    return AWS_CREDS
-
-
-# TODO - remove the endpoint, handle the logic on the client side 
-@audio.route("/upload", methods=["POST"])
-def audio_upload():
-    aws_access_key = AWS_CREDS['AWSAccessKeyId']
-    aws_secret = AWS_CREDS['AWSSecretKey']
-    s3 = boto3.client('s3', aws_access_key_id=aws_access_key, aws_secret_access_key=aws_secret)
-    try:
-        f = request.files["song_data"]
-        filename = f.filename
-        s3.upload_fileobj(f, AWS_CREDS['Bucket'], filename)
-        return {"message": "Upload successful"}
-    except FileNotFoundError:
-        return {"message": "File not found!"}
-    except NoCredentialsError:
-        return {"message": "Credentials not available"}
-    except Exception as e:
-        return {"message": str(e)}
 
 
 @audio.route("", methods=["POST"])
@@ -69,11 +43,11 @@ def create_song(user):
         return {"message": str(exc)}, 422
 
     row_id = insert_song(
-       user.get("uid"),
-       request.json.get("title"),
-       0,
-       datetime.datetime.utcnow(),
-       False
+        user.get("uid"),
+        request.json.get("title"),
+        0,
+        datetime.datetime.utcnow(),
+        False
     )
 
     insert_song_state(
