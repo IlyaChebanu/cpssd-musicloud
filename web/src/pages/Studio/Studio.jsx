@@ -8,6 +8,7 @@ import bass from '../../assets/samples/bass.wav';
 import Timeline from '../../components/Timeline';
 import TimelineControls from '../../components/TimelineControls';
 import SeekBar from '../../components/SeekBar';
+import TrackControls from '../../components/TrackControls';
 
 import FileUploader from '../../components/FileUploader';
 
@@ -38,6 +39,10 @@ const Studio = memo(props => {
     dispatch(setTracks([
       {
         volume: 0.25,
+        mute: false,
+        solo: false,
+        pan: 0,
+        name: 'Bass',
         samples: [
           {
             id: 1,
@@ -47,22 +52,26 @@ const Studio = memo(props => {
           {
             id: 3,
             time: 3,
-            url: bass
+            url: kick
           },
         ]
       },
       {
         volume: 1,
+        mute: false,
+        solo: false,
+        pan: 0,
+        name: 'Kick',
         samples: [
           {
             id: 2,
             time: 2,
-            url: bass
+            url: kick
           },
           {
             id: 4,
             time: 4,
-            url: bass
+            url: kick
           },
         ]
       }
@@ -80,6 +89,9 @@ const Studio = memo(props => {
         <SeekBar/>
         <div className={styles.sidebar}>
           <TimelineControls />
+          {props.studio.tracks.map((track, i) => {
+            return <TrackControls key={i} track={track} index={i}/>;
+          })}
         </div>
         <div className={styles.scrollableMain} onScroll={handleScroll}>
           <div className={styles.mainContent}>

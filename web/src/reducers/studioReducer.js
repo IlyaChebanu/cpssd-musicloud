@@ -60,6 +60,13 @@ export default (
         ...state,
         tracks: action.tracks
       }
+    case 'SET_TRACK':
+      const tracks = [...state.tracks];
+      tracks[action.index] = action.track;
+      return {
+        ...state,
+        tracks
+      }
     case 'SET_SAMPLE_LOADING':
       return {
         ...state,
