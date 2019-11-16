@@ -32,11 +32,13 @@ export default class ProfileComponent extends React.Component {
       <View style={styles.container}>
         <Image source={profilePic} />
         <View style={styles.statsContainer}>
-          <Text style={styles.profileText}><Text style={styles.profileNum}>{userData.followers}</Text>{' followers'}{'\n'}
+          <Text style={styles.profileText}>
+            <Text style={styles.profileNum}>{userData.followers}</Text>{' followers'}{'\n'}
             <Text style={styles.profileNum}>{userData.following}</Text>{' following'}{'\n'}
             <Text style={styles.profileNum}>{userData.songs}</Text>{' songs'}{'\n'}
             <Text style={styles.profileNum}>{userData.posts}</Text>{' posts'}{'\n'}
-            <Text style={styles.profileNum}>{userData.likes}</Text>{' likes'}</Text>
+            <Text style={styles.profileNum}>{userData.likes}</Text>{' likes'}
+          </Text>
         </View>
       </View>
     )
