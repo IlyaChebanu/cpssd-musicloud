@@ -3,7 +3,6 @@ const { width, height } = Dimensions.get("window");
 
 export default StyleSheet.create({
     container: {
-      // paddingTop: height > 600 ? 70 : 50,
       backgroundColor: '#1B1E23',
       flex: 1,
     },
