@@ -87,6 +87,8 @@ const TrackControls = memo(props => {
     props.dispatch(setTracks(props.track, props.index));
   }, [props.index, props.track]);
 
+  const soloTrack = _.findIndex(props.tracks, 'solo');
+
   return (
     <div className={`${styles.wrapper} ${props.index % 2 ? styles.even : ''}`}>
       <div className={styles.title}>
@@ -102,7 +104,7 @@ const TrackControls = memo(props => {
           <p>Pan</p>
         </span>
         <span>
-          {props.track.mute || _.find(props.tracks, 'solo') ?
+          {props.track.mute || soloTrack !== -1 && soloTrack !== props.index ?
             <MuteActive onClick={handleTrackMute}/> :
             <Mute onClick={handleTrackMute}/>}
           <p>Mute</p>
