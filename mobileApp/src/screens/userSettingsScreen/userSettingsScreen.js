@@ -72,7 +72,7 @@ class UserSettingsScreen extends React.Component {
             if (isNaN(response)) {
                 this.showAlert('Success', response.message)
             } else {
-                this.showAlert('Error', 'ops')
+                this.showAlert('Error', 'failed to patchUserDetails')
             }
         })
     }
