@@ -124,9 +124,6 @@ const Studio = memo(props => {
           <div className={styles.mainContent}>
             <Timeline />
             {tracks}
-            <button onClick={handlePlay}>Play</button>
-            <button onClick={handlePlause}>Pause</button>
-            <button onClick={handleStop}>Stop</button>
           </div>
         </div>
       </div>
