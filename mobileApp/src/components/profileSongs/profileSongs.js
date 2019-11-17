@@ -1,11 +1,14 @@
-import React from "react"
+import React from "react";
+import { connect } from 'react-redux';
+import { ActionCreators } from '../../actions/index';
+import { bindActionCreators } from 'redux';
 import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity } from "react-native"
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import ProfileComponent from "../profileComponent/profileComponent";
 import { getCompiledSongs } from "../../api/audioAPI";
 
-export default class ProfileSongs extends React.Component {
+class ProfileSongs extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -28,7 +31,10 @@ export default class ProfileSongs extends React.Component {
   }
 
   handleSongClick(item, index) {
-
+    this.props.setSongData(item)
+    this.props.setSongId(item[0])
+    this.props.setSongUrl(item[6])
+    this.props.navigateToMusicPlayerScreen()
   }
 
   renderheader() {
@@ -74,3 +80,15 @@ export default class ProfileSongs extends React.Component {
     )
   }
 }
+
+function mapStateToProps(state) {
+  return {
+    token: state.home.token,
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators(ActionCreators, dispatch);
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(ProfileSongs);
