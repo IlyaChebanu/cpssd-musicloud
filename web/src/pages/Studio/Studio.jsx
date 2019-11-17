@@ -130,9 +130,7 @@ const Studio = memo(props => {
           </div>
         </div>
       </div>
-      <PlayBackControls 
-        curSecond={(props.studio.currentBeat-1)/props.studio.tempo*60}
-      />
+      <PlayBackControls />
     </div>
   );
 });
