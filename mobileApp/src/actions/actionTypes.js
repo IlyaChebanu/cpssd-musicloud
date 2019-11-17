@@ -16,6 +16,9 @@ export const SET_SONG_ID = 'set_song_id';
 export const SET_SONG_URL = 'set_song_url';
 export const SET_SONG_DATA = 'set_song_data';
 
+//User actions
+export const SET_PIC_URL = 'set_pic_url';
+export const SET_USER_DATA = 'set_user_data';
 
 //clear redux
 export const CLEAR_REDUX_STATE = 'clear_redux_state';
