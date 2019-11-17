@@ -1,6 +1,6 @@
 import * as actionsTypes from "../actions/actionTypes";
 
-// Dummy Actions
+// Song Actions
 export function setSongId(songId) {
     return {
         type: actionsTypes.SET_SONG_ID,
