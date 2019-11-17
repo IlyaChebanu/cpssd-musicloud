@@ -1,8 +1,11 @@
 const API_URL = 'http://dcumusicloud.com:5000/'
 
-export function getCompiledSongs(token) {
+export function getCompiledSongs(token, userId) {
 
     let url = `${API_URL}api/v1/audio/compiled_songs`;
+    if (userId) {
+        url = url + `?uid=${userId}`
+    }
     var request = new Request(url, {
         method: "GET",
         headers: new Headers({

@@ -2,10 +2,30 @@ import React from "react"
 import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity } from "react-native"
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
-import songsData from "../../screens/homeScreen/sampleData";
 import ProfileComponent from "../profileComponent/profileComponent";
+import { getCompiledSongs } from "../../api/audioAPI";
 
 export default class ProfileSongs extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      songsData: [],
+    };
+  }
+
+  componentDidMount() {
+    this.getSongs()
+  }
+
+  getSongs() {
+    getCompiledSongs(this.props.accessToken, 111).then(response => {
+      if (isNaN(response)) {
+        this.setState({ songsData: response.compiled_songs})
+      } else {
+        
+      }
+    })
+  }
 
   handleSongClick(item, index) {
 
@@ -22,14 +42,13 @@ export default class ProfileSongs extends React.Component {
   }
 
   renderSong({ item, index }) {
-    let songName = item.name
-    let authorName = item.author
-    let songImage = item.image
+    let songName = item[2]
+    let authorName = item[8]
+    let songImage = item[7]
     let playImage = require('../../assets/images/play.png')
     return (
       <TouchableOpacity style={styles.songContainer} onPress={() => this.handleSongClick(item, index)}>
-        {/* <Image style={styles.songImage} source={{uri: songImage}} /> */}
-        <Image style={styles.songImage} source={songImage} />
+        <Image style={styles.songImage} source={{uri: songImage}} />
         <Image style={styles.playImage} source={playImage} />
         <View style={styles.songDetailsContainer}>
           <Text style={styles.songNameText}>{songName}</Text>
@@ -46,10 +65,10 @@ export default class ProfileSongs extends React.Component {
         <FlatList
           ListHeaderComponent={this.renderheader()}
           style={styles.songFlatList}
-          data={songsData}
+          data={this.state.songsData}
           renderItem={this.renderSong.bind(this)}
-          keyExtractor={item => String(item.id)}
-          extraData={songsData}
+          keyExtractor={item => String(item)}
+          extraData={this.state.songsData}
         />
       </View>
     )
