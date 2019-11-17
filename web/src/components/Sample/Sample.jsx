@@ -96,6 +96,7 @@ const Sample = memo(props => {
 
   return (
       <HotKeys
+        allowChanges={true}
         keyMap={keyMap}
         handlers={handlers}
         className={styles.wrapper}

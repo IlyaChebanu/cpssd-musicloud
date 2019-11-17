@@ -33,7 +33,7 @@ const Track = memo(props => {
   }, [props.index]);
 
   const pasteSample = useCallback(() => {
-    const sample = {...store.getState().studio.clipboard};
+    const sample = { ...props.clipboard };
     if (_.isEmpty(sample)) {
       return;
     }
@@ -53,7 +53,7 @@ const Track = memo(props => {
   };
 
   return (
-    <HotKeys keyMap={keyMap} handlers={handlers} className={`${styles.wrapper} ${props.index % 2 ? styles.even : ''}`} onMouseDown={handleSetSelected}>
+    <HotKeys allowChanges={true} keyMap={keyMap} handlers={handlers} className={`${styles.wrapper} ${props.index % 2 ? styles.even : ''}`} onMouseDown={handleSetSelected}>
       <svg className={styles.gridLines}>
         {ticks}
       </svg>
