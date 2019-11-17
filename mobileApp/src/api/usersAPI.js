@@ -389,7 +389,7 @@ export function patchUserDetails(current_password, password, email, token) {
         });
 }
 
-export function patchUserPictureUrl(token, url) {
+export function patchUserPictureUrl(token, picUrl) {
 
     let url = `${API_URL}api/v1/users/profiler`;
     var request = new Request(url, {
@@ -399,7 +399,7 @@ export function patchUserPictureUrl(token, url) {
             "Authorization": 'Bearer ' + token,
         }),
         body: JSON.stringify({
-            "url": url
+            "url": picUrl
         })
     });
     if (__DEV__) {
