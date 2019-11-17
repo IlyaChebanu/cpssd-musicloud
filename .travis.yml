@@ -1,6 +1,10 @@
 language: python
 python:
   - "3.6"
+
+notifications:
+  email: false
+
 install:
   - pip install -r backend/requirements.txt
-script: pytest --cov=backend/src backend/tests
+script: pytest --cov-fail-under=65 --cov=backend/src backend/tests
