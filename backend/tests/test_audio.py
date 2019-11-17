@@ -535,18 +535,19 @@ class AudioTests(unittest.TestCase):
             )
             self.assertEqual(403, res.status_code)
 
+    @mock.patch('backend.src.controllers.audio.controllers.get_user_via_uid')
     @mock.patch('backend.src.controllers.audio.controllers.get_all_compiled_songs')
     @mock.patch('backend.src.controllers.audio.controllers.get_number_of_compiled_songs')
-    def test_get_compiled_songs_success_no_scroll_token_or_uid(self, mocked_num_songs, mocked_songs):
+    def test_get_compiled_songs_success_no_scroll_token_or_username(self, mocked_num_songs, mocked_songs, mocked_user):
         """
         Ensure getting all compiled songs is successful without scroll tokens.
         """
         test_songs = [
-            [1, 1, "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, None],
-            [2, 1, "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, None]
+            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, None]
         ]
         mocked_num_songs.return_value = 2
         mocked_songs.return_value = test_songs
+        mocked_user.return_value = [[None, None, "username"]]
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
             vr.return_value = {
                 'uid': -1,
@@ -578,15 +579,17 @@ class AudioTests(unittest.TestCase):
             }
             self.assertEqual(expected_body, json.loads(res.data))
 
+    @mock.patch('backend.src.controllers.audio.controllers.get_user_via_uid')
     @mock.patch('backend.src.controllers.audio.controllers.get_all_compiled_songs')
-    def test_get_compiled_songs_success_next_scroll_token_and_no_uid(self, mocked_songs):
+    def test_get_compiled_songs_success_next_scroll_token_and_no_username(self, mocked_songs, mocked_user):
         """
-        Ensure getting songs is successful with a next page scroll token and no uid encoded.
+        Ensure getting songs is successful with a next page scroll token and no username encoded.
         """
         test_song = [
-            [2, 1, "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, None]
+            [2, "username2", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, None]
         ]
         mocked_songs.return_value = test_song
+        mocked_user.return_value = [[None, None, "username2"]]
         test_req_data = {
             "next_page": (
                 "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOm51bGwsInRvdGFsX3BhZ"
@@ -617,7 +620,7 @@ class AudioTests(unittest.TestCase):
             )
             self.assertEqual(200, res.status_code)
             expected_body = {
-                'back_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOm51bGwsInRvdGFsX3BhZ2VzIjoyLCJzb25nc19wZXJfcGFnZSI6MSwiY3VycmVudF9wYWdlIjoxfQ.heGjd8av77DIX83CJop8ZsmrNWLvTl1voX00GJS7xJo',
+                'back_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6bnVsbCwidG90YWxfcGFnZXMiOjIsInNvbmdzX3Blcl9wYWdlIjoxLCJjdXJyZW50X3BhZ2UiOjF9.FapIICe8ZHTTHSzw_SxsD-L6iePSI47uX2_bOp7Kwjg',
                 'current_page': 2,
                 'next_page': None,
                 'compiled_songs': test_song,
@@ -626,16 +629,18 @@ class AudioTests(unittest.TestCase):
             }
             self.assertEqual(expected_body, json.loads(res.data))
 
+    @mock.patch('backend.src.controllers.audio.controllers.get_user_via_uid')
     @mock.patch('backend.src.controllers.audio.controllers.get_all_compiled_songs')
-    def test_get_compiled_songs_success_back_scroll_token_and_no_uid(self, mocked_songs):
+    def test_get_compiled_songs_success_back_scroll_token_and_no_username(self, mocked_songs, mocked_user):
 
         """
-        Ensure getting songs is successful with a back page scroll token and no uid encoded.
+        Ensure getting songs is successful with a back page scroll token and no username encoded.
         """
         test_song = [
-            [1, 1, "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, None]
+            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, None]
         ]
         mocked_songs.return_value = test_song
+        mocked_user.return_value = [[None, None, "username"]]
         test_req_data = {
             "back_page": (
                 "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOm51bGwsIn"
@@ -669,25 +674,27 @@ class AudioTests(unittest.TestCase):
             expected_body = {
                 'back_page': None,
                 'current_page': 1,
-                'next_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOm51bGwsInRvdGFsX3BhZ2VzIjoyLCJzb25nc19wZXJfcGFnZSI6MSwiY3VycmVudF9wYWdlIjoyfQ.69SyUqB3nFPhjdBGNuX-_bQlWU1awOoo_YLvrDF9d6Q',
+                'next_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6bnVsbCwidG90YWxfcGFnZXMiOjIsInNvbmdzX3Blcl9wYWdlIjoxLCJjdXJyZW50X3BhZ2UiOjJ9.Q85alHs0LPZziERUTv0G4kUZeV2R5T9_4nYRi1ketBE',
                 'compiled_songs': test_song,
                 'songs_per_page': 1,
                 'total_pages': 2
             }
             self.assertEqual(expected_body, json.loads(res.data))
 
+    @mock.patch('backend.src.controllers.audio.controllers.get_user_via_username')
     @mock.patch('backend.src.controllers.audio.controllers.get_all_compiled_songs_by_uid')
     @mock.patch('backend.src.controllers.audio.controllers.get_number_of_compiled_songs_by_uid')
-    def test_get_compiled_songs_success_with_uid_and_no_scroll_token(self, mocked_num_songs, mocked_songs):
+    def test_get_compiled_songs_success_with_username_and_no_scroll_token(self, mocked_num_songs, mocked_songs, mocked_user):
         """
-        Ensure getting all compiled songs for a specified uid is successful without scroll tokens.
+        Ensure getting all compiled songs for a specified username is successful without scroll tokens.
         """
         test_songs = [
-            [1, 1, "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, None],
-            [2, 1, "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, None]
+            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, None],
+            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, None]
         ]
         mocked_num_songs.return_value = 2
         mocked_songs.return_value = test_songs
+        mocked_user.return_value =[[1]]
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
             vr.return_value = {
                 'uid': -1,
@@ -704,7 +711,7 @@ class AudioTests(unittest.TestCase):
                 )
             }
             test_req_data = {
-                "uid": 1
+                "username": "username"
             }
             res = self.test_client.get(
                 "/api/v1/audio/compiled_songs",
@@ -723,22 +730,24 @@ class AudioTests(unittest.TestCase):
             }
             self.assertEqual(expected_body, json.loads(res.data))
 
-    @mock.patch('backend.src.controllers.audio.controllers.get_all_compiled_songs_by_uid')
-    def test_get_compiled_songs_success_next_scroll_token_and_with_uid(self, mocked_songs):
+    @mock.patch('backend.src.controllers.audio.controllers.get_user_via_uid')
+    @mock.patch('backend.src.controllers.audio.controllers.get_all_compiled_songs')
+    def test_get_compiled_songs_success_next_scroll_token_and_with_username(self, mocked_songs, mocked_user):
         """
-        Ensure getting songs from a specified uid is successful with a next page scroll token.
+        Ensure getting songs using a next page scroll token works with username also being defined.
         """
         test_song = [
-            [2, 1, "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, None]
+            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, None]
         ]
         mocked_songs.return_value = test_song
+        mocked_user.return_value = [[None, None, "username"]]
         test_req_data = {
             "next_page": (
                 "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOiIxIiwidG90YWxfcGFnZXMi"
                 "OjIsInNvbmdzX3Blcl9wYWdlIjoxLCJjdXJyZW50X3BhZ2UiOjJ9.FrBOO89SyKC5HVkN"
                 "FFkRboBq3u4j129gTuvWnsGTy-w"
             ),
-            "uid": 1
+            "username": "username"
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
             vr.return_value = {
@@ -763,7 +772,7 @@ class AudioTests(unittest.TestCase):
             )
             self.assertEqual(200, res.status_code)
             expected_body = {
-                'back_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOiIxIiwidG90YWxfcGFnZXMiOjIsInNvbmdzX3Blcl9wYWdlIjoxLCJjdXJyZW50X3BhZ2UiOjF9.68zZKI-AZX_OM2hq2p9LFHX1oWYWRpk3S08aiNUlX4A',
+                'back_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6bnVsbCwidG90YWxfcGFnZXMiOjIsInNvbmdzX3Blcl9wYWdlIjoxLCJjdXJyZW50X3BhZ2UiOjF9.FapIICe8ZHTTHSzw_SxsD-L6iePSI47uX2_bOp7Kwjg',
                 'current_page': 2,
                 'next_page': None,
                 'compiled_songs': test_song,
@@ -772,22 +781,24 @@ class AudioTests(unittest.TestCase):
             }
             self.assertEqual(expected_body, json.loads(res.data))
 
-    @mock.patch('backend.src.controllers.audio.controllers.get_all_compiled_songs_by_uid')
-    def test_get_compiled_songs_success_back_scroll_token_and_with_uid(self, mocked_songs):
+    @mock.patch('backend.src.controllers.audio.controllers.get_user_via_uid')
+    @mock.patch('backend.src.controllers.audio.controllers.get_all_compiled_songs')
+    def test_get_compiled_songs_success_back_scroll_token_and_with_username(self, mocked_songs, mocked_user):
         """
-        Ensure getting songs for a specified uid is successful with a back page scroll token.
+        Ensure getting songs using a back page scroll token works with username also being defined.
         """
         test_song = [
-            [1, 1, "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, None]
+            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, None]
         ]
         mocked_songs.return_value = test_song
+        mocked_user.return_value = [[None, None, "username"]]
         test_req_data = {
             "back_page": (
                 "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOiIxIiwidG90YWxfcGFnZ"
                 "XMiOjIsInNvbmdzX3Blcl9wYWdlIjoxLCJjdXJyZW50X3BhZ2UiOjF9.68zZKI-AZX"
                 "_OM2hq2p9LFHX1oWYWRpk3S08aiNUlX4A"
             ),
-            "uid": 1
+            "username": "username2"
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
             vr.return_value = {
@@ -814,7 +825,7 @@ class AudioTests(unittest.TestCase):
             expected_body = {
                 'back_page': None,
                 'current_page': 1,
-                'next_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOiIxIiwidG90YWxfcGFnZXMiOjIsInNvbmdzX3Blcl9wYWdlIjoxLCJjdXJyZW50X3BhZ2UiOjJ9.FrBOO89SyKC5HVkNFFkRboBq3u4j129gTuvWnsGTy-w',
+                'next_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6bnVsbCwidG90YWxfcGFnZXMiOjIsInNvbmdzX3Blcl9wYWdlIjoxLCJjdXJyZW50X3BhZ2UiOjJ9.Q85alHs0LPZziERUTv0G4kUZeV2R5T9_4nYRi1ketBE',
                 'compiled_songs': test_song,
                 'songs_per_page': 1,
                 'total_pages': 2
@@ -953,8 +964,8 @@ class AudioTests(unittest.TestCase):
         Ensure getting all uncompiled songs for the current user is successful without scroll tokens.
         """
         test_songs = [
-            [1, 1, "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, None],
-            [2, 1, "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, None]
+            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, None],
+            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, None]
         ]
         mocked_num_songs.return_value = 2
         mocked_songs.return_value = test_songs
@@ -995,7 +1006,7 @@ class AudioTests(unittest.TestCase):
         Ensure getting uncompiled songs for the current user is successful with a next page scroll token.
         """
         test_song = [
-            [2, 1, "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, None]
+            [2, "username2", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, None]
         ]
         mocked_songs.return_value = test_song
         test_req_data = {
@@ -1043,7 +1054,7 @@ class AudioTests(unittest.TestCase):
         Ensure getting uncompiled songs for the current user is successful with a back page scroll token.
         """
         test_song = [
-            [1, 1, "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, None]
+            [1, "username2", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, None]
         ]
         mocked_songs.return_value = test_song
         test_req_data = {
@@ -1210,13 +1221,15 @@ class AudioTests(unittest.TestCase):
             )
             self.assertEqual(422, res.status_code)
 
+    @mock.patch('backend.src.controllers.audio.controllers.get_user_via_uid')
     @mock.patch('backend.src.controllers.audio.controllers.get_song_data')
-    def test_get_song_data_success(self, mocked_song):
+    def test_get_song_data_success(self, mocked_song, mocked_user):
         """
         Ensure user's can get a song's info successfully.
         """
-        test_song = [[1, 1, "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, None]]
+        test_song = [[1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, None]]
         mocked_song.return_value = test_song
+        mocked_user.return_value = [[1, "fake@email.com", "username"]]
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
             vr.return_value = {
                 'uid': -1,
@@ -1242,7 +1255,7 @@ class AudioTests(unittest.TestCase):
                 follow_redirects=True
             )
             self.assertEqual(200, res.status_code)
-            expected_body = {'song': test_song}
+            expected_body = {'song': test_song[0]}
             self.assertEqual(expected_body, json.loads(res.data))
 
     def test_get_song_data_fail_missing_sid(self):

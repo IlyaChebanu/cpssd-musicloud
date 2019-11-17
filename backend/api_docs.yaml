@@ -1302,7 +1302,7 @@ paths:
       tags:
       - "audio"
       summary: "Get all of the compiled songs available to listen to."
-      description: "This endpoint takes several arguments and returns a subset of all the songs on our system unordered. The arguments that can be provided are as follows:\n\n \"uid\" = If a 'next_page' or 'back_page' argument is not sent, then this is an optional argument you may send. This should be set to the uid of the user who's songs you are trying to view.\n\n \"songs_per_page\" = If a 'next_page' or 'back_page' argument is not sent, then this an optional argument you may send. This is used to adjust the number of songs you will get back per page of results.\n\n \"current_page\" = If a 'next_page' or 'back_page' argument is not sent, then this is an optional argument you may send. This is used to navigate through each of the pages of results. If this argument is not sent, the default page of results returned will be page 1.\n\n \"next_page\" = If this value is sent, then a back_page value should not be sent. This value should be set to a 'next_page' token. These tokens are returned by standard requests to support infinited scrolling. Making a request with this token requires no other value to be passed as it encodes all required data for the next request.\n\n \"back_page\" = If this value is sent, then a next_page value should not be sent. This value should be set to a 'back_page' token. These tokens are returned by standard requests to support infinited scrolling. Making a request with this token requires no other value to be passed as it encodes all required data for the next request."
+      description: "This endpoint takes several arguments and returns a subset of all the songs on our system unordered. The arguments that can be provided are as follows:\n\n \"username\" = If a 'next_page' or 'back_page' argument is not sent, then this is an optional argument you may send. This should be set to the username of the user who's songs you are trying to view.\n\n \"songs_per_page\" = If a 'next_page' or 'back_page' argument is not sent, then this an optional argument you may send. This is used to adjust the number of songs you will get back per page of results.\n\n \"current_page\" = If a 'next_page' or 'back_page' argument is not sent, then this is an optional argument you may send. This is used to navigate through each of the pages of results. If this argument is not sent, the default page of results returned will be page 1.\n\n \"next_page\" = If this value is sent, then a back_page value should not be sent. This value should be set to a 'next_page' token. These tokens are returned by standard requests to support infinited scrolling. Making a request with this token requires no other value to be passed as it encodes all required data for the next request.\n\n \"back_page\" = If this value is sent, then a next_page value should not be sent. This value should be set to a 'back_page' token. These tokens are returned by standard requests to support infinited scrolling. Making a request with this token requires no other value to be passed as it encodes all required data for the next request."
       consumes:
       - "application/json"
       produces:
@@ -1314,10 +1314,10 @@ paths:
           required: true
           type: "string"
         - in: "query"
-          name: "uid"
+          name: "username"
           type: "string"
           required: false
-          description: "The uid of the user who's songs you wish to view."
+          description: "The username of the user who's songs you wish to view."
         - in: "query"
           name: "current_page"
           type: "string"
@@ -1361,7 +1361,7 @@ paths:
                     type: "string"
                   example:
                     - 1
-                    - 1
+                    - "testUser"
                     - "A test song"
                     - 0
                     - "Wed, 13 Nov 2019 17:07:39 GMT"
@@ -1467,7 +1467,7 @@ paths:
                     type: "string"
                   example:
                     - 1
-                    - 1
+                    - "testUser"
                     - "A test song"
                     - 0
                     - "Wed, 13 Nov 2019 17:07:39 GMT"
@@ -1549,7 +1549,7 @@ paths:
                     type: "string"
                   example:
                     - 1
-                    - 1
+                    - "testUser"
                     - "A test song"
                     - 0
                     - "Wed, 13 Nov 2019 17:07:39 GMT"

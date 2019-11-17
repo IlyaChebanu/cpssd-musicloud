@@ -67,6 +67,7 @@ export default store => {
 
   return next => async action => {
     let state;
+    let loadingSet;
     switch (action.type) {
       case 'STUDIO_PLAY':
         store.dispatch(playingStartTime(audioContext.currentTime));
@@ -122,7 +123,7 @@ export default store => {
         });
 
         // Verify that all the tracks have buffers
-        let loadingSet = false;
+        loadingSet = false;
         await Promise.all(action.tracks.map(async track => {
           await Promise.all(track.samples.map(async sample => {
             if (!bufferStore[sample.url]) {
@@ -134,6 +135,31 @@ export default store => {
             }
             sample.duration = bufferStore[sample.url].duration;
           }));
+        }));
+        break;
+
+      case 'SET_TRACK':
+        state = store.getState().studio;
+        // React to volume change
+        Object.values(scheduledSamples).forEach(sample => {
+          const track = action.track;
+          const soloTrack = _.findIndex(state.tracks, 'solo');
+          const solo = soloTrack !== -1 && soloTrack !== sample.track;
+          sample.gain.gain.setValueAtTime(solo ? 0 : track.mute ? 0 : track.volume, audioContext.currentTime);
+          sample.pan.pan.setValueAtTime(track.pan, audioContext.currentTime);
+        });
+
+        // Verify that all the track has buffers
+        loadingSet = false;
+        await Promise.all(action.track.samples.map(async sample => {
+          if (!bufferStore[sample.url]) {
+            await store.dispatch(setSampleLoading(true));
+            const res = await axios.get(sample.url, { responseType: 'arraybuffer' });
+            const buffer = await audioContext.decodeAudioData(res.data);
+            bufferStore[sample.url] = buffer;
+            store.dispatch(setSampleLoading(false));
+          }
+          sample.duration = bufferStore[sample.url].duration;
         }));
         break;
 

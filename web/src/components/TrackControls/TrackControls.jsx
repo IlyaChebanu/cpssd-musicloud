@@ -2,7 +2,7 @@ import React, { memo, useState, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import styles from './TrackControls.module.scss';
 import { connect } from 'react-redux';
-import { setTracks, setTrackAtIndex } from '../../actions/studioActions';
+import { setTracks, setTrackAtIndex, setSelectedTrack } from '../../actions/studioActions';
 import { ReactComponent as Knob } from '../../assets/icons/Knob.svg';
 import { ReactComponent as Mute } from '../../assets/icons/volume-up-light.svg';
 import { ReactComponent as MuteActive } from '../../assets/icons/volume-slash-light.svg';
@@ -11,6 +11,7 @@ import { ReactComponent as SoloActive } from '../../assets/icons/headphones-alt-
 import _ from 'lodash';
 import { clamp, lerp } from '../../helpers/utils';
 import store from '../../store';
+import { colours } from '../../helpers/constants';
 
 const TrackControls = memo(props => {
 
@@ -84,13 +85,18 @@ const TrackControls = memo(props => {
 
   const handleTrackNameChange = useCallback(e => {
     props.track.name = e.target.value;
-    props.dispatch(setTracks(props.track, props.index));
+    props.dispatch(setTrackAtIndex(props.track, props.index));
   }, [props.index, props.track]);
 
   const soloTrack = _.findIndex(props.tracks, 'solo');
 
+  const handleSetSelected = useCallback(() => {
+    props.dispatch(setSelectedTrack(props.index));
+  }, [props.index]);
+
   return (
-    <div className={`${styles.wrapper} ${props.index % 2 ? styles.even : ''}`}>
+    <div className={`${styles.wrapper} ${props.index % 2 ? styles.even : ''}`} onMouseDown={handleSetSelected}>
+      {props.selectedTrack === props.index && <div className={styles.selectedBar} style={{ backgroundColor: colours[props.index % colours.length]}}/>}
       <div className={styles.title}>
         <input type='text' value={track.name} onChange={handleTrackNameChange}/>
       </div>
@@ -126,7 +132,8 @@ TrackControls.propTypes = {
 };
 
 const mapStateToProps = ({ studio }) => ({
-  tracks: studio.tracks
+  tracks: studio.tracks,
+  selectedTrack: studio.selectedTrack,
 });
 
 export default connect(mapStateToProps)(TrackControls);

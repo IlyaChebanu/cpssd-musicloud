@@ -5,6 +5,10 @@
   display: flex;
   flex-direction: column;
 
+  &:hover {
+    cursor: pointer;
+  }
+
   &.even {
     background-color: #303237;
   }
@@ -59,4 +63,10 @@
       }
     }
   }
+}
+
+.selectedBar {
+  position: absolute;
+  width: 10px;
+  height: 100px;
 }

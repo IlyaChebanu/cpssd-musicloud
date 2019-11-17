@@ -7,6 +7,7 @@
   width: 220px;
   height: 100%;
   float: left;
+  background-color: #26292E;
 }
 
 .scrollableMain {
@@ -17,4 +18,23 @@
 
 .mainContent {
   width: 150%;
+}
+
+.newTrack {
+  width: 100%;
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 18px;
+  background-color: #303237;
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  &.even {
+    background-color: #36393D;
+  }
 }
