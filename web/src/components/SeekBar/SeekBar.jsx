@@ -14,12 +14,11 @@ const SeekBar = memo(props => {
 
   const handleDragStart = useCallback(e => {
     props.dispatch(pause);
-    // const mousePosOffset = e.screenX - 220 - (props.currentBeat - 1) * 40;
     const mousePosOffset = e.screenX;
     const startBeat = props.currentBeat;
     const handleMouseMove = e => {
-      const scroll = store.getState().studio.scroll;
-      props.dispatch(setCurrentBeat(Math.max(1, startBeat + (e.screenX - mousePosOffset) / 40)));
+      e.preventDefault();
+      props.dispatch(setCurrentBeat(Math.max(1, startBeat + (e.screenX - mousePosOffset) / 40 / window.devicePixelRatio)));
     }
     const handleDragStop = () => {
       // Only plays if the music was playing when handleDragStart was called

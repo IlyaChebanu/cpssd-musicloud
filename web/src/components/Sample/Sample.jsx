@@ -45,7 +45,7 @@ const Sample = memo(props => {
     const handleMouseMove = e => {
       e.preventDefault();
       const scroll = store.getState().studio.scroll;
-      const start = (scroll + e.screenX - 220 - mousePosOffset) / 40 + 1;
+      const start = (scroll + e.screenX - 220 - mousePosOffset) / 40 / window.devicePixelRatio + 1;
       const numDecimalPlaces = Math.max(0, String(1 / props.gridSize).length - 2);
       const time = props.gridSnapEnabled ? Number((Math.round((start) * props.gridSize) / props.gridSize).toFixed(numDecimalPlaces)) : start;
 
