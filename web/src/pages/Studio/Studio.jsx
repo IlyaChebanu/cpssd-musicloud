@@ -90,6 +90,20 @@ const Studio = memo(props => {
     ));
   }, [props.tracks]);
 
+  const handleAddNewTrack = useCallback(() => {
+    props.dispatch(setTracks([
+      ...props.tracks,
+      {
+        volume: 1,
+        pan: 0,
+        mute: false,
+        solo: false,
+        name: 'New track',
+        samples: []
+      }
+    ]));
+  }, [props.tracks]);
+
   return (
     <div className={styles.wrapper}>
       <Header selected={0}/>
@@ -97,9 +111,12 @@ const Studio = memo(props => {
         <SeekBar/>
         <div className={styles.sidebar}>
           <TimelineControls />
-          {props.studio.tracks.map((track, i) => {
+          {props.tracks.map((track, i) => {
             return <TrackControls key={i} track={track} index={i}/>;
           })}
+          <div className={`${styles.newTrack} ${props.tracks.length % 2 !== 1 ? styles.even : ''}`} onClick={handleAddNewTrack}>
+            Add new track
+          </div>
         </div>
         <div className={styles.scrollableMain} onScroll={handleScroll}>
           <div className={styles.mainContent}>
