@@ -1,7 +1,6 @@
 import unittest
 import mock
 import json
-import pytest
 
 from jwt.exceptions import InvalidSignatureError
 
@@ -731,21 +730,22 @@ class AudioTests(unittest.TestCase):
             }
             self.assertEqual(expected_body, json.loads(res.data))
 
-    @pytest.mark.skip(reason="Need to come up with a way of encoding a new token for this test.")
-    @mock.patch('backend.src.controllers.audio.controllers.get_all_compiled_songs_by_uid')
-    def test_get_compiled_songs_success_next_scroll_token_and_with_username(self, mocked_songs):
+    @mock.patch('backend.src.controllers.audio.controllers.get_user_via_uid')
+    @mock.patch('backend.src.controllers.audio.controllers.get_all_compiled_songs')
+    def test_get_compiled_songs_success_next_scroll_token_and_with_username(self, mocked_songs, mocked_user):
         """
         Ensure getting songs using a next page scroll token works with username also being defined.
         """
         test_song = [
-            [2, "Abra", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, None]
+            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, None]
         ]
         mocked_songs.return_value = test_song
+        mocked_user.return_value = [[None, None, "username"]]
         test_req_data = {
             "next_page": (
-                "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6IkFicmEiLCJ0"
-                "b3RhbF9wYWdlcyI6Mywic29uZ3NfcGVyX3BhZ2UiOjEsImN1cnJlbnRfcGFnZSI6M"
-                "n0.IHRymJlWwi4ZbAvNC_fkJaPbZ7rsKmoS6JWUwg9IPoA"
+                "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOiIxIiwidG90YWxfcGFnZXMi"
+                "OjIsInNvbmdzX3Blcl9wYWdlIjoxLCJjdXJyZW50X3BhZ2UiOjJ9.FrBOO89SyKC5HVkN"
+                "FFkRboBq3u4j129gTuvWnsGTy-w"
             ),
             "username": "username"
         }
@@ -772,33 +772,33 @@ class AudioTests(unittest.TestCase):
             )
             self.assertEqual(200, res.status_code)
             expected_body = {
-                'back_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6IkFicmEiLCJ0b3RhbF9wYWdlcyI6Mywic29uZ3NfcGVyX3BhZ2UiOjEsImN1cnJlbnRfcGFnZSI6MX0.C_1hI_Y5tNScnQrvc0XM7AjVaiAvmuOtUVTkM3KEmG8',
+                'back_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6bnVsbCwidG90YWxfcGFnZXMiOjIsInNvbmdzX3Blcl9wYWdlIjoxLCJjdXJyZW50X3BhZ2UiOjF9.FapIICe8ZHTTHSzw_SxsD-L6iePSI47uX2_bOp7Kwjg',
                 'current_page': 2,
-                'next_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6IkFicmEiLCJ0b3RhbF9wYWdlcyI6Mywic29uZ3NfcGVyX3BhZ2UiOjEsImN1cnJlbnRfcGFnZSI6M30.OWDznV5AZjHZyWYJz33mEGaBwG4h33wqt1k07xgW5lY',
+                'next_page': None,
                 'compiled_songs': test_song,
                 'songs_per_page': 1,
-                'total_pages': 3
+                'total_pages': 2
             }
             self.assertEqual(expected_body, json.loads(res.data))
 
-    @pytest.mark.skip(reason="Need to come up with a way of encoding a new token for this test.")
-    @mock.patch('backend.src.controllers.audio.controllers.get_all_compiled_songs_by_uid')
-    def test_get_compiled_songs_success_back_scroll_token_and_with_username(self, mocked_songs):
+    @mock.patch('backend.src.controllers.audio.controllers.get_user_via_uid')
+    @mock.patch('backend.src.controllers.audio.controllers.get_all_compiled_songs')
+    def test_get_compiled_songs_success_back_scroll_token_and_with_username(self, mocked_songs, mocked_user):
         """
         Ensure getting songs using a back page scroll token works with username also being defined.
         """
         test_song = [
-            [1, "Abra", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, None]
+            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, None]
         ]
         mocked_songs.return_value = test_song
+        mocked_user.return_value = [[None, None, "username"]]
         test_req_data = {
             "back_page": (
-                "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6"
-                "IkFicmEiLCJ0b3RhbF9wYWdlcyI6Mywic29uZ3NfcGVyX3BhZ2UiO"
-                "jEsImN1cnJlbnRfcGFnZSI6MX0.C_1hI_Y5tNScnQrvc0XM7AjVai"
-                "AvmuOtUVTkM3KEmG8"
+                "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOiIxIiwidG90YWxfcGFnZ"
+                "XMiOjIsInNvbmdzX3Blcl9wYWdlIjoxLCJjdXJyZW50X3BhZ2UiOjF9.68zZKI-AZX"
+                "_OM2hq2p9LFHX1oWYWRpk3S08aiNUlX4A"
             ),
-            "username": "username"
+            "username": "username2"
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
             vr.return_value = {
@@ -825,10 +825,10 @@ class AudioTests(unittest.TestCase):
             expected_body = {
                 'back_page': None,
                 'current_page': 1,
-                'next_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6IkFicmEiLCJ0b3RhbF9wYWdlcyI6Mywic29uZ3NfcGVyX3BhZ2UiOjEsImN1cnJlbnRfcGFnZSI6Mn0.IHRymJlWwi4ZbAvNC_fkJaPbZ7rsKmoS6JWUwg9IPoA',
+                'next_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6bnVsbCwidG90YWxfcGFnZXMiOjIsInNvbmdzX3Blcl9wYWdlIjoxLCJjdXJyZW50X3BhZ2UiOjJ9.Q85alHs0LPZziERUTv0G4kUZeV2R5T9_4nYRi1ketBE',
                 'compiled_songs': test_song,
                 'songs_per_page': 1,
-                'total_pages': 3
+                'total_pages': 2
             }
             self.assertEqual(expected_body, json.loads(res.data))
 
