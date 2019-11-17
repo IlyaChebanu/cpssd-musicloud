@@ -8,7 +8,6 @@ import styles from "./styles";
 import HeaderComponent from "../../components/headerComponent/headerComponent";
 import { SafeAreaView } from "react-navigation";
 import SearchComponent from "../../components/searchComponent/searchComponent";
-import songsData from "./sampleData";
 import { getCompiledSongs } from "../../api/audioAPI";
 
 class HomeScreen extends React.Component {
