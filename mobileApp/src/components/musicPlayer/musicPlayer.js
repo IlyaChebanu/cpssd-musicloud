@@ -1,6 +1,5 @@
 import React from 'react'
 import { Dimensions, Text, View, Image, TouchableOpacity, ActivityIndicator } from 'react-native'
-// import GLOBALS from '../../utils/globalStrings';
 import styles from './styles';
 import Video from 'react-native-video';
 import Spinner from '../spinner/spinner';
@@ -34,7 +33,7 @@ export default class MusicPlayer extends React.Component {
     }
 
     musicError(error) {
-        console.log("MusicPlayer : MusicPlayer ERROR ")// + JSON.stringify(error))
+        console.log("MusicPlayer : MusicPlayer ERROR ")
         this.setState({ isError: true });
     }
 
@@ -44,7 +43,7 @@ export default class MusicPlayer extends React.Component {
     }
 
     onLoad(data) {
-        // console.log('MusicPlayer: On load fired! ' + JSON.stringify(data));
+        
     }
 
     onEnd(data) {
