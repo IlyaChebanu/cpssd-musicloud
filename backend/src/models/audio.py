@@ -46,7 +46,7 @@ def get_song_data(sid):
     song = query(sql, args, True)
     if not song:
         raise NoResults
-    return song[0]
+    return song
 
 
 def get_editable_song_ids(uid):

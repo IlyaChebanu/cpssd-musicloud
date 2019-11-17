@@ -109,6 +109,7 @@ def load_song(user):
 def get_compiled_songs():
     next_page = request.args.get('next_page')
     back_page = request.args.get('back_page')
+    uid = None
     if not next_page and not back_page:
         username = request.args.get('username')
         if username:
@@ -300,6 +301,6 @@ def get_song():
     if not sid:
         return {"message": "sid param can't be empty!"}, 422
 
-    res = list(get_song_data(sid))
+    res = get_song_data(sid)[0]
     res[1] = get_user_via_uid(res[1])[0][2]
     return {"song": res}, 200
