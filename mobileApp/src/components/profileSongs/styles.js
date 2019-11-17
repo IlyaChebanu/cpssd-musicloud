@@ -69,4 +69,10 @@ export default StyleSheet.create({
     textShadowRadius: 1,
     textShadowColor: '#666',
   },
+  noSongsText: {
+    textAlign: 'center',
+    color: '#FFF',
+    fontSize: 16,
+    width: width,
+  }
 })

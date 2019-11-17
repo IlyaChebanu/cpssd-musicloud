@@ -43,6 +43,7 @@ class ProfileSongs extends React.Component {
         <Text style={styles.profileTitleText}>{"PROFILE"}</Text>
         <ProfileComponent accessToken={this.props.accessToken} username={this.props.username} />
         <Text style={styles.titleText}>{"Songs"}</Text>
+        {this.state.songsData && <Text style={styles.noSongsText}>{'User has no songs yet'}</Text>}
       </View>
     )
   }
@@ -66,7 +67,6 @@ class ProfileSongs extends React.Component {
 
   render() {
 
-    console.warn(this.state.songsData.length)
     return (
       <View style={styles.container}>
         <FlatList
@@ -77,7 +77,6 @@ class ProfileSongs extends React.Component {
           keyExtractor={item => String(item)}
           extraData={this.state.songsData}
         />
-        {this.state.songsData && <Text style={styles.noSongsText}>{'User has no songs yet'}</Text>}
       </View>
     )
   }
