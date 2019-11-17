@@ -137,15 +137,20 @@ def get_compiled_songs():
                    }, 422
 
         start_index = (current_page * songs_per_page) - songs_per_page
+        compiled_songs = []
+
         if uid:
             raw_compiled_songs = get_all_compiled_songs_by_uid(uid, start_index, songs_per_page)
-            compiled_songs = []
             for song in raw_compiled_songs:
                 song = list(song)
                 song[1] = username
                 compiled_songs.append(song)
         else:
-            compiled_songs = get_all_compiled_songs(start_index, songs_per_page)
+            raw_compiled_songs = get_all_compiled_songs(start_index, songs_per_page)
+            for song in raw_compiled_songs:
+                song = list(song)
+                song[1] = get_user_via_uid(song[1])[0][2]
+                compiled_songs.append(song)
 
         jwt_payload = {
             "username": username,
@@ -176,17 +181,21 @@ def get_compiled_songs():
         songs_per_page = token.get("songs_per_page")
         total_pages = token.get("total_pages")
         start_index = (current_page * songs_per_page) - songs_per_page
+        compiled_songs = []
 
         if username:
             uid = get_user_via_username(username)[0][0]
             raw_compiled_songs = get_all_compiled_songs_by_uid(uid, start_index, songs_per_page)
-            compiled_songs = []
             for song in raw_compiled_songs:
                 song = list(song)
                 song[1] = username
                 compiled_songs.append(song)
         else:
-            compiled_songs = get_all_compiled_songs(start_index, songs_per_page)
+            raw_compiled_songs = get_all_compiled_songs(start_index, songs_per_page)
+            for song in raw_compiled_songs:
+                song = list(song)
+                song[1] = get_user_via_uid(song[1])[0][2]
+                compiled_songs.append(song)
 
         jwt_payload = {
             "username": username,
