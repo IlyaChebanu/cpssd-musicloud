@@ -16,8 +16,8 @@ const Looper = memo(props => {
       const start = (scroll + e.screenX - 220) / 40 + 1;
       const numDecimalPlaces = Math.max(0, String(1 / gridSize).length - 2);
       dispatch(setLoop({
-        start: Math.max(
-          1,
+        start: Math.min(
+          loopEnd - 1,
           gridSnapEnabled ? (Math.round((start) * gridSize) / gridSize).toFixed(numDecimalPlaces) : start
         ),
         stop: loopEnd
