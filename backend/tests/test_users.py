@@ -495,7 +495,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-        self.assertEqual(404, res.status_code)
+        self.assertEqual(401, res.status_code)
 
     @mock.patch('backend.src.controllers.users.controllers.get_user_via_username')
     def test_follow_fail_self_follow(self, mocked_user):
@@ -684,7 +684,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-        self.assertEqual(404, res.status_code)
+        self.assertEqual(401, res.status_code)
 
     @mock.patch('backend.src.controllers.users.controllers.get_follower_count')
     @mock.patch('backend.src.controllers.users.controllers.get_following_count')
@@ -857,7 +857,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-        self.assertEqual(404, res.status_code)
+        self.assertEqual(401, res.status_code)
 
     @mock.patch('backend.src.controllers.users.controllers.get_user_via_email')
     def test_get_reset_success(self, mocked_user):
@@ -935,7 +935,7 @@ class UserTests(unittest.TestCase):
             query_string=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual(404, res.status_code)
+        self.assertEqual(401, res.status_code)
 
     @mock.patch('backend.src.controllers.users.controllers.get_reset_request')
     @mock.patch('backend.src.controllers.users.controllers.get_user_via_email')
@@ -1164,7 +1164,7 @@ class UserTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual(404, res.status_code)
+        self.assertEqual(401, res.status_code)
 
     @mock.patch('backend.src.controllers.users.controllers.get_reset_request')
     @mock.patch('backend.src.controllers.users.controllers.get_user_via_email')
@@ -1184,7 +1184,7 @@ class UserTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual(404, res.status_code)
+        self.assertEqual(401, res.status_code)
 
     @mock.patch('backend.src.controllers.users.controllers.get_reset_request')
     @mock.patch('backend.src.controllers.users.controllers.get_user_via_email')
@@ -1557,7 +1557,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(404, res.status_code)
+            self.assertEqual(401, res.status_code)
 
     @mock.patch('backend.src.controllers.users.controllers.get_number_of_posts')
     @mock.patch('backend.src.controllers.users.controllers.get_user_via_username')

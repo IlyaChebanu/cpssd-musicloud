@@ -1313,7 +1313,7 @@ class AudioTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(404, res.status_code)
+            self.assertEqual(401, res.status_code)
 
     def test_get_song_data_fail_missing_access_token(self):
         """
