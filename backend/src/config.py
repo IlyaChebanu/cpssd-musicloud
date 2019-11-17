@@ -28,7 +28,7 @@ JWT_SECRET = os.environ['MUSICLOUD_JWT_SECRET']
 
 AWS_CREDS = {
    'AWSAccessKeyId': 'AKIAJQLWCAHOITMBWRJA',
-   'AWSSecretKey': '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',
+   'AWSSecretAccessKey': 'XVdgFyhjyhnqicDxxXZa9rLouFv5WQdXzXwxrP0u',
    'Bucket': 'dcumusicloudbucket'
 }
 
