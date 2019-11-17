@@ -10,11 +10,13 @@ import TimelineControls from '../../components/TimelineControls';
 import SeekBar from '../../components/SeekBar';
 import TrackControls from '../../components/TrackControls';
 import Sample from '../../components/Sample/Sample';
+import PlayBackControls from '../../components/PlaybackControls'
 
 import FileUploader from '../../components/FileUploader';
 import Track from '../../components/Track/Track';
 
 const Studio = memo(props => {
+
   const { dispatch } = props;
 
   const handlePlay = useCallback(() => {
@@ -122,12 +124,10 @@ const Studio = memo(props => {
           <div className={styles.mainContent}>
             <Timeline />
             {tracks}
-            <button onClick={handlePlay}>Play</button>
-            <button onClick={handlePlause}>Pause</button>
-            <button onClick={handleStop}>Stop</button>
           </div>
         </div>
       </div>
+      <PlayBackControls />
     </div>
   );
 });
