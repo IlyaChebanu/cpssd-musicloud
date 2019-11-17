@@ -44,11 +44,11 @@ const Sample = memo(props => {
 
   const handleDragSample = useCallback(e => {
     props.dispatch(setSelectedSample(props.sample.id));
-    const mousePosOffset = e.screenX - 220 - (props.sample.time - 1) * 40;
+    const initialMousePos = e.screenX;
+    const initialTime = props.sample.time;
     const handleMouseMove = e => {
       e.preventDefault();
-      const scroll = store.getState().studio.scroll;
-      const start = (scroll + e.screenX - 220 - mousePosOffset) / 40 / window.devicePixelRatio + 1;
+      const start = initialTime + (e.screenX - initialMousePos) / 40 / window.devicePixelRatio;
       const numDecimalPlaces = Math.max(0, String(1 / props.gridSize).length - 2);
       const time = props.gridSnapEnabled ? Number((Math.round((start) * props.gridSize) / props.gridSize).toFixed(numDecimalPlaces)) : start;
 
