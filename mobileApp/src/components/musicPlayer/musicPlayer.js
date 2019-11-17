@@ -25,20 +25,28 @@ export default class MusicPlayer extends React.Component {
     }
 
     componentDidMount() {
-        console.log("MusicPlayer : MusicPlayer SCREEN MOUNTED ")
+        if (__DEV__) {
+            console.log("MusicPlayer : MusicPlayer SCREEN MOUNTED ")
+        }
     }
 
     componentWillUnmount() {
-        console.log("MusicPlayer : MusicPlayer SCREEN UNMOUNTED ")
+        if (__DEV__) {
+            console.log("MusicPlayer : MusicPlayer SCREEN UNMOUNTED ")
+        }
     }
 
     musicError(error) {
-        console.log("MusicPlayer : MusicPlayer ERROR ")
+        if (__DEV__) {
+            console.log("MusicPlayer : MusicPlayer ERROR ")
+        }
         this.setState({ isError: true });
     }
 
     onBuffer(isBuffering) {
-        console.log("MusicPlayer: BUFFERING " + JSON.stringify(isBuffering))
+        if (__DEV__) {
+            console.log("MusicPlayer: BUFFERING " + JSON.stringify(isBuffering))
+        }
         this.setState({ isBuffering: isBuffering.isBuffering });
     }
 
@@ -47,7 +55,9 @@ export default class MusicPlayer extends React.Component {
     }
 
     onEnd(data) {
-        console.log('MusicPlayer: Music has ended');
+        if (__DEV__) {
+            console.log('MusicPlayer: Music has ended');
+        }
         this.props.musicDidEnd()
         this.player.seek(0)
     }
@@ -57,7 +67,9 @@ export default class MusicPlayer extends React.Component {
     }
 
     togglePlay() {
-        console.log('MusicPlayer: Music isPaused: ' + !this.state.isPaused);
+        if (__DEV__) {
+            console.log('MusicPlayer: Music isPaused: ' + !this.state.isPaused);
+        }
         this.setState({ isPaused: !this.state.isPaused });
     }
 
