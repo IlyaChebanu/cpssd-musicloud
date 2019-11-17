@@ -107,3 +107,18 @@ export const setGridSnapEnabled = bool => dispatch => {
     bool
   });
 };
+
+export const setSampleTime = (time, id) => dispatch => {
+  dispatch({
+    type: 'SET_SAMPLE_TIME',
+    time,
+    id
+  });
+};
+
+export const setSelectedTrack = track => dispatch => {
+  dispatch({
+    type: 'SET_SELECTED_TRACK',
+    track
+  });
+};

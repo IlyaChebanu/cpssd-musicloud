@@ -5,6 +5,8 @@ import { connect } from 'react-redux';
 import _ from 'lodash';
 import { bufferStore } from '../../helpers/constants';
 import { lerp } from '../../helpers/utils';
+import store from '../../store';
+import { setSampleTime } from '../../actions/studioActions';
 
 const colors = [
   '#C52161',
@@ -30,7 +32,7 @@ const Sample = memo(props => {
       const amp = 80;
       const bars = [];
       for (let i = 0; i < step; i++) {
-        const d = _.clamp(data[lerp(0, buffer.length, i / step)], -1, 1);
+        const d = _.clamp(data[Math.floor(lerp(0, data.length, i / step))], -1, 1);
         bars.push(Math.max(2, Math.abs(Math.floor(d * amp))));
       }
       return <svg className={styles.waveform}>
@@ -47,19 +49,54 @@ const Sample = memo(props => {
     };
   }, [props.tempo, buffer, props.sample.track]);
 
+  const handleDragSample = useCallback(e => {
+    const mousePosOffset = e.screenX - 220 - (props.sample.time - 1) * 40;
+    const handleMouseMove = e => {
+      const scroll = store.getState().studio.scroll;
+      const start = (scroll + e.screenX - 220 - mousePosOffset) / 40 + 1;
+      const numDecimalPlaces = Math.max(0, String(1 / props.gridSize).length - 2);
+      const time = props.gridSnapEnabled ? Number((Math.round((start) * props.gridSize) / props.gridSize).toFixed(numDecimalPlaces)) : start;
+
+      // Check for collisions with other samples
+      const timeEnd = time + props.sample.duration * (props.tempo / 60);
+      for (const sample of props.tracks[props.sample.track].samples) {
+        if (sample.id !== props.sample.id) {
+          const sampleEndTime = sample.time + sample.duration * (props.tempo / 60);
+          if (sample.time < timeEnd && sampleEndTime > time) {
+            return;
+          }
+        }
+      }
+
+      props.dispatch(setSampleTime(time, props.sample.id));
+    }
+    const handleDragStop = () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleDragStop);
+    }
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleDragStop);
+  }, [props.gridSnapEnabled, props.gridSize, props.sample, props.tracks, props.tempo]);
+
   return (
-    <div className={styles.wrapper} style={wrapperStyle}>
+    <div className={styles.wrapper} style={{ ...wrapperStyle, ...props.style }} onMouseDown={handleDragSample}>
       {waveform}
     </div>
   );
 });
 
 Sample.propTypes = {
+  style: PropTypes.object,
 };
 
 const mapStateToProps = ({ studio }) => ({
   sampleLoading: studio.sampleLoading,
   tempo: studio.tempo,
+  gridSnapEnabled: studio.gridSnapEnabled,
+  gridSize: studio.gridSize,
+  tracks: studio.tracks,
+  tempo: studio.tempo
 });
 
 export default connect(mapStateToProps)(Sample);

@@ -2,7 +2,7 @@ import React, { memo, useState, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import styles from './TrackControls.module.scss';
 import { connect } from 'react-redux';
-import { setTracks, setTrackAtIndex } from '../../actions/studioActions';
+import { setTracks, setTrackAtIndex, setSelectedTrack } from '../../actions/studioActions';
 import { ReactComponent as Knob } from '../../assets/icons/Knob.svg';
 import { ReactComponent as Mute } from '../../assets/icons/volume-up-light.svg';
 import { ReactComponent as MuteActive } from '../../assets/icons/volume-slash-light.svg';
@@ -11,6 +11,17 @@ import { ReactComponent as SoloActive } from '../../assets/icons/headphones-alt-
 import _ from 'lodash';
 import { clamp, lerp } from '../../helpers/utils';
 import store from '../../store';
+
+const colors = [
+  '#FD1F76',
+  '#FF594C',
+  '#FEB233',
+  '#EAB740',
+  '#5CBB4E',
+  '#4DAC7A',
+  '#5696B1',
+  '#9B57A2'
+];
 
 const TrackControls = memo(props => {
 
@@ -89,8 +100,13 @@ const TrackControls = memo(props => {
 
   const soloTrack = _.findIndex(props.tracks, 'solo');
 
+  const handleSetSelected = useCallback(() => {
+    props.dispatch(setSelectedTrack(props.index));
+  }, [props.index]);
+
   return (
-    <div className={`${styles.wrapper} ${props.index % 2 ? styles.even : ''}`}>
+    <div className={`${styles.wrapper} ${props.index % 2 ? styles.even : ''}`} onMouseDown={handleSetSelected}>
+      {props.selectedTrack === props.index && <div className={styles.selectedBar} style={{ backgroundColor: colors[props.index % colors.length]}}/>}
       <div className={styles.title}>
         <input type='text' value={track.name} onChange={handleTrackNameChange}/>
       </div>
@@ -126,7 +142,8 @@ TrackControls.propTypes = {
 };
 
 const mapStateToProps = ({ studio }) => ({
-  tracks: studio.tracks
+  tracks: studio.tracks,
+  selectedTrack: studio.selectedTrack,
 });
 
 export default connect(mapStateToProps)(TrackControls);
