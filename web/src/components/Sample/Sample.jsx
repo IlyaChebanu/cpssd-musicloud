@@ -6,8 +6,9 @@ import _ from 'lodash';
 import { bufferStore } from '../../helpers/constants';
 import { lerp } from '../../helpers/utils';
 import store from '../../store';
-import { setSampleTime } from '../../actions/studioActions';
+import { setSampleTime, setTrackAtIndex } from '../../actions/studioActions';
 import { dColours } from '../../helpers/constants';
+import { HotKeys } from 'react-hotkeys';
 
 const Sample = memo(props => {
 
@@ -42,6 +43,7 @@ const Sample = memo(props => {
   const handleDragSample = useCallback(e => {
     const mousePosOffset = e.screenX - 220 - (props.sample.time - 1) * 40;
     const handleMouseMove = e => {
+      e.preventDefault();
       const scroll = store.getState().studio.scroll;
       const start = (scroll + e.screenX - 220 - mousePosOffset) / 40 + 1;
       const numDecimalPlaces = Math.max(0, String(1 / props.gridSize).length - 2);
@@ -69,10 +71,21 @@ const Sample = memo(props => {
     window.addEventListener('mouseup', handleDragStop);
   }, [props.gridSnapEnabled, props.gridSize, props.sample, props.tracks, props.tempo]);
 
+  const deleteSample = useCallback(() => {
+    const track = props.tracks[props.sample.track];
+    console.log(props.sample.id);
+    track.samples = track.samples.filter(s => s.id !== props.sample.id);
+    props.dispatch(setTrackAtIndex(track, props.sample.track));
+  }, [props.tracks, props.sample]);
+
+  const handlers = useMemo(() => ({
+    DELETE_SAMPLE: deleteSample
+  }), []);
+
   return (
-    <div className={styles.wrapper} style={{ ...wrapperStyle, ...props.style }} onMouseDown={handleDragSample}>
-      {waveform}
-    </div>
+      <HotKeys handlers={handlers} className={styles.wrapper} style={{ ...wrapperStyle, ...props.style }} onMouseDown={handleDragSample}>
+        {waveform}
+      </HotKeys>
   );
 });
 

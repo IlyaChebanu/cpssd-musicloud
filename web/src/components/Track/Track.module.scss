@@ -8,6 +8,10 @@
     cursor: pointer;
   }
 
+  &:focus {
+    outline: none;
+  }
+
   &.even {
     background-color: #26292E;
   }

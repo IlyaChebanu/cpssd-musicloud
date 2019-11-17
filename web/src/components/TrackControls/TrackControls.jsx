@@ -85,7 +85,7 @@ const TrackControls = memo(props => {
 
   const handleTrackNameChange = useCallback(e => {
     props.track.name = e.target.value;
-    props.dispatch(setTracks(props.track, props.index));
+    props.dispatch(setTrackAtIndex(props.track, props.index));
   }, [props.index, props.track]);
 
   const soloTrack = _.findIndex(props.tracks, 'solo');

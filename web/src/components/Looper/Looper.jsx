@@ -12,6 +12,7 @@ const Looper = memo(props => {
 
   const handleDragLArrow = useCallback(() => {
     const handleMouseMove = e => {
+      e.preventDefault();
       const scroll = store.getState().studio.scroll;
       const start = (scroll + e.screenX - 220) / 40 + 1;
       const numDecimalPlaces = Math.max(0, String(1 / gridSize).length - 2);
@@ -34,6 +35,7 @@ const Looper = memo(props => {
 
   const handleDragRArrow = useCallback(() => {
     const handleMouseMove = e => {
+      e.preventDefault();
       const scroll = store.getState().studio.scroll;
       const stop = (scroll + e.screenX - 220) / 40 + 1;
       const numDecimalPlaces = Math.max(0, String(1 / gridSize).length - 2);

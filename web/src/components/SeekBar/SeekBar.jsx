@@ -12,12 +12,12 @@ const SeekBar = memo(props => {
   const scroll = props.scroll;
   const playing = props.playing;
 
-  const handleDragStart = useCallback(() => {
+  const handleDragStart = useCallback(e => {
     props.dispatch(pause);
-
+    const mousePosOffset = e.screenX - 220 - (props.currentBeat - 1) * 40;
     const handleMouseMove = e => {
       const scroll = store.getState().studio.scroll;
-      props.dispatch(setCurrentBeat(Math.max(scroll / 40 + 1, (scroll + e.screenX - 220) / 40 + 1)));
+      props.dispatch(setCurrentBeat(Math.max(scroll / 40 + 1, (scroll + e.screenX - 220 - mousePosOffset) / 40 + 1)));
     }
     const handleDragStop = () => {
       // Only plays if the music was playing when handleDragStart was called
@@ -30,7 +30,7 @@ const SeekBar = memo(props => {
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleDragStop);
-  }, [playing]);
+  }, [playing, props.currentBeat]);
 
   const iconStyle = useMemo(() => {
     const pos = -7 + 220 + (currentBeat - 1) * 40 - scroll;

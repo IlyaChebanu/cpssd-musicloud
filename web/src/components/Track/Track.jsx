@@ -7,6 +7,7 @@ import { bufferStore } from '../../helpers/constants';
 import { lerp } from '../../helpers/utils';
 import Sample from '../Sample/Sample';
 import { setSelectedTrack } from '../../actions/studioActions';
+import { HotKeys } from 'react-hotkeys';
 
 const Track = memo(props => {
   const ticks = useMemo(() => {
@@ -29,13 +30,17 @@ const Track = memo(props => {
     props.dispatch(setSelectedTrack(props.index));
   }, [props.index]);
 
+  const keyMap = useMemo(() => ({
+    DELETE_SAMPLE: "del"
+  }), []);
+
   return (
-    <div className={`${styles.wrapper} ${props.index % 2 ? styles.even : ''}`} onMouseDown={handleSetSelected}>
+    <HotKeys keyMap={keyMap} className={`${styles.wrapper} ${props.index % 2 ? styles.even : ''}`} onMouseDown={handleSetSelected}>
       <svg className={styles.gridLines}>
         {ticks}
       </svg>
       {props.track.samples.map(getSample)}
-    </div>
+    </HotKeys>
   );
 });
 
