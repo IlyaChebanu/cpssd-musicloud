@@ -21,7 +21,7 @@ class ProfileSongs extends React.Component {
   }
 
   getSongs() {
-    getCompiledSongs(this.props.accessToken, 'Tamarra', 10).then(response => {
+    getCompiledSongs(this.props.accessToken, this.props.username, 10).then(response => {
       if (isNaN(response)) {
         this.setState({ songsData: response.compiled_songs})
       } else {
@@ -65,6 +65,8 @@ class ProfileSongs extends React.Component {
   }
 
   render() {
+
+    console.warn(this.state.songsData.length)
     return (
       <View style={styles.container}>
         <FlatList
@@ -75,6 +77,7 @@ class ProfileSongs extends React.Component {
           keyExtractor={item => String(item)}
           extraData={this.state.songsData}
         />
+        {this.state.songsData && <Text style={styles.noSongsText}>{'User has no songs yet'}</Text>}
       </View>
     )
   }
@@ -83,6 +86,7 @@ class ProfileSongs extends React.Component {
 function mapStateToProps(state) {
   return {
     token: state.home.token,
+    username: state.home.username,
   };
 }
 
