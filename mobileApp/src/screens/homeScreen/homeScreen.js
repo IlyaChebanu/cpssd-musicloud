@@ -79,7 +79,6 @@ class HomeScreen extends React.Component {
             extraData={this.state.songsData}
           />
         </View>
-        {/* <Text>{JSON.stringify(this.props, null, 2)}</Text> */}
 
 
       </SafeAreaView>

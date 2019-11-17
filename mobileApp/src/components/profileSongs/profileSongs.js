@@ -67,7 +67,6 @@ class ProfileSongs extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        {/* <Text style={styles.titleText}>{"Songs"}</Text> */}
         <FlatList
           ListHeaderComponent={this.renderheader()}
           style={styles.songFlatList}
