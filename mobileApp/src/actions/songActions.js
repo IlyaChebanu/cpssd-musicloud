@@ -14,3 +14,10 @@ export function setSongUrl(songUrl) {
         songUrl
     }
 }
+
+export function setSongData(songData) {
+    return {
+        type: actionsTypes.SET_SONG_DATA,
+        songData
+    }
+}
