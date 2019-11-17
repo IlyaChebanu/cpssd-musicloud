@@ -17,6 +17,8 @@ export default (
     sampleLoading: false,
     tracks: [],
     selectedTrack: -1,
+    selectedSample: -1,
+    clipboard: {}
   },
   action
 ) => {
@@ -121,6 +123,16 @@ export default (
       return {
         ...state,
         selectedTrack: action.track
+      }
+    case 'SET_SELECTED_SAMPLE':
+      return {
+        ...state,
+        selectedSample: action.id
+      }
+    case 'SET_CLIPBOARD':
+      return {
+        ...state,
+        clipboard: action.sample
       }
     default:
       return state

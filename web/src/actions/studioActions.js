@@ -122,3 +122,17 @@ export const setSelectedTrack = track => dispatch => {
     track
   });
 };
+
+export const setSelectedSample = id => dispatch => {
+  dispatch({
+    type: 'SET_SELECTED_SAMPLE',
+    id
+  });
+};
+
+export const setClipboard = sample => dispatch => {
+  dispatch({
+    type: 'SET_CLIPBOARD',
+    sample
+  });
+};

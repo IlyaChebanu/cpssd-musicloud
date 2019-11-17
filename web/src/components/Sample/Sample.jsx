@@ -6,8 +6,8 @@ import _ from 'lodash';
 import { bufferStore } from '../../helpers/constants';
 import { lerp } from '../../helpers/utils';
 import store from '../../store';
-import { setSampleTime, setTrackAtIndex } from '../../actions/studioActions';
-import { dColours } from '../../helpers/constants';
+import { setSampleTime, setTrackAtIndex, setSelectedSample, setClipboard } from '../../actions/studioActions';
+import { dColours, colours } from '../../helpers/constants';
 import { HotKeys } from 'react-hotkeys';
 
 const Sample = memo(props => {
@@ -17,8 +17,8 @@ const Sample = memo(props => {
   const waveform = useMemo(() => {
     if (buffer) {
       const data = buffer.getChannelData(0);
-      const beatsPerSeconds = props.tempo / 60;
-      const width = buffer.duration * beatsPerSeconds * 40;
+      const secondsPerBeat = 60 / props.tempo;
+      const width = buffer.duration * secondsPerBeat * 40;
       const step = Math.ceil(width / 2);
       const amp = 80;
       const bars = [];
@@ -33,14 +33,17 @@ const Sample = memo(props => {
   }, [buffer, props.tempo]);
 
   const wrapperStyle = useMemo(() => {
-    const beatsPerSeconds = props.tempo / 60;
+    const secondsPerBeat = 60 / props.tempo;
+    const colourIdx = props.sample.track % dColours.length;
+    const selected = props.sample.id === props.selectedSample;
     return {
-      width: buffer ? buffer.duration * beatsPerSeconds * 40 : 20,
-      backgroundColor: dColours[props.sample.track % dColours.length]
+      width: buffer ? buffer.duration * secondsPerBeat * 40 : 20,
+      backgroundColor: selected ? colours[colourIdx] : dColours[colourIdx]
     };
-  }, [props.tempo, buffer, props.sample.track]);
+  }, [props.tempo, buffer, props.sample.track, props.sample.id, props.selectedSample]);
 
   const handleDragSample = useCallback(e => {
+    props.dispatch(setSelectedSample(props.sample.id));
     const mousePosOffset = e.screenX - 220 - (props.sample.time - 1) * 40;
     const handleMouseMove = e => {
       e.preventDefault();
@@ -73,17 +76,32 @@ const Sample = memo(props => {
 
   const deleteSample = useCallback(() => {
     const track = props.tracks[props.sample.track];
-    console.log(props.sample.id);
     track.samples = track.samples.filter(s => s.id !== props.sample.id);
     props.dispatch(setTrackAtIndex(track, props.sample.track));
   }, [props.tracks, props.sample]);
 
-  const handlers = useMemo(() => ({
-    DELETE_SAMPLE: deleteSample
-  }), []);
+  const copySample = useCallback(() => {
+    props.dispatch(setClipboard(props.sample));
+  }, [props.sample]);
+
+  const keyMap = {
+    COPY_SAMPLE: "ctrl+c",
+    DELETE_SAMPLE: "del",
+  };
+
+  const handlers = {
+    DELETE_SAMPLE: deleteSample,
+    COPY_SAMPLE: copySample
+  };
 
   return (
-      <HotKeys handlers={handlers} className={styles.wrapper} style={{ ...wrapperStyle, ...props.style }} onMouseDown={handleDragSample}>
+      <HotKeys
+        keyMap={keyMap}
+        handlers={handlers}
+        className={styles.wrapper}
+        style={{ ...wrapperStyle, ...props.style }}
+        onMouseDown={handleDragSample}
+      >
         {waveform}
       </HotKeys>
   );
@@ -99,7 +117,8 @@ const mapStateToProps = ({ studio }) => ({
   gridSnapEnabled: studio.gridSnapEnabled,
   gridSize: studio.gridSize,
   tracks: studio.tracks,
-  tempo: studio.tempo
+  tempo: studio.tempo,
+  selectedSample: studio.selectedSample,
 });
 
 export default connect(mapStateToProps)(Sample);
