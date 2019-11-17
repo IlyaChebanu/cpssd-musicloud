@@ -1,8 +1,18 @@
 .wrapper {
   height: 90px;
-  margin: 0px;
   border-radius: 10px;
   margin: 5px 0px;
+  display: inline-block;
+  position: relative;
+  left: 0;
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  &:focus {
+    outline: none;
+  }
 }
 
 .waveform {

@@ -15,10 +15,14 @@ export default (
     currentBeat: 1,
     volume: 1,
     sampleLoading: false,
-    tracks: []
+    tracks: [],
+    selectedTrack: -1,
+    selectedSample: -1,
+    clipboard: {}
   },
   action
 ) => {
+  let tracks;
   switch (action.type) {
     case 'STUDIO_PLAY':
       return {
@@ -61,8 +65,21 @@ export default (
         tracks: action.tracks
       }
     case 'SET_TRACK':
-      const tracks = [...state.tracks];
+      tracks = [...state.tracks];
       tracks[action.index] = action.track;
+      return {
+        ...state,
+        tracks
+      }
+    case 'SET_SAMPLE_TIME':
+      tracks = [...state.tracks];
+      tracks.forEach(track => {
+        track.samples.forEach(sample => {
+          if (sample.id === action.id) {
+            sample.time = action.time;
+          }
+        });
+      });
       return {
         ...state,
         tracks
@@ -101,6 +118,21 @@ export default (
       return {
         ...state,
         gridSnapEnabled: action.bool
+      }
+    case 'SET_SELECTED_TRACK':
+      return {
+        ...state,
+        selectedTrack: action.track
+      }
+    case 'SET_SELECTED_SAMPLE':
+      return {
+        ...state,
+        selectedSample: action.id
+      }
+    case 'SET_CLIPBOARD':
+      return {
+        ...state,
+        clipboard: action.sample
       }
     default:
       return state
