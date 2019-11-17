@@ -1,39 +1,50 @@
-import { StyleSheet, Dimensions } from 'react-native';
+import { StyleSheet, Dimensions, Platform } from 'react-native';
 const { width, height } = Dimensions.get('window');
 
 export default StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'black',
+    backgroundColor: '#1B1E23',
   },
   backgroundVideo: {
+    backgroundColor: '#1B1E23',
+    height: Platform.OS === 'android' ? 375 : 420,
     position: 'absolute',
     top: 0,
     left: 0,
-    bottom: 200,
     right: 0,
-    // width: width,
-    // height: height,
   },
-  videoText: {
-    fontSize: 13,
-    // fontFamily: "SFProDisplay-Medium",
-    color: 'rgb(233, 244, 255)',
-    //opacity: .50,
+  songImg: {
     position: 'absolute',
-    textAlign: 'center',
+    width: width,
+    height: 375,
+    top: 0,
     left: 0,
-    bottom: 75,
     right: 0,
-    
+  },
+  textContainer: {
+    marginTop: 440,
+  },
+  songNameText: {
+    color: '#fff',
+    textAlign: 'center',
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginLeft: 20,
+    marginRight: 20,
+  },
+  songTypeText: {
+    marginTop: 10,
+    textAlign: 'center',
+    color: '#fff',
+    fontSize: 15,
+    marginLeft: 20,
+    marginRight: 20,
+  },
+  playButton: {
+    marginTop: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
-  circle: {
-    width: 100,
-    height: 100,
-    borderRadius: 100/2,
-    backgroundColor: 'purple'
-}
 });

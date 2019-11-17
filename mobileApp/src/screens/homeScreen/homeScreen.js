@@ -24,6 +24,7 @@ class HomeScreen extends React.Component {
   }
 
   handleSongClick(item, index) {
+    this.props.setSongData(item)
     this.props.setSongId(item[0])
     this.props.setSongUrl(item[6])
     this.props.navigateToMusicPlayerScreen()

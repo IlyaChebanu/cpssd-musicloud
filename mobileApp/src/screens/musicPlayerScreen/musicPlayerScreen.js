@@ -12,7 +12,7 @@ import MusicPlayer from "../../components/musicPlayer/musicPlayer";
 class MusicPlayerScreen extends React.Component {
 
     componentDidMount() {
-        
+
     }
 
     musicDidEnd() {
@@ -24,7 +24,7 @@ class MusicPlayerScreen extends React.Component {
             <SafeAreaView forceInset={{ bottom: 'never' }} style={{ 'backgroundColor': '#3D4044', 'flex': 1 }}>
                 <View style={{ 'backgroundColor': '#1B1E23', 'flex': 1 }}>
                     <HeaderComponent navigation={this.props.navigation} />
-                    <MusicPlayer videoUrl={'https://dcumusicloudbucket.s3-eu-west-1.amazonaws.com/compiled_audio/-1.mp3'} videoDidEnd={this.musicDidEnd.bind(this)} navigation={this.props.navigation} />
+                    <MusicPlayer songData={this.props.songData} videoUrl={this.props.songUrl} musicDidEnd={this.musicDidEnd.bind(this)} navigation={this.props.navigation} />
                 </View>
 
             </SafeAreaView>
@@ -36,7 +36,8 @@ function mapStateToProps(state) {
     return {
         token: state.home.token,
         songId: state.song.songId,
-        songUrl: state.song.songUrl
+        songUrl: state.song.songUrl,
+        songData: state.song.songData,
     };
 }
 
