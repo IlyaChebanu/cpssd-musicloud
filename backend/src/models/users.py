@@ -45,6 +45,20 @@ def get_user_via_email(email):
     return user
 
 
+def get_user_via_uid(uid):
+    sql = (
+        "SELECT * FROM Users "
+        "WHERE uid = %s"
+    )
+    args = (
+        uid,
+    )
+    user = query(sql, args, True)
+    if not user:
+        raise NoResults
+    return user
+
+
 def verify_user(uid):
     sql = (
         "UPDATE Users "
