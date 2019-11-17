@@ -1,0 +1,21 @@
+.wrapper {
+    align-items: center;
+    display: flex;;
+    position: relative;
+    z-index: 12;
+    svg {
+      transition: opacity 100ms;
+  
+      &:hover {
+        cursor: pointer;
+      }
+    }
+    .bar {
+      transition: opacity 100ms;
+      width: 1px;
+      position: absolute;
+      
+      top: -40px;
+      background-color: #FE0A63;
+    }
+  }

@@ -10,10 +10,12 @@ import TimelineControls from '../../components/TimelineControls';
 import SeekBar from '../../components/SeekBar';
 import TrackControls from '../../components/TrackControls';
 import Sample from '../../components/Sample/Sample';
+import PlayBackControls from '../../components/PlaybackControls'
 
 import FileUploader from '../../components/FileUploader';
 
 const Studio = memo(props => {
+
   const { dispatch } = props;
 
   const handlePlay = useCallback(() => {
@@ -111,6 +113,9 @@ const Studio = memo(props => {
           </div>
         </div>
       </div>
+      <PlayBackControls 
+        curSecond={(props.studio.currentBeat-1)/props.studio.tempo*60}
+      />
     </div>
   );
 });

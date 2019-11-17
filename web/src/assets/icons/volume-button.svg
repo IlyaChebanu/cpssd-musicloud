@@ -1,0 +1,10 @@
+<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle id="Ellipse 6" cx="10" cy="10" r="10" fill="url(#paint0_angular)"/>
+<defs>
+<radialGradient id="paint0_angular" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(10 10) rotate(90) scale(10)">
+<stop stop-color="#FF0265"/>
+<stop offset="0.5" stop-color="#FE7C33"/>
+<stop offset="1" stop-color="#FF0265"/>
+</radialGradient>
+</defs>
+</svg>
