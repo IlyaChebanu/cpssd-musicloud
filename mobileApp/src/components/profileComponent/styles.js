@@ -10,6 +10,7 @@ export default StyleSheet.create({
   },
   statsContainer: {
       paddingLeft: 30,
+      flex: 2
   },
   profileNum: {
     color: '#FFF',
@@ -19,4 +20,9 @@ export default StyleSheet.create({
       color: '#AAA',
       fontSize: 18,
   },
+  profilePic: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+  }
 })

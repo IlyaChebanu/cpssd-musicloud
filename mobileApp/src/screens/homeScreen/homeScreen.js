@@ -1,4 +1,4 @@
-import React from "react"
+import React from "react";
 import { connect } from 'react-redux';
 import { ActionCreators } from '../../actions/index';
 import { bindActionCreators } from 'redux';
