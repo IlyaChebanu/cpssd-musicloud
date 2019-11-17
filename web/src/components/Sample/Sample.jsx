@@ -17,8 +17,8 @@ const Sample = memo(props => {
   const waveform = useMemo(() => {
     if (buffer) {
       const data = buffer.getChannelData(0);
-      const secondsPerBeat = 60 / props.tempo;
-      const width = buffer.duration * secondsPerBeat * 40;
+      const beatsPerSecond = props.tempo / 60;
+      const width = buffer.duration * beatsPerSecond * 40;
       const step = Math.ceil(width / 2);
       const amp = 80;
       const bars = [];
@@ -33,11 +33,11 @@ const Sample = memo(props => {
   }, [buffer, props.tempo]);
 
   const wrapperStyle = useMemo(() => {
-    const secondsPerBeat = 60 / props.tempo;
+    const beatsPerSecond = props.tempo / 60;
     const colourIdx = props.sample.track % dColours.length;
     const selected = props.sample.id === props.selectedSample;
     return {
-      width: buffer ? buffer.duration * secondsPerBeat * 40 : 20,
+      width: buffer ? buffer.duration * beatsPerSecond * 40 : 20,
       backgroundColor: selected ? colours[colourIdx] : dColours[colourIdx]
     };
   }, [props.tempo, buffer, props.sample.track, props.sample.id, props.selectedSample]);
