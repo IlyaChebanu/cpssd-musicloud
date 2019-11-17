@@ -7,17 +7,7 @@ import { bufferStore } from '../../helpers/constants';
 import { lerp } from '../../helpers/utils';
 import store from '../../store';
 import { setSampleTime } from '../../actions/studioActions';
-
-const colors = [
-  '#C52161',
-  '#D66B62',
-  '#E7B562',
-  '#ACB164',
-  '#6FAD66',
-  '#62A080',
-  '#6790A2',
-  '#8D6192'
-];
+import { dColours } from '../../helpers/constants';
 
 const Sample = memo(props => {
 
@@ -45,7 +35,7 @@ const Sample = memo(props => {
     const beatsPerSeconds = props.tempo / 60;
     return {
       width: buffer ? buffer.duration * beatsPerSeconds * 40 : 20,
-      backgroundColor: colors[props.sample.track % colors.length]
+      backgroundColor: dColours[props.sample.track % dColours.length]
     };
   }, [props.tempo, buffer, props.sample.track]);
 

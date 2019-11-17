@@ -11,17 +11,7 @@ import { ReactComponent as SoloActive } from '../../assets/icons/headphones-alt-
 import _ from 'lodash';
 import { clamp, lerp } from '../../helpers/utils';
 import store from '../../store';
-
-const colors = [
-  '#FD1F76',
-  '#FF594C',
-  '#FEB233',
-  '#EAB740',
-  '#5CBB4E',
-  '#4DAC7A',
-  '#5696B1',
-  '#9B57A2'
-];
+import { colours } from '../../helpers/constants';
 
 const TrackControls = memo(props => {
 
@@ -106,7 +96,7 @@ const TrackControls = memo(props => {
 
   return (
     <div className={`${styles.wrapper} ${props.index % 2 ? styles.even : ''}`} onMouseDown={handleSetSelected}>
-      {props.selectedTrack === props.index && <div className={styles.selectedBar} style={{ backgroundColor: colors[props.index % colors.length]}}/>}
+      {props.selectedTrack === props.index && <div className={styles.selectedBar} style={{ backgroundColor: colours[props.index % colours.length]}}/>}
       <div className={styles.title}>
         <input type='text' value={track.name} onChange={handleTrackNameChange}/>
       </div>

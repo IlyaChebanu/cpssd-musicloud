@@ -126,9 +126,6 @@ const Studio = memo(props => {
             <button onClick={handlePlause}>Pause</button>
             <button onClick={handleStop}>Stop</button>
           </div>
-          {/* <div style={{backgroundColor: "darkgrey"}}>
-            <FileUploader />
-          </div> */}
         </div>
       </div>
     </div>
