@@ -1,14 +1,12 @@
 import datetime
 import json
 
-import boto3
 import jwt
-from botocore.exceptions import NoCredentialsError
 from flask import Blueprint
 from flask import request
 from jsonschema import validate, ValidationError
 
-from ...config import AWS_CREDS, JWT_SECRET
+from ...config import JWT_SECRET
 from ...middleware.auth_required import auth_required
 from ...middleware.sql_err_catcher import sql_err_catcher
 from ...utils.logger import log
@@ -18,6 +16,7 @@ from ...models.audio import (
     get_all_compiled_songs_by_uid, get_all_uncompiled_songs_by_uid, get_number_of_compiled_songs,
     get_number_of_compiled_songs_by_uid, get_number_of_uncompiled_songs_by_uid, get_song_data
 )
+from ...models.users import get_user_via_username, get_user_via_uid
 
 audio = Blueprint('audio', __name__)
 
@@ -110,9 +109,11 @@ def load_song(user):
 def get_compiled_songs():
     next_page = request.args.get('next_page')
     back_page = request.args.get('back_page')
+    uid = None
     if not next_page and not back_page:
-        uid = request.args.get("uid")
-        if uid:
+        username = request.args.get('username')
+        if username:
+            uid = get_user_via_username(username)[0][0]
             total_songs = get_number_of_compiled_songs_by_uid(uid)
         else:
             total_songs = get_number_of_compiled_songs()
@@ -137,12 +138,17 @@ def get_compiled_songs():
 
         start_index = (current_page * songs_per_page) - songs_per_page
         if uid:
-            compiled_songs = get_all_compiled_songs_by_uid(uid, start_index, songs_per_page)
+            raw_compiled_songs = get_all_compiled_songs_by_uid(uid, start_index, songs_per_page)
+            compiled_songs = []
+            for song in raw_compiled_songs:
+                song = list(song)
+                song[1] = username
+                compiled_songs.append(song)
         else:
             compiled_songs = get_all_compiled_songs(start_index, songs_per_page)
 
         jwt_payload = {
-            "uid": uid,
+            "username": username,
             "total_pages": total_pages,
             "songs_per_page": songs_per_page,
         }
@@ -165,19 +171,25 @@ def get_compiled_songs():
             token = back_page
         token = jwt.decode(token, JWT_SECRET, algorithms=['HS256'])
 
-        uid = token.get("uid")
+        username = token.get("username")
         current_page = token.get("current_page")
         songs_per_page = token.get("songs_per_page")
         total_pages = token.get("total_pages")
         start_index = (current_page * songs_per_page) - songs_per_page
 
-        if uid:
-            compiled_songs = get_all_compiled_songs_by_uid(uid, start_index, songs_per_page)
+        if username:
+            uid = get_user_via_username(username)[0][0]
+            raw_compiled_songs = get_all_compiled_songs_by_uid(uid, start_index, songs_per_page)
+            compiled_songs = []
+            for song in raw_compiled_songs:
+                song = list(song)
+                song[1] = username
+                compiled_songs.append(song)
         else:
             compiled_songs = get_all_compiled_songs(start_index, songs_per_page)
 
         jwt_payload = {
-            "uid": uid,
+            "username": username,
             "total_pages": total_pages,
             "songs_per_page": songs_per_page,
         }
@@ -222,7 +234,12 @@ def get_uncompiled_songs(user):
                    }, 422
 
         start_index = (current_page * songs_per_page) - songs_per_page
-        uncompiled_songs = get_all_uncompiled_songs_by_uid(user.get("uid"), start_index, songs_per_page)
+        raw_uncompiled_songs = get_all_uncompiled_songs_by_uid(user.get("uid"), start_index, songs_per_page)
+        uncompiled_songs = []
+        for song in raw_uncompiled_songs:
+            song = list(song)
+            song[1] = user.get("username")
+            uncompiled_songs.append(song)
 
         jwt_payload = {
             "total_pages": total_pages,
@@ -252,7 +269,12 @@ def get_uncompiled_songs(user):
         total_pages = token.get("total_pages")
         start_index = (current_page * songs_per_page) - songs_per_page
 
-        uncompiled_songs = get_all_uncompiled_songs_by_uid(user.get("uid"), start_index, songs_per_page)
+        raw_uncompiled_songs = get_all_uncompiled_songs_by_uid(user.get("uid"), start_index, songs_per_page)
+        uncompiled_songs = []
+        for song in raw_uncompiled_songs:
+            song = list(song)
+            song[1] = user.get("username")
+            uncompiled_songs.append(song)
 
         jwt_payload = {
             "total_pages": total_pages,
@@ -279,5 +301,6 @@ def get_song():
     if not sid:
         return {"message": "sid param can't be empty!"}, 422
 
-    res = get_song_data(sid)
+    res = get_song_data(sid)[0]
+    res[1] = get_user_via_uid(res[1])[0][2]
     return {"song": res}, 200
