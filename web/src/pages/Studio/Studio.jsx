@@ -3,11 +3,15 @@ import styles from './Studio.module.scss';
 import Header from '../../components/Header';
 import { play, pause, stop, setTempo, setVolume, setTracks, setScroll } from '../../actions/studioActions';
 import { connect } from 'react-redux';
-import kick from '../../assets/samples/kick23.wav';
+import kick from '../../assets/basic_sounds/kick.wav';
 import bass from '../../assets/samples/bass.wav';
 import Timeline from '../../components/Timeline';
+import TimelineControls from '../../components/TimelineControls';
 import SeekBar from '../../components/SeekBar';
+import TrackControls from '../../components/TrackControls';
+import Sample from '../../components/Sample/Sample';
 
+import FileUploader from '../../components/FileUploader';
 
 const Studio = memo(props => {
   const { dispatch } = props;
@@ -36,31 +40,39 @@ const Studio = memo(props => {
     dispatch(setTracks([
       {
         volume: 0.25,
+        mute: false,
+        solo: false,
+        pan: 0,
+        name: 'Bass',
         samples: [
           {
             id: 1,
             time: 1,
-            url: bass
+            url: kick
           },
           {
             id: 3,
             time: 3,
-            url: bass
+            url: kick
           },
         ]
       },
       {
         volume: 1,
+        mute: false,
+        solo: false,
+        pan: 0,
+        name: 'Kick',
         samples: [
           {
             id: 2,
             time: 2,
-            url: bass
+            url: kick
           },
           {
             id: 4,
             time: 4,
-            url: bass
+            url: kick
           },
         ]
       }
@@ -77,10 +89,15 @@ const Studio = memo(props => {
       <div className={styles.contentWrapper}>
         <SeekBar/>
         <div className={styles.sidebar}>
+          <TimelineControls />
+          {props.studio.tracks.map((track, i) => {
+            return <TrackControls key={i} track={track} index={i}/>;
+          })}
         </div>
         <div className={styles.scrollableMain} onScroll={handleScroll}>
           <div className={styles.mainContent}>
             <Timeline />
+            {props.studio.tracks.length && <Sample sample={{...props.studio.tracks[0].samples[0], track: 0}}/>}
             <button onClick={handlePlay}>Play</button>
             <button onClick={handlePlause}>Pause</button>
             <button onClick={handleStop}>Stop</button>
@@ -88,6 +105,9 @@ const Studio = memo(props => {
             <p>Current BPM: {props.studio.tempo}</p>
             <p>Beat number: {props.studio.currentBeat}</p>
             <p>Volume:<input type='text' defaultValue={1} onChange={handleVolume}/></p>
+          </div>
+          <div style={{backgroundColor: "darkgrey"}}>
+            <FileUploader />
           </div>
         </div>
       </div>
@@ -102,4 +122,3 @@ Studio.propTypes = {
 const mapStateToProps = ({ studio }) => ({ studio });
 
 export default connect(mapStateToProps)(Studio);
-

@@ -41,7 +41,7 @@ class ProfileSongs extends React.Component {
     return (
       <View style={styles.container}>
         <Text style={styles.profileTitleText}>{"PROFILE"}</Text>
-        <ProfileComponent />
+        <ProfileComponent accessToken={this.props.accessToken} username={this.props.username} />
         <Text style={styles.titleText}>{"Songs"}</Text>
       </View>
     )

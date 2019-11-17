@@ -51,6 +51,14 @@ export const setTracks = tracks => dispatch => {
   });
 };
 
+export const setTrackAtIndex = (track, index) => dispatch => {
+  dispatch({
+    type: 'SET_TRACK',
+    track,
+    index
+  });
+};
+
 export const setSampleLoading = bool => dispatch => {
   dispatch({
     type: 'SET_SAMPLE_LOADING',

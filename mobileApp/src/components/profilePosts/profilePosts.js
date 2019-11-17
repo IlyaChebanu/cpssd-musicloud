@@ -39,7 +39,7 @@ export default class ProfilePosts extends React.Component {
     return (
       <View style={styles.container}>
         <Text style={styles.profileTitleText}>{"PROFILE"}</Text>
-        <ProfileComponent />
+        <ProfileComponent accessToken={this.props.accessToken} username={this.props.username} />
         <Text style={styles.titleText}>{"Posts"}</Text>
         <CreatePostComponent accessToken={this.props.accessToken}/>
       </View>

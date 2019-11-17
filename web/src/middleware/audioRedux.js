@@ -3,6 +3,7 @@ import axios from 'axios';
 import scheduleSample from '../helpers/scheduleSample';
 import getSampleTimes from '../helpers/getSampleTimes';
 import { globalSongGain, audioContext, bufferStore } from '../helpers/constants';
+import _ from 'lodash';
 
 const LOOKAHEAD = 25; //ms
 const OVERLAP = 100/*ms*/ / 1000;
@@ -57,7 +58,6 @@ export default store => {
       // Schedule samples
       schedulableSamples.forEach(sample => {
         if (!(sample.id in scheduledSamples)) {
-          console.log('scheduling', sample);
           const source = scheduleSample(sample);
           scheduledSamples[sample.id] = { ...sample, ...source };
         }
@@ -96,7 +96,6 @@ export default store => {
       case 'STUDIO_PAUSE':
         state = store.getState().studio;
         Object.entries(scheduledSamples).forEach(([id, sample]) => {
-          console.log(sample);
           sample.source.stop();
           delete scheduledSamples[id];
         });
@@ -115,22 +114,27 @@ export default store => {
       case 'SET_TRACKS':
         // React to volume change
         Object.values(scheduledSamples).forEach(sample => {
-          sample.gain.gain.setValueAtTime(action.tracks[sample.track].volume, audioContext.currentTime);
+          const track = action.tracks[sample.track];
+          const soloTrack = _.findIndex(action.tracks, 'solo');
+          const solo = soloTrack !== -1 && soloTrack !== sample.track;
+          sample.gain.gain.setValueAtTime(solo ? 0 : track.mute ? 0 : track.volume, audioContext.currentTime);
+          sample.pan.pan.setValueAtTime(track.pan, audioContext.currentTime);
         });
 
         // Verify that all the tracks have buffers
-        await store.dispatch(setSampleLoading(true));
+        let loadingSet = false;
         await Promise.all(action.tracks.map(async track => {
           await Promise.all(track.samples.map(async sample => {
             if (!bufferStore[sample.url]) {
+              await store.dispatch(setSampleLoading(true));
               const res = await axios.get(sample.url, { responseType: 'arraybuffer' });
               const buffer = await audioContext.decodeAudioData(res.data);
               bufferStore[sample.url] = buffer;
+              store.dispatch(setSampleLoading(false));
             }
             sample.duration = bufferStore[sample.url].duration;
           }));
         }));
-        store.dispatch(setSampleLoading(false));
         break;
 
       case 'SET_VOLUME':

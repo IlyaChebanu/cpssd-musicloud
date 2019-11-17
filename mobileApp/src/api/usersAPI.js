@@ -302,3 +302,89 @@ export function createUserPost(message, token) {
             return error
         });
 }
+
+export function getUserInfo(username, token) {
+
+    let url = `${API_URL}api/v1/users?username=${username}`;
+    var request = new Request(url, {
+        method: "GET",
+        headers: new Headers({
+            "Content-Type": "application/json",
+            "Authorization": 'Bearer ' + token,
+        }),
+    });
+    if (__DEV__) {
+        console.log("getUserInfo : request " + JSON.stringify(request))
+    }
+
+    return fetch(request)
+        .then(response => {
+            if (response.status === 200) {
+                return response.json()
+            } else {
+                return response.status
+            }
+        })
+        .then(responseJson => {
+            if (__DEV__) {
+                console.log("getUserInfo : response " + JSON.stringify(responseJson))
+            }
+            return responseJson;
+        })
+        .catch(error => {
+            if (__DEV__) {
+                console.log("getUserInfo : error " + JSON.stringify(error))
+            }
+            return error
+        });
+}
+
+export function patchUserDetails(current_password, password, email, token) {
+
+    let url = `${API_URL}api/v1/users`;
+
+    let bodyData = {
+        "current_password": current_password,
+        "email": email,
+        "password": password
+    }
+    if(email === ""){
+        delete bodyData.email;
+    }
+    if(password === ""){
+        delete bodyData.password;
+    }
+
+    var request = new Request(url, {
+        method: "PATCH",
+        headers: new Headers({
+            "Content-Type": "application/json",
+            "Authorization": 'Bearer ' + token,
+        }),
+        body: JSON.stringify(bodyData)
+    });
+    if (__DEV__) {
+        console.log("patchUserDetails : request " + JSON.stringify(request))
+    }
+
+    return fetch(request)
+        .then(response => {
+            if (response.status === 200) {
+                return response.json()
+            } else {
+                return response.status
+            }
+        })
+        .then(responseJson => {
+            if (__DEV__) {
+                console.log("patchUserDetails : response " + JSON.stringify(responseJson))
+            }
+            return responseJson;
+        })
+        .catch(error => {
+            if (__DEV__) {
+                console.log("patchUserDetails : error " + JSON.stringify(error))
+            }
+            return error
+        });
+}

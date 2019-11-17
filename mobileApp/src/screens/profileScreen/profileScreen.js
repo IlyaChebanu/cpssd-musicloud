@@ -49,7 +49,7 @@ class ProfileScreen extends React.Component {
             </View>
           </View>
             {this.state.activeTab === 1 ?
-            <ProfileSongs accessToken={this.props.token} username={this.props.username}/>
+            <ProfileSongs accessToken={this.props.token} username={this.props.username} />
             : <ProfilePosts accessToken={this.props.token} username={this.props.username} />
             }
         </View>
