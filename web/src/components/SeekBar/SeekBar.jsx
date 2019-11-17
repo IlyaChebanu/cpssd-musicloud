@@ -1,4 +1,4 @@
-import React, { memo, useState, useCallback, useMemo } from 'react';
+import React, { memo, useState, useCallback, useMemo, useRef } from 'react';
 import PropTypes from 'prop-types';
 import styles from './SeekBar.module.scss';
 import { ReactComponent as SeekBarSvg } from '../../assets/seekbar.svg';
@@ -14,10 +14,12 @@ const SeekBar = memo(props => {
 
   const handleDragStart = useCallback(e => {
     props.dispatch(pause);
-    const mousePosOffset = e.screenX - 220 - (props.currentBeat - 1) * 40;
+    // const mousePosOffset = e.screenX - 220 - (props.currentBeat - 1) * 40;
+    const mousePosOffset = e.screenX;
+    const startBeat = props.currentBeat;
     const handleMouseMove = e => {
       const scroll = store.getState().studio.scroll;
-      props.dispatch(setCurrentBeat(Math.max(scroll / 40 + 1, (scroll + e.screenX - 220 - mousePosOffset) / 40 + 1)));
+      props.dispatch(setCurrentBeat(Math.max(1, startBeat + (e.screenX - mousePosOffset) / 40)));
     }
     const handleDragStop = () => {
       // Only plays if the music was playing when handleDragStart was called
