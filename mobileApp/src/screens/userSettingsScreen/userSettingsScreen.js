@@ -1,5 +1,8 @@
-import React from "react"
-import { StyleSheet, Text, View, Image } from "react-native"
+import React from "react";
+import { connect } from 'react-redux';
+import { ActionCreators } from '../../actions/index';
+import { bindActionCreators } from 'redux';
+import { StyleSheet, Text, View, Image, Alert } from "react-native"
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import LoginInput from "../../components/loginInput/loginInput";
@@ -8,8 +11,9 @@ import PasswordInput from "../../components/passwordInput/passwordInput";
 import MultiPurposeButton from "../../components/multiPurposeButton/multiPurposeButton";
 import HeaderComponent from "../../components/headerComponent/headerComponent";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { patchUserDetails } from "../../api/usersAPI";
 
-export default class UserSettingsScreen extends React.Component {
+class UserSettingsScreen extends React.Component {
     constructor(props) {
         super(props);
 
@@ -22,6 +26,17 @@ export default class UserSettingsScreen extends React.Component {
             maskNewPassword: true,
             maskNewPasswordRepeat: true,
         }
+    }
+
+    showAlert(title, text, action) {
+        Alert.alert(
+            title,
+            text,
+            [
+                { text: 'OK', onPress: action },
+            ],
+            { cancelable: false },
+        );
     }
 
     setEmailTextInput(text) {
@@ -53,7 +68,13 @@ export default class UserSettingsScreen extends React.Component {
     }
 
     handleSaveChangesClick() {
-
+        patchUserDetails(this.state.oldPassword, this.state.newPassword, this.state.email, this.props.token).then(response => {
+            if (isNaN(response)) {
+                this.showAlert('Success', response.message)
+            } else {
+                this.showAlert('Error', 'failed to patchUserDetails')
+            }
+        })
     }
 
     render() {
@@ -63,37 +84,37 @@ export default class UserSettingsScreen extends React.Component {
                     <HeaderComponent navigation={this.props.navigation} />
                     <View style={styles.container}>
                         <KeyboardAwareScrollView>
-                        <Text style={styles.titleText}>{"USER SETTINGS"}</Text>
-                        <LoginInput
-                            ref={ref => (this.loginInputName = ref)}
-                            setText={this.setEmailTextInput.bind(this)}
-                            style={{ "marginBottom": 25 }}
-                            labelName={"Change Email"} />
+                            <Text style={styles.titleText}>{"USER SETTINGS"}</Text>
+                            <LoginInput
+                                ref={ref => (this.loginInputName = ref)}
+                                setText={this.setEmailTextInput.bind(this)}
+                                style={{ "marginBottom": 25 }}
+                                labelName={"Change Email"} />
 
-                        <PasswordInput
-                            ref={ref => (this.loginInputName = ref)}
-                            togglePassword={this.toggleOldPasswordMask.bind(this)}
-                            maskPassword={this.state.maskOldPassword}
-                            setText={this.setOldPasswordTextInput.bind(this)}
-                            style={{ "marginBottom": 1 }}
-                            labelName={"Old Password"} />
+                            <PasswordInput
+                                ref={ref => (this.loginInputName = ref)}
+                                togglePassword={this.toggleOldPasswordMask.bind(this)}
+                                maskPassword={this.state.maskOldPassword}
+                                setText={this.setOldPasswordTextInput.bind(this)}
+                                style={{ "marginBottom": 1 }}
+                                labelName={"Old Password"} />
 
-                        <PasswordInput
-                            ref={ref => (this.loginInputName = ref)}
-                            togglePassword={this.toggleNewPasswordMask.bind(this)}
-                            maskPassword={this.state.maskNewPassword}
-                            setText={this.setNewPasswordTextInput.bind(this)}
-                            style={{ "marginBottom": 1 }}
-                            labelName={"New Password"} />
+                            <PasswordInput
+                                ref={ref => (this.loginInputName = ref)}
+                                togglePassword={this.toggleNewPasswordMask.bind(this)}
+                                maskPassword={this.state.maskNewPassword}
+                                setText={this.setNewPasswordTextInput.bind(this)}
+                                style={{ "marginBottom": 1 }}
+                                labelName={"New Password"} />
 
-                        <PasswordInput
-                            ref={ref => (this.loginInputName = ref)}
-                            togglePassword={this.toggleNewPasswordRepeatMask.bind(this)}
-                            maskPassword={this.state.maskNewPasswordRepeat}
-                            setText={this.setNewPasswordRepeatTextInput.bind(this)}
-                            style={{ "marginBottom": 20 }}
-                            labelName={"New Password Repeat"} />
-                        
+                            <PasswordInput
+                                ref={ref => (this.loginInputName = ref)}
+                                togglePassword={this.toggleNewPasswordRepeatMask.bind(this)}
+                                maskPassword={this.state.maskNewPasswordRepeat}
+                                setText={this.setNewPasswordRepeatTextInput.bind(this)}
+                                style={{ "marginBottom": 20 }}
+                                labelName={"New Password Repeat"} />
+
                         </KeyboardAwareScrollView>
 
                         <MultiPurposeButton
@@ -107,3 +128,15 @@ export default class UserSettingsScreen extends React.Component {
         )
     }
 }
+
+function mapStateToProps(state) {
+    return {
+        token: state.home.token,
+    };
+}
+
+function mapDispatchToProps(dispatch) {
+    return bindActionCreators(ActionCreators, dispatch);
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(UserSettingsScreen);
