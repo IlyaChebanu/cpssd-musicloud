@@ -1,14 +1,16 @@
-import React, { memo, useState, useCallback, useMemo, useEffect } from 'react';
+import React, { memo, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import styles from './Track.module.scss';
 import { connect } from 'react-redux';
 import _ from 'lodash';
-import { bufferStore } from '../../helpers/constants';
-import { lerp, genId } from '../../helpers/utils';
+import { genId } from '../../helpers/utils';
 import Sample from '../Sample/Sample';
 import { setSelectedTrack, setTrackAtIndex } from '../../actions/studioActions';
-import { HotKeys } from 'react-hotkeys';
-import store from '../../store';
+import { HotKeys, configure } from 'react-hotkeys';
+
+configure({
+  allowCombinationSubmatches: true
+})
 
 const Track = memo(props => {
   const ticks = useMemo(() => {
