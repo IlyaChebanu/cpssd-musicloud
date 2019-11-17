@@ -11,6 +11,11 @@ export const SET_USERNAME = 'set_username';
 export const SET_NEW_ACCOUNT = 'set_new_account';
 export const SET_EMAIL = 'set_email';
 
+//Song actions
+export const SET_SONG_ID = 'set_song_id';
+export const SET_SONG_URL = 'set_song_url';
+export const SET_SONG_DATA = 'set_song_data';
+
 
 //clear redux
 export const CLEAR_REDUX_STATE = 'clear_redux_state';

@@ -7,6 +7,7 @@ import DummyScreen from "../screens/dummyScreen/dummyScreen"
 import StartScreen from "../screens/startScreen/startScreen"
 import LoginScreen from "../screens/loginScreen/loginScreen"
 import RegisterScreen from "../screens/registerScreen/registerScreen"
+import MusicPlayerScreen from "../screens/musicPlayerScreen/musicPlayerScreen"
 import HomeScreen from "../screens/homeScreen/homeScreen"
 import { DrawerNavigator } from "./drawerNavigator";
 import * as screenNames from "./screenNames";
@@ -18,6 +19,7 @@ export const AppNavigator = createStackNavigator({
     [screenNames.FORGOT_PASSWORD_SCREEN]: { screen: ForgotPasswordScreen},
     [screenNames.REGISTER_SCREEN]: { screen: RegisterScreen},
     [screenNames.HOME_SCREEN]: { screen: DrawerNavigator},
+    [screenNames.MUSIC_PLAYER_SCREEN]: { screen: MusicPlayerScreen},
 }, {
         initialRouteName: [screenNames.START_SCREEN],
         // Default config for all screens

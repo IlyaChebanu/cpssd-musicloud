@@ -2,6 +2,7 @@ import * as dummyActions from "./dummyActions";
 import * as navActions from "./navActions";
 import * as homeActions from "./homeActions";
 import * as regActions from "./registrationActions";
+import * as songActions from "./songActions";
 
 //Combime all your actions
 export const ActionCreators = Object.assign({}, 
@@ -9,4 +10,5 @@ export const ActionCreators = Object.assign({},
     homeActions,
     navActions,
     regActions,
+    songActions,
 );

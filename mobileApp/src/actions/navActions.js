@@ -38,3 +38,8 @@ export const navigateToForgotPasswordScreen = () =>
         routeName: screenNames.FORGOT_PASSWORD_SCREEN
     });
 
+export const navigateToMusicPlayerScreen = () =>
+    NavigationActions.navigate({
+        routeName: screenNames.MUSIC_PLAYER_SCREEN
+    });
+

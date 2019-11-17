@@ -190,20 +190,20 @@ export function passwordResetInitialize(email) {
 
 export function passwordResetConfirm(email, code, password) {
 
-    let url = `${API_URL}api/v1/users/reset?email=${email}`;
+    let url = `${API_URL}api/v1/users/reset`;
     var request = new Request(url, {
         method: "POST",
         headers: new Headers({
             "Content-Type": "application/json",
         }),
         body: JSON.stringify({
-            "email": email,
             "code": code,
+            "email": email,
             "password": password
         })
     });
     if (__DEV__) {
-        console.log("passwordResetInitiliaze : request " + JSON.stringify(request))
+        console.log("passwordResetConfirm : request " + JSON.stringify(request))
     }
 
     return fetch(request)
@@ -216,13 +216,13 @@ export function passwordResetConfirm(email, code, password) {
         })
         .then(responseJson => {
             if (__DEV__) {
-                console.log("passwordResetInitiliaze : response " + JSON.stringify(responseJson))
+                console.log("passwordResetConfirm : response " + JSON.stringify(responseJson))
             }
             return responseJson;
         })
         .catch(error => {
             if (__DEV__) {
-                console.log("passwordResetInitiliaze : error " + JSON.stringify(error))
+                console.log("passwordResetConfirm : error " + JSON.stringify(error))
             }
             return error
         });

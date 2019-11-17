@@ -61,7 +61,7 @@ class ForgotPasswordScreen extends React.Component {
   }
 
   handleConfirmResetClick() {
-    passwordResetConfirm(this.state.email, this.state.code, this.state.password).then(response => {
+    passwordResetConfirm(this.state.email, Number(this.state.code), this.state.password).then(response => {
       if (response.message) {
         this.showAlert('Password Sucessfully reset', 'Password succesfully reset. Press Ok to log in.', this.handleResetOkClick)
       } else {
