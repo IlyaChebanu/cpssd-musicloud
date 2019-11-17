@@ -19,7 +19,7 @@ def sql_err_catcher():
                 return {"message": "Duplicate entry"}, 409
             except NoResults:
                 log("error", "Select query returned no results", traceback.format_exc())
-                return {"message": "A result could not be found."}, 404
+                return {"message": "A result could not be found."}, 401
             except Exception:
                 log("error", "MySQL query failed", traceback.format_exc())
                 return {"message": "MySQL unavailable."}, 503
