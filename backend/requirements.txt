@@ -7,6 +7,5 @@ flask
 mock
 jsonschema
 flask-cors
-
-# accessing s3 bucket
+pytest-cov
 boto3

@@ -3,4 +3,4 @@ python:
   - "3.6"
 install:
   - pip install -r backend/requirements.txt
-script: pytest backend/tests
+script: pytest --cov=backend/src backend/tests
