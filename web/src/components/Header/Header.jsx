@@ -27,7 +27,10 @@ const Header = memo(props => {
 
   return (
     <div className={styles.header}>
-      <Logo className={styles.logo}/>
+      <span>
+        <Logo className={styles.logo}/>
+        {props.children}
+      </span>
       <span>
         <nav>
           <Link to='/studio' className={props.selected === 0 ? styles.selected : ''}>Studio</Link>

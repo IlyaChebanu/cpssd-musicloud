@@ -55,7 +55,7 @@ const Track = memo(props => {
   };
 
   return (
-    <HotKeys allowChanges={true} keyMap={keyMap} handlers={handlers} className={`${styles.wrapper} ${props.index % 2 ? styles.even : ''}`} onMouseDown={handleSetSelected}>
+    <HotKeys allowChanges={true} keyMap={keyMap} handlers={handlers} className={`${styles.wrapper} ${props.index % 2 ? styles.even : ''} ${props.className ? props.className : ''}`} onMouseDown={handleSetSelected}>
       <svg className={styles.gridLines}>
         {ticks}
       </svg>

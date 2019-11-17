@@ -2,13 +2,15 @@ export default (
   state = {
     loop: {
       start: 1,
-      stop: 5
+      stop: 17
     },
+    songId: 1001,
     gridSize: 1,
     gridSnapEnabled: true,
     loopEnabled: true,
     scroll: 0,
-    tempo: 90.0,
+    scrollY: 0,
+    tempo: 400.0,
     playingStartBeat: 1,
     playingStartTime: 0,
     playing: false,
@@ -99,6 +101,11 @@ export default (
         ...state,
         scroll: action.scroll
       }
+      case 'SET_SCROLL_Y':
+        return {
+          ...state,
+          scrollY: action.scroll
+        }
     case 'SET_LOOP':
       return {
         ...state,

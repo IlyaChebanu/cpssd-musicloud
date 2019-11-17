@@ -17,11 +17,15 @@
   width: calc(100% - 220px);
   height: 100%;
   overflow-x: scroll;
+  overflow-y: hidden;
 }
 
 .mainContent {
   width: 150%;
+  // height: 100%;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 100px;
+  // overflow-y: scroll;
 }
 
 .newTrack {
@@ -41,4 +45,18 @@
   &.even {
     background-color: #36393D;
   }
+}
+
+.saveButton {
+  height: 25px !important;
+  width: 65px;
+}
+
+.tracks {
+  height: calc(100vh - 200px);
+  overflow-y: scroll;
+}
+
+.track:last-child {
+  margin-bottom: 100px;
 }

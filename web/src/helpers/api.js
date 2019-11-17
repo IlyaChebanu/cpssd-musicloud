@@ -1,6 +1,11 @@
 import axios from 'axios';
+import store from '../store';
 
 const API_URL = `http://dcumusicloud.com:5000/api`;
+
+const getAuth = () => ({
+  Authorization: 'Bearer ' + store.getState().user.token
+});
 
 export const login = (username, password) => {
   return axios.post(
@@ -74,4 +79,14 @@ export const uploadFile = async (dir, f, token, e) => {
 const makeSignedUrl = (object) => {
   let url = new URL(object.url + object.fields.key)
   return url.href
+}
+
+export const saveState = (songId, songState) => {
+  return axios.post(
+    `${API_URL}/v1/audio/state`,
+    { sid: songId, song_state: songState },
+    {
+      headers: getAuth()
+    }
+  ).catch(e => e.response);
 }

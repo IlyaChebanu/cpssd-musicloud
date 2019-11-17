@@ -80,6 +80,13 @@ export const setScroll = scroll => dispatch => {
   });
 };
 
+export const setScrollY = scroll => dispatch => {
+  dispatch({
+    type: 'SET_SCROLL_Y',
+    scroll
+  });
+};
+
 export const setLoop = obj => dispatch => {
   dispatch({
     type: 'SET_LOOP',
