@@ -7,11 +7,10 @@ import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import HeaderComponent from "../../components/headerComponent/headerComponent";
 import { SafeAreaView } from "react-navigation";
-import ProfileComponent from "../../components/profileComponent/profileComponent";
-import ProfileSongs from "../../components/profileSongs/profileSongs";
-import ProfilePosts from "../../components/profilePosts/profilePosts";
+import UserProfileSongs from "../../components/profileSongs/userProfileSongs";
+import UserProfilePosts from "../../components/profilePosts/userProfilePosts";
 
-class ProfileScreen extends React.Component {
+class UserProfileScreen extends React.Component {
   constructor(props) {
     super(props);
 
@@ -30,28 +29,35 @@ class ProfileScreen extends React.Component {
   }
 
   render() {
+    var logoImage = require("../../assets/images/logo.png");
+    var arrowDownImg = require("../../assets/images/arrow_down.png");
     return (
-      <SafeAreaView forceInset={{ bottom: 'never'}} style={{'backgroundColor': '#3D4044', 'flex': 1 }}>
-        <View style={{'backgroundColor': '#1B1E23', 'flex': 1 }}>
-          <HeaderComponent navigation={this.props.navigation}/>
+      <SafeAreaView forceInset={{ bottom: 'never' }} style={{ 'backgroundColor': '#3D4044', 'flex': 1 }}>
+        <View style={{ 'backgroundColor': '#1B1E23', 'flex': 1 }}>
+          <View style={styles.headerContainer}>
+            <Image style={styles.logo} source={logoImage} />
+            <TouchableOpacity style={styles.arrowDown} onPress={() => this.props.navigateBack()}>
+              <Image style={styles.arrowDownImg} source={arrowDownImg} />
+            </TouchableOpacity>
+          </View>
           <View style={styles.profileTabs}>
             <View style={styles.profileSongTab}>
-              {this.state.activeTab=== 1 && <View style={styles.activeTab} />}
+              {this.state.activeTab === 1 && <View style={styles.activeTab} />}
               <TouchableOpacity style={styles.tabClick} onPress={() => this.handleSongsClick()}>
                 <Text style={styles.tabTitleText}>{'Songs'}</Text>
               </TouchableOpacity>
             </View>
             <View style={styles.profilePostTab}>
-              {this.state.activeTab=== 2 && <View style={styles.activeTab} />}
+              {this.state.activeTab === 2 && <View style={styles.activeTab} />}
               <TouchableOpacity style={styles.tabClick} onPress={() => this.handlePostsClick()}>
                 <Text style={styles.tabTitleText}>{'Posts'}</Text>
               </TouchableOpacity>
             </View>
           </View>
-            {this.state.activeTab === 1 ?
-            <ProfileSongs accessToken={this.props.token} username={this.props.username} navigation={this.props.navigation} />
-            : <ProfilePosts accessToken={this.props.token} username={this.props.username} />
-            }
+          {this.state.activeTab === 1 ?
+            <UserProfileSongs accessToken={this.props.token} username={this.props.otherUserData.username} navigation={this.props.navigation} />
+            : <UserProfilePosts accessToken={this.props.token} username={this.props.otherUserData.username} />
+          }
         </View>
       </SafeAreaView>
     )
@@ -62,6 +68,7 @@ function mapStateToProps(state) {
   return {
     token: state.home.token,
     username: state.home.username,
+    otherUserData: state.user.otherUserData,
   };
 }
 
@@ -69,4 +76,4 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators(ActionCreators, dispatch);
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(ProfileScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(UserProfileScreen);

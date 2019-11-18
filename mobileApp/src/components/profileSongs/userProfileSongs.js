@@ -5,13 +5,10 @@ import { bindActionCreators } from 'redux';
 import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity } from "react-native";
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
-import HeaderComponent from "../../components/headerComponent/headerComponent";
-import { SafeAreaView } from "react-navigation";
-import SearchComponent from "../../components/searchComponent/searchComponent";
+import UserProfileComponent from "../profileComponent/userProfileComponent";
 import { getCompiledSongs } from "../../api/audioAPI";
-import { getUserInfo } from "../../api/usersAPI";
 
-class HomeScreen extends React.Component {
+class UserProfileSongs extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -23,24 +20,8 @@ class HomeScreen extends React.Component {
     this.getSongs()
   }
 
-  getOtherUserDetails(username) {
-    getUserInfo(username, this.props.token).then(response => {
-      if (response.status===200) {
-        this.props.setOtherUserData(response.data)
-      }
-    })
-  }
-
-  handleSongClick(item, index) {
-    this.props.setSongData(item)
-    this.props.setSongId(item[0])
-    this.props.setSongUrl(item[6])
-    this.getOtherUserDetails(item[1])
-    this.props.navigateToMusicPlayerScreen()
-  }
-
   getSongs() {
-    getCompiledSongs(this.props.token, '', 10).then(response => {
+    getCompiledSongs(this.props.accessToken, this.props.username, 10).then(response => {
       if (response.status === 200) {
         this.setState({ songsData: response.data.compiled_songs})
       } else {
@@ -49,11 +30,21 @@ class HomeScreen extends React.Component {
     })
   }
 
+  handleSongClick(item, index) {
+    this.props.setSongData(item)
+    this.props.setSongId(item[0])
+    this.props.setSongUrl(item[6])
+    this.props.navigateToMusicPlayerScreen()
+    // this.props.navigation.navigate('Player')
+  }
+
   renderheader() {
     return (
       <View style={styles.container}>
-        <Text style={styles.titleText}>{"DISCOVER"}</Text>
-        <SearchComponent />
+        <Text style={styles.profileTitleText}>{"PROFILE"}</Text>
+        <UserProfileComponent accessToken={this.props.accessToken} username={this.props.username} />
+        <Text style={styles.titleText}>{"Songs"}</Text>
+        {this.state.songsData.length === 0 ? <Text style={styles.noSongsText}>{'User has no songs yet'}</Text> : null}
       </View>
     )
   }
@@ -62,7 +53,6 @@ class HomeScreen extends React.Component {
     let songName = item[2]
     let authorName = item[1]
     let songImage = item[7]
-    let genre = item[8]
     let playImage = require('../../assets/images/play.png')
     return (
       <TouchableOpacity style={styles.songContainer} onPress={() => this.handleSongClick(item, index)}>
@@ -77,22 +67,18 @@ class HomeScreen extends React.Component {
   }
 
   render() {
+
     return (
-      <SafeAreaView forceInset={{ bottom: 'never' }} style={{ 'backgroundColor': '#3D4044', 'flex': 1 }}>
-        <View style={{ 'backgroundColor': '#1B1E23', 'flex': 1 }}>
-          <HeaderComponent navigation={this.props.navigation} />
-          <FlatList
-            ListHeaderComponent={this.renderheader()}
-            style={styles.discoverFlatList}
-            data={this.state.songsData}
-            renderItem={this.renderSong.bind(this)}
-            keyExtractor={item => String(item)}
-            extraData={this.state.songsData}
-          />
-        </View>
-
-
-      </SafeAreaView>
+      <View style={styles.container}>
+        <FlatList
+          ListHeaderComponent={this.renderheader()}
+          style={styles.songFlatList}
+          data={this.state.songsData}
+          renderItem={this.renderSong.bind(this)}
+          keyExtractor={item => String(item)}
+          extraData={this.state.songsData}
+        />
+      </View>
     )
   }
 }
@@ -100,6 +86,7 @@ class HomeScreen extends React.Component {
 function mapStateToProps(state) {
   return {
     token: state.home.token,
+    // username: state.home.username,
   };
 }
 
@@ -107,4 +94,4 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators(ActionCreators, dispatch);
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(UserProfileSongs);

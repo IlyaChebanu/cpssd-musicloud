@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, TouchableOpacity, Image, Text, TextInput, Platform } from 'react-native'
+import { View, TouchableOpacity, Image, Text, TextInput, Platform } from 'react-native';
 import GLOBALS from '../../utils/globalStrings';
 import styles from './styles';
 
@@ -13,6 +13,7 @@ export default class PasswordInput extends Component {
             inputText: '',
             style: props.style,
             maskPassword: props.maskPassword,
+            editable: props.editable && props.editable
         }
     }
 
@@ -23,6 +24,9 @@ export default class PasswordInput extends Component {
     componentDidUpdate(prevProps) {
         if (prevProps.maskPassword != this.props.maskPassword) {
             this.setState({ maskPassword: this.props.maskPassword })
+        }
+        if (prevProps.editable != this.props.editable) {
+            this.setState({ editable: this.props.editable })
         }
     }
 
@@ -50,15 +54,16 @@ export default class PasswordInput extends Component {
     render() {
         let visibleImg = this.state.maskPassword ? require("../../assets/images/visibility.png") : require("../../assets/images/visibility_off.png")
         return (
-            <View style={[this.props.style, styles.container]} >
+            <View style={[this.props.style, styles.container, !this.state.editable && styles.disabledContainer]} >
                 <TouchableOpacity activeOpacity={1} onPress={() => this.handleInputClick()}>
                     <View style={styles.subContainer} >
-                        <Text style={styles.loginLabelName}>{this.state.labelName}</Text>
+                        <Text style={this.state.editable ? styles.loginLabelName : styles.disableLabelName}>{this.state.labelName}</Text>
                         <TextInput
                             autoCapitalize={'none'}
                             autoCorrect={false}
                             spellCheck={false}
                             secureTextEntry={this.state.maskPassword}
+                            editable={this.state.editable}
                             underlineColorAndroid='rgba(0,0,0,0)'
                             keyboardType={Platform.OS === 'android' ? 'default' : 'ascii-capable'}
                             onChangeText={text => this.setTextInput(text)}

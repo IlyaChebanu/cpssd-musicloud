@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, TouchableOpacity, Alert, Text, TextInput, Platform } from 'react-native'
+import { View, TouchableOpacity, Alert, Text, TextInput, Platform } from 'react-native';
 import GLOBALS from '../../utils/globalStrings';
 import styles from './styles';
 import LinearGradient from "react-native-linear-gradient";
@@ -11,7 +11,7 @@ export default class CreatePostComponent extends Component {
         super(props)
 
         this.state = {
-            postMessage: ''
+            postMessage: '',
         }
     }
 
@@ -38,19 +38,26 @@ export default class CreatePostComponent extends Component {
         this.setState({ postMessage: text})
     }
 
+    clearPost() {
+        this.props.createdPost()
+        this.setState({ postMessage: ''})
+        this.postTextInput.clear()
+    }
+
     handlePostButtonClick() {
         createUserPost(this.state.postMessage, this.props.accessToken).then(response => {
-            if (response.message === 'Message posted.') {
+            if (response.status === 200) {
+                this.clearPost()
                 this.showAlert('Post created')
             } else {
-                this.showAlert('Error', 'ops')
+                this.showAlert('Error', response.data.message ? response.data.message : 'createUserPost Failed')
             }
         })
     }
 
     render() {
         return (
-            <View style={[this.props.style, styles.container]} >
+            <View keyboardShouldPersistTaps={true} style={[this.props.style, styles.container]} >
                 <TextInput
                     autoCapitalize={'none'}
                     autoCorrect={false}
@@ -61,7 +68,7 @@ export default class CreatePostComponent extends Component {
                     underlineColorAndroid='rgba(0,0,0,0)'
                     keyboardType={Platform.OS === 'android' ? 'default' : 'ascii-capable'}
                     onChangeText={text => this.setTextInput(text)}
-                    ref={input => this.textInput = input}
+                    ref={input => this.postTextInput = input}
                     style={styles.createPostContainer} />
 
                     <TouchableOpacity style={styles.buttonContainer} onPress={() => this.handlePostButtonClick()}>

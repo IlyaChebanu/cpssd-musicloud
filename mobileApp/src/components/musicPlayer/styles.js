@@ -8,7 +8,7 @@ export default StyleSheet.create({
   },
   backgroundVideo: {
     backgroundColor: '#1B1E23',
-    height: Platform.OS === 'android' ? 375 : 420,
+    height: Platform.OS === 'android' ? height > 600 ? 375 : 300 : height > 600 ? 420 : 300,
     position: 'absolute',
     top: 0,
     left: 0,
@@ -17,13 +17,13 @@ export default StyleSheet.create({
   songImg: {
     position: 'absolute',
     width: width,
-    height: 375,
+    height: height > 600 ? 375 : 250,
     top: 0,
     left: 0,
     right: 0,
   },
   textContainer: {
-    marginTop: 440,
+    marginTop: Platform.OS === 'android' ? height > 600 ? 360 : 300 : height > 600 ? 440 : 280,
   },
   songNameText: {
     color: '#fff',
@@ -33,8 +33,7 @@ export default StyleSheet.create({
     marginLeft: 20,
     marginRight: 20,
   },
-  songTypeText: {
-    marginTop: 10,
+  songAuthorText: {
     textAlign: 'center',
     color: '#fff',
     fontSize: 15,
@@ -46,5 +45,16 @@ export default StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  profilePic: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+  },
+  profileContainer: {
+    marginTop: 10,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  }
 
 });

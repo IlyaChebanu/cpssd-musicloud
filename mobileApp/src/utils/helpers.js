@@ -40,3 +40,30 @@ export function getInvalidRegisterDetails(username, email, password, passwordRep
     }
     return invalidFields
 }
+
+export function getInvalidUserSettingsDetails(oldPassword, email, password, passwordRepeat) {
+    var invalidFields = []
+    if (oldPassword < 1) {
+        invalidFields.push(GLOBALS.SETTINGS_PASSWORD)
+    }
+    if ((password || email) < 1) {
+        invalidFields.push(GLOBALS.SETTINGS_PASSWORD_OR_EMAIL)
+    }
+    if (password !== passwordRepeat) {
+        invalidFields.push(GLOBALS.SETTINGS_PASSWORD_NOT_MATCH)
+    }
+    return invalidFields
+}
+
+export function getInvalidForgotPasswordDetails(newPassword, newPasswordRepeat, code) {
+    var invalidFields = []
+    if (code < 1) {
+        invalidFields.push(GLOBALS.FORGOT_CODE)
+    }
+    if (newPassword < 1) {
+        invalidFields.push(GLOBALS.FORGOT_PASSWORD)
+    } else if (newPassword !== newPasswordRepeat) {
+        invalidFields.push(GLOBALS.FORGOT_PASSWORD_NOT_MATCH)
+    }
+    return invalidFields
+}

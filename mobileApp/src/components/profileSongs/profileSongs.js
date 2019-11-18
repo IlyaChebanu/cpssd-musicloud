@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from 'react-redux';
 import { ActionCreators } from '../../actions/index';
 import { bindActionCreators } from 'redux';
-import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity } from "react-native"
+import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity } from "react-native";
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import ProfileComponent from "../profileComponent/profileComponent";
@@ -22,8 +22,8 @@ class ProfileSongs extends React.Component {
 
   getSongs() {
     getCompiledSongs(this.props.accessToken, this.props.username, 10).then(response => {
-      if (isNaN(response)) {
-        this.setState({ songsData: response.compiled_songs})
+      if (response.status === 200) {
+        this.setState({ songsData: response.data.compiled_songs})
       } else {
         
       }
@@ -35,6 +35,7 @@ class ProfileSongs extends React.Component {
     this.props.setSongId(item[0])
     this.props.setSongUrl(item[6])
     this.props.navigateToMusicPlayerScreen()
+    // this.props.navigation.navigate('Player')
   }
 
   renderheader() {
@@ -43,14 +44,14 @@ class ProfileSongs extends React.Component {
         <Text style={styles.profileTitleText}>{"PROFILE"}</Text>
         <ProfileComponent accessToken={this.props.accessToken} username={this.props.username} />
         <Text style={styles.titleText}>{"Songs"}</Text>
-        {this.state.songsData && <Text style={styles.noSongsText}>{'User has no songs yet'}</Text>}
+        {this.state.songsData.length === 0 ? <Text style={styles.noSongsText}>{'User has no songs yet'}</Text> : null}
       </View>
     )
   }
 
   renderSong({ item, index }) {
     let songName = item[2]
-    let authorName = item[8]
+    let authorName = item[1]
     let songImage = item[7]
     let playImage = require('../../assets/images/play.png')
     return (

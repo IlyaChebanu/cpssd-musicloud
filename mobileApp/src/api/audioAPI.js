@@ -22,11 +22,9 @@ export function getCompiledSongs(token, username, songs_per_page) {
 
     return fetch(request)
         .then(response => {
-            if (response.status === 200) {
-                return response.json()
-            } else {
-                return response.status
-            }
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
         })
         .then(responseJson => {
             if (__DEV__) {

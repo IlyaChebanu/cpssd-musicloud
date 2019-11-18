@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from 'react-redux';
 import { ActionCreators } from '../../actions/index';
 import { bindActionCreators } from 'redux';
-import { StyleSheet, Text, View, Image, Alert } from "react-native"
+import { StyleSheet, Text, View, Image, Alert } from "react-native";
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import { getUserInfo, patchUserPictureUrl } from "../../api/usersAPI";
@@ -35,12 +35,12 @@ class ProfileComponent extends React.Component {
 
   getUserDetails() {
     getUserInfo(this.props.username, this.props.accessToken).then(response => {
-      if (isNaN(response)) {
+      if (response.status===200) {
         this.setState({
-          userDetails: response
+          userDetails: response.data
         })
-        this.props.setUserData(response)
-        this.props.setPicUrl(response.profile_pic_url)
+        this.props.setUserData(response.data)
+        this.props.setPicUrl(response.data.profile_pic_url)
       }
     })
   }
@@ -61,11 +61,12 @@ class ProfileComponent extends React.Component {
           let picUrl = signedUrl + urlKey
           putUploadFile(urlKey, file, 'image/png').then(response => {
             if (response === 200) {
+              this.props.setPicUrl(picUrl)
               patchUserPictureUrl(this.props.accessToken, picUrl).then(response => {
-                if (isNaN(response)) {
+                if (response.status===200) {
                   this.showAlert('Sucess', 'Photo uploaded sucessfully')
                 } else {
-                  this.showAlert('Error', 'Failed to patch profile url')
+                  this.showAlert('Error', response.data.message ? response.data.message : 'patchUserPicture failed')
                 }
               })
             } else {

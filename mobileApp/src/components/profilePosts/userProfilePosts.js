@@ -2,13 +2,13 @@ import React from "react";
 import { StyleSheet, Text, View, Image, FlatList, TextInput } from "react-native";
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
-import ProfileComponent from "../profileComponent/profileComponent";
+import UserProfileComponent from "../profileComponent/userProfileComponent";
 import CreatePostComponent from "../createPostComponent/createPostComponent";
 import { getUserPosts } from "../../api/usersAPI";
 
 var moment = require('moment');
 
-export default class ProfilePosts extends React.Component {
+export default class UserProfilePosts extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -42,9 +42,9 @@ export default class ProfilePosts extends React.Component {
     return (
       <View style={styles.container}>
         <Text style={styles.profileTitleText}>{"PROFILE"}</Text>
-        <ProfileComponent accessToken={this.props.accessToken} username={this.props.username} />
+        <UserProfileComponent accessToken={this.props.accessToken} username={this.props.username} />
         <Text style={styles.titleText}>{"Posts"}</Text>
-        <CreatePostComponent createdPost={this.createdPost.bind(this)} accessToken={this.props.accessToken}/>
+        {/* <CreatePostComponent createdPost={this.createdPost.bind(this)} accessToken={this.props.accessToken}/> */}
       </View>
     )
   }

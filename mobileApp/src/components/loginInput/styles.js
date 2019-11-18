@@ -8,6 +8,9 @@ export default StyleSheet.create({
         height: 66,
         backgroundColor: 'rgba(255, 255, 255, 0.08)',
     },
+    disabledContainer: {
+        opacity: 0.5,
+    },
     subContainer: {
         // flex: 1,
         marginLeft: 15,
@@ -21,7 +24,11 @@ export default StyleSheet.create({
         //fontFamily: "SFProDisplay-Bold",
         color: 'rgba(255,255,255,1)',
     },
-
+    disableLabelName: {
+        fontSize: 12,
+        marginRight: 8,
+        color: '#000',
+    },
     loginTextInput: {
         fontSize: 18,
         //fontFamily: "SFProDisplay-Medium",
