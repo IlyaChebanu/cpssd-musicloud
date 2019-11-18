@@ -19,7 +19,7 @@ import TrackControls from '../../components/TrackControls';
 import Button from '../../components/Button';
 import PlayBackControls from '../../components/PlaybackControls'
 
-import FileUploader from '../../components/FileSelector/FileSelector';
+// import FileUploader from '../../components/FileSelector/FileSelector';
 import Track from '../../components/Track/Track';
 
 import { saveState } from '../../helpers/api';
