@@ -14,4 +14,19 @@ export function setUserData(userData) {
     }
 }
 
+export function setOtherUserData(otherUserData) {
+    return {
+        type: actionsTypes.SET_OTHER_USER_DATA,
+        otherUserData
+    }
+}
+
+export function setFollowing(following) {
+    return {
+        type: actionsTypes.SET_FOLLOWING,
+        following
+    }
+}
+
+
 
