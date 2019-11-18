@@ -405,3 +405,77 @@ export function patchUserPictureUrl(token, picUrl) {
             return error
         });
 }
+
+export function followUser(token, username) {
+
+    let url = `${API_URL}api/v1/users/follow`;
+    var request = new Request(url, {
+        method: "POST",
+        headers: new Headers({
+            "Content-Type": "application/json",
+            "Authorization": 'Bearer ' + token,
+        }),
+        body: JSON.stringify({
+            "username": username
+        })
+    });
+    if (__DEV__) {
+        console.log("followUser : request " + JSON.stringify(request))
+    }
+
+    return fetch(request)
+        .then(response => {
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
+        })
+        .then(responseJson => {
+            if (__DEV__) {
+                console.log("followUser : response " + JSON.stringify(responseJson))
+            }
+            return responseJson;
+        })
+        .catch(error => {
+            if (__DEV__) {
+                console.log("followUser : error " + JSON.stringify(error))
+            }
+            return error
+        });
+}
+
+export function unfollowUser(token, username) {
+
+    let url = `${API_URL}api/v1/users/unfollow`;
+    var request = new Request(url, {
+        method: "POST",
+        headers: new Headers({
+            "Content-Type": "application/json",
+            "Authorization": 'Bearer ' + token,
+        }),
+        body: JSON.stringify({
+            "username": username
+        })
+    });
+    if (__DEV__) {
+        console.log("unfollowUser : request " + JSON.stringify(request))
+    }
+
+    return fetch(request)
+        .then(response => {
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
+        })
+        .then(responseJson => {
+            if (__DEV__) {
+                console.log("unfollowUser : response " + JSON.stringify(responseJson))
+            }
+            return responseJson;
+        })
+        .catch(error => {
+            if (__DEV__) {
+                console.log("unfollowUser : error " + JSON.stringify(error))
+            }
+            return error
+        });
+}
