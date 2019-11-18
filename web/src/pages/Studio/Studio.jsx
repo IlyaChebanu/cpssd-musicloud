@@ -379,7 +379,9 @@ const Studio = memo(props => {
         <div className={styles.scrollableMain} onScroll={handleScroll}>
           <div className={styles.mainContent}>
             <Timeline />
-            {tracks}
+            <div className={styles.tracks}>
+              {tracks}
+            </div>
           </div>
         </div>
       </div>
