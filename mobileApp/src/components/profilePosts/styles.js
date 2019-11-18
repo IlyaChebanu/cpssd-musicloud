@@ -60,15 +60,4 @@ export default StyleSheet.create({
     bottom: 10,
     left: 10
   },
-  likes: {
-    fontSize: 18,
-    color: '#FFF',
-  },
-  likeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    position: 'absolute',
-    bottom: 10,
-    right: 10
-  },
 })

@@ -55,9 +55,6 @@ export default class ProfilePosts extends React.Component {
       <View style={styles.postContainer}>
         <Text style={styles.postText}>{postText}</Text>
         <Text style={styles.timeAgo}>{postTimeAgo}</Text>
-        <View style={styles.likeContainer}>
-          <Text style={styles.likes}>{postLikes}</Text><Image source={likeImg} />
-        </View>
       </View>
     );
   }
