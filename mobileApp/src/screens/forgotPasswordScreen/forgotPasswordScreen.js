@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from 'react-redux';
 import { ActionCreators } from '../../actions/index';
 import { bindActionCreators } from 'redux';
-import { StyleSheet, Text, View, Image, TouchableOpacity, Alert } from "react-native"
+import { StyleSheet, Text, View, Image, TouchableOpacity, Alert } from "react-native";
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import LoginInput from "../../components/loginInput/loginInput";
@@ -10,6 +10,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import MultiPurposeButton from "../../components/multiPurposeButton/multiPurposeButton";
 import PasswordInput from "../../components/passwordInput/passwordInput";
 import { passwordResetInitialize, passwordResetConfirm } from "../../api/usersAPI";
+import { getInvalidForgotPasswordDetails } from "../../utils/helpers";
 
 const STATE_LOGIN_RESET_INITIAL = 1;
 const STATE_LOGIN_RESET_FINISH = 2;
@@ -51,23 +52,28 @@ class ForgotPasswordScreen extends React.Component {
 
   handleResetClick() {
     passwordResetInitialize(this.state.email).then(response => {
-      if (response.message === 'Email sent.') {
+      if (response.status === 200) {
         this.showAlert('Email Sent', `Please check your email: ${this.state.email} for verification code`)
         this.setState({ screenState: [STATE_LOGIN_RESET_FINISH] })
       } else {
-        this.showAlert('Error', 'A result could not be found.')
+        this.showAlert('Error', response.data.message ? response.data.message : 'PasswordResetInitialize failed')
       }
     })
   }
 
   handleConfirmResetClick() {
-    passwordResetConfirm(this.state.email, this.state.code, this.state.password).then(response => {
-      if (response.message) {
-        this.showAlert('Password Sucessfully reset', 'Password succesfully reset. Press Ok to log in.', this.handleResetOkClick)
-      } else {
-        this.showAlert('Error', 'A result could not be found.')
-      }
-    })
+    let invalidFields = getInvalidForgotPasswordDetails(this.state.password, this.state.passwordRepeat, this.state.code)
+    if (invalidFields.length === 0) {
+      passwordResetConfirm(this.state.email, Number(this.state.code), this.state.password).then(response => {
+        if (response.status === 200) {
+          this.showAlert('Password Sucessfully reset', 'Password succesfully reset. Press Ok to log in.', this.handleResetOkClick)
+        } else {
+          this.showAlert('Error', response.data.message ? response.data.message : 'PasswordResetConfirm Failed')
+        }
+      })
+    } else {
+      this.showAlert('Error', "Invalid: " + invalidFields.join(', '))
+    }
   }
 
   setEmailTextInput(text) {
@@ -98,6 +104,7 @@ class ForgotPasswordScreen extends React.Component {
     return (
       <LoginInput
             ref={ref => (this.emailInputName = ref)}
+            editable={true}
             setText={this.setEmailTextInput.bind(this)}
             style={{ "marginBottom": 1 }}
             labelName={"Email"} />
@@ -109,11 +116,13 @@ class ForgotPasswordScreen extends React.Component {
       <View>
         <LoginInput
               ref={ref => (this.codeInputName = ref)}
+              editable={true}
               setText={this.setCodeTextInput.bind(this)}
               style={{ "marginBottom": 1 }}
               labelName={"Code"} />
         <PasswordInput
             ref={ref => (this.passwordInputName = ref)}
+            editable={true}
             togglePassword={this.togglePasswordMask.bind(this)}
             maskPassword={this.state.maskPassword}
             style={{ "marginBottom": 1 }}
@@ -121,6 +130,7 @@ class ForgotPasswordScreen extends React.Component {
             labelName={"New Password"} />
         <PasswordInput
             ref={ref => (this.passwordRepeatInputName = ref)}
+            editable={true}
             togglePassword={this.togglePasswordRepeatMask.bind(this)}
             maskPassword={this.state.maskPasswordRepeat}
             setText={this.setPasswordRepeatTextInput.bind(this)}

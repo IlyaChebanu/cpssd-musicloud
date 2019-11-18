@@ -55,18 +55,24 @@ export default StyleSheet.create({
     right: 20,
   },
   songNameText: {
-    color: '#FFF',
+    color: '#000',
     fontSize: 18,
-    textShadowOffset: { width: 2, height: 2 },
-    textShadowRadius: 1,
-    textShadowColor: '#666',
+    // textShadowOffset: { width: 2, height: 2 },
+    // textShadowRadius: 1,
+    // textShadowColor: '#666',
   },
   authorNameText: {
-    color: '#FFF',
+    color: '#000',
     fontSize: 14,
     marginTop: 5,
-    textShadowOffset: { width: 2, height: 2 },
-    textShadowRadius: 1,
-    textShadowColor: '#666',
+    // textShadowOffset: { width: 2, height: 2 },
+    // textShadowRadius: 1,
+    // textShadowColor: '#666',
   },
+  noSongsText: {
+    textAlign: 'center',
+    color: '#FFF',
+    fontSize: 16,
+    width: width,
+  }
 })

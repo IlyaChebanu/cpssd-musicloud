@@ -19,11 +19,9 @@ export function loginUser(username, password) {
 
     return fetch(request)
         .then(response => {
-            if (response.status === 200) {
-                return response.json()
-            } else {
-                return response.status
-            }
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
         })
         .then(responseJson => {
             if (__DEV__) {
@@ -59,11 +57,9 @@ export function registerUser(username, email, password) {
 
     return fetch(request)
         .then(response => {
-            if (response.status === 200) {
-                return response.json()
-            } else {
-                return response.status
-            }
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
         })
         .then(responseJson => {
             if (__DEV__) {
@@ -95,11 +91,9 @@ export function logoutUser(token) {
 
     return fetch(request)
         .then(response => {
-            if (response.status === 200) {
-                return response.json()
-            } else {
-                return response.status
-            }
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
         })
         .then(responseJson => {
             if (__DEV__) {
@@ -133,11 +127,9 @@ export function reVerifyEmail(email) {
 
     return fetch(request)
         .then(response => {
-            if (response.status === 200) {
-                return response.json()
-            } else {
-                return response.status
-            }
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
         })
         .then(responseJson => {
             if (__DEV__) {
@@ -168,11 +160,9 @@ export function passwordResetInitialize(email) {
 
     return fetch(request)
         .then(response => {
-            if (response.status === 200) {
-                return response.json()
-            } else {
-                return response.status
-            }
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
         })
         .then(responseJson => {
             if (__DEV__) {
@@ -190,39 +180,37 @@ export function passwordResetInitialize(email) {
 
 export function passwordResetConfirm(email, code, password) {
 
-    let url = `${API_URL}api/v1/users/reset?email=${email}`;
+    let url = `${API_URL}api/v1/users/reset`;
     var request = new Request(url, {
         method: "POST",
         headers: new Headers({
             "Content-Type": "application/json",
         }),
         body: JSON.stringify({
-            "email": email,
             "code": code,
+            "email": email,
             "password": password
         })
     });
     if (__DEV__) {
-        console.log("passwordResetInitiliaze : request " + JSON.stringify(request))
+        console.log("passwordResetConfirm : request " + JSON.stringify(request))
     }
 
     return fetch(request)
         .then(response => {
-            if (response.status === 200) {
-                return response.json()
-            } else {
-                return response.status
-            }
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
         })
         .then(responseJson => {
             if (__DEV__) {
-                console.log("passwordResetInitiliaze : response " + JSON.stringify(responseJson))
+                console.log("passwordResetConfirm : response " + JSON.stringify(responseJson))
             }
             return responseJson;
         })
         .catch(error => {
             if (__DEV__) {
-                console.log("passwordResetInitiliaze : error " + JSON.stringify(error))
+                console.log("passwordResetConfirm : error " + JSON.stringify(error))
             }
             return error
         });
@@ -244,11 +232,9 @@ export function getUserPosts(username, token) {
 
     return fetch(request)
         .then(response => {
-            if (response.status === 200) {
-                return response.json()
-            } else {
-                return response.status
-            }
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
         })
         .then(responseJson => {
             if (__DEV__) {
@@ -283,11 +269,9 @@ export function createUserPost(message, token) {
 
     return fetch(request)
         .then(response => {
-            if (response.status === 200) {
-                return response.json()
-            } else {
-                return response.status
-            }
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
         })
         .then(responseJson => {
             if (__DEV__) {
@@ -319,11 +303,9 @@ export function getUserInfo(username, token) {
 
     return fetch(request)
         .then(response => {
-            if (response.status === 200) {
-                return response.json()
-            } else {
-                return response.status
-            }
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
         })
         .then(responseJson => {
             if (__DEV__) {
@@ -369,11 +351,9 @@ export function patchUserDetails(current_password, password, email, token) {
 
     return fetch(request)
         .then(response => {
-            if (response.status === 200) {
-                return response.json()
-            } else {
-                return response.status
-            }
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
         })
         .then(responseJson => {
             if (__DEV__) {
@@ -384,6 +364,117 @@ export function patchUserDetails(current_password, password, email, token) {
         .catch(error => {
             if (__DEV__) {
                 console.log("patchUserDetails : error " + JSON.stringify(error))
+            }
+            return error
+        });
+}
+
+export function patchUserPictureUrl(token, picUrl) {
+
+    let url = `${API_URL}api/v1/users/profiler`;
+    var request = new Request(url, {
+        method: "PATCH",
+        headers: new Headers({
+            "Content-Type": "application/json",
+            "Authorization": 'Bearer ' + token,
+        }),
+        body: JSON.stringify({
+            "url": picUrl
+        })
+    });
+    if (__DEV__) {
+        console.log("patchUserPictureUrl : request " + JSON.stringify(request))
+    }
+
+    return fetch(request)
+        .then(response => {
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
+        })
+        .then(responseJson => {
+            if (__DEV__) {
+                console.log("patchUserPictureUrl : response " + JSON.stringify(responseJson))
+            }
+            return responseJson;
+        })
+        .catch(error => {
+            if (__DEV__) {
+                console.log("patchUserPictureUrl : error " + JSON.stringify(error))
+            }
+            return error
+        });
+}
+
+export function followUser(token, username) {
+
+    let url = `${API_URL}api/v1/users/follow`;
+    var request = new Request(url, {
+        method: "POST",
+        headers: new Headers({
+            "Content-Type": "application/json",
+            "Authorization": 'Bearer ' + token,
+        }),
+        body: JSON.stringify({
+            "username": username
+        })
+    });
+    if (__DEV__) {
+        console.log("followUser : request " + JSON.stringify(request))
+    }
+
+    return fetch(request)
+        .then(response => {
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
+        })
+        .then(responseJson => {
+            if (__DEV__) {
+                console.log("followUser : response " + JSON.stringify(responseJson))
+            }
+            return responseJson;
+        })
+        .catch(error => {
+            if (__DEV__) {
+                console.log("followUser : error " + JSON.stringify(error))
+            }
+            return error
+        });
+}
+
+export function unfollowUser(token, username) {
+
+    let url = `${API_URL}api/v1/users/unfollow`;
+    var request = new Request(url, {
+        method: "POST",
+        headers: new Headers({
+            "Content-Type": "application/json",
+            "Authorization": 'Bearer ' + token,
+        }),
+        body: JSON.stringify({
+            "username": username
+        })
+    });
+    if (__DEV__) {
+        console.log("unfollowUser : request " + JSON.stringify(request))
+    }
+
+    return fetch(request)
+        .then(response => {
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
+        })
+        .then(responseJson => {
+            if (__DEV__) {
+                console.log("unfollowUser : response " + JSON.stringify(responseJson))
+            }
+            return responseJson;
+        })
+        .catch(error => {
+            if (__DEV__) {
+                console.log("unfollowUser : error " + JSON.stringify(error))
             }
             return error
         });

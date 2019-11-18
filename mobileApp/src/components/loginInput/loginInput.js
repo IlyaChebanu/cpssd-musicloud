@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, TouchableOpacity, Image, Text, TextInput, Platform } from 'react-native'
+import { View, TouchableOpacity, Image, Text, TextInput, Platform } from 'react-native';
 import GLOBALS from '../../utils/globalStrings';
 import styles from './styles';
 
@@ -12,6 +12,7 @@ export default class LoginInput extends Component {
             labelName: props.labelName,
             inputText: '',
             style: props.style,
+            editable: props.editable && props.editable,
         }
     }
 
@@ -20,7 +21,9 @@ export default class LoginInput extends Component {
     }
 
     componentDidUpdate(prevProps) {
-
+        if (prevProps.editable != this.props.editable) {
+            this.setState({ editable: this.props.editable })
+        }
     }
 
     setTextInput(text) {
@@ -42,14 +45,15 @@ export default class LoginInput extends Component {
 
     render() {
         return (
-            <View style={[this.props.style, styles.container]} >
+            <View style={[this.props.style, styles.container, !this.state.editable && styles.disabledContainer]} >
                 <TouchableOpacity activeOpacity={1} onPress={() => this.handleInputClick()}>
                 <View style={styles.subContainer} >
-                    <Text style={styles.loginLabelName}>{this.state.labelName}</Text>
+                    <Text style={this.state.editable ? styles.loginLabelName : styles.disableLabelName}>{this.state.labelName}</Text>
                     <TextInput
                         autoCapitalize={'none'}
                         autoCorrect={false}
                         spellCheck={false}
+                        editable={this.state.editable}
                         underlineColorAndroid='rgba(0,0,0,0)'
                         keyboardType={Platform.OS === 'android' ? 'default' : 'ascii-capable'}
                         onChangeText={text => this.setTextInput(text)}

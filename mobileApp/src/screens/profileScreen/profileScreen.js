@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from 'react-redux';
 import { ActionCreators } from '../../actions/index';
 import { bindActionCreators } from 'redux';
-import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native"
+import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import HeaderComponent from "../../components/headerComponent/headerComponent";
@@ -49,7 +49,7 @@ class ProfileScreen extends React.Component {
             </View>
           </View>
             {this.state.activeTab === 1 ?
-            <ProfileSongs accessToken={this.props.token} username={this.props.username} />
+            <ProfileSongs accessToken={this.props.token} username={this.props.username} navigation={this.props.navigation} />
             : <ProfilePosts accessToken={this.props.token} username={this.props.username} />
             }
         </View>

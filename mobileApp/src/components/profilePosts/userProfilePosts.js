@@ -1,0 +1,77 @@
+import React from "react";
+import { StyleSheet, Text, View, Image, FlatList, TextInput } from "react-native";
+import GLOBALS from "../../utils/globalStrings";
+import styles from "./styles";
+import UserProfileComponent from "../profileComponent/userProfileComponent";
+import CreatePostComponent from "../createPostComponent/createPostComponent";
+import { getUserPosts } from "../../api/usersAPI";
+
+var moment = require('moment');
+
+export default class UserProfilePosts extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      posts: [],
+    };
+  }
+
+  componentDidMount() {
+    this.getPosts()
+  }
+
+  getPosts() {
+    getUserPosts(this.props.username, this.props.accessToken).then(response => {
+      if (response.status===200) {
+        this.setState({
+          posts: response.data.posts
+        })
+      }
+    })
+  }
+
+  setTextInput(text) {
+    this.setState({ inputText: text });
+  }
+
+  createdPost() {
+    this.getPosts()
+  }
+
+  renderheader() {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.profileTitleText}>{"PROFILE"}</Text>
+        <UserProfileComponent accessToken={this.props.accessToken} username={this.props.username} />
+        <Text style={styles.titleText}>{"Posts"}</Text>
+        {/* <CreatePostComponent createdPost={this.createdPost.bind(this)} accessToken={this.props.accessToken}/> */}
+      </View>
+    )
+  }
+
+  renderPost({ item, index }) {
+    let postText = item[0]
+    let postTimeAgo = moment(item[1]).fromNow()
+    return (
+      <View style={styles.postContainer}>
+        <Text style={styles.postText}>{postText}</Text>
+        <Text style={styles.timeAgo}>{postTimeAgo}</Text>
+      </View>
+    );
+  }
+
+  render() {
+    return (
+      <View style={styles.container}>
+        <FlatList 
+          ListHeaderComponent={this.renderheader()}
+          style={styles.postFlatList}
+          data={this.state.posts}
+          renderItem={this.renderPost.bind(this)}
+          keyExtractor={item => String(item)}
+          extraData={this.state.posts}
+        />
+      </View>
+    )
+  }
+}

@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from 'react-redux';
 import { ActionCreators } from '../../actions/index';
 import { bindActionCreators } from 'redux';
-import { StyleSheet, Text, View, Image, TouchableOpacity, Alert } from "react-native"
+import { StyleSheet, Text, View, Image, TouchableOpacity, Alert } from "react-native";
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import LoginInput from "../../components/loginInput/loginInput";
@@ -12,7 +12,6 @@ import { writeDataToStorage, TOKEN_DATA_KEY, USERNAME_DATA_KEY } from "../../uti
 import { getInvalidLoginDetails } from "../../utils/helpers";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import PasswordInput from "../../components/passwordInput/passwordInput";
-// import { loginUser } from "../../api/usersAPI";
 
 class LoginScreen extends React.Component {
   constructor(props) {
@@ -72,12 +71,12 @@ class LoginScreen extends React.Component {
     let invalidFields = getInvalidLoginDetails(this.state.username.trim(), this.state.password)
     if (invalidFields.length == 0) {
       loginUser(this.state.username, this.state.password).then(response => {
-        if (response.access_token) {
-          this.saveLoginDetails(response.access_token)
+        if (response.data.access_token) {
+          this.saveLoginDetails(response.data.access_token)
           this.props.setNewAccount(false)
           this.props.navigateToHomeScreen()
         } else {
-          this.showAlert('Invalid Credentials')
+          this.showAlert(response.data.message ? response.data.message : 'LoginUser Failed')
         }
       })
     } else {
@@ -87,10 +86,10 @@ class LoginScreen extends React.Component {
 
   handleVerifyClick() {
     reVerifyEmail(this.props.email).then(response => {
-      if (response.message == "Verification email sent.") {
+      if (response.status === 200) {
         this.reverifyAlert()
       } else {
-        this.showAlert('Failed to resent verification email')
+        this.showAlert(response.data.message ? response.data.message : 'VerifyEmail Failed')
       }
     })
   }
@@ -142,11 +141,13 @@ class LoginScreen extends React.Component {
             : null}
           <LoginInput
             ref={ref => (this.loginInputName = ref)}
+            editable={true}
             setText={this.setUserTextInput.bind(this)}
             style={{ "marginBottom": 1 }}
             labelName={"Username"} />
           <PasswordInput
             ref={ref => (this.loginInputName = ref)}
+            editable={true}
             togglePassword={this.togglePasswordMask.bind(this)}
             maskPassword={this.state.maskPassword}
             setText={this.setPasswordTextInput.bind(this)}

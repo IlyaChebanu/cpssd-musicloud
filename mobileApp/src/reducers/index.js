@@ -5,6 +5,8 @@ import { DummyReducer } from "./dummyReducer";
 import { NavReducer } from "./navReducers";
 import HomeReducer from "./homeReducer";
 import RegistrationReducer from "./registrationReducer";
+import SongReducer from "./songReducer";
+import UserReducer from "./userReducer";
 //Here you import all your different reducers and combine them into ONE
 
 const appReducer = combineReducers({
@@ -12,6 +14,8 @@ const appReducer = combineReducers({
     nav: NavReducer,
     home: HomeReducer,
     reg: RegistrationReducer,
+    song: SongReducer,
+    user: UserReducer
   });
 
 const rootReducer = (state, action) => {

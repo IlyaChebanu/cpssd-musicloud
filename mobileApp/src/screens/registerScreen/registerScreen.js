@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from 'react-redux';
 import { ActionCreators } from '../../actions/index';
 import { bindActionCreators } from 'redux';
-import { StyleSheet, Text, View, Image, TouchableOpacity, Alert } from "react-native"
+import { StyleSheet, Text, View, Image, TouchableOpacity, Alert } from "react-native";
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import LoginInput from "../../components/loginInput/loginInput";
@@ -41,12 +41,12 @@ class RegisterScreen extends React.Component {
     let invalidFields = getInvalidRegisterDetails(this.state.username.trim(), this.state.email.trim(), this.state.password, this.state.passwordRepeat)
     if (invalidFields.length === 0) {
       registerUser(this.state.username.trim(), this.state.email.trim(), this.state.password).then(response => {
-        if (response.message == "User created!") {
+        if (response.status === 200) {
           this.props.setEmail(this.state.email.trim())
           this.props.setNewAccount(true)
           this.props.navigateToLoginScreen()
         } else {
-          this.showAlert('User Already Exists')
+          this.showAlert(response.data.message ? response.data.message : 'registerUser failed')
         }
       })
     } else {
@@ -105,16 +105,19 @@ class RegisterScreen extends React.Component {
         </View>
         <LoginInput
           ref={ref => (this.loginInputName = ref)}
+          editable={true}
           setText={this.setEmailTextInput.bind(this)}
           style={{"marginBottom": 1}}
           labelName={"Email"} />
         <LoginInput
           ref={ref => (this.loginInputName = ref)}
+          editable={true}
           setText={this.setUsernameTextInput.bind(this)}
           style={{"marginBottom": 1}}
           labelName={"Username"} />
         <PasswordInput
           ref={ref => (this.loginInputName = ref)}
+          editable={true}
           togglePassword={this.togglePasswordMask.bind(this)}
           maskPassword={this.state.maskPassword}
           setText={this.setPasswordTextInput.bind(this)}
@@ -122,6 +125,7 @@ class RegisterScreen extends React.Component {
           labelName={"Password"} />
         <PasswordInput
           ref={ref => (this.loginInputName = ref)}
+          editable={true}
           togglePassword={this.togglePasswordRepeatMask.bind(this)}
           maskPassword={this.state.maskPasswordRepeat}
           setText={this.setPasswordRepeatTextInput.bind(this)}
