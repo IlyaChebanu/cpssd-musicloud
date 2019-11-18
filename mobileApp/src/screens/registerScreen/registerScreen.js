@@ -105,16 +105,19 @@ class RegisterScreen extends React.Component {
         </View>
         <LoginInput
           ref={ref => (this.loginInputName = ref)}
+          editable={true}
           setText={this.setEmailTextInput.bind(this)}
           style={{"marginBottom": 1}}
           labelName={"Email"} />
         <LoginInput
           ref={ref => (this.loginInputName = ref)}
+          editable={true}
           setText={this.setUsernameTextInput.bind(this)}
           style={{"marginBottom": 1}}
           labelName={"Username"} />
         <PasswordInput
           ref={ref => (this.loginInputName = ref)}
+          editable={true}
           togglePassword={this.togglePasswordMask.bind(this)}
           maskPassword={this.state.maskPassword}
           setText={this.setPasswordTextInput.bind(this)}
@@ -122,6 +125,7 @@ class RegisterScreen extends React.Component {
           labelName={"Password"} />
         <PasswordInput
           ref={ref => (this.loginInputName = ref)}
+          editable={true}
           togglePassword={this.togglePasswordRepeatMask.bind(this)}
           maskPassword={this.state.maskPasswordRepeat}
           setText={this.setPasswordRepeatTextInput.bind(this)}

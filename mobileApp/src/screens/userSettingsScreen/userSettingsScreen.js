@@ -98,12 +98,14 @@ class UserSettingsScreen extends React.Component {
                                 maskPassword={this.state.maskOldPassword}
                                 setText={this.setOldPasswordTextInput.bind(this)}
                                 style={{ "marginBottom": 25 }}
+                                editable={true}
                                 labelName={"Current Password"} />
 
                             <LoginInput
                                 ref={ref => (this.loginInputName = ref)}
                                 setText={this.setEmailTextInput.bind(this)}
                                 style={{ "marginBottom": 1 }}
+                                editable={this.state.oldPassword.length >= 1}
                                 labelName={"New Email"} />
 
                             <PasswordInput
@@ -112,6 +114,7 @@ class UserSettingsScreen extends React.Component {
                                 maskPassword={this.state.maskNewPassword}
                                 setText={this.setNewPasswordTextInput.bind(this)}
                                 style={{ "marginBottom": 1 }}
+                                editable={this.state.oldPassword.length >= 1}
                                 labelName={"New Password"} />
 
                             <PasswordInput
@@ -119,6 +122,7 @@ class UserSettingsScreen extends React.Component {
                                 togglePassword={this.toggleNewPasswordRepeatMask.bind(this)}
                                 maskPassword={this.state.maskNewPasswordRepeat}
                                 setText={this.setNewPasswordRepeatTextInput.bind(this)}
+                                editable={this.state.oldPassword.length >= 1}
                                 style={{ "marginBottom": 20 }}
                                 labelName={"New Password Repeat"} />
 

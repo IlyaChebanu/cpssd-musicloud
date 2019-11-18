@@ -98,6 +98,7 @@ class ForgotPasswordScreen extends React.Component {
     return (
       <LoginInput
             ref={ref => (this.emailInputName = ref)}
+            editable={true}
             setText={this.setEmailTextInput.bind(this)}
             style={{ "marginBottom": 1 }}
             labelName={"Email"} />
@@ -109,11 +110,13 @@ class ForgotPasswordScreen extends React.Component {
       <View>
         <LoginInput
               ref={ref => (this.codeInputName = ref)}
+              editable={true}
               setText={this.setCodeTextInput.bind(this)}
               style={{ "marginBottom": 1 }}
               labelName={"Code"} />
         <PasswordInput
             ref={ref => (this.passwordInputName = ref)}
+            editable={true}
             togglePassword={this.togglePasswordMask.bind(this)}
             maskPassword={this.state.maskPassword}
             style={{ "marginBottom": 1 }}
@@ -121,6 +124,7 @@ class ForgotPasswordScreen extends React.Component {
             labelName={"New Password"} />
         <PasswordInput
             ref={ref => (this.passwordRepeatInputName = ref)}
+            editable={true}
             togglePassword={this.togglePasswordRepeatMask.bind(this)}
             maskPassword={this.state.maskPasswordRepeat}
             setText={this.setPasswordRepeatTextInput.bind(this)}

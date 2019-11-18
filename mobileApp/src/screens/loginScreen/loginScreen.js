@@ -141,11 +141,13 @@ class LoginScreen extends React.Component {
             : null}
           <LoginInput
             ref={ref => (this.loginInputName = ref)}
+            editable={true}
             setText={this.setUserTextInput.bind(this)}
             style={{ "marginBottom": 1 }}
             labelName={"Username"} />
           <PasswordInput
             ref={ref => (this.loginInputName = ref)}
+            editable={true}
             togglePassword={this.togglePasswordMask.bind(this)}
             maskPassword={this.state.maskPassword}
             setText={this.setPasswordTextInput.bind(this)}

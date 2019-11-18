@@ -13,6 +13,7 @@ export default class PasswordInput extends Component {
             inputText: '',
             style: props.style,
             maskPassword: props.maskPassword,
+            editable: props.editable && props.editable
         }
     }
 
@@ -23,6 +24,9 @@ export default class PasswordInput extends Component {
     componentDidUpdate(prevProps) {
         if (prevProps.maskPassword != this.props.maskPassword) {
             this.setState({ maskPassword: this.props.maskPassword })
+        }
+        if (prevProps.editable != this.props.editable) {
+            this.setState({ editable: this.props.editable })
         }
     }
 
@@ -53,12 +57,13 @@ export default class PasswordInput extends Component {
             <View style={[this.props.style, styles.container]} >
                 <TouchableOpacity activeOpacity={1} onPress={() => this.handleInputClick()}>
                     <View style={styles.subContainer} >
-                        <Text style={styles.loginLabelName}>{this.state.labelName}</Text>
+                        <Text style={this.state.editable ? styles.loginLabelName : styles.disableLabelName}>{this.state.labelName}</Text>
                         <TextInput
                             autoCapitalize={'none'}
                             autoCorrect={false}
                             spellCheck={false}
                             secureTextEntry={this.state.maskPassword}
+                            editable={this.state.editable}
                             underlineColorAndroid='rgba(0,0,0,0)'
                             keyboardType={Platform.OS === 'android' ? 'default' : 'ascii-capable'}
                             onChangeText={text => this.setTextInput(text)}
