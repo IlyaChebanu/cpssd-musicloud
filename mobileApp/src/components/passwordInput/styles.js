@@ -8,6 +8,9 @@ export default StyleSheet.create({
         height: 66,
         backgroundColor: 'rgba(255, 255, 255, 0.08)',
     },
+    disabledContainer: {
+        opacity: 0.5,
+    },
     subContainer: {
         // flex: 1,
         marginLeft: 15,

@@ -45,7 +45,7 @@ export default class LoginInput extends Component {
 
     render() {
         return (
-            <View style={[this.props.style, styles.container]} >
+            <View style={[this.props.style, styles.container, !this.state.editable && styles.disabledContainer]} >
                 <TouchableOpacity activeOpacity={1} onPress={() => this.handleInputClick()}>
                 <View style={styles.subContainer} >
                     <Text style={this.state.editable ? styles.loginLabelName : styles.disableLabelName}>{this.state.labelName}</Text>

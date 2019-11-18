@@ -104,7 +104,7 @@ class UserSettingsScreen extends React.Component {
                             <LoginInput
                                 ref={ref => (this.loginInputName = ref)}
                                 setText={this.setEmailTextInput.bind(this)}
-                                style={{ "marginBottom": 1 }}
+                                style={{ "marginBottom": 15 }}
                                 editable={this.state.oldPassword.length >= 1}
                                 labelName={"New Email"} />
 
