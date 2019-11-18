@@ -32,13 +32,10 @@ li {
     text-align: left;
     
     border-bottom: 1px solid #3d4044;
-
-    svg {
-        
-        width: 20px;
-        height: 20px;
+    p {
+        margin: 0;
+        padding: 8px;
     }
-    
 }
 li:last-child {
     border-bottom: none;
@@ -49,10 +46,6 @@ li:hover {
     color: white;
 }
 
-p {
-    margin: 0;
-    padding: 8px;
-}
 
 p:hover {
     padding-left: 12px;
