@@ -74,6 +74,7 @@ class UserProfileComponent extends React.Component {
     let userData = this.props.otherUserData
     return (
       <View>
+        <Text style={styles.usernameText}>{this.props.otherUserData.username}</Text>
         <View style={styles.container}>
           {profilePicUrl ? <Image style={styles.profilePic} source={{ uri: profilePicUrl }} /> :
             <Image style={styles.profilePic} source={profilePic} />}

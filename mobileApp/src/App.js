@@ -10,7 +10,7 @@ import { Provider } from "react-redux";
 import store from "./Store";
 import Navigator, { middleware } from "./navigation/navigator";
 import { Platform, StyleSheet, Text, View } from "react-native";
-
+console.disableYellowBox = true;
 type Props = {};
 export default class App extends Component<Props> {
   render() {

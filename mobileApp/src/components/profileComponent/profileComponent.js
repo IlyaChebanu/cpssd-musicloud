@@ -61,6 +61,7 @@ class ProfileComponent extends React.Component {
           let picUrl = signedUrl + urlKey
           putUploadFile(urlKey, file, 'image/png').then(response => {
             if (response === 200) {
+              this.props.setPicUrl(picUrl)
               patchUserPictureUrl(this.props.accessToken, picUrl).then(response => {
                 if (response.status===200) {
                   this.showAlert('Sucess', 'Photo uploaded sucessfully')

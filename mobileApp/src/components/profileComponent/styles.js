@@ -8,6 +8,13 @@ export default StyleSheet.create({
     paddingTop: 20,
     flexDirection: 'row',
   },
+  usernameText: {
+    color: '#FFF',
+    fontSize: 16,
+    marginTop: 10,
+    marginLeft: 20,
+    justifyContent: 'center',
+  },
   statsContainer: {
       paddingLeft: 30,
       flex: 2

@@ -23,7 +23,7 @@ export default StyleSheet.create({
     right: 0,
   },
   textContainer: {
-    marginTop: height > 600 ? 440 : 280,
+    marginTop: Platform.OS === 'android' ? height > 600 ? 360 : 300 : height > 600 ? 440 : 280,
   },
   songNameText: {
     color: '#fff',
