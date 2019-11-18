@@ -21,7 +21,7 @@ class ProfileSongs extends React.Component {
   }
 
   getSongs() {
-    getCompiledSongs(this.props.accessToken, 111).then(response => {
+    getCompiledSongs(this.props.accessToken, this.props.username, 10).then(response => {
       if (isNaN(response)) {
         this.setState({ songsData: response.compiled_songs})
       } else {
@@ -43,6 +43,7 @@ class ProfileSongs extends React.Component {
         <Text style={styles.profileTitleText}>{"PROFILE"}</Text>
         <ProfileComponent accessToken={this.props.accessToken} username={this.props.username} />
         <Text style={styles.titleText}>{"Songs"}</Text>
+        {this.state.songsData && <Text style={styles.noSongsText}>{'User has no songs yet'}</Text>}
       </View>
     )
   }
@@ -65,6 +66,7 @@ class ProfileSongs extends React.Component {
   }
 
   render() {
+
     return (
       <View style={styles.container}>
         <FlatList
@@ -83,6 +85,7 @@ class ProfileSongs extends React.Component {
 function mapStateToProps(state) {
   return {
     token: state.home.token,
+    username: state.home.username,
   };
 }
 

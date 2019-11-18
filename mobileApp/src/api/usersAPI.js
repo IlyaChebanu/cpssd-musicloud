@@ -388,3 +388,42 @@ export function patchUserDetails(current_password, password, email, token) {
             return error
         });
 }
+
+export function patchUserPictureUrl(token, picUrl) {
+
+    let url = `${API_URL}api/v1/users/profiler`;
+    var request = new Request(url, {
+        method: "PATCH",
+        headers: new Headers({
+            "Content-Type": "application/json",
+            "Authorization": 'Bearer ' + token,
+        }),
+        body: JSON.stringify({
+            "url": picUrl
+        })
+    });
+    if (__DEV__) {
+        console.log("patchUserPictureUrl : request " + JSON.stringify(request))
+    }
+
+    return fetch(request)
+        .then(response => {
+            if (response.status === 200) {
+                return response.json()
+            } else {
+                return response.status
+            }
+        })
+        .then(responseJson => {
+            if (__DEV__) {
+                console.log("patchUserPictureUrl : response " + JSON.stringify(responseJson))
+            }
+            return responseJson;
+        })
+        .catch(error => {
+            if (__DEV__) {
+                console.log("patchUserPictureUrl : error " + JSON.stringify(error))
+            }
+            return error
+        });
+}
