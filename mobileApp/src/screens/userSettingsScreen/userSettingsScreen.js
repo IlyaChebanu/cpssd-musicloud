@@ -12,6 +12,7 @@ import MultiPurposeButton from "../../components/multiPurposeButton/multiPurpose
 import HeaderComponent from "../../components/headerComponent/headerComponent";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { patchUserDetails } from "../../api/usersAPI";
+import { getInvalidUserSettingsDetails } from "../../utils/helpers";
 
 class UserSettingsScreen extends React.Component {
     constructor(props) {
@@ -68,13 +69,18 @@ class UserSettingsScreen extends React.Component {
     }
 
     handleSaveChangesClick() {
-        patchUserDetails(this.state.oldPassword, this.state.newPassword, this.state.email, this.props.token).then(response => {
-            if (isNaN(response)) {
-                this.showAlert('Success', response.message)
-            } else {
-                this.showAlert('Error', 'failed to patchUserDetails')
-            }
-        })
+        let invalidFields = getInvalidUserSettingsDetails(this.state.oldPassword, this.state.email, this.state.newPassword, this.state.newPasswordRepeat)
+        if (invalidFields.length === 0) {
+            patchUserDetails(this.state.oldPassword, this.state.newPassword, this.state.email, this.props.token).then(response => {
+                if (response.status===200) {
+                    this.showAlert('Success', response.data.message)
+                } else {
+                    this.showAlert('Error', (response.data.message))
+                }
+            })
+        } else {
+            this.showAlert('Error', "Invalid: " + invalidFields.join(', '))
+        }
     }
 
     render() {
@@ -85,19 +91,20 @@ class UserSettingsScreen extends React.Component {
                     <View style={styles.container}>
                         <KeyboardAwareScrollView>
                             <Text style={styles.titleText}>{"USER SETTINGS"}</Text>
-                            <LoginInput
-                                ref={ref => (this.loginInputName = ref)}
-                                setText={this.setEmailTextInput.bind(this)}
-                                style={{ "marginBottom": 25 }}
-                                labelName={"Change Email"} />
 
                             <PasswordInput
                                 ref={ref => (this.loginInputName = ref)}
                                 togglePassword={this.toggleOldPasswordMask.bind(this)}
                                 maskPassword={this.state.maskOldPassword}
                                 setText={this.setOldPasswordTextInput.bind(this)}
+                                style={{ "marginBottom": 25 }}
+                                labelName={"Current Password"} />
+
+                            <LoginInput
+                                ref={ref => (this.loginInputName = ref)}
+                                setText={this.setEmailTextInput.bind(this)}
                                 style={{ "marginBottom": 1 }}
-                                labelName={"Old Password"} />
+                                labelName={"New Email"} />
 
                             <PasswordInput
                                 ref={ref => (this.loginInputName = ref)}
