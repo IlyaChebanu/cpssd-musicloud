@@ -19,6 +19,13 @@ class MusicPlayerScreen extends React.Component {
 
     }
 
+    handleAuthorClick() {
+        // this.props.navigateToHomeScreen()
+        // this.props.setViewingProfile(true)
+        this.props.navigation.navigate('Profile')
+        // this.props.navigateBack()
+    }
+
     render() {
         var logoImage = require("../../assets/images/logo.png");
         var arrowDownImg = require("../../assets/images/arrow_down.png");
@@ -31,7 +38,7 @@ class MusicPlayerScreen extends React.Component {
                             <Image style={styles.arrowDownImg} source={arrowDownImg} />
                         </TouchableOpacity>
                     </View>
-                    <MusicPlayer songData={this.props.songData} videoUrl={this.props.songUrl} musicDidEnd={this.musicDidEnd.bind(this)} navigation={this.props.navigation} />
+                    <MusicPlayer songData={this.props.songData} videoUrl={this.props.songUrl} musicDidEnd={this.musicDidEnd.bind(this)} navigation={this.props.navigation} handleAuthorClick={this.handleAuthorClick.bind(this)} />
                 </View>
 
             </SafeAreaView>

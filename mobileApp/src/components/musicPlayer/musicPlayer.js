@@ -81,6 +81,10 @@ export default class MusicPlayer extends React.Component {
         this.togglePlay()
     }
 
+    handleProfileClick() {
+        this.props.handleAuthorClick()
+    }
+
     render() {
         let songImage = this.state.songData[7]
         let playButtonImg = this.state.isPaused ? require('../../assets/images/play_arrow.png') : require('../../assets/images/pause.png')
@@ -103,7 +107,9 @@ export default class MusicPlayer extends React.Component {
                 <Image source={{uri: songImage}} style={styles.songImg} />
                 <View style={styles.textContainer}>
                     <Text style={styles.songNameText}>{this.state.songData[2]}</Text>
-                    <Text style={styles.songTypeText}>{this.state.songData[8]}</Text>
+                    <TouchableOpacity onPress={() => this.handleProfileClick()} >
+                        <Text style={styles.songAuthorText}>{this.state.songData[1]}</Text>
+                    </TouchableOpacity>
                 </View>
                 <TouchableOpacity onPress={() => this.handlePlayClick()} style={styles.playButton}>
                     <Image source={playButtonImg} />

@@ -33,7 +33,7 @@ export default StyleSheet.create({
     marginLeft: 20,
     marginRight: 20,
   },
-  songTypeText: {
+  songAuthorText: {
     marginTop: 10,
     textAlign: 'center',
     color: '#fff',

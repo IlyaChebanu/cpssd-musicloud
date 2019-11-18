@@ -50,8 +50,9 @@ class HomeScreen extends React.Component {
 
   renderSong({ item, index }) {
     let songName = item[2]
-    let authorName = item[8]
+    let authorName = item[1]
     let songImage = item[7]
+    let genre = item[8]
     let playImage = require('../../assets/images/play.png')
     return (
       <TouchableOpacity style={styles.songContainer} onPress={() => this.handleSongClick(item, index)}>
