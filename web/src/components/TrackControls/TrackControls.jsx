@@ -23,7 +23,7 @@ const TrackControls = memo(props => {
     const handleMouseMove = e => {
       const track = store.getState().studio.tracks[props.index];
       const pos = e.screenY;
-      const volume = clamp(0, 1, startVolume - (pos - startPos) / 100);
+      const volume = clamp(0, 1, startVolume - (pos - startPos) / 200);
       if (volume !== lastVolume) {
         lastVolume = volume;
         track.volume = volume;
@@ -46,7 +46,7 @@ const TrackControls = memo(props => {
     const handleMouseMove = e => {
       const track = store.getState().studio.tracks[props.index];
       const pos = e.screenY;
-      const pan = clamp(-1, 1, startPan - (pos - startPos) / 100);
+      const pan = clamp(-1, 1, startPan - (pos - startPos) / 200);
       if (pan !== lastPan) {
         lastPan = pan;
         track.pan = pan;

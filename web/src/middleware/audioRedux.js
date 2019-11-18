@@ -51,7 +51,7 @@ export default store => {
           sample.track = i;
           sample.buffer = bufferStore[sample.url];
           sample.endTime = endTime;
-          return startTime >= audioContext.currentTime && startTime < startTime + OVERLAP;
+          return endTime > audioContext.currentTime && startTime <= audioContext.currentTime || startTime >= audioContext.currentTime && startTime < startTime + OVERLAP;
         }));
       });
 
@@ -74,24 +74,6 @@ export default store => {
         requestAnimationFrame(beatUpdate);
         state = store.getState().studio;
         store.dispatch(playingStartBeat(state.currentBeat));
-        const schedulableSamples = [];
-        state.tracks.forEach((track, i) => {
-          schedulableSamples.push(...track.samples.filter(sample => {
-            const [startTime, endTime] = getSampleTimes(audioContext, state, sample);
-            sample.volume = track.volume;
-            sample.track = i;
-            sample.buffer = bufferStore[sample.url];
-            sample.endTime = endTime;
-            return endTime > audioContext.currentTime && startTime <= audioContext.currentTime;
-          }));
-        });
-
-        schedulableSamples.forEach(sample => {
-          if (!(sample.id in scheduledSamples)) {
-            const source = scheduleSample(sample);
-            scheduledSamples[sample.id] = { ...sample, ...source };
-          }
-        });
         break;
 
       case 'STUDIO_PAUSE':
@@ -142,10 +124,11 @@ export default store => {
         state = store.getState().studio;
         // React to volume change
         Object.values(scheduledSamples).forEach(sample => {
-          const track = action.track;
+          const track = state.tracks[sample.track];
           const soloTrack = _.findIndex(state.tracks, 'solo');
           const solo = soloTrack !== -1 && soloTrack !== sample.track;
-          sample.gain.gain.setValueAtTime(solo ? 0 : track.mute ? 0 : track.volume, audioContext.currentTime);
+          const newVol = solo ? 0 : track.mute ? 0 : track.volume;
+          sample.gain.gain.setValueAtTime(newVol, audioContext.currentTime);
           sample.pan.pan.setValueAtTime(track.pan, audioContext.currentTime);
         });
 
