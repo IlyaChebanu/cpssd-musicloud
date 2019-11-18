@@ -10,10 +10,12 @@ import { ReactComponent as Arrow } from '../../assets/icons/arrow-up-light.svg';
 const Looper = memo(props => {
   const { loopStart, loopEnd, loopEnabled, gridSnapEnabled, gridSize, dispatch } = props;
 
-  const handleDragLArrow = useCallback(() => {
+  const handleDragLArrow = useCallback(e => {
+    const mouseStartPos = e.screenX;
+    const initialLoopStart = loopStart;
     const handleMouseMove = e => {
-      const scroll = store.getState().studio.scroll;
-      const start = (scroll + e.screenX - 220) / 40 + 1;
+      e.preventDefault();
+      const start = initialLoopStart + (e.screenX - mouseStartPos) / 40 / window.devicePixelRatio;
       const numDecimalPlaces = Math.max(0, String(1 / gridSize).length - 2);
       dispatch(setLoop({
         start: Math.min(
@@ -30,12 +32,15 @@ const Looper = memo(props => {
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleDragStop);
-  }, [loopEnd, gridSnapEnabled, gridSize]);
+  }, [loopStart, loopEnd, gridSnapEnabled, gridSize]);
 
-  const handleDragRArrow = useCallback(() => {
+  const handleDragRArrow = useCallback(e => {
+    const mouseStartPos = e.screenX;
+    const initialLoopEnd = loopEnd;
     const handleMouseMove = e => {
+      e.preventDefault();
       const scroll = store.getState().studio.scroll;
-      const stop = (scroll + e.screenX - 220) / 40 + 1;
+      const stop = initialLoopEnd + (e.screenX - mouseStartPos) / 40 / window.devicePixelRatio;
       const numDecimalPlaces = Math.max(0, String(1 / gridSize).length - 2);
       dispatch(setLoop({
         start: loopStart,
@@ -52,7 +57,7 @@ const Looper = memo(props => {
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleDragStop);
-  }, [loopStart, gridSnapEnabled, gridSize]);
+  }, [loopEnd, loopStart, gridSnapEnabled, gridSize]);
 
   const wrapperStyle = useMemo(() => {
     return {

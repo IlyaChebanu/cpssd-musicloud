@@ -2,7 +2,6 @@ import React from "react"
 import { StyleSheet, Text, View, Image, FlatList, TextInput } from "react-native"
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
-import postsData from "./samplePostData";
 import MultiPurposeButton from "../multiPurposeButton/multiPurposeButton";
 import ProfileComponent from "../profileComponent/profileComponent";
 import CreatePostComponent from "../createPostComponent/createPostComponent";
