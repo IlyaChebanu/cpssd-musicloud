@@ -34,13 +34,17 @@ export default class ProfilePosts extends React.Component {
     this.setState({ inputText: text });
   }
 
+  createdPost() {
+    this.getPosts()
+  }
+
   renderheader() {
     return (
       <View style={styles.container}>
         <Text style={styles.profileTitleText}>{"PROFILE"}</Text>
         <ProfileComponent accessToken={this.props.accessToken} username={this.props.username} />
         <Text style={styles.titleText}>{"Posts"}</Text>
-        <CreatePostComponent accessToken={this.props.accessToken}/>
+        <CreatePostComponent createdPost={this.createdPost.bind(this)} accessToken={this.props.accessToken}/>
       </View>
     )
   }
