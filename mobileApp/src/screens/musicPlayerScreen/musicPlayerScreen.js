@@ -8,11 +8,18 @@ import styles from "./styles";
 import { SafeAreaView } from "react-navigation";
 import HeaderComponent from "../../components/headerComponent/headerComponent";
 import MusicPlayer from "../../components/musicPlayer/musicPlayer";
+import { getUserInfo } from "../../api/usersAPI";
 
 class MusicPlayerScreen extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+        //   userDetails: {},
+        };
+      }
 
     componentDidMount() {
-
+        // this.getUserDetails()
     }
 
     musicDidEnd() {
@@ -20,9 +27,8 @@ class MusicPlayerScreen extends React.Component {
     }
 
     handleAuthorClick() {
-        // this.props.navigateToHomeScreen()
-        // this.props.setViewingProfile(true)
-        this.props.navigation.navigate('Profile')
+        this.props.navigateToUserProfileScreen()
+        // this.props.navigation.navigate('Profile')
         // this.props.navigateBack()
     }
 
@@ -38,7 +44,15 @@ class MusicPlayerScreen extends React.Component {
                             <Image style={styles.arrowDownImg} source={arrowDownImg} />
                         </TouchableOpacity>
                     </View>
-                    <MusicPlayer songData={this.props.songData} videoUrl={this.props.songUrl} musicDidEnd={this.musicDidEnd.bind(this)} navigation={this.props.navigation} handleAuthorClick={this.handleAuthorClick.bind(this)} />
+                    {/* <HeaderComponent navigation={this.props.navigation} /> */}
+                    <MusicPlayer 
+                        songData={this.props.songData}
+                        profilePic={this.props.otherUserData.profile_pic_url && this.props.otherUserData.profile_pic_url}
+                        videoUrl={this.props.songUrl}
+                        arrowClick={() => this.props.navigateBack()}
+                        musicDidEnd={this.musicDidEnd.bind(this)}
+                        navigation={this.props.navigation}
+                        handleAuthorClick={this.handleAuthorClick.bind(this)} />
                 </View>
 
             </SafeAreaView>
@@ -49,6 +63,7 @@ class MusicPlayerScreen extends React.Component {
 function mapStateToProps(state) {
     return {
         token: state.home.token,
+        otherUserData: state.user.otherUserData,
         songId: state.song.songId,
         songUrl: state.song.songUrl,
         songData: state.song.songData,

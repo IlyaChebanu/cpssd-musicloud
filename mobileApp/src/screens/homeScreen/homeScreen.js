@@ -9,6 +9,7 @@ import HeaderComponent from "../../components/headerComponent/headerComponent";
 import { SafeAreaView } from "react-navigation";
 import SearchComponent from "../../components/searchComponent/searchComponent";
 import { getCompiledSongs } from "../../api/audioAPI";
+import { getUserInfo } from "../../api/usersAPI";
 
 class HomeScreen extends React.Component {
   constructor(props) {
@@ -22,10 +23,19 @@ class HomeScreen extends React.Component {
     this.getSongs()
   }
 
+  getOtherUserDetails(username) {
+    getUserInfo(username, this.props.token).then(response => {
+      if (response.status===200) {
+        this.props.setOtherUserData(response.data)
+      }
+    })
+  }
+
   handleSongClick(item, index) {
     this.props.setSongData(item)
     this.props.setSongId(item[0])
     this.props.setSongUrl(item[6])
+    this.getOtherUserDetails(item[1])
     this.props.navigateToMusicPlayerScreen()
   }
 
