@@ -16,4 +16,9 @@ export default {
     SETTINGS_PASSWORD: "Current Password required",
     SETTINGS_PASSWORD_OR_EMAIL: "New Password or Email needed",
     SETTINGS_PASSWORD_NOT_MATCH: "New Passwords do not match",
+
+    //Forgot Password Screen
+    FORGOT_PASSWORD: "New Password Required",
+    FORGOT_PASSWORD_NOT_MATCH: "New Passwords do not match",
+    FORGOT_CODE: "Code required",
   };

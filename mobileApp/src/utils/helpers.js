@@ -54,3 +54,16 @@ export function getInvalidUserSettingsDetails(oldPassword, email, password, pass
     }
     return invalidFields
 }
+
+export function getInvalidForgotPasswordDetails(newPassword, newPasswordRepeat, code) {
+    var invalidFields = []
+    if (code < 1) {
+        invalidFields.push(GLOBALS.FORGOT_CODE)
+    }
+    if (newPassword < 1) {
+        invalidFields.push(GLOBALS.FORGOT_PASSWORD)
+    } else if (newPassword !== newPasswordRepeat) {
+        invalidFields.push(GLOBALS.FORGOT_PASSWORD_NOT_MATCH)
+    }
+    return invalidFields
+}

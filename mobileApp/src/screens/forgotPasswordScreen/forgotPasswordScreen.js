@@ -10,6 +10,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import MultiPurposeButton from "../../components/multiPurposeButton/multiPurposeButton";
 import PasswordInput from "../../components/passwordInput/passwordInput";
 import { passwordResetInitialize, passwordResetConfirm } from "../../api/usersAPI";
+import { getInvalidForgotPasswordDetails } from "../../utils/helpers";
 
 const STATE_LOGIN_RESET_INITIAL = 1;
 const STATE_LOGIN_RESET_FINISH = 2;
@@ -61,13 +62,18 @@ class ForgotPasswordScreen extends React.Component {
   }
 
   handleConfirmResetClick() {
-    passwordResetConfirm(this.state.email, Number(this.state.code), this.state.password).then(response => {
-      if (response.status === 200) {
-        this.showAlert('Password Sucessfully reset', 'Password succesfully reset. Press Ok to log in.', this.handleResetOkClick)
-      } else {
-        this.showAlert('Error', response.data.message ? response.data.message : 'PasswordResetConfirm Failed')
-      }
-    })
+    let invalidFields = getInvalidForgotPasswordDetails(this.state.password, this.state.passwordRepeat, this.state.code)
+    if (invalidFields.length === 0) {
+      passwordResetConfirm(this.state.email, Number(this.state.code), this.state.password).then(response => {
+        if (response.status === 200) {
+          this.showAlert('Password Sucessfully reset', 'Password succesfully reset. Press Ok to log in.', this.handleResetOkClick)
+        } else {
+          this.showAlert('Error', response.data.message ? response.data.message : 'PasswordResetConfirm Failed')
+        }
+      })
+    } else {
+      this.showAlert('Error', "Invalid: " + invalidFields.join(', '))
+    }
   }
 
   setEmailTextInput(text) {
