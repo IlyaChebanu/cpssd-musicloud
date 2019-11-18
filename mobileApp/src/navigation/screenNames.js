@@ -7,4 +7,5 @@ export const REGISTER_SCREEN = "RegisterScreen";
 export const HOME_SCREEN = "HomeScreen";
 export const USER_SETTINGS_SCREEN = "UserSettingsScreen";
 export const MUSIC_PLAYER_SCREEN = "MusicPlayerScreen";
+export const USER_PROFILE_SCREEN = "UserProfileScreen";
 

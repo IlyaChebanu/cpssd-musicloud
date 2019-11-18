@@ -24,5 +24,31 @@ export default StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
+  },
+  followingContainer: {
+    marginTop: 10,
+    marginLeft: 20,
+    justifyContent: 'center',
+    // alignItems: 'flex',
+  },
+  button: {
+    borderRadius: 5,
+    width: 100,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  followingButton: {
+    
+  },
+  followingNotButton: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 5,
+    width: 100,
+    height: 40,
+  },
+  followText: {
+    color: '#FFF'
   }
 })

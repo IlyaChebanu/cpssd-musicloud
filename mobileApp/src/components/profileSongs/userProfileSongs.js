@@ -5,10 +5,10 @@ import { bindActionCreators } from 'redux';
 import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity } from "react-native";
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
-import ProfileComponent from "../profileComponent/profileComponent";
+import UserProfileComponent from "../profileComponent/userProfileComponent";
 import { getCompiledSongs } from "../../api/audioAPI";
 
-class ProfileSongs extends React.Component {
+class UserProfileSongs extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -42,7 +42,7 @@ class ProfileSongs extends React.Component {
     return (
       <View style={styles.container}>
         <Text style={styles.profileTitleText}>{"PROFILE"}</Text>
-        <ProfileComponent accessToken={this.props.accessToken} username={this.props.username} />
+        <UserProfileComponent accessToken={this.props.accessToken} username={this.props.username} />
         <Text style={styles.titleText}>{"Songs"}</Text>
         {this.state.songsData.length === 0 ? <Text style={styles.noSongsText}>{'User has no songs yet'}</Text> : null}
       </View>
@@ -86,7 +86,7 @@ class ProfileSongs extends React.Component {
 function mapStateToProps(state) {
   return {
     token: state.home.token,
-    username: state.home.username,
+    // username: state.home.username,
   };
 }
 
@@ -94,4 +94,4 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators(ActionCreators, dispatch);
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(ProfileSongs);
+export default connect(mapStateToProps, mapDispatchToProps)(UserProfileSongs);
