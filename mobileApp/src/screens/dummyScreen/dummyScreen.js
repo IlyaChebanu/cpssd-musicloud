@@ -1,5 +1,5 @@
-import React from "react"
-import { StyleSheet, Text, View, Image } from "react-native"
+import React from "react";
+import { StyleSheet, Text, View, Image } from "react-native";
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import LoginInput from "../../components/loginInput/loginInput";

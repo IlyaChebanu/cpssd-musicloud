@@ -1,5 +1,5 @@
-import React from "react"
-import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native"
+import React from "react";
+import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
 import styles from "./styles";
 
 export default class HeaderComponent extends React.Component {

@@ -1,5 +1,5 @@
-import React from 'react'
-import { Dimensions, Text, View, Image, TouchableOpacity, ActivityIndicator } from 'react-native'
+import React from 'react';
+import { Dimensions, Text, View, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
 import styles from './styles';
 import Video from 'react-native-video';
 import Spinner from '../spinner/spinner';

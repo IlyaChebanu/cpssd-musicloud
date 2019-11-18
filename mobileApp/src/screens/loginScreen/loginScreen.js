@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from 'react-redux';
 import { ActionCreators } from '../../actions/index';
 import { bindActionCreators } from 'redux';
-import { StyleSheet, Text, View, Image, TouchableOpacity, Alert } from "react-native"
+import { StyleSheet, Text, View, Image, TouchableOpacity, Alert } from "react-native";
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import LoginInput from "../../components/loginInput/loginInput";
@@ -12,7 +12,6 @@ import { writeDataToStorage, TOKEN_DATA_KEY, USERNAME_DATA_KEY } from "../../uti
 import { getInvalidLoginDetails } from "../../utils/helpers";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import PasswordInput from "../../components/passwordInput/passwordInput";
-// import { loginUser } from "../../api/usersAPI";
 
 class LoginScreen extends React.Component {
   constructor(props) {

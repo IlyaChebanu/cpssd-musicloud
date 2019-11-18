@@ -1,8 +1,8 @@
-import React from "react"
+import React from "react";
 import { connect } from 'react-redux';
 import { ActionCreators } from '../../actions/index';
 import { bindActionCreators } from 'redux';
-import { StyleSheet, Text, View, Image, Dimensions, Platform, TouchableOpacity } from "react-native"
+import { StyleSheet, Text, View, Image, Dimensions, Platform, TouchableOpacity } from "react-native";
 import styles from "./styles";
 import { SafeAreaView, NavigationActions } from "react-navigation";
 import { clearAllStorage } from "../../utils/localStorage";

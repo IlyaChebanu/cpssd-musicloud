@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, TouchableOpacity, Alert, Text, TextInput, Platform } from 'react-native'
+import { View, TouchableOpacity, Alert, Text, TextInput, Platform } from 'react-native';
 import GLOBALS from '../../utils/globalStrings';
 import styles from './styles';
 import LinearGradient from "react-native-linear-gradient";
