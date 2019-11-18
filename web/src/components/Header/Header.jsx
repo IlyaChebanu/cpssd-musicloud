@@ -1,4 +1,4 @@
-import React, { useCallback, memo } from 'react';
+import React, { useEffect, useRef, useCallback, memo } from 'react';
 import cookie from 'js-cookie';
 import PropTypes from 'prop-types';
 import styles from './Header.module.scss';
@@ -20,20 +20,62 @@ import importIcon from '../../assets/icons/file_dropdown/import.svg';
 import exportIcon from '../../assets/icons/file_dropdown/export.svg';
 import generateIcon from '../../assets/icons/file_dropdown/generate.svg';
 import exitIcon from '../../assets/icons/file_dropdown/exit.svg';
-
+import { uploadFile } from '../../helpers/api';
+import {setTrackAtIndex } from '../../actions/studioActions';
+import store from '../../store'
+import { bufferStore } from '../../helpers/constants';
 
 const Header = memo(props => {
 
- const func = () => {
-    console.log("action New")
+  function buildFileSelector(){
+    const fileSelector = document.createElement('input');
+    fileSelector.setAttribute('type', 'file');
+    fileSelector.setAttribute('accept', 'audio/*');
+    return fileSelector;
   }
+  
+  
+    
+  const fileSelector = buildFileSelector();
+  const { dispatch, history } = props;
+  const { token } = props.user;
+   const handleSampleSelect = useCallback(() => {
+      
+      fileSelector.click();
+      fileSelector.onchange = function() {
+        const url = uploadFile("audio", fileSelector.files[0], cookie.get("token"));
+        
+        var sampleUrl = '';
+        var cast = Promise.resolve(url);
+          cast.then(function(value) {
+
+            var state = store.getState().studio
+            
+            
+           var track = {...state.tracks[state.selectedTrack]}
+           track.samples.push({
+            url: fileSelector.files[0],
+            id: 1156,
+            time: 10,
+          })
+          
+          props.dispatch(setTrackAtIndex(track, state.selectedTrack))
+        })
+          }
+      
+      });
+
+
+
+
+  
 
   const fileDropdownItems = [
-    {name: "New", action: func, icon: newIcon },
+    {name: "New", action: null, icon: newIcon },
     {name: "Open", icon: openIcon},
     {name: "Publish", icon: publishIcon},
     {name: "Save", icon: saveIcon},
-    {name: "Import", icon: importIcon},
+    {name: "Import", icon: importIcon, action: handleSampleSelect},
     {name: "Export", icon: exportIcon},
     {name: "Generate", icon: generateIcon},
     {name: "Exit", icon: exitIcon},
@@ -48,8 +90,7 @@ const Header = memo(props => {
     {name: "Edit 7"},
     {name: "Edit 8"},
   ]
-  const { dispatch, history } = props;
-  const { token } = props.user;
+
 
   const handleSignout = useCallback(
     () => {
@@ -89,11 +130,11 @@ const Header = memo(props => {
   );
 });
 
-Header.propTypes = {
+Header.PropTypes = {
+  
+}
 
-};
-
-const mapStateToProps = ({ user }) => ({ user });
+const mapStateToProps = ({ state, user, studio }) => ({ state, user, studio, tracks: studio.tracks });
 
 export default withRouter(connect(mapStateToProps)(Header));
 

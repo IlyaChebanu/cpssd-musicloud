@@ -1,7 +1,7 @@
 import React, { memo, useCallback, useEffect, useMemo } from 'react';
 import styles from './Studio.module.scss';
 import Header from '../../components/Header';
-import { play, pause, stop, setTempo, setVolume, setTracks, setScroll, setScrollY } from '../../actions/studioActions';
+import { play, pause, stop, setTempo, setVolume, setTracks, setScroll, setTrackAtIndex, setScrollY} from '../../actions/studioActions';
 import { connect } from 'react-redux';
 import kick from '../../assets/basic_sounds/kick.wav';
 import clap from '../../assets/basic_sounds/clap.wav';
@@ -19,7 +19,7 @@ import TrackControls from '../../components/TrackControls';
 import Button from '../../components/Button';
 import PlayBackControls from '../../components/PlaybackControls'
 
-import FileUploader from '../../components/FileUploader';
+import FileUploader from '../../components/FileSelector/FileSelector';
 import Track from '../../components/Track/Track';
 
 import { saveState } from '../../helpers/api';
@@ -347,6 +347,12 @@ const Studio = memo(props => {
     transform: `translateY(${-props.studio.scrollY}px)`
   }), [props.studio.scrollY]);
 
+  const handleAddNewSample = useCallback((sample) => {
+    var track = props.tracks[props.index]
+    track.samples.concat(sample)
+    props.dispatch(setTrackAtIndex())
+  })
+
   return (
     <div className={styles.wrapper}>
       <Header selected={0}>
@@ -373,9 +379,7 @@ const Studio = memo(props => {
         <div className={styles.scrollableMain} onScroll={handleScroll}>
           <div className={styles.mainContent}>
             <Timeline />
-            <div className={styles.tracks}>
-              {tracks}
-            </div>
+            {tracks}
           </div>
         </div>
       </div>

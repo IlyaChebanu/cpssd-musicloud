@@ -55,24 +55,33 @@ const putMedia = (signedUrl, file, options) => {
 }
 
 export const uploadFile = async (dir, f, token, e) => {
+  var url = '';
   try {
-    const res = await generatePresignedPost(dir, f.meta.name, f.meta.type, token)
+    const res = await generatePresignedPost(dir, f.name, f.type, token)
+    
     var options = {
       headers: {
-        'Content-Type': f.meta.type,
+        'Content-Type': f.type,
       }
     }
     if (res.status === 200) {
       var data = new FormData();
       data.append("file", f.file)
         const putAudio = async e1 => {
-          const res2 = await putMedia(makeSignedUrl(res.data.signed_url), data, options)
+          
+          url = makeSignedUrl(res.data.signed_url)
+          
+          const res2 = await putMedia(url, data, options)
+          
         }
         putAudio()
     }
   } catch (e) {
+    
     return e.response
   }
+  return url.toString()
+  
 }
 
 // TODO: use extra params to make use of signed url without public access to the bucket

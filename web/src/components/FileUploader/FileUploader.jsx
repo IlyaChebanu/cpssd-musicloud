@@ -1,6 +1,6 @@
-import React, { useCallback } from 'react';
+import React, { memo, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import 'react-dropzone-uploader/dist/styles.css';
+
 import Dropzone from 'react-dropzone-uploader';
 import { uploadFile } from '../../helpers/api';
 import cookie from 'js-cookie';
