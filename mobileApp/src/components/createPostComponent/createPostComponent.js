@@ -46,11 +46,11 @@ export default class CreatePostComponent extends Component {
 
     handlePostButtonClick() {
         createUserPost(this.state.postMessage, this.props.accessToken).then(response => {
-            if (response.message === 'Message posted.') {
+            if (response.status === 200) {
                 this.clearPost()
                 this.showAlert('Post created')
             } else {
-                this.showAlert('Error', 'ops')
+                this.showAlert('Error', response.data.message ? response.data.message : 'createUserPost Failed')
             }
         })
     }

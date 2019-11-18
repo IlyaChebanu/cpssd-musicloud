@@ -22,8 +22,8 @@ class ProfileSongs extends React.Component {
 
   getSongs() {
     getCompiledSongs(this.props.accessToken, this.props.username, 10).then(response => {
-      if (isNaN(response)) {
-        this.setState({ songsData: response.compiled_songs})
+      if (response.status === 200) {
+        this.setState({ songsData: response.data.compiled_songs})
       } else {
         
       }

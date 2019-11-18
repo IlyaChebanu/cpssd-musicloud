@@ -19,11 +19,9 @@ export function loginUser(username, password) {
 
     return fetch(request)
         .then(response => {
-            if (response.status === 200) {
-                return response.json()
-            } else {
-                return response.status
-            }
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
         })
         .then(responseJson => {
             if (__DEV__) {
@@ -59,11 +57,9 @@ export function registerUser(username, email, password) {
 
     return fetch(request)
         .then(response => {
-            if (response.status === 200) {
-                return response.json()
-            } else {
-                return response.status
-            }
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
         })
         .then(responseJson => {
             if (__DEV__) {
@@ -95,11 +91,9 @@ export function logoutUser(token) {
 
     return fetch(request)
         .then(response => {
-            if (response.status === 200) {
-                return response.json()
-            } else {
-                return response.status
-            }
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
         })
         .then(responseJson => {
             if (__DEV__) {
@@ -133,11 +127,9 @@ export function reVerifyEmail(email) {
 
     return fetch(request)
         .then(response => {
-            if (response.status === 200) {
-                return response.json()
-            } else {
-                return response.status
-            }
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
         })
         .then(responseJson => {
             if (__DEV__) {
@@ -168,11 +160,9 @@ export function passwordResetInitialize(email) {
 
     return fetch(request)
         .then(response => {
-            if (response.status === 200) {
-                return response.json()
-            } else {
-                return response.status
-            }
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
         })
         .then(responseJson => {
             if (__DEV__) {
@@ -208,11 +198,9 @@ export function passwordResetConfirm(email, code, password) {
 
     return fetch(request)
         .then(response => {
-            if (response.status === 200) {
-                return response.json()
-            } else {
-                return response.status
-            }
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
         })
         .then(responseJson => {
             if (__DEV__) {
@@ -244,11 +232,9 @@ export function getUserPosts(username, token) {
 
     return fetch(request)
         .then(response => {
-            if (response.status === 200) {
-                return response.json()
-            } else {
-                return response.status
-            }
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
         })
         .then(responseJson => {
             if (__DEV__) {
@@ -283,11 +269,9 @@ export function createUserPost(message, token) {
 
     return fetch(request)
         .then(response => {
-            if (response.status === 200) {
-                return response.json()
-            } else {
-                return response.status
-            }
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
         })
         .then(responseJson => {
             if (__DEV__) {
@@ -319,11 +303,9 @@ export function getUserInfo(username, token) {
 
     return fetch(request)
         .then(response => {
-            if (response.status === 200) {
-                return response.json()
-            } else {
-                return response.status
-            }
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
         })
         .then(responseJson => {
             if (__DEV__) {
@@ -369,11 +351,9 @@ export function patchUserDetails(current_password, password, email, token) {
 
     return fetch(request)
         .then(response => {
-            if (response.status === 200) {
-                return response.json()
-            } else {
-                return response.status
-            }
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
         })
         .then(responseJson => {
             if (__DEV__) {
@@ -408,11 +388,9 @@ export function patchUserPictureUrl(token, picUrl) {
 
     return fetch(request)
         .then(response => {
-            if (response.status === 200) {
-                return response.json()
-            } else {
-                return response.status
-            }
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
         })
         .then(responseJson => {
             if (__DEV__) {

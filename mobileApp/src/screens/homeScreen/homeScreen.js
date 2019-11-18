@@ -31,8 +31,8 @@ class HomeScreen extends React.Component {
 
   getSongs() {
     getCompiledSongs(this.props.token, '', 10).then(response => {
-      if (isNaN(response)) {
-        this.setState({ songsData: response.compiled_songs})
+      if (response.status === 200) {
+        this.setState({ songsData: response.data.compiled_songs})
       } else {
         
       }

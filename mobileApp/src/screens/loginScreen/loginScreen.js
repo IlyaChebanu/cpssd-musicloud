@@ -71,12 +71,12 @@ class LoginScreen extends React.Component {
     let invalidFields = getInvalidLoginDetails(this.state.username.trim(), this.state.password)
     if (invalidFields.length == 0) {
       loginUser(this.state.username, this.state.password).then(response => {
-        if (response.access_token) {
-          this.saveLoginDetails(response.access_token)
+        if (response.data.access_token) {
+          this.saveLoginDetails(response.data.access_token)
           this.props.setNewAccount(false)
           this.props.navigateToHomeScreen()
         } else {
-          this.showAlert('Invalid Credentials')
+          this.showAlert(response.data.message ? response.data.message : 'LoginUser Failed')
         }
       })
     } else {
@@ -86,10 +86,10 @@ class LoginScreen extends React.Component {
 
   handleVerifyClick() {
     reVerifyEmail(this.props.email).then(response => {
-      if (response.message == "Verification email sent.") {
+      if (response.status === 200) {
         this.reverifyAlert()
       } else {
-        this.showAlert('Failed to resent verification email')
+        this.showAlert(response.data.message ? response.data.message : 'VerifyEmail Failed')
       }
     })
   }

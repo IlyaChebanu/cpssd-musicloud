@@ -22,9 +22,9 @@ export default class ProfilePosts extends React.Component {
 
   getPosts() {
     getUserPosts(this.props.username, this.props.accessToken).then(response => {
-      if (isNaN(response)) {
+      if (response.status===200) {
         this.setState({
-          posts: response.posts
+          posts: response.data.posts
         })
       }
     })
