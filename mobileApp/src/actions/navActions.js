@@ -43,3 +43,8 @@ export const navigateToMusicPlayerScreen = () =>
         routeName: screenNames.MUSIC_PLAYER_SCREEN
     });
 
+export const navigateToUserProfileScreen = () =>
+    NavigationActions.navigate({
+        routeName: screenNames.USER_PROFILE_SCREEN
+    });
+
