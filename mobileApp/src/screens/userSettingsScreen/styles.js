@@ -17,4 +17,16 @@ export default StyleSheet.create({
     marginBottom: 20,
     paddingTop: 20,
   },
+  orientationText: {
+    color: '#FFF',
+    fontSize: 16,
+  },
+  orientationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginLeft: 20,
+    marginRight: 20,
+    marginTop: 20,
+  },
 })

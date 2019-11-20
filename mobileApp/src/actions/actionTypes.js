@@ -21,6 +21,7 @@ export const SET_PIC_URL = 'set_pic_url';
 export const SET_USER_DATA = 'set_user_data';
 export const SET_OTHER_USER_DATA = 'set_other_user_data';
 export const SET_FOLLOWING = 'set_following';
+export const SET_IS_PORTRAIT = 'set_is_portrait';
 
 //clear redux
 export const CLEAR_REDUX_STATE = 'clear_redux_state';
