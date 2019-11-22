@@ -1589,4 +1589,214 @@ paths:
               message:
                 type: "string"
                 example: "MySQL unavailable."
+                
+  /users/followers:
+    get:
+      tags:
+      - "users"
+      summary: "Get all of the followers of a particular user."
+      description: "This endpoint takes several arguments and returns a subset of followers, of a particular user. The arguments that can be provided are as follows:\n\n \"username\" = If a 'next_page' or 'back_page' argument is not sent, then this argument is mandatory. This should be set to the username of the user who's followers you are trying to view.\n\n \"users_per_page\" = If a 'next_page' or 'back_page' argument is not sent, then this an optional argument you may send. This is used to adjust the number of users you will get back per page of results.\n\n \"current_page\" = If a 'next_page' or 'back_page' argument is not sent, then this is an optional argument you may send. This is used to navigate through each of the pages of results. If this argument is not sent, the default page of results returned will be page 1.\n\n \"next_page\" = If this value is sent, then a back_page value should not be sent. This value should be set to a 'next_page' token. These tokens are returned by standard requests to support infinited scrolling. Making a request with this token requires no other value to be passed as it encodes all required data for the next request.\n\n \"back_page\" = If this value is sent, then a next_page value should not be sent. This value should be set to a 'back_page' token. These tokens are returned by standard requests to support infinited scrolling. Making a request with this token requires no other value to be passed as it encodes all required data for the next request."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "query"
+          name: "username"
+          type: "string"
+          required: false
+          description: "The username of the user who's followers you wish to view."
+        - in: "query"
+          name: "current_page"
+          type: "string"
+          required: false
+          description: "The page of results you wish to view."
+        - in: "query"
+          name: "users_per_page"
+          type: "string"
+          required: false
+          description: "The number of users you wish to have per page of results."
+        - in: "query"
+          name: "next_page"
+          type: "string"
+          required: false
+          description: "A next page token to get the next page of results."
+        - in: "query"
+          name: "back_page"
+          type: "string"
+          required: false
+          description: "A back_page token to get the previous page of results."
+      responses:
+        200:
+          description: "Query made successfully"
+          schema:
+            type: "object"
+            properties:
+              back_page:
+                type: "string"
+                example: "will be null or a token"
+              current_page:
+                type: "integer"
+                example: 1
+              next_page:
+                type: "string"
+                example: "will be null or a token"
+              followers:
+                type: "array"
+                items:
+                  type: "array"
+                  items:
+                    type: "string"
+                  example:
+                    - "AKoolUsername"
+                    - "http://profile.pic.url"
+                    - "0"
+              users_per_page:
+                type: "integer"
+                example: 50
+              total_pages:
+                type: "integer"
+                example: 2
+        401:
+          description: "User's token has expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Failed to decode token."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+                
+  /users/following:
+    get:
+      tags:
+      - "users"
+      summary: "Get all of the users a particular user follows."
+      description: "This endpoint takes several arguments and returns a subset of the users a particular user follows. The arguments that can be provided are as follows:\n\n \"username\" = If a 'next_page' or 'back_page' argument is not sent, then this argument is mandatory. This should be set to the username of the user who's followings you are trying to view.\n\n \"users_per_page\" = If a 'next_page' or 'back_page' argument is not sent, then this an optional argument you may send. This is used to adjust the number of users you will get back per page of results.\n\n \"current_page\" = If a 'next_page' or 'back_page' argument is not sent, then this is an optional argument you may send. This is used to navigate through each of the pages of results. If this argument is not sent, the default page of results returned will be page 1.\n\n \"next_page\" = If this value is sent, then a back_page value should not be sent. This value should be set to a 'next_page' token. These tokens are returned by standard requests to support infinited scrolling. Making a request with this token requires no other value to be passed as it encodes all required data for the next request.\n\n \"back_page\" = If this value is sent, then a next_page value should not be sent. This value should be set to a 'back_page' token. These tokens are returned by standard requests to support infinited scrolling. Making a request with this token requires no other value to be passed as it encodes all required data for the next request."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "query"
+          name: "username"
+          type: "string"
+          required: false
+          description: "The username of the user who's followings you wish to view."
+        - in: "query"
+          name: "current_page"
+          type: "string"
+          required: false
+          description: "The page of results you wish to view."
+        - in: "query"
+          name: "users_per_page"
+          type: "string"
+          required: false
+          description: "The number of users you wish to have per page of results."
+        - in: "query"
+          name: "next_page"
+          type: "string"
+          required: false
+          description: "A next page token to get the next page of results."
+        - in: "query"
+          name: "back_page"
+          type: "string"
+          required: false
+          description: "A back_page token to get the previous page of results."
+      responses:
+        200:
+          description: "Query made successfully"
+          schema:
+            type: "object"
+            properties:
+              back_page:
+                type: "string"
+                example: "will be null or a token"
+              current_page:
+                type: "integer"
+                example: 1
+              next_page:
+                type: "string"
+                example: "will be null or a token"
+              followers:
+                type: "array"
+                items:
+                  type: "array"
+                  items:
+                    type: "string"
+                  example:
+                    - "AKoolUsername"
+                    - "http://profile.pic.url"
+                    - "0"
+              users_per_page:
+                type: "integer"
+                example: 50
+              total_pages:
+                type: "integer"
+                example: 2
+        401:
+          description: "User's token has expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Failed to decode token."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
 x-aws-api-id: 'fvg2nhhlzk'
