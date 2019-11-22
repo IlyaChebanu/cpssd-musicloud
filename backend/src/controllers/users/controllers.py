@@ -628,7 +628,7 @@ def following():
             current_page = 1
         current_page = int(current_page)
 
-        total_users = get_follower_count(uid)
+        total_users = get_following_count(uid)
         total_pages = (total_users // users_per_page)
         if total_pages == 0:
             total_pages = 1
