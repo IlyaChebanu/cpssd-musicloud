@@ -43,19 +43,22 @@ def populate_posts(start_uid, end_uid, number_of_posts=10000):
     """
     total = number_of_posts
     while number_of_posts:
-        uid = random.randrange(start_uid, end_uid)
-        message = random_string(32)
-        time_of_post = datetime.datetime(
-            random.randrange(1970, 2020),
-            random.randrange(1, 13),
-            random.randrange(1, 29),
-            random.randrange(0, 24),
-            random.randrange(0, 60),
-            random.randrange(0, 60)
-        )
-        make_post(uid, message, time_of_post)
-        number_of_posts -= 1
-        print(str(total - number_of_posts) + " out of " + str(total) + " posts added.")
+        try:
+            uid = random.randrange(start_uid, end_uid)
+            message = random_string(32)
+            time_of_post = datetime.datetime(
+                random.randrange(1970, 2020),
+                random.randrange(1, 13),
+                random.randrange(1, 29),
+                random.randrange(0, 24),
+                random.randrange(0, 60),
+                random.randrange(0, 60)
+            )
+            make_post(uid, message, time_of_post)
+            number_of_posts -= 1
+            print(str(total - number_of_posts) + " out of " + str(total) + " posts added.")
+        except:
+            continue
 
 
 def populate_followers(start_uid, end_uid, number_of_followers=10000):
@@ -99,7 +102,7 @@ def populate_songs(start_uid, end_uid, number_of_songs=1000, offset=0):
             insert_full_song(
                 insertion_count + offset,
                 random.randrange(start_uid, end_uid),
-                random_string(32),
+                "Test Song " + str(insertion_count),
                 155000,
                 time_created,
                 1,

@@ -1,5 +1,5 @@
 CREATE TABLE `musicloud_db`.`Songs` (
-    `sid` INT NOT NULL UNIQUE AUTO_INCREMENT,
+    `sid` INT NOT NULL UNIQUE AUTO_INCREMENT PRIMARY KEY,
     `uid` INT NOT NULL,
     `title` VARCHAR(255) NOT NULL,
     `duration` INT NOT NULL,
@@ -8,6 +8,5 @@ CREATE TABLE `musicloud_db`.`Songs` (
     `url` VARCHAR(255),
     `cover` VARCHAR(255),
     `genre` VARCHAR(50),
-    PRIMARY KEY (`sid`),
-    UNIQUE INDEX `uid_UNIQUE` (`sid` ASC)
+    FOREIGN KEY (uid) REFERENCES Users(uid)
 );

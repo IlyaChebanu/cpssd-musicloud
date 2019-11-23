@@ -133,14 +133,14 @@ def get_followers(uid):
     return query(sql, args, True)
 
 
-def get_following_pair(uid_a, uid_b):
+def get_following_pair(username_a, username_b):
     sql = (
         "SELECT * FROM Followers "
         "WHERE follower = %s AND following = %s"
     )
     args = (
-        uid_a,
-        uid_b,
+        username_a,
+        username_b,
     )
     return query(sql, args, True)
 
@@ -248,27 +248,27 @@ def get_posts(uid, start_index, posts_per_page):
     return query(sql, args, True)
 
 
-def post_follow(follower_uid, following_uid):
+def post_follow(follower_username, following_username):
     sql = (
         "INSERT INTO Followers "
         "(follower, following) "
         "VALUES (%s, %s)"
     )
     args = (
-        follower_uid,
-        following_uid,
+        follower_username,
+        following_username,
     )
     query(sql, args)
 
 
-def post_unfollow(follower_uid, following_uid):
+def post_unfollow(follower_username, following_username):
     sql = (
         "DELETE FROM Followers "
         "WHERE follower=%s AND following=%s"
     )
     args = (
-        follower_uid,
-        following_uid,
+        follower_username,
+        following_username,
     )
     query(sql, args)
 
@@ -324,3 +324,39 @@ def insert_full_user_data(uid, email, username, password, verified, profiler):
         profiler,
     )
     query(sql, args)
+
+
+def get_following_names(fid, start_index, users_per_page):
+    sql = (
+        "SELECT username, profiler, ("
+        "SELECT COUNT(*) FROM Followers WHERE follower=uid AND following=%s"
+        ") as follow_back FROM Users "
+        "INNER JOIN Followers ON uid=following "
+        "WHERE follower=%s "
+        "LIMIT %s, %s;"
+    )
+    args = (
+        fid,
+        fid,
+        start_index,
+        users_per_page,
+    )
+    return query(sql, args, True)
+
+
+def get_follower_names(fid, start_index, users_per_page):
+    sql = (
+        "SELECT username, profiler, ("
+        "SELECT COUNT(*) FROM Followers WHERE following=uid AND follower=%s"
+        ") as follow_back FROM Users "
+        "INNER JOIN Followers ON uid=follower "
+        "WHERE following=%s "
+        "LIMIT %s, %s;"
+    )
+    args = (
+        fid,
+        fid,
+        start_index,
+        users_per_page,
+    )
+    return query(sql, args, True)

@@ -17,7 +17,7 @@ from ...models.users import (
     insert_user, get_user_via_username, get_user_via_email, make_post, create_reset, get_reset_request, delete_reset,
     post_follow, post_unfollow, reset_password, update_reset, get_number_of_posts, get_posts, get_follower_count,
     get_song_count, get_number_of_likes, get_following_count, get_following_pair, reset_user_verification, reset_email,
-    update_profiler_url
+    update_profiler_url, get_following_names, get_follower_names
 )
 from ...models.verification import insert_verification, get_verification
 from ...middleware.auth_required import auth_required
@@ -51,10 +51,10 @@ def follow(user):
     if other_user[0] == user.get("uid"):
         return {"message": "You cannot follow your self"}, 422
 
-    other_user_followers = get_following_pair(user.get("uid"), other_user[0])
+    other_user_followers = get_following_pair(user.get("username"), other_user[2])
 
-    if (user.get("uid"), other_user[0]) not in other_user_followers:
-        post_follow(user.get("uid"), other_user[0])
+    if (user.get("username"), other_user[2]) not in other_user_followers:
+        post_follow(user.get("username"), other_user[2])
 
     return {"message": "You are now following: " + request.json.get("username")}, 200
 
@@ -84,7 +84,7 @@ def unfollow(user):
     if other_user[2] == user.get("username"):
         return {"message": "You cannot unfollow your self"}, 422
 
-    post_unfollow(user.get("uid"), other_user[0])
+    post_unfollow(user.get("username"), other_user[2])
 
     return {"message": "You are now no longer following: " + request.json.get("username")}, 200
 
@@ -518,3 +518,173 @@ def profiler(user):
 
     update_profiler_url(user.get("uid"), request.json.get("url"))
     return {"message": "Profile picture URL updated."}, 200
+
+
+@users.route("/followers", methods=["GET"])
+@sql_err_catcher()
+@auth_required()
+def followers():
+    next_page = request.args.get('next_page')
+    back_page = request.args.get('back_page')
+    if not next_page and not back_page:
+        username = request.args.get('username')
+        if not username:
+            return {"message": "Username param can't be empty!"}, 422
+
+        uid = get_user_via_username(username)[0][0]
+
+        users_per_page = request.args.get('users_per_page')
+        if not users_per_page:
+            users_per_page = 50
+        users_per_page = int(users_per_page)
+
+        current_page = request.args.get('current_page')
+        if not current_page:
+            current_page = 1
+        current_page = int(current_page)
+
+        total_users = get_follower_count(uid)
+        total_pages = (total_users // users_per_page)
+        if total_pages == 0:
+            total_pages = 1
+        if current_page > total_pages:
+            return {
+               "message": "current_page exceeds the total number of pages available(" + str(total_pages) + ")."
+            }, 422
+
+        start_index = (current_page * users_per_page) - users_per_page
+        follower_accounts = get_follower_names(uid, start_index, users_per_page)
+
+        jwt_payload = {
+            "uid": uid,
+            "total_pages": total_pages,
+            "users_per_page": users_per_page,
+        }
+
+        back_page, next_page = gen_scroll_tokens(current_page, total_pages, jwt_payload)
+
+        return {
+           "current_page": current_page,
+           "total_pages": total_pages,
+           "users_per_page": users_per_page,
+           "next_page": next_page,
+           "back_page": back_page,
+           "followers": follower_accounts
+        }, 200
+    elif next_page and back_page:
+        return {"message": "You can't send both a 'next_page' token and a 'back_page' token."}, 422
+    else:
+        token = next_page
+        if not token:
+            token = back_page
+        token = jwt.decode(token, JWT_SECRET, algorithms=['HS256'])
+
+        uid = token.get("uid")
+        current_page = token.get("current_page")
+        users_per_page = token.get("users_per_page")
+        total_pages = token.get("total_pages")
+        start_index = (current_page * users_per_page) - users_per_page
+
+        follower_accounts = get_follower_names(uid, start_index, users_per_page)
+
+        jwt_payload = {
+            "uid": uid,
+            "total_pages": total_pages,
+            "users_per_page": users_per_page,
+        }
+
+        back_page, next_page = gen_scroll_tokens(current_page, total_pages, jwt_payload)
+
+        return {
+           "current_page": current_page,
+           "total_pages": total_pages,
+           "users_per_page": users_per_page,
+           "next_page": next_page,
+           "back_page": back_page,
+           "followers": follower_accounts
+        }, 200
+
+
+@users.route("/following", methods=["GET"])
+@sql_err_catcher()
+@auth_required()
+def following():
+    next_page = request.args.get('next_page')
+    back_page = request.args.get('back_page')
+    if not next_page and not back_page:
+        username = request.args.get('username')
+        if not username:
+            return {"message": "Username param can't be empty!"}, 422
+
+        uid = get_user_via_username(username)[0][0]
+
+        users_per_page = request.args.get('users_per_page')
+        if not users_per_page:
+            users_per_page = 50
+        users_per_page = int(users_per_page)
+
+        current_page = request.args.get('current_page')
+        if not current_page:
+            current_page = 1
+        current_page = int(current_page)
+
+        total_users = get_following_count(uid)
+        total_pages = (total_users // users_per_page)
+        if total_pages == 0:
+            total_pages = 1
+        if current_page > total_pages:
+            return {
+               "message": "current_page exceeds the total number of pages available(" + str(total_pages) + ")."
+            }, 422
+
+        start_index = (current_page * users_per_page) - users_per_page
+        following_accounts = get_following_names(uid, start_index, users_per_page)
+
+        jwt_payload = {
+            "uid": uid,
+            "total_pages": total_pages,
+            "users_per_page": users_per_page,
+        }
+
+        back_page, next_page = gen_scroll_tokens(current_page, total_pages, jwt_payload)
+
+        return {
+           "current_page": current_page,
+           "total_pages": total_pages,
+           "users_per_page": users_per_page,
+           "next_page": next_page,
+           "back_page": back_page,
+           "following": following_accounts
+        }, 200
+    elif next_page and back_page:
+        return {"message": "You can't send both a 'next_page' token and a 'back_page' token."}, 422
+    else:
+        token = next_page
+        if not token:
+            token = back_page
+        token = jwt.decode(token, JWT_SECRET, algorithms=['HS256'])
+
+        uid = token.get("uid")
+        current_page = token.get("current_page")
+        users_per_page = token.get("users_per_page")
+        total_pages = token.get("total_pages")
+        start_index = (current_page * users_per_page) - users_per_page
+
+        following_accounts = get_following_names(uid, start_index, users_per_page)
+
+        jwt_payload = {
+            "uid": uid,
+            "total_pages": total_pages,
+            "users_per_page": users_per_page,
+        }
+
+        back_page, next_page = gen_scroll_tokens(current_page, total_pages, jwt_payload)
+
+        return {
+           "current_page": current_page,
+           "total_pages": total_pages,
+           "users_per_page": users_per_page,
+           "next_page": next_page,
+           "back_page": back_page,
+           "following": following_accounts
+        }, 200

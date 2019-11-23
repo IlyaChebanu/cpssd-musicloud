@@ -2236,3 +2236,691 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
+
+    @mock.patch('backend.src.controllers.users.controllers.get_follower_names')
+    @mock.patch('backend.src.controllers.users.controllers.get_follower_count')
+    @mock.patch('backend.src.controllers.users.controllers.get_user_via_username')
+    def test_get_followers_success_no_scroll_token(self, mocked_user, mocked_num_followers, mocked_followers):
+        """
+        Ensure getting followers is successful without scroll tokens.
+        """
+        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake"]]
+        mocked_num_followers.return_value = 2
+        mocked_followers.return_value = [
+            ["username1", "http://fake.com", 0]
+        ]
+        test_req_data = {
+            "username": "username",
+            "users_per_page": 1
+        }
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.get(
+                "/api/v1/users/followers",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(200, res.status_code)
+            expected_body = {
+                'back_page': None,
+                'current_page': 1,
+                'next_page': "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0xLCJ0b3RhbF9wYWdlcyI6MiwidXNlcnNfcGVyX3BhZ2UiOjEsImN1cnJlbnRfcGFnZSI6Mn0.v2-mDpj6xdvash_c32QCw64PhAKCBnjPjoLkBiY7yKE",
+                'followers': [["username1", "http://fake.com", 0]],
+                'users_per_page': 1,
+                'total_pages': 2
+            }
+            self.assertEqual(expected_body, json.loads(res.data))
+
+    @mock.patch('backend.src.controllers.users.controllers.get_follower_names')
+    def test_get_followers_success_next_scroll_token(self, mocked_followers):
+        """
+        Ensure getting followers is successful with a next page scroll token.
+        """
+        mocked_followers.return_value = [
+            ["username2", "http://fake.com", 0]
+        ]
+        test_req_data = {
+            "next_page": (
+                "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0xLCJ0b3Rhb"
+                "F9wYWdlcyI6MiwidXNlcnNfcGVyX3BhZ2UiOjEsImN1cnJlbnRfcGFnZSI"
+                "6Mn0.v2-mDpj6xdvash_c32QCw64PhAKCBnjPjoLkBiY7yKE"
+            )
+        }
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.get(
+                "/api/v1/users/followers",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(200, res.status_code)
+            expected_body = {
+                'back_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0xLCJ0b3RhbF9wYWdlcyI6MiwidXNlcnNfcGVyX3BhZ2UiOjEsImN1cnJlbnRfcGFnZSI6MX0.Nfif2O8XNKso0PwCZI3BHh0jru5EhqmfH000KybZ2ZY',
+                'current_page': 2,
+                'next_page': None,
+                'followers': [["username2", "http://fake.com", 0]],
+                'users_per_page': 1,
+                'total_pages': 2
+            }
+            self.assertEqual(expected_body, json.loads(res.data))
+
+    @mock.patch('backend.src.controllers.users.controllers.get_follower_names')
+    def test_get_followers_success_back_scroll_token(self, mocked_followers):
+        """
+        Ensure getting followers is successful with a back page scroll token.
+        """
+        mocked_followers.return_value = [
+            ["username1", "http://fake.com", 0]
+        ]
+        test_req_data = {
+            "back_page": (
+                "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0xLCJ0b3RhbF9wYWdlcyI"
+                "6MiwidXNlcnNfcGVyX3BhZ2UiOjEsImN1cnJlbnRfcGFnZSI6MX0.Nfif2O8XNKso0Pw"
+                "CZI3BHh0jru5EhqmfH000KybZ2ZY"
+            )
+        }
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.get(
+                "/api/v1/users/followers",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(200, res.status_code)
+            expected_body = {
+                'back_page': None,
+                'current_page': 1,
+                'next_page': "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0xLCJ0b3RhbF9wYWdlcyI6MiwidXNlcnNfcGVyX3BhZ2UiOjEsImN1cnJlbnRfcGFnZSI6Mn0.v2-mDpj6xdvash_c32QCw64PhAKCBnjPjoLkBiY7yKE",
+                'followers': [["username1", "http://fake.com", 0]],
+                'users_per_page': 1,
+                'total_pages': 2
+            }
+            self.assertEqual(expected_body, json.loads(res.data))
+
+    def test_get_followers_fail_missing_access_token(self):
+        """
+        Ensure getting a user's followers fails if no access_token is sent.
+        """
+        res = self.test_client.get(
+            "/api/v1/users/followers",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_get_followers_fail_access_token_expired(self):
+        """
+        Ensure getting a user's followers fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.side_effect = ValueError
+            res = self.test_client.get(
+                "/api/v1/users/posts",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_get_followers_fail_bad_access_token_signature(self):
+        """
+        Ensure getting a user's followers fails if the access_token signature does not match
+        the one configured on the server.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.side_effect = InvalidSignatureError
+            res = self.test_client.get(
+                "/api/v1/users/posts",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_get_followers_fail_unknown_access_token_issue(self):
+        """
+        Ensure getting a user's followers fails if some unknown error relating to the access_token
+        occurs.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.side_effect = Exception
+            res = self.test_client.get(
+                "/api/v1/users/posts",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(503, res.status_code)
+
+    def test_get_followers_fail_no_scroll_token_no_username(self):
+        """
+        Ensure getting followers fails if no username or scroll tokens were provided.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            test_req_data = {
+                "users_per_page": 1
+            }
+            res = self.test_client.get(
+                "/api/v1/users/followers",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+            test_req_data = {
+                "username": "",
+                "users_per_page": 1
+            }
+            res = self.test_client.get(
+                "/api/v1/users/followers",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    @mock.patch('backend.src.controllers.users.controllers.get_user_via_username')
+    def test_get_followers_fail_no_scroll_token_bad_username(self, mocked_user):
+        """
+        Ensure getting followers fails if the user provided a bad username.
+        """
+        mocked_user.side_effect = NoResults
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            test_req_data = {
+                "username": "username",
+                "users_per_page": 1
+            }
+            res = self.test_client.get(
+                "/api/v1/users/followers",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    @mock.patch('backend.src.controllers.users.controllers.get_follower_count')
+    @mock.patch('backend.src.controllers.users.controllers.get_user_via_username')
+    def test_get_followers_fail_no_scroll_token_exceeded_last_page(self, mocked_user, mocked_num_followers):
+        """
+        Ensure getting followers fails if the user tries to access a page that doesn't exist.
+        """
+        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake"]]
+        mocked_num_followers.return_value = 2
+        test_req_data = {
+            "username": "username",
+            "current_page": 12,
+            "users_per_page": 1
+        }
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.get(
+                "/api/v1/users/followers",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    def test_get_followers_fail_sent_both_tokens(self):
+        """
+        Ensure getting followers fails if the user tries to send a next_page & back_page token.
+        """
+        test_req_data = {
+            "next_page": (
+                "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0xLCJ0b"
+                "3RhbF9wYWdlcyI6MiwicG9zdHNfcGVyX3BhZ2UiOjEsImN1cnJlbnR"
+                "fcGFnZSI6Mn0.rOexY_eF1nUjFJvpDbbbTTgpoVjxIh9ZbVs0Q6ggR"
+                "uQ"
+            ),
+            "back_page": (
+                "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0x"
+                "LCJ0b3RhbF9wYWdlcyI6MiwicG9zdHNfcGVyX3BhZ2UiOjEsI"
+                "mN1cnJlbnRfcGFnZSI6MX0.pkQCRbBgvwuozzSG6LK-kFGuxT"
+                "8YYsYN3m9g-AzquyM"
+            )
+        }
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.get(
+                "/api/v1/users/followers",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    @mock.patch('backend.src.controllers.users.controllers.get_following_names')
+    @mock.patch('backend.src.controllers.users.controllers.get_following_count')
+    @mock.patch('backend.src.controllers.users.controllers.get_user_via_username')
+    def test_get_following_success_no_scroll_token(self, mocked_user, mocked_num_followings, mocked_followings):
+        """
+        Ensure getting followings is successful without scroll tokens.
+        """
+        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake"]]
+        mocked_num_followings.return_value = 2
+        mocked_followings.return_value = [
+            ["username1", "http://fake.com", 0]
+        ]
+        test_req_data = {
+            "username": "username",
+            "users_per_page": 1
+        }
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.get(
+                "/api/v1/users/following",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(200, res.status_code)
+            expected_body = {
+                'back_page': None,
+                'current_page': 1,
+                'next_page': "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0xLCJ0b3RhbF9wYWdlcyI6MiwidXNlcnNfcGVyX3BhZ2UiOjEsImN1cnJlbnRfcGFnZSI6Mn0.v2-mDpj6xdvash_c32QCw64PhAKCBnjPjoLkBiY7yKE",
+                'following': [["username1", "http://fake.com", 0]],
+                'users_per_page': 1,
+                'total_pages': 2
+            }
+            self.assertEqual(expected_body, json.loads(res.data))
+
+    @mock.patch('backend.src.controllers.users.controllers.get_following_names')
+    def test_get_following_success_next_scroll_token(self, mocked_followings):
+        """
+        Ensure getting followings is successful with a next page scroll token.
+        """
+        mocked_followings.return_value = [
+            ["username2", "http://fake.com", 0]
+        ]
+        test_req_data = {
+            "next_page": (
+                "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0xLCJ0b3Rhb"
+                "F9wYWdlcyI6MiwidXNlcnNfcGVyX3BhZ2UiOjEsImN1cnJlbnRfcGFnZSI"
+                "6Mn0.v2-mDpj6xdvash_c32QCw64PhAKCBnjPjoLkBiY7yKE"
+            )
+        }
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.get(
+                "/api/v1/users/following",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(200, res.status_code)
+            expected_body = {
+                'back_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0xLCJ0b3RhbF9wYWdlcyI6MiwidXNlcnNfcGVyX3BhZ2UiOjEsImN1cnJlbnRfcGFnZSI6MX0.Nfif2O8XNKso0PwCZI3BHh0jru5EhqmfH000KybZ2ZY',
+                'current_page': 2,
+                'next_page': None,
+                'following': [["username2", "http://fake.com", 0]],
+                'users_per_page': 1,
+                'total_pages': 2
+            }
+            self.assertEqual(expected_body, json.loads(res.data))
+
+    @mock.patch('backend.src.controllers.users.controllers.get_following_names')
+    def test_get_following_success_back_scroll_token(self, mocked_followings):
+        """
+        Ensure getting followings is successful with a back page scroll token.
+        """
+        mocked_followings.return_value = [
+            ["username1", "http://fake.com", 0]
+        ]
+        test_req_data = {
+            "back_page": (
+                "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0xLCJ0b3RhbF9wYWdlcyI"
+                "6MiwidXNlcnNfcGVyX3BhZ2UiOjEsImN1cnJlbnRfcGFnZSI6MX0.Nfif2O8XNKso0Pw"
+                "CZI3BHh0jru5EhqmfH000KybZ2ZY"
+            )
+        }
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.get(
+                "/api/v1/users/following",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(200, res.status_code)
+            expected_body = {
+                'back_page': None,
+                'current_page': 1,
+                'next_page': "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0xLCJ0b3RhbF9wYWdlcyI6MiwidXNlcnNfcGVyX3BhZ2UiOjEsImN1cnJlbnRfcGFnZSI6Mn0.v2-mDpj6xdvash_c32QCw64PhAKCBnjPjoLkBiY7yKE",
+                'following': [["username1", "http://fake.com", 0]],
+                'users_per_page': 1,
+                'total_pages': 2
+            }
+            self.assertEqual(expected_body, json.loads(res.data))
+
+    def test_get_following_fail_missing_access_token(self):
+        """
+        Ensure getting a user's followers fails if no access_token is sent.
+        """
+        res = self.test_client.get(
+            "/api/v1/users/following",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_get_following_fail_access_token_expired(self):
+        """
+        Ensure getting a user's followings fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.side_effect = ValueError
+            res = self.test_client.get(
+                "/api/v1/users/following",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_get_following_fail_bad_access_token_signature(self):
+        """
+        Ensure getting a user's followings fails if the access_token signature does not match
+        the one configured on the server.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.side_effect = InvalidSignatureError
+            res = self.test_client.get(
+                "/api/v1/users/following",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_get_following_fail_unknown_access_token_issue(self):
+        """
+        Ensure getting a user's followings fails if some unknown error relating to the access_token
+        occurs.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.side_effect = Exception
+            res = self.test_client.get(
+                "/api/v1/users/following",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(503, res.status_code)
+
+    def test_get_following_fail_no_scroll_token_no_username(self):
+        """
+        Ensure getting followings fails if no username or scroll tokens were provided.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            test_req_data = {
+                "users_per_page": 1
+            }
+            res = self.test_client.get(
+                "/api/v1/users/following",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+            test_req_data = {
+                "username": "",
+                "users_per_page": 1
+            }
+            res = self.test_client.get(
+                "/api/v1/users/following",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    @mock.patch('backend.src.controllers.users.controllers.get_user_via_username')
+    def test_get_following_fail_no_scroll_token_bad_username(self, mocked_user):
+        """
+        Ensure getting followings fails if the user provided a bad username.
+        """
+        mocked_user.side_effect = NoResults
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            test_req_data = {
+                "username": "username",
+                "users_per_page": 1
+            }
+            res = self.test_client.get(
+                "/api/v1/users/following",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    @mock.patch('backend.src.controllers.users.controllers.get_following_count')
+    @mock.patch('backend.src.controllers.users.controllers.get_user_via_username')
+    def test_get_following_fail_no_scroll_token_exceeded_last_page(self, mocked_user, mocked_num_followings):
+        """
+        Ensure getting followings fails if the user tries to access a page that doesn't exist.
+        """
+        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake"]]
+        mocked_num_followings.return_value = 2
+        test_req_data = {
+            "username": "username",
+            "current_page": 12,
+            "users_per_page": 1
+        }
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.get(
+                "/api/v1/users/following",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    def test_get_following_fail_sent_both_tokens(self):
+        """
+        Ensure getting followings fails if the user tries to send a next_page & back_page token.
+        """
+        test_req_data = {
+            "next_page": (
+                "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0xLCJ0b"
+                "3RhbF9wYWdlcyI6MiwicG9zdHNfcGVyX3BhZ2UiOjEsImN1cnJlbnR"
+                "fcGFnZSI6Mn0.rOexY_eF1nUjFJvpDbbbTTgpoVjxIh9ZbVs0Q6ggR"
+                "uQ"
+            ),
+            "back_page": (
+                "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0x"
+                "LCJ0b3RhbF9wYWdlcyI6MiwicG9zdHNfcGVyX3BhZ2UiOjEsI"
+                "mN1cnJlbnRfcGFnZSI6MX0.pkQCRbBgvwuozzSG6LK-kFGuxT"
+                "8YYsYN3m9g-AzquyM"
+            )
+        }
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.get(
+                "/api/v1/users/following",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)

@@ -1,5 +1,5 @@
 CREATE TABLE `musicloud_db`.`Verification` (
-    `code` VARCHAR(64) UNIQUE NOT NULL,
+    `code` VARCHAR(64) UNIQUE NOT NULL PRIMARY KEY,
     `uid` INT NOT NULL,
-    PRIMARY KEY (`code`)
+    FOREIGN KEY (uid) REFERENCES Users(uid)
 );
