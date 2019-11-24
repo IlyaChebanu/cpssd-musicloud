@@ -29,17 +29,17 @@ class UserTests(unittest.TestCase):
             "email": "username@fakemail.noshow",
             "password": "1234"
         }
-
-        with mock.patch('backend.src.controllers.users.controllers.insert_user'):
-            with mock.patch('backend.src.controllers.users.controllers.send_mail'):
-                res = self.test_client.post(
-                    "/api/v1/users",
-                    json=test_req_data,
-                    follow_redirects=True
-                )
-                self.assertEqual(200, res.status_code)
-                expected_body = {"message": "User created!"}
-                self.assertEqual(expected_body, json.loads(res.data))
+        with mock.patch("backend.src.controllers.users.controllers.insert_verification"):
+            with mock.patch('backend.src.controllers.users.controllers.insert_user'):
+                with mock.patch('backend.src.controllers.users.controllers.send_mail'):
+                    res = self.test_client.post(
+                        "/api/v1/users",
+                        json=test_req_data,
+                        follow_redirects=True
+                    )
+                    self.assertEqual(200, res.status_code)
+                    expected_body = {"message": "User created!"}
+                    self.assertEqual(expected_body, json.loads(res.data))
 
     def test_registration_fail_missing_username(self):
         """
@@ -351,30 +351,31 @@ class UserTests(unittest.TestCase):
         test_req_data = {
             "username": "username",
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
-                'uid': -2,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
+        with mock.patch("backend.src.controllers.users.controllers.post_follow"):
+            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+                vr.return_value = {
+                    'uid': -2,
+                    'email': 'username2@fakemail.noshow',
+                    'username': 'username2',
+                    'verified': 1,
+                    'random_value': (
+                        'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                        'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                        'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                        'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                        'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                        'zeyvzkssMFUTdeEvzbKu'
+                    )
+                }
+                res = self.test_client.post(
+                    "/api/v1/users/follow",
+                    json=test_req_data,
+                    headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                    follow_redirects=True
                 )
-            }
-            res = self.test_client.post(
-                "/api/v1/users/follow",
-                json=test_req_data,
-                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
-                follow_redirects=True
-            )
-            self.assertEqual(200, res.status_code)
-            expected_body = {"message": "You are now following: username"}
-            self.assertEqual(expected_body, json.loads(res.data))
+                self.assertEqual(200, res.status_code)
+                expected_body = {"message": "You are now following: username"}
+                self.assertEqual(expected_body, json.loads(res.data))
 
     def test_follow_fail_missing_access_token(self):
         """
