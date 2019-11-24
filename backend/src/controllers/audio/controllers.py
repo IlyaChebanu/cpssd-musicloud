@@ -146,6 +146,21 @@ def get_compiled_songs():
         else:
             compiled_songs = get_all_compiled_songs(start_index, songs_per_page)
 
+        res = []
+        for song in compiled_songs:
+            res.append({
+                "sid": song[0],
+                "username": song[1],
+                "title": song[2],
+                "duration": song[3],
+                "created": song[4],
+                "public": song[5],
+                "url": song[6],
+                "cover": song[7],
+                "genre": song[8],
+                "likes": song[9]
+            })
+
         jwt_payload = {
             "username": username,
             "total_pages": total_pages,
@@ -160,7 +175,7 @@ def get_compiled_songs():
             "songs_per_page": songs_per_page,
             "next_page": next_page,
             "back_page": back_page,
-            "songs": compiled_songs,
+            "songs": res,
         }, 200
     elif next_page and back_page:
         return {"message": "You can't send both a 'next_page' token and a 'back_page' token."}, 422
@@ -182,6 +197,21 @@ def get_compiled_songs():
         else:
             compiled_songs = get_all_compiled_songs(start_index, songs_per_page)
 
+        res = []
+        for song in compiled_songs:
+            res.append({
+                "sid": song[0],
+                "username": song[1],
+                "title": song[2],
+                "duration": song[3],
+                "created": song[4],
+                "public": song[5],
+                "url": song[6],
+                "cover": song[7],
+                "genre": song[8],
+                "likes": song[9]
+            })
+
         jwt_payload = {
             "username": username,
             "total_pages": total_pages,
@@ -196,7 +226,7 @@ def get_compiled_songs():
             "songs_per_page": songs_per_page,
             "next_page": next_page,
             "back_page": back_page,
-            "songs": compiled_songs
+            "songs": res
         }, 200
 
 
@@ -208,7 +238,19 @@ def get_song():
     if not sid:
         return {"message": "sid param can't be empty!"}, 422
 
-    res = get_song_data(sid)[0]
+    song = get_song_data(sid)[0]
+    res = {
+        "sid": song[0],
+                "username": song[1],
+                "title": song[2],
+                "duration": song[3],
+                "created": song[4],
+                "public": song[5],
+                "url": song[6],
+                "cover": song[7],
+                "genre": song[8],
+                "likes": song[9]
+    }
     return {"song": res}, 200
 
 
@@ -298,6 +340,20 @@ def get_editable_songs(user):
 
         start_index = (current_page * songs_per_page) - songs_per_page
         editable_songs = get_all_editable_songs_by_uid(user.get("uid"), start_index, songs_per_page)
+        res = []
+        for song in editable_songs:
+            res.append({
+                "sid": song[0],
+                "username": song[1],
+                "title": song[2],
+                "duration": song[3],
+                "created": song[4],
+                "public": song[5],
+                "url": song[6],
+                "cover": song[7],
+                "genre": song[8],
+                "likes": song[9]
+            })
 
         jwt_payload = {
             "total_pages": total_pages,
@@ -312,7 +368,7 @@ def get_editable_songs(user):
             "songs_per_page": songs_per_page,
             "next_page": next_page,
             "back_page": back_page,
-            "songs": editable_songs,
+            "songs": res,
         }, 200
     elif next_page and back_page:
         return {"message": "You can't send both a 'next_page' token and a 'back_page' token."}, 422
@@ -328,6 +384,21 @@ def get_editable_songs(user):
         start_index = (current_page * songs_per_page) - songs_per_page
 
         editable_songs = get_all_editable_songs_by_uid(user.get("uid"), start_index, songs_per_page)
+        res = []
+        for song in editable_songs:
+            res.append({
+                "sid": song[0],
+                "username": song[1],
+                "title": song[2],
+                "duration": song[3],
+                "created": song[4],
+                "public": song[5],
+                "url": song[6],
+                "cover": song[7],
+                "genre": song[8],
+                "likes": song[9]
+            })
+
 
         jwt_payload = {
             "total_pages": total_pages,
@@ -342,7 +413,7 @@ def get_editable_songs(user):
             "songs_per_page": songs_per_page,
             "next_page": next_page,
             "back_page": back_page,
-            "songs": editable_songs
+            "songs": res
         }, 200
 
 
@@ -382,6 +453,21 @@ def get_liked_songs():
 
         liked_songs = get_all_liked_songs_by_uid(uid, start_index, songs_per_page)
 
+        res = []
+        for song in liked_songs:
+            res.append({
+                "sid": song[0],
+                "username": song[1],
+                "title": song[2],
+                "duration": song[3],
+                "created": song[4],
+                "public": song[5],
+                "url": song[6],
+                "cover": song[7],
+                "genre": song[8],
+                "likes": song[9]
+            })
+
         jwt_payload = {
             "username": username,
             "total_pages": total_pages,
@@ -396,7 +482,7 @@ def get_liked_songs():
             "songs_per_page": songs_per_page,
             "next_page": next_page,
             "back_page": back_page,
-            "songs": liked_songs,
+            "songs": res,
         }, 200
     elif next_page and back_page:
         return {"message": "You can't send both a 'next_page' token and a 'back_page' token."}, 422
@@ -415,6 +501,21 @@ def get_liked_songs():
         uid = get_user_via_username(username)[0][0]
         liked_songs = get_all_liked_songs_by_uid(uid, start_index, songs_per_page)
 
+        res = []
+        for song in liked_songs:
+            res.append({
+                "sid": song[0],
+                "username": song[1],
+                "title": song[2],
+                "duration": song[3],
+                "created": song[4],
+                "public": song[5],
+                "url": song[6],
+                "cover": song[7],
+                "genre": song[8],
+                "likes": song[9]
+            })
+
         jwt_payload = {
             "username": username,
             "total_pages": total_pages,
@@ -429,7 +530,7 @@ def get_liked_songs():
             "songs_per_page": songs_per_page,
             "next_page": next_page,
             "back_page": back_page,
-            "songs": liked_songs
+            "songs": res
         }, 200
 
 

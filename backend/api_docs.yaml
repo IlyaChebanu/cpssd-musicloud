@@ -1503,20 +1503,38 @@ paths:
               songs:
                 type: "array"
                 items:
-                  type: "array"
-                  items:
-                    type: "string"
-                  example:
-                    - 1
-                    - "testUser"
-                    - "A test song"
-                    - 0
-                    - "Wed, 13 Nov 2019 17:07:39 GMT"
-                    - 1
-                    - None
-                    - None
-                    - None
-                    - 8
+                  type: "object"
+                  properties:
+                    sid:
+                      type: "integer"
+                      example: 1
+                    username:
+                      type: "string"
+                      example: "testUser"
+                    title:
+                      type: "string"
+                      example: "A test song"
+                    duration:
+                      type: "integer"
+                      example: 1
+                    created:
+                      type: "string"
+                      example: "Wed, 13 Nov 2019 17:07:39 GMT"
+                    public:
+                      type: "integer"
+                      example: 1
+                    url:
+                      type: "string"
+                      example: "None"
+                    cover:
+                      type: "string"
+                      example: "None"
+                    genre:
+                      type: "string"
+                      example: "None"
+                    likes:
+                      type: "string"
+                      example: 8
               songs_per_page:
                 type: "integer"
                 example: 50
@@ -1610,20 +1628,38 @@ paths:
               songs:
                 type: "array"
                 items:
-                  type: "array"
-                  items:
-                    type: "string"
-                  example:
-                    - 1
-                    - "testUser"
-                    - "A test song"
-                    - 0
-                    - "Wed, 13 Nov 2019 17:07:39 GMT"
-                    - 0
-                    - None
-                    - None
-                    - None
-                    - 8
+                  type: "object"
+                  properties:
+                    sid:
+                      type: "integer"
+                      example: 1
+                    username:
+                      type: "string"
+                      example: "testUser"
+                    title:
+                      type: "string"
+                      example: "A test song"
+                    duration:
+                      type: "integer"
+                      example: 1
+                    created:
+                      type: "string"
+                      example: "Wed, 13 Nov 2019 17:07:39 GMT"
+                    public:
+                      type: "integer"
+                      example: 1
+                    url:
+                      type: "string"
+                      example: "None"
+                    cover:
+                      type: "string"
+                      example: "None"
+                    genre:
+                      type: "string"
+                      example: "None"
+                    likes:
+                      type: "string"
+                      example: 8
               songs_per_page:
                 type: "integer"
                 example: 50
@@ -1722,20 +1758,38 @@ paths:
               songs:
                 type: "array"
                 items:
-                  type: "array"
-                  items:
-                    type: "string"
-                  example:
-                    - 1
-                    - "testUser"
-                    - "A test song"
-                    - 0
-                    - "Wed, 13 Nov 2019 17:07:39 GMT"
-                    - 1
-                    - None
-                    - None
-                    - None
-                    - 8
+                  type: "object"
+                  properties:
+                    sid:
+                      type: "integer"
+                      example: 1
+                    username:
+                      type: "string"
+                      example: "testUser"
+                    title:
+                      type: "string"
+                      example: "A test song"
+                    duration:
+                      type: "integer"
+                      example: 1
+                    created:
+                      type: "string"
+                      example: "Wed, 13 Nov 2019 17:07:39 GMT"
+                    public:
+                      type: "integer"
+                      example: 1
+                    url:
+                      type: "string"
+                      example: "None"
+                    cover:
+                      type: "string"
+                      example: "None"
+                    genre:
+                      type: "string"
+                      example: "None"
+                    likes:
+                      type: "string"
+                      example: 8
               songs_per_page:
                 type: "integer"
                 example: 50
@@ -2075,22 +2129,38 @@ paths:
             type: "object"
             properties:
               song:
-                type: "array"
-                items:
-                  type: "array"
-                  items:
+                type: "object"
+                properties:
+                  sid:
+                    type: "integer"
+                    example: 1
+                  username:
                     type: "string"
-                  example:
-                    - 1
-                    - "testUser"
-                    - "A test song"
-                    - 0
-                    - "Wed, 13 Nov 2019 17:07:39 GMT"
-                    - 0
-                    - None
-                    - None
-                    - None
-                    - 8
+                    example: "testUser"
+                  title:
+                    type: "string"
+                    example: "A test song"
+                  duration:
+                    type: "integer"
+                    example: 1
+                  created:
+                    type: "string"
+                    example: "Wed, 13 Nov 2019 17:07:39 GMT"
+                  public:
+                    type: "integer"
+                    example: 1
+                  url:
+                    type: "string"
+                    example: "None"
+                  cover:
+                    type: "string"
+                    example: "None"
+                  genre:
+                    type: "string"
+                    example: "None"
+                  likes:
+                    type: "string"
+                    example: 8
         401:
           description: "Access_token expired"
           schema:
@@ -2183,13 +2253,17 @@ paths:
               followers:
                 type: "array"
                 items:
-                  type: "array"
-                  items:
-                    type: "string"
-                  example:
-                    - "AKoolUsername"
-                    - "http://profile.pic.url"
-                    - "0"
+                  type: "object"
+                  properties:
+                    username:
+                      type: "string"
+                      example: "AKoolUsername"
+                    profiler:
+                      type: "string"
+                      example: "http://profile.pic.url"
+                    follow_back:
+                      type: "integer"
+                      example: 0
               users_per_page:
                 type: "integer"
                 example: 50
@@ -2288,13 +2362,17 @@ paths:
               followers:
                 type: "array"
                 items:
-                  type: "array"
-                  items:
-                    type: "string"
-                  example:
-                    - "AKoolUsername"
-                    - "http://profile.pic.url"
-                    - "0"
+                  type: "object"
+                  properties:
+                    username:
+                      type: "string"
+                      example: "AKoolUsername"
+                    profiler:
+                      type: "string"
+                      example: "http://profile.pic.url"
+                    follow_back:
+                      type: "integer"
+                      example: 0
               users_per_page:
                 type: "integer"
                 example: 50

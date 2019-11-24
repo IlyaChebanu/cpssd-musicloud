@@ -2281,7 +2281,7 @@ class UserTests(unittest.TestCase):
                 'back_page': None,
                 'current_page': 1,
                 'next_page': "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0xLCJ0b3RhbF9wYWdlcyI6MiwidXNlcnNfcGVyX3BhZ2UiOjEsImN1cnJlbnRfcGFnZSI6Mn0.v2-mDpj6xdvash_c32QCw64PhAKCBnjPjoLkBiY7yKE",
-                'followers': [["username1", "http://fake.com", 0]],
+                'followers': [{"username": "username1","profiler": "http://fake.com","follow_back": 0}],
                 'users_per_page': 1,
                 'total_pages': 2
             }
@@ -2328,7 +2328,7 @@ class UserTests(unittest.TestCase):
                 'back_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0xLCJ0b3RhbF9wYWdlcyI6MiwidXNlcnNfcGVyX3BhZ2UiOjEsImN1cnJlbnRfcGFnZSI6MX0.Nfif2O8XNKso0PwCZI3BHh0jru5EhqmfH000KybZ2ZY',
                 'current_page': 2,
                 'next_page': None,
-                'followers': [["username2", "http://fake.com", 0]],
+                'followers': [{"username": "username2", "profiler": "http://fake.com", "follow_back": 0}],
                 'users_per_page': 1,
                 'total_pages': 2
             }
@@ -2375,7 +2375,7 @@ class UserTests(unittest.TestCase):
                 'back_page': None,
                 'current_page': 1,
                 'next_page': "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0xLCJ0b3RhbF9wYWdlcyI6MiwidXNlcnNfcGVyX3BhZ2UiOjEsImN1cnJlbnRfcGFnZSI6Mn0.v2-mDpj6xdvash_c32QCw64PhAKCBnjPjoLkBiY7yKE",
-                'followers': [["username1", "http://fake.com", 0]],
+                'followers': [{"username": "username1", "profiler": "http://fake.com", "follow_back": 0}],
                 'users_per_page': 1,
                 'total_pages': 2
             }
@@ -2625,7 +2625,7 @@ class UserTests(unittest.TestCase):
                 'back_page': None,
                 'current_page': 1,
                 'next_page': "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0xLCJ0b3RhbF9wYWdlcyI6MiwidXNlcnNfcGVyX3BhZ2UiOjEsImN1cnJlbnRfcGFnZSI6Mn0.v2-mDpj6xdvash_c32QCw64PhAKCBnjPjoLkBiY7yKE",
-                'following': [["username1", "http://fake.com", 0]],
+                'following': [{"username": "username1", "profiler": "http://fake.com", "follow_back": 0}],
                 'users_per_page': 1,
                 'total_pages': 2
             }
@@ -2672,7 +2672,7 @@ class UserTests(unittest.TestCase):
                 'back_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0xLCJ0b3RhbF9wYWdlcyI6MiwidXNlcnNfcGVyX3BhZ2UiOjEsImN1cnJlbnRfcGFnZSI6MX0.Nfif2O8XNKso0PwCZI3BHh0jru5EhqmfH000KybZ2ZY',
                 'current_page': 2,
                 'next_page': None,
-                'following': [["username2", "http://fake.com", 0]],
+                'following': [{"username": "username2", "profiler": "http://fake.com", "follow_back": 0}],
                 'users_per_page': 1,
                 'total_pages': 2
             }
@@ -2719,7 +2719,7 @@ class UserTests(unittest.TestCase):
                 'back_page': None,
                 'current_page': 1,
                 'next_page': "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0xLCJ0b3RhbF9wYWdlcyI6MiwidXNlcnNfcGVyX3BhZ2UiOjEsImN1cnJlbnRfcGFnZSI6Mn0.v2-mDpj6xdvash_c32QCw64PhAKCBnjPjoLkBiY7yKE",
-                'following': [["username1", "http://fake.com", 0]],
+                'following': [{"username": "username1", "profiler": "http://fake.com", "follow_back": 0}],
                 'users_per_page': 1,
                 'total_pages': 2
             }

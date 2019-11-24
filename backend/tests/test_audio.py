@@ -567,9 +567,23 @@ class AudioTests(unittest.TestCase):
                 follow_redirects=True
             )
             self.assertEqual(200, res.status_code)
+            expected_songs = [
+                {
+                    "sid": 1,
+                    "username": "username",
+                    "title": "A test song",
+                    "duration": 0,
+                    "created": "Wed, 13 Nov 2019 17:07:39 GMT",
+                    "public": 1,
+                    "url": None,
+                    "cover": None,
+                    "genre": None,
+                    "likes": 8
+                }
+            ]
             expected_body = {
                 'back_page': None,
-                'songs': test_songs,
+                'songs': expected_songs,
                 'current_page': 1,
                 'next_page': None,
                 'songs_per_page': 50,
@@ -615,11 +629,25 @@ class AudioTests(unittest.TestCase):
                 follow_redirects=True
             )
             self.assertEqual(200, res.status_code)
+            expected_songs = [
+                {
+                    "sid": 2,
+                    "username": "username2",
+                    "title": "A very test song",
+                    "duration": 0,
+                    "created": "Wed, 13 Nov 2019 17:07:40 GMT",
+                    "public": 1,
+                    "url": None,
+                    "cover": None,
+                    "genre": None,
+                    "likes": 8
+                }
+            ]
             expected_body = {
                 'back_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6bnVsbCwidG90YWxfcGFnZXMiOjIsInNvbmdzX3Blcl9wYWdlIjoxLCJjdXJyZW50X3BhZ2UiOjF9.FapIICe8ZHTTHSzw_SxsD-L6iePSI47uX2_bOp7Kwjg',
                 'current_page': 2,
                 'next_page': None,
-                'songs': test_song,
+                'songs': expected_songs,
                 'songs_per_page': 1,
                 'total_pages': 2
             }
@@ -665,11 +693,25 @@ class AudioTests(unittest.TestCase):
                 follow_redirects=True
             )
             self.assertEqual(200, res.status_code)
+            expected_songs = [
+                {
+                    "sid": 1,
+                    "username": "username",
+                    "title": "A test song",
+                    "duration": 0,
+                    "created": "Wed, 13 Nov 2019 17:07:39 GMT",
+                    "public": 1,
+                    "url": None,
+                    "cover": None,
+                    "genre": None,
+                    "likes": 8
+                }
+            ]
             expected_body = {
                 'back_page': None,
                 'current_page': 1,
                 'next_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6bnVsbCwidG90YWxfcGFnZXMiOjIsInNvbmdzX3Blcl9wYWdlIjoxLCJjdXJyZW50X3BhZ2UiOjJ9.Q85alHs0LPZziERUTv0G4kUZeV2R5T9_4nYRi1ketBE',
-                'songs': test_song,
+                'songs': expected_songs,
                 'songs_per_page': 1,
                 'total_pages': 2
             }
@@ -714,9 +756,35 @@ class AudioTests(unittest.TestCase):
                 follow_redirects=True
             )
             self.assertEqual(200, res.status_code)
+            expected_songs = [
+                {
+                    "sid": 1,
+                    "username": "username",
+                    "title": "A test song",
+                    "duration": 0,
+                    "created": "Wed, 13 Nov 2019 17:07:39 GMT",
+                    "public": 1,
+                    "url": None,
+                    "cover": None,
+                    "genre": None,
+                    "likes": 8
+                },
+                {
+                    "sid": 2,
+                    "username": "username",
+                    "title": "A very test song",
+                    "duration": 0,
+                    "created": "Wed, 13 Nov 2019 17:07:40 GMT",
+                    "public": 1,
+                    "url": None,
+                    "cover": None,
+                    "genre": None,
+                    "likes": 8
+                }
+            ]
             expected_body = {
                 'back_page': None,
-                'songs': test_songs,
+                'songs': expected_songs,
                 'current_page': 1,
                 'next_page': None,
                 'songs_per_page': 50,
@@ -763,11 +831,25 @@ class AudioTests(unittest.TestCase):
                 follow_redirects=True
             )
             self.assertEqual(200, res.status_code)
+            expected_songs = [
+                {
+                    "sid": 2,
+                    "username": "username",
+                    "title": "A very test song",
+                    "duration": 0,
+                    "created": "Wed, 13 Nov 2019 17:07:40 GMT",
+                    "public": 1,
+                    "url": None,
+                    "cover": None,
+                    "genre": None,
+                    "likes": 8
+                }
+            ]
             expected_body = {
                 'back_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6bnVsbCwidG90YWxfcGFnZXMiOjIsInNvbmdzX3Blcl9wYWdlIjoxLCJjdXJyZW50X3BhZ2UiOjF9.FapIICe8ZHTTHSzw_SxsD-L6iePSI47uX2_bOp7Kwjg',
                 'current_page': 2,
                 'next_page': None,
-                'songs': test_song,
+                'songs': expected_songs,
                 'songs_per_page': 1,
                 'total_pages': 2
             }
@@ -812,11 +894,25 @@ class AudioTests(unittest.TestCase):
                 follow_redirects=True
             )
             self.assertEqual(200, res.status_code)
+            expected_songs = [
+                {
+                    "sid": 1,
+                    "username": "username",
+                    "title": "A test song",
+                    "duration": 0,
+                    "created": "Wed, 13 Nov 2019 17:07:39 GMT",
+                    "public": 1,
+                    "url": None,
+                    "cover": None,
+                    "genre": None,
+                    "likes": 8
+                }
+            ]
             expected_body = {
                 'back_page': None,
                 'current_page': 1,
                 'next_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6bnVsbCwidG90YWxfcGFnZXMiOjIsInNvbmdzX3Blcl9wYWdlIjoxLCJjdXJyZW50X3BhZ2UiOjJ9.Q85alHs0LPZziERUTv0G4kUZeV2R5T9_4nYRi1ketBE',
-                'songs': test_song,
+                'songs': expected_songs,
                 'songs_per_page': 1,
                 'total_pages': 2
             }
@@ -979,7 +1075,7 @@ class AudioTests(unittest.TestCase):
                 follow_redirects=True
             )
             self.assertEqual(200, res.status_code)
-            expected_body = {'song': test_song[0]}
+            expected_body = {'song': {'sid': 1, 'username': 'username', 'title': 'A test song', 'duration': 0, 'created': 'Wed, 13 Nov 2019 17:07:39 GMT', 'public': 1, 'url': None, 'cover': None, 'genre': None, 'likes': 8}}
             self.assertEqual(expected_body, json.loads(res.data))
 
     def test_get_song_data_fail_missing_sid(self):
@@ -1136,9 +1232,35 @@ class AudioTests(unittest.TestCase):
                 follow_redirects=True
             )
             self.assertEqual(200, res.status_code)
+            expected_songs = [
+                {
+                    "sid": 1,
+                    "username": "username",
+                    "title": "A test song",
+                    "duration": 0,
+                    "created": "Wed, 13 Nov 2019 17:07:39 GMT",
+                    "public": 1,
+                    "url": None,
+                    "cover": None,
+                    "genre": None,
+                    "likes": 8
+                },
+                {
+                    "sid": 2,
+                    "username": "username",
+                    "title": "A very test song",
+                    "duration": 0,
+                    "created": "Wed, 13 Nov 2019 17:07:40 GMT",
+                    "public": 1,
+                    "url": None,
+                    "cover": None,
+                    "genre": None,
+                    "likes": 8
+                }
+            ]
             expected_body = {
                 'back_page': None,
-                'songs': test_songs,
+                'songs': expected_songs,
                 'current_page': 1,
                 'next_page': None,
                 'songs_per_page': 50,
@@ -1184,11 +1306,25 @@ class AudioTests(unittest.TestCase):
                 follow_redirects=True
             )
             self.assertEqual(200, res.status_code)
+            expected_songs = [
+                {
+                    "sid": 2,
+                    "username": "username2",
+                    "title": "A very test song",
+                    "duration": 0,
+                    "created": "Wed, 13 Nov 2019 17:07:40 GMT",
+                    "public": 1,
+                    "url": None,
+                    "cover": None,
+                    "genre": None,
+                    "likes": 8
+                }
+            ]
             expected_body = {
                 'back_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b3RhbF9wYWdlcyI6Miwic29uZ3NfcGVyX3BhZ2UiOjEsImN1cnJlbnRfcGFnZSI6MX0.lPvUPb8m3ldR3tOfX26YQjMM1bczO05d4-vuuXarl90',
                 'current_page': 2,
                 'next_page': None,
-                'songs': test_song,
+                'songs': expected_songs,
                 'songs_per_page': 1,
                 'total_pages': 2
             }
@@ -1232,11 +1368,25 @@ class AudioTests(unittest.TestCase):
                 follow_redirects=True
             )
             self.assertEqual(200, res.status_code)
+            expected_songs = [
+                {
+                    "sid": 1,
+                    "username": "username2",
+                    "title": "A test song",
+                    "duration": 0,
+                    "created": "Wed, 13 Nov 2019 17:07:39 GMT",
+                    "public": 1,
+                    "url": None,
+                    "cover": None,
+                    "genre": None,
+                    "likes": 8
+                }
+            ]
             expected_body = {
                 'back_page': None,
                 'current_page': 1,
                 'next_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b3RhbF9wYWdlcyI6Miwic29uZ3NfcGVyX3BhZ2UiOjEsImN1cnJlbnRfcGFnZSI6Mn0.bNW1teHPVxJgLLi_2MHodcdC8djnsu-QU_9m_AE5Sfc',
-                'songs': test_song,
+                'songs': expected_songs,
                 'songs_per_page': 1,
                 'total_pages': 2
             }
@@ -1407,9 +1557,35 @@ class AudioTests(unittest.TestCase):
                 follow_redirects=True
             )
             self.assertEqual(200, res.status_code)
+            expected_songs = [
+                {
+                    "sid": 1,
+                    "username": "username",
+                    "title": "A test song",
+                    "duration": 0,
+                    "created": "Wed, 13 Nov 2019 17:07:39 GMT",
+                    "public": 1,
+                    "url": None,
+                    "cover": None,
+                    "genre": None,
+                    "likes": 8
+                },
+                {
+                    "sid": 2,
+                    "username": "username",
+                    "title": "A very test song",
+                    "duration": 0,
+                    "created": "Wed, 13 Nov 2019 17:07:40 GMT",
+                    "public": 1,
+                    "url": None,
+                    "cover": None,
+                    "genre": None,
+                    "likes": 8
+                }
+            ]
             expected_body = {
                 'back_page': None,
-                'songs': test_songs,
+                'songs': expected_songs,
                 'current_page': 1,
                 'next_page': None,
                 'songs_per_page': 50,
@@ -1458,11 +1634,25 @@ class AudioTests(unittest.TestCase):
                 follow_redirects=True
             )
             self.assertEqual(200, res.status_code)
+            expected_songs = [
+                {
+                    "sid": 2,
+                    "username": "username",
+                    "title": "A very test song",
+                    "duration": 0,
+                    "created": "Wed, 13 Nov 2019 17:07:40 GMT",
+                    "public": 1,
+                    "url": None,
+                    "cover": None,
+                    "genre": None,
+                    "likes": 8
+                }
+            ]
             expected_body = {
                 'back_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6bnVsbCwidG90YWxfcGFnZXMiOjIsInNvbmdzX3Blcl9wYWdlIjoxLCJjdXJyZW50X3BhZ2UiOjF9.FapIICe8ZHTTHSzw_SxsD-L6iePSI47uX2_bOp7Kwjg',
                 'current_page': 2,
                 'next_page': None,
-                'songs': test_song,
+                'songs': expected_songs,
                 'songs_per_page': 1,
                 'total_pages': 2
             }
@@ -1509,11 +1699,25 @@ class AudioTests(unittest.TestCase):
                 follow_redirects=True
             )
             self.assertEqual(200, res.status_code)
+            expected_songs = [
+                {
+                    "sid": 1,
+                    "username": "username",
+                    "title": "A test song",
+                    "duration": 0,
+                    "created": "Wed, 13 Nov 2019 17:07:39 GMT",
+                    "public": 1,
+                    "url": None,
+                    "cover": None,
+                    "genre": None,
+                    "likes": 8
+                }
+            ]
             expected_body = {
                 'back_page': None,
                 'current_page': 1,
                 'next_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6bnVsbCwidG90YWxfcGFnZXMiOjIsInNvbmdzX3Blcl9wYWdlIjoxLCJjdXJyZW50X3BhZ2UiOjJ9.Q85alHs0LPZziERUTv0G4kUZeV2R5T9_4nYRi1ketBE',
-                'songs': test_song,
+                'songs': expected_songs,
                 'songs_per_page': 1,
                 'total_pages': 2
             }
