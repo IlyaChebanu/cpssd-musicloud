@@ -15,7 +15,7 @@ from ...models.audio import (
     insert_song, insert_song_state, get_song_state, get_all_compiled_songs,
     get_all_compiled_songs_by_uid, get_all_editable_songs_by_uid, get_number_of_compiled_songs,
     get_number_of_compiled_songs_by_uid, get_number_of_editable_songs_by_uid, get_song_data, post_like,
-    post_unlike, get_number_of_liked_songs_by_uid, get_all_liked_songs_by_uid, get_like_pair
+    post_unlike, get_number_of_liked_songs_by_uid, get_all_liked_songs_by_uid, get_like_pair, update_published_status
 )
 from ...models.users import get_user_via_username
 from ...models.errors import NoResults
@@ -430,3 +430,59 @@ def get_liked_songs():
             "back_page": back_page,
             "songs": liked_songs
         }, 200
+
+
+@audio.route("/publish", methods=["POST"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def publish_song(user):
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "sid": {
+                "type": "integer",
+                "minimum": 1
+            }
+        },
+        "required": ["sid"]
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    if not permitted_to_edit(request.json.get("sid"), user.get("uid")):
+        return {"message": "You can't publish that song!"}, 401
+
+    update_published_status(1, request.json.get("sid"))
+
+    return {"message": "Song published."}, 200
+
+
+@audio.route("/unpublish", methods=["POST"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def unpublish_song(user):
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "sid": {
+                "type": "integer",
+                "minimum": 1
+            }
+        },
+        "required": ["sid"]
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    if not permitted_to_edit(request.json.get("sid"), user.get("uid")):
+        return {"message": "You can't publish that song!"}, 401
+
+    update_published_status(0, request.json.get("sid"))
+
+    return {"message": "Song unpublished."}, 200

@@ -1890,3 +1890,317 @@ class AudioTests(unittest.TestCase):
                 follow_redirects=True
             )
             self.assertEqual(422, res.status_code)
+
+    def test_publish_success(self):
+        """
+        Ensure publish is successful.
+        """
+        test_req_data = {
+            "sid": 1,
+        }
+        with mock.patch("backend.src.controllers.audio.controllers.permitted_to_edit"):
+            with mock.patch("backend.src.controllers.audio.controllers.update_published_status"):
+                with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+                    vr.return_value = {
+                        'uid': -2,
+                        'email': 'username2@fakemail.noshow',
+                        'username': 'username2',
+                        'verified': 1,
+                        'random_value': (
+                            'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                            'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                            'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                            'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                            'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                            'zeyvzkssMFUTdeEvzbKu'
+                        )
+                    }
+                    res = self.test_client.post(
+                        "/api/v1/audio/publish",
+                        json=test_req_data,
+                        headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                        follow_redirects=True
+                    )
+                    self.assertEqual(200, res.status_code)
+                    expected_body = {"message": "Song published."}
+                    self.assertEqual(expected_body, json.loads(res.data))
+
+    def test_publish_fail_missing_access_token(self):
+        """
+        Ensure publishing fails if no access_token is sent.
+        """
+        res = self.test_client.post(
+            "/api/v1/audio/publish",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_publish_fail_access_token_expired(self):
+        """
+        Ensure publishing fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.side_effect = ValueError
+            res = self.test_client.post(
+                "/api/v1/audio/publish",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_publish_fail_bad_access_token_signature(self):
+        """
+        Ensure publishing fails if the access_token signature does not match
+        the one configured on the server.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.side_effect = InvalidSignatureError
+            res = self.test_client.post(
+                "/api/v1/audio/publish",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_publish_fail_unknown_access_token_issue(self):
+        """
+        Ensure publishing fails if some unknown error relating to the access_token
+        occurs.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.side_effect = Exception
+            res = self.test_client.post(
+                "/api/v1/audio/publish",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(503, res.status_code)
+
+    def test_publish_fail_missing_sid(self):
+        """
+        Ensure publishing fails if no sid is sent.
+        """
+        test_req_data = {}
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.return_value = {
+                'uid': -2,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.post(
+                "/api/v1/audio/publish",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+            test_req_data = {
+                "sid": None,
+            }
+            res = self.test_client.post(
+                "/api/v1/audio/publish",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    @mock.patch("backend.src.controllers.audio.controllers.permitted_to_edit")
+    def test_publish_fail_not_permitted_to_edit(self, mocked_editor_check):
+        """
+        Ensure publishing a song fails if I don't have permission to edit the song.
+        """
+        test_req_data = {
+            "sid": 1,
+        }
+        mocked_editor_check.return_value = False
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.return_value = {
+                'uid': -2,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.post(
+                "/api/v1/audio/publish",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+            expected_body = {"message": "You can't publish that song!"}
+            self.assertEqual(expected_body, json.loads(res.data))
+
+    def test_unpublish_success(self):
+        """
+        Ensure unpublish is successful.
+        """
+        test_req_data = {
+            "sid": 1,
+        }
+        with mock.patch("backend.src.controllers.audio.controllers.permitted_to_edit"):
+            with mock.patch("backend.src.controllers.audio.controllers.update_published_status"):
+                with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+                    vr.return_value = {
+                        'uid': -2,
+                        'email': 'username2@fakemail.noshow',
+                        'username': 'username2',
+                        'verified': 1,
+                        'random_value': (
+                            'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                            'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                            'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                            'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                            'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                            'zeyvzkssMFUTdeEvzbKu'
+                        )
+                    }
+                    res = self.test_client.post(
+                        "/api/v1/audio/unpublish",
+                        json=test_req_data,
+                        headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                        follow_redirects=True
+                    )
+                    self.assertEqual(200, res.status_code)
+                    expected_body = {"message": "Song unpublished."}
+                    self.assertEqual(expected_body, json.loads(res.data))
+
+    def test_unpublish_fail_missing_access_token(self):
+        """
+        Ensure unpublishing fails if no access_token is sent.
+        """
+        res = self.test_client.post(
+            "/api/v1/audio/unpublish",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_unpublish_fail_access_token_expired(self):
+        """
+        Ensure unpublishing fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.side_effect = ValueError
+            res = self.test_client.post(
+                "/api/v1/audio/unpublish",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_unpublish_fail_bad_access_token_signature(self):
+        """
+        Ensure unpublishing fails if the access_token signature does not match
+        the one configured on the server.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.side_effect = InvalidSignatureError
+            res = self.test_client.post(
+                "/api/v1/audio/unpublish",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_unpublish_fail_unknown_access_token_issue(self):
+        """
+        Ensure unpublishing fails if some unknown error relating to the access_token
+        occurs.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.side_effect = Exception
+            res = self.test_client.post(
+                "/api/v1/audio/unpublish",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(503, res.status_code)
+
+    def test_unpublish_fail_missing_sid(self):
+        """
+        Ensure unpublishing fails if no sid is sent.
+        """
+        test_req_data = {}
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.return_value = {
+                'uid': -2,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.post(
+                "/api/v1/audio/unpublish",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+            test_req_data = {
+                "sid": None,
+            }
+            res = self.test_client.post(
+                "/api/v1/audio/unpublish",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    @mock.patch("backend.src.controllers.audio.controllers.permitted_to_edit")
+    def test_unpublish_fail_not_permitted_to_edit(self, mocked_editor_check):
+        """
+        Ensure unpublishing a song fails if I don't have permission to edit the song.
+        """
+        test_req_data = {
+            "sid": 1,
+        }
+        mocked_editor_check.return_value = False
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.return_value = {
+                'uid': -2,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.post(
+                "/api/v1/audio/unpublish",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+            expected_body = {"message": "You can't publish that song!"}
+            self.assertEqual(expected_body, json.loads(res.data))

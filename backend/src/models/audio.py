@@ -292,3 +292,16 @@ def get_like_pair(sid, uid):
         uid,
     )
     return query(sql, args, True)
+
+
+def update_published_status(public, sid):
+    sql = (
+        "UPDATE Songs "
+        "SET public=%s "
+        "WHERE sid = %s"
+    )
+    args = (
+        public,
+        sid,
+    )
+    query(sql, args)
