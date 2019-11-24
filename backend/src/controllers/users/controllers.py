@@ -555,6 +555,14 @@ def followers():
         start_index = (current_page * users_per_page) - users_per_page
         follower_accounts = get_follower_names(uid, start_index, users_per_page)
 
+        res = []
+        for user in follower_accounts:
+            res.append({
+                "username": user[0],
+                "profiler": user[1],
+                "follow_back": user[2]
+            })
+
         jwt_payload = {
             "uid": uid,
             "total_pages": total_pages,
@@ -569,7 +577,7 @@ def followers():
            "users_per_page": users_per_page,
            "next_page": next_page,
            "back_page": back_page,
-           "followers": follower_accounts
+           "followers": res
         }, 200
     elif next_page and back_page:
         return {"message": "You can't send both a 'next_page' token and a 'back_page' token."}, 422
@@ -586,6 +594,13 @@ def followers():
         start_index = (current_page * users_per_page) - users_per_page
 
         follower_accounts = get_follower_names(uid, start_index, users_per_page)
+        res = []
+        for user in follower_accounts:
+            res.append({
+                "username": user[0],
+                "profiler": user[1],
+                "follow_back": user[2]
+            })
 
         jwt_payload = {
             "uid": uid,
@@ -601,7 +616,7 @@ def followers():
            "users_per_page": users_per_page,
            "next_page": next_page,
            "back_page": back_page,
-           "followers": follower_accounts
+           "followers": res
         }, 200
 
 
@@ -639,6 +654,13 @@ def following():
 
         start_index = (current_page * users_per_page) - users_per_page
         following_accounts = get_following_names(uid, start_index, users_per_page)
+        res = []
+        for user in following_accounts:
+            res.append({
+                "username": user[0],
+                "profiler": user[1],
+                "follow_back": user[2]
+            })
 
         jwt_payload = {
             "uid": uid,
@@ -654,7 +676,7 @@ def following():
            "users_per_page": users_per_page,
            "next_page": next_page,
            "back_page": back_page,
-           "following": following_accounts
+           "following": res
         }, 200
     elif next_page and back_page:
         return {"message": "You can't send both a 'next_page' token and a 'back_page' token."}, 422
@@ -671,6 +693,13 @@ def following():
         start_index = (current_page * users_per_page) - users_per_page
 
         following_accounts = get_following_names(uid, start_index, users_per_page)
+        res = []
+        for user in following_accounts:
+            res.append({
+                "username": user[0],
+                "profiler": user[1],
+                "follow_back": user[2]
+            })
 
         jwt_payload = {
             "uid": uid,
@@ -686,5 +715,5 @@ def following():
            "users_per_page": users_per_page,
            "next_page": next_page,
            "back_page": back_page,
-           "following": following_accounts
+           "following": res
         }, 200

@@ -37,10 +37,13 @@ def insert_song_state(sid, state, time_updated):
 
 def get_song_data(sid):
     sql = (
-        "SELECT * FROM Songs "
-        "WHERE sid = %s AND public = 1"
+        "SELECT Songs.sid, (SELECT username FROM Users WHERE Songs.uid=Users.uid) as usernanme,"
+        "title, duration, created, public, url, cover, ("
+        "SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=%s"
+        ") as likes FROM Songs WHERE sid=%s"
     )
     args = (
+        sid,
         sid,
     )
     song = query(sql, args, True)
@@ -103,9 +106,10 @@ def get_song_state(sid):
 
 def get_all_compiled_songs(start_index, songs_per_page):
     sql = (
-        "SELECT * FROM Songs "
-        "WHERE public = 1 "
-        "LIMIT %s, %s"
+        "SELECT Songs.sid, (SELECT username FROM Users WHERE Songs.uid=Users.uid) as usernanme,"
+        "title, duration, created, public, url, cover, ("
+        "SELECT COUNT(*) FROM Song_Likes WHERE Songs.sid = Song_Likes.sid"
+        ") as likes FROM Songs WHERE public=1 LIMIT %s, %s;"
     )
     args = (
         start_index,
@@ -116,28 +120,35 @@ def get_all_compiled_songs(start_index, songs_per_page):
 
 def get_all_compiled_songs_by_uid(uid, start_index, songs_per_page):
     sql = (
-        "SELECT * FROM Songs "
-        "WHERE public = 1 AND uid = %s "
-        "LIMIT %s, %s"
+        "SELECT Songs.sid, (SELECT username FROM Users WHERE Songs.uid=Users.uid) as usernanme,"
+        "title, duration, created, public, url, cover, ("
+        "SELECT COUNT(*) FROM Song_Likes WHERE Songs.sid = Song_Likes.sid"
+        ") as likes FROM Songs WHERE public=1 AND uid=%s LIMIT %s, %s;"
     )
     args = (
         uid,
         start_index,
         songs_per_page
+
     )
     return query(sql, args, True)
 
 
-def get_all_uncompiled_songs_by_uid(uid, start_index, songs_per_page):
+def get_all_editable_songs_by_uid(uid, start_index, songs_per_page):
     sql = (
-        "SELECT * FROM Songs "
-        "WHERE public = 0 AND uid = %s "
-        "LIMIT %s, %s"
+        "SELECT Songs.sid, (SELECT username FROM Users WHERE Songs.uid=Users.uid) as usernanme,"
+        "title, duration, created, public, url, cover, (SELECT COUNT(*) FROM Song_Likes WHERE "
+        "Songs.sid = Song_Likes.sid ) as likes FROM Songs WHERE uid = %s UNION SELECT "
+        "Songs.sid, (SELECT username FROM Users WHERE Songs.uid=Users.uid) as usernanme,"
+        "title, duration, created, public, url, cover, (SELECT COUNT(*) FROM Song_Likes WHERE "
+        "Songs.sid = Song_Likes.sid) as likes FROM Songs INNER JOIN Song_Editors ON "
+        "Song_Editors.sid = Songs.sid WHERE Song_Editors.uid = %s LIMIT %s, %s;"
     )
     args = (
         uid,
+        uid,
         start_index,
-        songs_per_page
+        songs_per_page,
     )
     return query(sql, args, True)
 
@@ -161,15 +172,17 @@ def get_number_of_compiled_songs_by_uid(uid):
     return query(sql, args, True)[0][0]
 
 
-def get_number_of_uncompiled_songs_by_uid(uid):
+def get_number_of_editable_songs_by_uid(uid):
     sql = (
-        "SELECT COUNT(*) FROM Songs "
-        "WHERE public = 0 AND uid = %s"
+        "SELECT (SELECT COUNT(*) FROM Songs WHERE uid = %s) AS `count_own`,"
+        "(SELECT COUNT(*) FROM Song_Editors WHERE uid = %s) AS `count_editor`"
     )
     args = (
         uid,
+        uid,
     )
-    return query(sql, args, True)[0][0]
+    res=query(sql, args, True)[0]
+    return res[0] + res[1]
 
 
 def is_public(sid):
@@ -204,4 +217,118 @@ def insert_full_song(sid, uid, title, duration, created, public, url, cover, gen
     if not row_id:
         raise NoResults
     return row_id
-  
+
+
+def post_like(uid, sid):
+    sql = (
+        "INSERT INTO Song_Likes "
+        "(uid, sid) "
+        "VALUES (%s, %s)"
+    )
+    args = (
+        uid,
+        sid,
+    )
+    query(sql, args)
+
+
+def post_unlike(uid, sid):
+    sql = (
+        "DELETE FROM Song_Likes "
+        "WHERE uid=%s AND sid=%s"
+    )
+    args = (
+        uid,
+        sid,
+    )
+    query(sql, args)
+
+
+def insert_editor(sid, uid):
+    sql = (
+        "INSERT INTO Song_Editors "
+        "(sid, uid) "
+        "VALUES (%s, %s)"
+    )
+    args = (
+        sid,
+        uid,
+    )
+    query(sql, args)
+
+
+def get_number_of_liked_songs_by_uid(uid):
+    sql = (
+        "SELECT COUNT(*) FROM Song_Likes WHERE uid=%s"
+    )
+    args = (
+        uid,
+    )
+    return query(sql, args, True)[0][0]
+
+
+def get_all_liked_songs_by_uid(uid, start_index, songs_per_page):
+    sql = (
+        "SELECT Songs.sid, (SELECT username FROM Users WHERE Songs.uid=Users.uid) as usernanme,"
+        "title, duration, created, public, url, cover, (SELECT COUNT(*) FROM Song_Likes WHERE "
+        "Songs.sid = Song_Likes.sid) as likes FROM Songs INNER JOIN Song_Likes ON "
+        "Song_Likes.sid = Songs.sid WHERE Song_Likes.uid = %s LIMIT %s, %s;"
+    )
+    args = (
+        uid,
+        start_index,
+        songs_per_page,
+    )
+    return query(sql, args, True)
+
+
+def get_like_pair(sid, uid):
+    sql = (
+        "SELECT * FROM Song_Likes "
+        "WHERE sid = %s AND uid = %s"
+    )
+    args = (
+        sid,
+        uid,
+    )
+    return query(sql, args, True)
+
+
+def update_published_status(public, sid):
+    sql = (
+        "UPDATE Songs "
+        "SET public=%s "
+        "WHERE sid = %s"
+    )
+    args = (
+        public,
+        sid,
+    )
+    query(sql, args)
+
+
+def update_compiled_url(sid, url, duration):
+    sql = (
+        "UPDATE Songs "
+        "SET url = %s AND duration = %s "
+        "WHERE sid = %s"
+    )
+    args = (
+        url,
+        duration,
+        sid,
+    )
+    query(sql, args)
+
+
+def update_cover_url(sid, url):
+    sql = (
+        "UPDATE Songs "
+        "SET cover = %s "
+        "WHERE sid = %s"
+    )
+    args = (
+        url,
+        sid,
+    )
+    query(sql, args)

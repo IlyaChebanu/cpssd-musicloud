@@ -29,17 +29,17 @@ class UserTests(unittest.TestCase):
             "email": "username@fakemail.noshow",
             "password": "1234"
         }
-
-        with mock.patch('backend.src.controllers.users.controllers.insert_user'):
-            with mock.patch('backend.src.controllers.users.controllers.send_mail'):
-                res = self.test_client.post(
-                    "/api/v1/users",
-                    json=test_req_data,
-                    follow_redirects=True
-                )
-                self.assertEqual(200, res.status_code)
-                expected_body = {"message": "User created!"}
-                self.assertEqual(expected_body, json.loads(res.data))
+        with mock.patch("backend.src.controllers.users.controllers.insert_verification"):
+            with mock.patch('backend.src.controllers.users.controllers.insert_user'):
+                with mock.patch('backend.src.controllers.users.controllers.send_mail'):
+                    res = self.test_client.post(
+                        "/api/v1/users",
+                        json=test_req_data,
+                        follow_redirects=True
+                    )
+                    self.assertEqual(200, res.status_code)
+                    expected_body = {"message": "User created!"}
+                    self.assertEqual(expected_body, json.loads(res.data))
 
     def test_registration_fail_missing_username(self):
         """
@@ -351,30 +351,31 @@ class UserTests(unittest.TestCase):
         test_req_data = {
             "username": "username",
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
-                'uid': -2,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
+        with mock.patch("backend.src.controllers.users.controllers.post_follow"):
+            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+                vr.return_value = {
+                    'uid': -2,
+                    'email': 'username2@fakemail.noshow',
+                    'username': 'username2',
+                    'verified': 1,
+                    'random_value': (
+                        'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                        'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                        'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                        'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                        'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                        'zeyvzkssMFUTdeEvzbKu'
+                    )
+                }
+                res = self.test_client.post(
+                    "/api/v1/users/follow",
+                    json=test_req_data,
+                    headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                    follow_redirects=True
                 )
-            }
-            res = self.test_client.post(
-                "/api/v1/users/follow",
-                json=test_req_data,
-                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
-                follow_redirects=True
-            )
-            self.assertEqual(200, res.status_code)
-            expected_body = {"message": "You are now following: username"}
-            self.assertEqual(expected_body, json.loads(res.data))
+                self.assertEqual(200, res.status_code)
+                expected_body = {"message": "You are now following: username"}
+                self.assertEqual(expected_body, json.loads(res.data))
 
     def test_follow_fail_missing_access_token(self):
         """
@@ -2236,6 +2237,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
+            self.assertEqual(422, res.status_code)
 
     @mock.patch('backend.src.controllers.users.controllers.get_follower_names')
     @mock.patch('backend.src.controllers.users.controllers.get_follower_count')
@@ -2279,7 +2281,7 @@ class UserTests(unittest.TestCase):
                 'back_page': None,
                 'current_page': 1,
                 'next_page': "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0xLCJ0b3RhbF9wYWdlcyI6MiwidXNlcnNfcGVyX3BhZ2UiOjEsImN1cnJlbnRfcGFnZSI6Mn0.v2-mDpj6xdvash_c32QCw64PhAKCBnjPjoLkBiY7yKE",
-                'followers': [["username1", "http://fake.com", 0]],
+                'followers': [{"username": "username1","profiler": "http://fake.com","follow_back": 0}],
                 'users_per_page': 1,
                 'total_pages': 2
             }
@@ -2326,7 +2328,7 @@ class UserTests(unittest.TestCase):
                 'back_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0xLCJ0b3RhbF9wYWdlcyI6MiwidXNlcnNfcGVyX3BhZ2UiOjEsImN1cnJlbnRfcGFnZSI6MX0.Nfif2O8XNKso0PwCZI3BHh0jru5EhqmfH000KybZ2ZY',
                 'current_page': 2,
                 'next_page': None,
-                'followers': [["username2", "http://fake.com", 0]],
+                'followers': [{"username": "username2", "profiler": "http://fake.com", "follow_back": 0}],
                 'users_per_page': 1,
                 'total_pages': 2
             }
@@ -2373,7 +2375,7 @@ class UserTests(unittest.TestCase):
                 'back_page': None,
                 'current_page': 1,
                 'next_page': "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0xLCJ0b3RhbF9wYWdlcyI6MiwidXNlcnNfcGVyX3BhZ2UiOjEsImN1cnJlbnRfcGFnZSI6Mn0.v2-mDpj6xdvash_c32QCw64PhAKCBnjPjoLkBiY7yKE",
-                'followers': [["username1", "http://fake.com", 0]],
+                'followers': [{"username": "username1", "profiler": "http://fake.com", "follow_back": 0}],
                 'users_per_page': 1,
                 'total_pages': 2
             }
@@ -2623,7 +2625,7 @@ class UserTests(unittest.TestCase):
                 'back_page': None,
                 'current_page': 1,
                 'next_page': "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0xLCJ0b3RhbF9wYWdlcyI6MiwidXNlcnNfcGVyX3BhZ2UiOjEsImN1cnJlbnRfcGFnZSI6Mn0.v2-mDpj6xdvash_c32QCw64PhAKCBnjPjoLkBiY7yKE",
-                'following': [["username1", "http://fake.com", 0]],
+                'following': [{"username": "username1", "profiler": "http://fake.com", "follow_back": 0}],
                 'users_per_page': 1,
                 'total_pages': 2
             }
@@ -2670,7 +2672,7 @@ class UserTests(unittest.TestCase):
                 'back_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0xLCJ0b3RhbF9wYWdlcyI6MiwidXNlcnNfcGVyX3BhZ2UiOjEsImN1cnJlbnRfcGFnZSI6MX0.Nfif2O8XNKso0PwCZI3BHh0jru5EhqmfH000KybZ2ZY',
                 'current_page': 2,
                 'next_page': None,
-                'following': [["username2", "http://fake.com", 0]],
+                'following': [{"username": "username2", "profiler": "http://fake.com", "follow_back": 0}],
                 'users_per_page': 1,
                 'total_pages': 2
             }
@@ -2717,7 +2719,7 @@ class UserTests(unittest.TestCase):
                 'back_page': None,
                 'current_page': 1,
                 'next_page': "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0xLCJ0b3RhbF9wYWdlcyI6MiwidXNlcnNfcGVyX3BhZ2UiOjEsImN1cnJlbnRfcGFnZSI6Mn0.v2-mDpj6xdvash_c32QCw64PhAKCBnjPjoLkBiY7yKE",
-                'following': [["username1", "http://fake.com", 0]],
+                'following': [{"username": "username1", "profiler": "http://fake.com", "follow_back": 0}],
                 'users_per_page': 1,
                 'total_pages': 2
             }

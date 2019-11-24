@@ -1297,6 +1297,153 @@ paths:
                 type: "string"
                 example: "MySQL unavailable."
                 
+  /audio/compiled_url:
+    patch:
+      tags:
+      - "audio"
+      summary: "Update the URL for the compiled version of the selected song."
+      description: "Change a songs compiled URL by sending an access_token for a user permitted to edit the song, the song ID, the duration of the compiled song in milliseconds, and the URL pointing to it."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "Send the required information."
+          required: true
+          schema:
+            type: "object"
+            properties:
+              url:
+                type: "string"
+                example: "http://image.fake"
+              sid:
+                type: "integer"
+                example: 1
+              duration:
+                type: "integer"
+                example: 15000
+                
+      responses:
+        200:
+          description: "successful query"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Compiled song URL updated."
+        401:
+          description: "Access_token expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+                
+  /audio/cover_art:
+    patch:
+      tags:
+      - "audio"
+      summary: "Update the URL for the cover art of the selected song."
+      description: "Change a songs cover art URL by sending an access_token for a user permitted to edit the song, the song ID, and the URL pointing to the cover art."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "Send the required information."
+          required: true
+          schema:
+            type: "object"
+            properties:
+              url:
+                type: "string"
+                example: "http://image.fake"
+              sid:
+                type: "integer"
+                example: 1
+                
+      responses:
+        200:
+          description: "successful query"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Cover URL updated."
+        401:
+          description: "Access_token expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+                
   /audio/compiled_songs:
     get:
       tags:
@@ -1356,19 +1503,38 @@ paths:
               songs:
                 type: "array"
                 items:
-                  type: "array"
-                  items:
-                    type: "string"
-                  example:
-                    - 1
-                    - "testUser"
-                    - "A test song"
-                    - 0
-                    - "Wed, 13 Nov 2019 17:07:39 GMT"
-                    - 1
-                    - None
-                    - None
-                    - None
+                  type: "object"
+                  properties:
+                    sid:
+                      type: "integer"
+                      example: 1
+                    username:
+                      type: "string"
+                      example: "testUser"
+                    title:
+                      type: "string"
+                      example: "A test song"
+                    duration:
+                      type: "integer"
+                      example: 1
+                    created:
+                      type: "string"
+                      example: "Wed, 13 Nov 2019 17:07:39 GMT"
+                    public:
+                      type: "integer"
+                      example: 1
+                    url:
+                      type: "string"
+                      example: "None"
+                    cover:
+                      type: "string"
+                      example: "None"
+                    genre:
+                      type: "string"
+                      example: "None"
+                    likes:
+                      type: "string"
+                      example: 8
               songs_per_page:
                 type: "integer"
                 example: 50
@@ -1408,12 +1574,12 @@ paths:
                 type: "string"
                 example: "MySQL unavailable."
                 
-  /audio/uncompiled_songs:
+  /audio/editable_songs:
     get:
       tags:
       - "audio"
-      summary: "Get all of the uncompiled songs created by the current user."
-      description: "This endpoint takes several arguments and returns a subset of all the songs on our system unordered. The arguments that can be provided are as follows:\n\n \"songs_per_page\" = If a 'next_page' or 'back_page' argument is not sent, then this an optional argument you may send. This is used to adjust the number of songs you will get back per page of results.\n\n \"current_page\" = If a 'next_page' or 'back_page' argument is not sent, then this is an optional argument you may send. This is used to navigate through each of the pages of results. If this argument is not sent, the default page of results returned will be page 1.\n\n \"next_page\" = If this value is sent, then a back_page value should not be sent. This value should be set to a 'next_page' token. These tokens are returned by standard requests to support infinited scrolling. Making a request with this token requires no other value to be passed as it encodes all required data for the next request.\n\n \"back_page\" = If this value is sent, then a next_page value should not be sent. This value should be set to a 'back_page' token. These tokens are returned by standard requests to support infinited scrolling. Making a request with this token requires no other value to be passed as it encodes all required data for the next request."
+      summary: "Get all of the songs the current user may edit editable."
+      description: "This endpoint takes several arguments and returns a subset of all the editable songs for the current user on our system, unordered. The arguments that can be provided are as follows:\n\n \"songs_per_page\" = If a 'next_page' or 'back_page' argument is not sent, then this an optional argument you may send. This is used to adjust the number of songs you will get back per page of results.\n\n \"current_page\" = If a 'next_page' or 'back_page' argument is not sent, then this is an optional argument you may send. This is used to navigate through each of the pages of results. If this argument is not sent, the default page of results returned will be page 1.\n\n \"next_page\" = If this value is sent, then a back_page value should not be sent. This value should be set to a 'next_page' token. These tokens are returned by standard requests to support infinited scrolling. Making a request with this token requires no other value to be passed as it encodes all required data for the next request.\n\n \"back_page\" = If this value is sent, then a next_page value should not be sent. This value should be set to a 'back_page' token. These tokens are returned by standard requests to support infinited scrolling. Making a request with this token requires no other value to be passed as it encodes all required data for the next request."
       consumes:
       - "application/json"
       produces:
@@ -1462,19 +1628,38 @@ paths:
               songs:
                 type: "array"
                 items:
-                  type: "array"
-                  items:
-                    type: "string"
-                  example:
-                    - 1
-                    - "testUser"
-                    - "A test song"
-                    - 0
-                    - "Wed, 13 Nov 2019 17:07:39 GMT"
-                    - 0
-                    - None
-                    - None
-                    - None
+                  type: "object"
+                  properties:
+                    sid:
+                      type: "integer"
+                      example: 1
+                    username:
+                      type: "string"
+                      example: "testUser"
+                    title:
+                      type: "string"
+                      example: "A test song"
+                    duration:
+                      type: "integer"
+                      example: 1
+                    created:
+                      type: "string"
+                      example: "Wed, 13 Nov 2019 17:07:39 GMT"
+                    public:
+                      type: "integer"
+                      example: 1
+                    url:
+                      type: "string"
+                      example: "None"
+                    cover:
+                      type: "string"
+                      example: "None"
+                    genre:
+                      type: "string"
+                      example: "None"
+                    likes:
+                      type: "string"
+                      example: 8
               songs_per_page:
                 type: "integer"
                 example: 50
@@ -1499,6 +1684,408 @@ paths:
                 example: "A req validation traceback will be here."
         500:
           description: "Failed to decode token."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+                
+  /audio/liked_songs:
+    get:
+      tags:
+      - "audio"
+      summary: "Get all of the liked songs of a selected user."
+      description: "This endpoint takes several arguments and returns a subset of all the songs, liked by a certain user, on our system unordered. The arguments that can be provided are as follows:\n\n \"username\" = If a 'next_page' or 'back_page' argument is not sent, then this is a mandatory argument you must send. This should be set to the username of the user who's liked songs you are trying to view.\n\n \"songs_per_page\" = If a 'next_page' or 'back_page' argument is not sent, then this an optional argument you may send. This is used to adjust the number of songs you will get back per page of results.\n\n \"current_page\" = If a 'next_page' or 'back_page' argument is not sent, then this is an optional argument you may send. This is used to navigate through each of the pages of results. If this argument is not sent, the default page of results returned will be page 1.\n\n \"next_page\" = If this value is sent, then a back_page value should not be sent. This value should be set to a 'next_page' token. These tokens are returned by standard requests to support infinited scrolling. Making a request with this token requires no other value to be passed as it encodes all required data for the next request.\n\n \"back_page\" = If this value is sent, then a next_page value should not be sent. This value should be set to a 'back_page' token. These tokens are returned by standard requests to support infinited scrolling. Making a request with this token requires no other value to be passed as it encodes all required data for the next request."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "query"
+          name: "username"
+          type: "string"
+          required: false
+          description: "The username of the user who's songs you wish to view."
+        - in: "query"
+          name: "current_page"
+          type: "string"
+          required: false
+          description: "The page of results you wish to view."
+        - in: "query"
+          name: "songs_per_page"
+          type: "string"
+          required: false
+          description: "The number of songs you wish to have per page of results."
+        - in: "query"
+          name: "next_page"
+          type: "string"
+          required: false
+          description: "A next page token to get the next page of results."
+        - in: "query"
+          name: "back_page"
+          type: "string"
+          required: false
+          description: "A back_page token to get the previous page of results."
+      responses:
+        200:
+          description: "Successful search query"
+          schema:
+            type: "object"
+            properties:
+              back_page:
+                type: "string"
+                example: "will be null or a token"
+              current_page:
+                type: "integer"
+                example: 1
+              next_page:
+                type: "string"
+                example: "will be null or a token"
+              songs:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    sid:
+                      type: "integer"
+                      example: 1
+                    username:
+                      type: "string"
+                      example: "testUser"
+                    title:
+                      type: "string"
+                      example: "A test song"
+                    duration:
+                      type: "integer"
+                      example: 1
+                    created:
+                      type: "string"
+                      example: "Wed, 13 Nov 2019 17:07:39 GMT"
+                    public:
+                      type: "integer"
+                      example: 1
+                    url:
+                      type: "string"
+                      example: "None"
+                    cover:
+                      type: "string"
+                      example: "None"
+                    genre:
+                      type: "string"
+                      example: "None"
+                    likes:
+                      type: "string"
+                      example: 8
+              songs_per_page:
+                type: "integer"
+                example: 50
+              total_pages:
+                type: "integer"
+                example: 2
+        401:
+          description: "User's token has expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Failed to decode token."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+                
+  /audio/like:
+    post:
+      tags:
+      - "audio"
+      summary: "Like a song"
+      description: "By passing an access_token to this endpoint in the request header, along with the sid of the song you wish to like in the request body, you will then have liked that song."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "sid of the song you wish to like."
+          required: true
+          schema:
+            type: "object"
+            properties:
+              sid:
+                type: "integer"
+                example: 1
+      responses:
+        200:
+          description: "successful query"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Song liked"
+        401:
+          description: "Access_token expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+                
+  /audio/publish:
+    post:
+      tags:
+      - "audio"
+      summary: "Publish a song"
+      description: "By passing an access_token to this endpoint in the request header, along with the sid of the song you wish to publish in the request body, you will update that songs visability to public, if you have permission to edit the song."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "sid of the song you wish to publish."
+          required: true
+          schema:
+            type: "object"
+            properties:
+              sid:
+                type: "integer"
+                example: 1
+      responses:
+        200:
+          description: "successful query"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Song published."
+        401:
+          description: "Access_token expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+                
+  /audio/unpublish:
+    post:
+      tags:
+      - "audio"
+      summary: "Unpublish a song"
+      description: "By passing an access_token to this endpoint in the request header, along with the sid of the song you wish to unpublish in the request body, you will update that songs visability to private, if you have permission to edit the song."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "sid of the song you wish to unpublish."
+          required: true
+          schema:
+            type: "object"
+            properties:
+              sid:
+                type: "integer"
+                example: 1
+      responses:
+        200:
+          description: "successful query"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Song unpublished."
+        401:
+          description: "Access_token expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+                
+  /audio/unlike:
+    post:
+      tags:
+      - "audio"
+      summary: "Unlike a song"
+      description: "By passing an access_token to this endpoint in the request header, along with the sid of the song you wish to unlike in the request body, you will then have unliked that song."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "sid of the song you wish to unlike."
+          required: true
+          schema:
+            type: "object"
+            properties:
+              sid:
+                type: "integer"
+                example: 1
+      responses:
+        200:
+          description: "successful query"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Song unliked"
+        401:
+          description: "Access_token expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
           schema:
             type: "object"
             properties:
@@ -1542,21 +2129,38 @@ paths:
             type: "object"
             properties:
               song:
-                type: "array"
-                items:
-                  type: "array"
-                  items:
+                type: "object"
+                properties:
+                  sid:
+                    type: "integer"
+                    example: 1
+                  username:
                     type: "string"
-                  example:
-                    - 1
-                    - "testUser"
-                    - "A test song"
-                    - 0
-                    - "Wed, 13 Nov 2019 17:07:39 GMT"
-                    - 0
-                    - None
-                    - None
-                    - None
+                    example: "testUser"
+                  title:
+                    type: "string"
+                    example: "A test song"
+                  duration:
+                    type: "integer"
+                    example: 1
+                  created:
+                    type: "string"
+                    example: "Wed, 13 Nov 2019 17:07:39 GMT"
+                  public:
+                    type: "integer"
+                    example: 1
+                  url:
+                    type: "string"
+                    example: "None"
+                  cover:
+                    type: "string"
+                    example: "None"
+                  genre:
+                    type: "string"
+                    example: "None"
+                  likes:
+                    type: "string"
+                    example: 8
         401:
           description: "Access_token expired"
           schema:
@@ -1649,13 +2253,17 @@ paths:
               followers:
                 type: "array"
                 items:
-                  type: "array"
-                  items:
-                    type: "string"
-                  example:
-                    - "AKoolUsername"
-                    - "http://profile.pic.url"
-                    - "0"
+                  type: "object"
+                  properties:
+                    username:
+                      type: "string"
+                      example: "AKoolUsername"
+                    profiler:
+                      type: "string"
+                      example: "http://profile.pic.url"
+                    follow_back:
+                      type: "integer"
+                      example: 0
               users_per_page:
                 type: "integer"
                 example: 50
@@ -1754,13 +2362,17 @@ paths:
               followers:
                 type: "array"
                 items:
-                  type: "array"
-                  items:
-                    type: "string"
-                  example:
-                    - "AKoolUsername"
-                    - "http://profile.pic.url"
-                    - "0"
+                  type: "object"
+                  properties:
+                    username:
+                      type: "string"
+                      example: "AKoolUsername"
+                    profiler:
+                      type: "string"
+                      example: "http://profile.pic.url"
+                    follow_back:
+                      type: "integer"
+                      example: 0
               users_per_page:
                 type: "integer"
                 example: 50
