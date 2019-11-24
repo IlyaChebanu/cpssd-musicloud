@@ -15,7 +15,8 @@ from ...models.audio import (
     insert_song, insert_song_state, get_song_state, get_all_compiled_songs,
     get_all_compiled_songs_by_uid, get_all_editable_songs_by_uid, get_number_of_compiled_songs,
     get_number_of_compiled_songs_by_uid, get_number_of_editable_songs_by_uid, get_song_data, post_like,
-    post_unlike, get_number_of_liked_songs_by_uid, get_all_liked_songs_by_uid, get_like_pair, update_published_status
+    post_unlike, get_number_of_liked_songs_by_uid, get_all_liked_songs_by_uid, get_like_pair, update_published_status,
+    update_compiled_url, update_cover_url
 )
 from ...models.users import get_user_via_username
 from ...models.errors import NoResults
@@ -486,3 +487,73 @@ def unpublish_song(user):
     update_published_status(0, request.json.get("sid"))
 
     return {"message": "Song unpublished."}, 200
+
+
+@audio.route("/compiled_url", methods=["PATCH"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def compiled_url(user):
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "sid": {
+                "type": "integer",
+                "minimum": 1
+            },
+            "url": {
+                "type": "string",
+                "pattern": "http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+",
+                "minLength": 1
+            },
+            "duration": {
+                "type": "integer",
+                "minimum": 0
+            }
+        },
+        "required": ["sid", "url", "duration"],
+        "minProperties": 3
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    if not permitted_to_edit(request.json.get("sid"), user.get("uid")):
+        return {"message": "You can't update that song!"}, 401
+
+    update_compiled_url(request.json.get("sid"), request.json.get("url"), request.json.get("duration"))
+    return {"message": "Compiled song URL updated."}, 200
+
+
+@audio.route("/cover_art", methods=["PATCH"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def cover_url(user):
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "sid": {
+                "type": "integer",
+                "minimum": 1
+            },
+            "url": {
+                "type": "string",
+                "pattern": "http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+",
+                "minLength": 1
+            }
+        },
+        "required": ["sid", "url"],
+        "minProperties": 2
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    if not permitted_to_edit(request.json.get("sid"), user.get("uid")):
+        return {"message": "You can't update that song!"}, 401
+
+    update_cover_url(request.json.get("sid"), request.json.get("url"))
+    return {"message": "Cover URL updated."}, 200

@@ -2204,3 +2204,618 @@ class AudioTests(unittest.TestCase):
             self.assertEqual(401, res.status_code)
             expected_body = {"message": "You can't publish that song!"}
             self.assertEqual(expected_body, json.loads(res.data))
+
+    @mock.patch("backend.src.controllers.audio.controllers.permitted_to_edit")
+    def test_patch_compiled_url_success(self, mocked_editor_check):
+        """
+        Ensure editing a URL for a compile song works.
+        """
+        test_req_data = {
+            "url": "http://image.fake",
+            "sid": 1,
+            "duration": 1
+        }
+        mocked_editor_check.return_value = True
+        with mock.patch('backend.src.controllers.audio.controllers.update_compiled_url'):
+            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+                vr.return_value = {
+                    'uid': -1,
+                    'email': 'username2@fakemail.noshow',
+                    'username': 'username2',
+                    'verified': 1,
+                    'random_value': (
+                        'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                        'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                        'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                        'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                        'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                        'zeyvzkssMFUTdeEvzbKu'
+                    )
+                }
+                res = self.test_client.patch(
+                    "/api/v1/audio/compiled_url",
+                    json=test_req_data,
+                    headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                    follow_redirects=True
+                )
+                self.assertEqual(200, res.status_code)
+                expected_body = {'message': 'Compiled song URL updated.'}
+                self.assertEqual(expected_body, json.loads(res.data))
+
+    def test_patch_compiled_url_fail_missing_access_token(self):
+        """
+        Ensure patching a URL for a compiled song fails if no access_token is sent.
+        """
+        res = self.test_client.patch(
+            "/api/v1/audio/compiled_url",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_patch_compiled_url_fail_access_token_expired(self):
+        """
+        Ensure patching the URL for a compiled song fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.side_effect = ValueError
+            res = self.test_client.patch(
+                "/api/v1/audio/compiled_url",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_patch_compiled_url_fail_bad_access_token_signature(self):
+        """
+        Ensure patching the URL for a compiled song fails if the access_token signature does not match
+        the one configured on the server.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.side_effect = InvalidSignatureError
+            res = self.test_client.patch(
+                "/api/v1/audio/compiled_url",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_patch_compiled_url_fail_unknown_access_token_issue(self):
+        """
+        Ensure patching the URL for a compiled song fails if some unknown error relating to the access_token
+        occurs.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.side_effect = Exception
+            res = self.test_client.patch(
+                "/api/v1/audio/compiled_url",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(503, res.status_code)
+
+    def test_patch_compiled_url_fail_missing_url(self):
+        """
+        Ensure patching the URL for a compiled song fails if the user doesn't send a URL.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            test_req_data = {
+                "sid": 1,
+                "duration": 1
+            }
+            res = self.test_client.patch(
+                "/api/v1/audio/compiled_url",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+            test_req_data = {
+                "url": "",
+                "sid": 1,
+                "duration": 1
+            }
+            res = self.test_client.patch(
+                "/api/v1/audio/compiled_url",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    def test_patch_compiled_url_fail_bad_url(self):
+        """
+        Ensure patching the URL for a compiled song fails if the user doesn't send a valid URL.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            test_req_data = {
+                "sid": 1,
+                "duration": 1,
+                "url": "not a url string"
+            }
+            res = self.test_client.patch(
+                "/api/v1/audio/compiled_url",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    def test_patch_compiled_url_fail_missing_sid(self):
+        """
+        Ensure patching the URL for a compiled song fails if the user doesn't send a sid.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            test_req_data = {
+                "url": "http://fake.com",
+                "duration": 1
+            }
+            res = self.test_client.patch(
+                "/api/v1/audio/compiled_url",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+            test_req_data = {
+                "url": "http://fake.com",
+                "sid": None,
+                "duration": 1
+            }
+            res = self.test_client.patch(
+                "/api/v1/audio/compiled_url",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    def test_patch_compiled_url_fail_bad_sid(self):
+        """
+        Ensure patching the URL for a compiled song fails if the user doesn't send a valid sid.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            test_req_data = {
+                "sid": -1,
+                "duration": 1,
+                "url": "http://fake.com"
+            }
+            res = self.test_client.patch(
+                "/api/v1/audio/compiled_url",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    def test_patch_compiled_url_fail_missing_duration(self):
+        """
+        Ensure patching the URL for a compiled song fails if the user doesn't send a duration.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            test_req_data = {
+                "url": "http://fake.com",
+                "sid": 1
+            }
+            res = self.test_client.patch(
+                "/api/v1/audio/compiled_url",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+            test_req_data = {
+                "url": "http://fake.com",
+                "duration": None,
+                "sid": 1
+            }
+            res = self.test_client.patch(
+                "/api/v1/audio/compiled_url",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    def test_patch_compiled_url_fail_bad_duration(self):
+        """
+        Ensure patching the URL for a compiled song fails if the user doesn't send a valid duration.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            test_req_data = {
+                "duration": -1,
+                "sid": 1,
+                "url": "http://fake.com"
+            }
+            res = self.test_client.patch(
+                "/api/v1/audio/compiled_url",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    @mock.patch("backend.src.controllers.audio.controllers.permitted_to_edit")
+    def test_patch_compiled_url_fail_not_permitted_to_edit(self, mocked_editor_check):
+        """
+        Ensure patching the URL for a compiled song fails if you don't have permission to edit the song.
+        """
+        test_req_data = {
+            "sid": 1,
+            "duration": 1,
+            "url": "http://fake.com"
+        }
+        mocked_editor_check.return_value = False
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.return_value = {
+                'uid': -2,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.patch(
+                "/api/v1/audio/compiled_url",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+            expected_body = {"message": "You can't update that song!"}
+            self.assertEqual(expected_body, json.loads(res.data))
+
+    @mock.patch("backend.src.controllers.audio.controllers.permitted_to_edit")
+    def test_patch_cover_art_success(self, mocked_editor_check):
+        """
+        Ensure editing a URL for a song's cover art works.
+        """
+        test_req_data = {
+            "url": "http://image.fake",
+            "sid": 1,
+        }
+        mocked_editor_check.return_value = True
+        with mock.patch('backend.src.controllers.audio.controllers.update_cover_url'):
+            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+                vr.return_value = {
+                    'uid': -1,
+                    'email': 'username2@fakemail.noshow',
+                    'username': 'username2',
+                    'verified': 1,
+                    'random_value': (
+                        'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                        'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                        'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                        'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                        'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                        'zeyvzkssMFUTdeEvzbKu'
+                    )
+                }
+                res = self.test_client.patch(
+                    "/api/v1/audio/cover_art",
+                    json=test_req_data,
+                    headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                    follow_redirects=True
+                )
+                self.assertEqual(200, res.status_code)
+                expected_body = {'message': 'Cover URL updated.'}
+                self.assertEqual(expected_body, json.loads(res.data))
+
+    def test_patch_cover_art_fail_missing_access_token(self):
+        """
+        Ensure patching a URL for a song's cover art fails if no access_token is sent.
+        """
+        res = self.test_client.patch(
+            "/api/v1/audio/cover_art",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_patch_cover_art_fail_access_token_expired(self):
+        """
+        Ensure patching the URL for a song's cover art fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.side_effect = ValueError
+            res = self.test_client.patch(
+                "/api/v1/audio/cover_art",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_patch_cover_art_fail_bad_access_token_signature(self):
+        """
+        Ensure patching the URL for a song's cover art fails if the access_token signature does not match
+        the one configured on the server.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.side_effect = InvalidSignatureError
+            res = self.test_client.patch(
+                "/api/v1/audio/cover_art",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_patch_cover_art_fail_unknown_access_token_issue(self):
+        """
+        Ensure patching the URL for a song's cover art fails if some unknown error relating to the access_token
+        occurs.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.side_effect = Exception
+            res = self.test_client.patch(
+                "/api/v1/audio/cover_art",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(503, res.status_code)
+
+    def test_patch_cover_art_fail_missing_url(self):
+        """
+        Ensure patching the URL for a song's cover art fails if the user doesn't send a URL.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            test_req_data = {
+                "sid": 1,
+            }
+            res = self.test_client.patch(
+                "/api/v1/audio/cover_art",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+            test_req_data = {
+                "url": "",
+                "sid": 1,
+            }
+            res = self.test_client.patch(
+                "/api/v1/audio/cover_art",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    def test_patch_cover_art_fail_bad_url(self):
+        """
+        Ensure patching the URL for a song's cover art fails if the user doesn't send a valid URL.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            test_req_data = {
+                "sid": 1,
+                "url": "not a url string"
+            }
+            res = self.test_client.patch(
+                "/api/v1/audio/cover_art",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    def test_patch_cover_art_fail_missing_sid(self):
+        """
+        Ensure patching the URL for a song's cover art fails if the user doesn't send a sid.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            test_req_data = {
+                "url": "http://fake.com"
+            }
+            res = self.test_client.patch(
+                "/api/v1/audio/cover_art",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+            test_req_data = {
+                "url": "http://fake.com",
+                "sid": None
+            }
+            res = self.test_client.patch(
+                "/api/v1/audio/cover_art",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    def test_patch_cover_art_fail_bad_sid(self):
+        """
+        Ensure patching the URL for a song's cover art fails if the user doesn't send a valid sid.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            test_req_data = {
+                "sid": -1,
+                "url": "http://fake.com"
+            }
+            res = self.test_client.patch(
+                "/api/v1/audio/cover_art",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    @mock.patch("backend.src.controllers.audio.controllers.permitted_to_edit")
+    def test_patch_cover_art_fail_not_permitted_to_edit(self, mocked_editor_check):
+        """
+        Ensure patching the URL for a song's cover art fails if you don't have permission to edit the song.
+        """
+        test_req_data = {
+            "sid": 1,
+            "url": "http://fake.com"
+        }
+        mocked_editor_check.return_value = False
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+            vr.return_value = {
+                'uid': -2,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.patch(
+                "/api/v1/audio/cover_art",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+            expected_body = {"message": "You can't update that song!"}
+            self.assertEqual(expected_body, json.loads(res.data))

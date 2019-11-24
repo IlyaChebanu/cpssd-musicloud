@@ -305,3 +305,30 @@ def update_published_status(public, sid):
         sid,
     )
     query(sql, args)
+
+
+def update_compiled_url(sid, url, duration):
+    sql = (
+        "UPDATE Songs "
+        "SET url = %s AND duration = %s "
+        "WHERE sid = %s"
+    )
+    args = (
+        url,
+        duration,
+        sid,
+    )
+    query(sql, args)
+
+
+def update_cover_url(sid, url):
+    sql = (
+        "UPDATE Songs "
+        "SET cover = %s "
+        "WHERE sid = %s"
+    )
+    args = (
+        url,
+        sid,
+    )
+    query(sql, args)

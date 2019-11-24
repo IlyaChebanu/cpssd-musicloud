@@ -1297,6 +1297,153 @@ paths:
                 type: "string"
                 example: "MySQL unavailable."
                 
+  /audio/compiled_url:
+    patch:
+      tags:
+      - "audio"
+      summary: "Update the URL for the compiled version of the selected song."
+      description: "Change a songs compiled URL by sending an access_token for a user permitted to edit the song, the song ID, the duration of the compiled song in milliseconds, and the URL pointing to it."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "Send the required information."
+          required: true
+          schema:
+            type: "object"
+            properties:
+              url:
+                type: "string"
+                example: "http://image.fake"
+              sid:
+                type: "integer"
+                example: 1
+              duration:
+                type: "integer"
+                example: 15000
+                
+      responses:
+        200:
+          description: "successful query"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Compiled song URL updated."
+        401:
+          description: "Access_token expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+                
+  /audio/cover_art:
+    patch:
+      tags:
+      - "audio"
+      summary: "Update the URL for the cover art of the selected song."
+      description: "Change a songs cover art URL by sending an access_token for a user permitted to edit the song, the song ID, and the URL pointing to the cover art."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "Send the required information."
+          required: true
+          schema:
+            type: "object"
+            properties:
+              url:
+                type: "string"
+                example: "http://image.fake"
+              sid:
+                type: "integer"
+                example: 1
+                
+      responses:
+        200:
+          description: "successful query"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Cover URL updated."
+        401:
+          description: "Access_token expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+                
   /audio/compiled_songs:
     get:
       tags:

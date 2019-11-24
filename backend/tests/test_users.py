@@ -2237,6 +2237,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
+            self.assertEqual(422, res.status_code)
 
     @mock.patch('backend.src.controllers.users.controllers.get_follower_names')
     @mock.patch('backend.src.controllers.users.controllers.get_follower_count')
