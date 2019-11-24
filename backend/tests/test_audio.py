@@ -1653,31 +1653,32 @@ class AudioTests(unittest.TestCase):
         test_req_data = {
             "sid": 1,
         }
-        with mock.patch("backend.src.controllers.audio.controllers.post_like"):
-            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-                vr.return_value = {
-                    'uid': -2,
-                    'email': 'username2@fakemail.noshow',
-                    'username': 'username2',
-                    'verified': 1,
-                    'random_value': (
-                        'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                        'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                        'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                        'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                        'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                        'zeyvzkssMFUTdeEvzbKu'
+        with mock.patch("backend.src.controllers.audio.controllers.get_song_data"):
+            with mock.patch("backend.src.controllers.audio.controllers.post_like"):
+                with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
+                    vr.return_value = {
+                        'uid': -2,
+                        'email': 'username2@fakemail.noshow',
+                        'username': 'username2',
+                        'verified': 1,
+                        'random_value': (
+                            'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                            'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                            'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                            'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                            'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                            'zeyvzkssMFUTdeEvzbKu'
+                        )
+                    }
+                    res = self.test_client.post(
+                        "/api/v1/audio/like",
+                        json=test_req_data,
+                        headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                        follow_redirects=True
                     )
-                }
-                res = self.test_client.post(
-                    "/api/v1/audio/like",
-                    json=test_req_data,
-                    headers={'Authorization': 'Bearer ' + TEST_TOKEN},
-                    follow_redirects=True
-                )
-                self.assertEqual(200, res.status_code)
-                expected_body = {"message": "Song liked"}
-                self.assertEqual(expected_body, json.loads(res.data))
+                    self.assertEqual(200, res.status_code)
+                    expected_body = {"message": "Song liked"}
+                    self.assertEqual(expected_body, json.loads(res.data))
 
     def test_like_fail_missing_access_token(self):
         """
