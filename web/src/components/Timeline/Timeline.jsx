@@ -1,5 +1,4 @@
-import React, { memo, useState, useCallback, useMemo } from 'react';
-import PropTypes from 'prop-types';
+import React, { memo, useMemo } from 'react';
 import styles from './Timeline.module.scss';
 import Looper from '../Looper';
 
@@ -7,13 +6,13 @@ const Timeline = memo(props => {
 
   const ticks = useMemo(() => {
     return [...Array(1000)].map((_, i) => {
-      return <rect x={i * 40} y={24} className={styles.tick}></rect>
+      return <rect key={i} x={i * 40} y={24} className={styles.tick}></rect>
     });
   }, []);
 
   const numbers = useMemo(() => {
     return [...Array(1000)].map((_, i) => {
-      return <text x={i * 40 + 5} y={24} className={styles.nums}>{i + 1}</text>
+      return <text key={i} x={i * 40 + 5} y={24} className={styles.nums}>{i + 1}</text>
     });
   }, []);
 
@@ -28,10 +27,6 @@ const Timeline = memo(props => {
     </div>
   );
 });
-
-Timeline.propTypes = {
-
-};
 
 export default Timeline;
 
