@@ -59,10 +59,13 @@ export const reverify = email => {
   );
 }
 
-export const deleteToken = token => {
+export const deleteToken = () => {
   return axios.post(
     `${API_URL}/v1/auth/logout`,
-    { access_token: token }
+    {},
+    {
+      headers: getAuth()
+    }
   );
 }
 
@@ -132,6 +135,7 @@ export const saveState = (songId, songState) => {
 }
 
 export const getUserDetails = username => {
+  console.log(getAuth());
   return axios.get(
     `${API_URL}/v1/users?username=${username}`,
     {

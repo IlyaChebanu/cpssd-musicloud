@@ -21,29 +21,35 @@ export default (state = {
   switch (action.type) {
    case 'SET_TOKEN':
     return {
-     token: action.payload
+      ...state,
+      token: action.payload
     }
   case 'DELETE_TOKEN':
     return {
+      ...state,
       token: undefined
     }
   case 'SET_USERNAME':
     return {
-     username: action.username
+      ...state,
+      username: action.username
     }
   case 'DELETE_USERNAME':
     return {
+      ...state,
       username: undefined
     }
   case 'SET_PROFILE_PIC_URL':
     return {
+      ...state,
       profilePicUrl: action.profilePicUrl
     }
   case 'DELETE_PROFILE_PIC_URL':
     return {
+      ...state,
       profilePicUrl: undefined
     }
-   default:
+  default:
     return state
   }
  }

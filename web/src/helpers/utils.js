@@ -11,14 +11,16 @@ export const lerp = (v0, v1, t) => (1 - t) * v0 + t * v1;
 export const genId = () => btoa(Math.random()).substring(0,12);
 
 export const useUpdateUserDetails = () => {
-  const username = store.getState().user.username;
+  const user = store.getState().user;
   useEffect(() => {
-    getUserDetails(username).then(res => {
-      if (res.status === 200) {
-        store.dispatch(setProfilePicUrl(res.data.profile_pic_url));
-      } else {
-        store.dispatch(showNotification({ message: 'An unknown error has occurred.' }));
-      }
-    });
-  }, []);
+    if (user.token) {
+      getUserDetails(user.username).then(res => {
+        if (res.status === 200) {
+          store.dispatch(setProfilePicUrl(res.data.profile_pic_url));
+        } else {
+          store.dispatch(showNotification({ message: 'An unknown error has occurred.' }));
+        }
+      });
+    }
+  }, [user.token]);
 };

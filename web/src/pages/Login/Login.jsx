@@ -34,7 +34,7 @@ const Login = memo(props => {
 
   const handleSubmit = useCallback(async e => {
     e.preventDefault();
-
+    setSubmitted(true);
     if (username && password) {
       try {
         const res = await login(username, password);
@@ -42,8 +42,8 @@ const Login = memo(props => {
           if (rememberMe) {
             cookie.set('token', res.data.access_token);
           }
-          dispatch(setToken(res.data.access_token));
           const decoded = jwt.decode(res.data.access_token);
+          dispatch(setToken(res.data.access_token));
           dispatch(setUsernameAction(decoded.username));
           history.push('/discover');
         } else if (res.status === 401) {
@@ -62,8 +62,6 @@ const Login = memo(props => {
         console.error(e);
       }
     }
-
-    setSubmitted(true);
   }, [username, password, rememberMe, dispatch, history]);
 
 
@@ -92,11 +90,6 @@ const Login = memo(props => {
   );
 });
 
-Login.propTypes = {
-  user: PropTypes.object.isRequired
-};
 
-const mapStateToProps = ({ user }) => ({ user });
-
-export default connect(mapStateToProps)(Login);
+export default connect()(Login);
 

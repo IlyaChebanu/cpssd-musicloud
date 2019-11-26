@@ -88,9 +88,9 @@ const Header = memo(props => {
 
   const handleSignout = useCallback(
     () => {
+      deleteTokenAPI();
       cookie.remove('token');
       dispatch(deleteToken);
-      deleteTokenAPI(token);
       history.push('/login');
     },
     [dispatch, history, token],
