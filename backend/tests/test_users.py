@@ -426,7 +426,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(503, res.status_code)
+            self.assertEqual(500, res.status_code)
 
     def test_follow_fail_missing_username(self):
         """
@@ -615,7 +615,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(503, res.status_code)
+            self.assertEqual(500, res.status_code)
 
     def test_unfollow_fail_missing_username(self):
         """
@@ -788,7 +788,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(503, res.status_code)
+            self.assertEqual(500, res.status_code)
 
     def test_get_user_fails_no_username(self,):
         """
@@ -1289,7 +1289,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(503, res.status_code)
+            self.assertEqual(500, res.status_code)
 
     @mock.patch('backend.src.controllers.users.controllers.get_posts')
     @mock.patch('backend.src.controllers.users.controllers.get_number_of_posts')
@@ -1484,7 +1484,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(503, res.status_code)
+            self.assertEqual(500, res.status_code)
 
     def test_get_posts_fail_no_scroll_token_no_username(self):
         """
@@ -1809,7 +1809,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(503, res.status_code)
+            self.assertEqual(500, res.status_code)
 
     def test_patch_user_fail_email_empty(self):
         """
@@ -2169,7 +2169,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(503, res.status_code)
+            self.assertEqual(500, res.status_code)
 
     def test_patch_profiler_fail_missing_url(self):
         """
@@ -2430,7 +2430,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(503, res.status_code)
+            self.assertEqual(500, res.status_code)
 
     def test_get_followers_fail_no_scroll_token_no_username(self):
         """
@@ -2774,7 +2774,7 @@ class UserTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(503, res.status_code)
+            self.assertEqual(500, res.status_code)
 
     def test_get_following_fail_no_scroll_token_no_username(self):
         """
