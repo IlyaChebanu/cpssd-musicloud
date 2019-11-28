@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import axios from 'axios';
 import _ from 'lodash';
 import {
@@ -77,8 +78,7 @@ export default (store) => {
       // Find schedulable samples
       const schedulableSamples = [];
       state.tracks.forEach((track, i) => {
-        schedulableSamples.push(...track.samples.filter((s) => {
-          const sample = { ...s };
+        schedulableSamples.push(...track.samples.filter((sample) => {
           const [startTime, endTime] = getSampleTimes(audioContext, state, sample);
           sample.volume = track.volume;
           sample.track = i;
@@ -143,8 +143,7 @@ export default (store) => {
 
         // Verify that all the tracks have buffers
         await Promise.all(action.tracks.map(async (track) => {
-          await Promise.all(track.samples.map(async (s) => {
-            const sample = { ...s };
+          await Promise.all(track.samples.map(async (sample) => {
             if (!bufferStore[sample.url]) {
               await store.dispatch(setSampleLoading(true));
               const res = await axios.get(sample.url, { responseType: 'arraybuffer' });
@@ -173,8 +172,7 @@ export default (store) => {
         });
 
         // Verify that all the track has buffers
-        await Promise.all(action.track.samples.map(async (s) => {
-          const sample = { ...s };
+        await Promise.all(action.track.samples.map(async (sample) => {
           if (!bufferStore[sample.url]) {
             await store.dispatch(setSampleLoading(true));
             const res = await axios.get(sample.url, { responseType: 'arraybuffer' });
