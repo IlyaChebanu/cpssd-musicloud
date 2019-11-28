@@ -106,7 +106,7 @@ const Header = memo(props => {
       dispatch(deleteToken);
       history.push('/login');
     },
-    [dispatch, history, token],
+    [dispatch, history],
   );
 
   return (
@@ -115,6 +115,7 @@ const Header = memo(props => {
       <div className={props.selected !== 0 ? styles.hide : styles.dropdownBlock}>
         <Dropdown items={fileDropdownItems} title="File" />
         <Dropdown items={editDropdownItems} title="Edit" />
+        {props.children}
       </div>
       <span>
 
