@@ -135,7 +135,6 @@ export const saveState = (songId, songState) => {
 };
 
 export const getUserDetails = username => {
-  console.log(getAuth());
   return axios.get(
     `${API_URL}/v1/users?username=${username}`,
     {
