@@ -1,8 +1,6 @@
-import React, { memo, useState, useCallback, useMemo } from 'react';
-import { ReactComponent as SeekBarSvg } from '../../assets/seekbar.svg';
+import React, { memo, useCallback, useMemo } from 'react';
 import { connect } from 'react-redux';
-import { setVolume, play, pause } from '../../actions/studioActions';
-import store from '../../store';
+import { setVolume } from '../../actions/studioActions';
 import styles from './Slider.module.scss';
 import { ReactComponent as Volume } from '../../assets/icons/volume.svg';
 import { ReactComponent as VolumeIndicator } from '../../assets/icons/volume-button.svg';

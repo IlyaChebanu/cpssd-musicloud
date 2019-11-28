@@ -1,9 +1,7 @@
-import React, { memo, useState, useCallback, useMemo } from 'react';
-import PropTypes from 'prop-types';
+import React, { memo, useCallback, useMemo } from 'react';
 import styles from './Looper.module.scss';
 import { connect } from 'react-redux';
 import { setLoop } from '../../actions/studioActions';
-import store from '../../store';
 import { ReactComponent as Arrow } from '../../assets/icons/arrow-up-light.svg';
 
 
@@ -39,7 +37,6 @@ const Looper = memo(props => {
     const initialLoopEnd = loopEnd;
     const handleMouseMove = e => {
       e.preventDefault();
-      const scroll = store.getState().studio.scroll;
       const stop = initialLoopEnd + (e.screenX - mouseStartPos) / 40 / window.devicePixelRatio;
       const numDecimalPlaces = Math.max(0, String(1 / gridSize).length - 2);
       dispatch(setLoop({
@@ -74,9 +71,6 @@ const Looper = memo(props => {
   );
 });
 
-Looper.propTypes = {
-
-};
 
 const mapStateToProps = ({ studio }) => ({
   loopStart: studio.loop.start,

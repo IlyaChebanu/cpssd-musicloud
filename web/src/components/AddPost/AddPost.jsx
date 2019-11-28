@@ -1,10 +1,7 @@
-import React, { useState, useCallback } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import styles from './AddPost.module.scss';
 import InputField from '../InputField';
-import { ReactComponent as SortIcon } from '../../assets/icons/sort-alt-light.svg';
-import { ReactComponent as SortDuotoneIcon } from '../../assets/icons/sort-duotone.svg';
-import { ReactComponent as SortUpDuotoneIcon } from '../../assets/icons/sort-up-duotone.svg';
 import SubmitButton from '../SubmitButton';
 
 // TODO: Connect to redux

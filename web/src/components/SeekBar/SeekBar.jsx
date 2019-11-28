@@ -1,10 +1,8 @@
-import React, { memo, useState, useCallback, useMemo, useRef } from 'react';
-import PropTypes from 'prop-types';
+import React, { memo, useCallback, useMemo } from 'react';
 import styles from './SeekBar.module.scss';
 import { ReactComponent as SeekBarSvg } from '../../assets/seekbar.svg';
 import { connect } from 'react-redux';
 import { setCurrentBeat, play, pause } from '../../actions/studioActions';
-import store from '../../store';
 
 
 const SeekBar = memo(props => {
@@ -55,10 +53,6 @@ const SeekBar = memo(props => {
     </div>
   );
 });
-
-SeekBar.propTypes = {
-
-};
 
 const mapStateToProps = ({ studio }) => ({
   currentBeat: studio.currentBeat,

@@ -8,6 +8,7 @@ import SongCard from '../../components/SongCard';
 import PostCard from '../../components/PostCard/PostCard'
 import ProfileBlock from '../../components/ProfileBlock'
 import AddPost from '../../components/AddPost'
+import { useUpdateUserDetails } from '../../helpers/utils';
 
 const blogCards = [];
 for (let i = 0; i < 3; i++) {
@@ -20,6 +21,8 @@ for (let i = 0; i < 4; i++) {
 }
 
 const Profile = props => {
+  useUpdateUserDetails();
+
   return (
     <div className={styles.wrapper}>
       <Header selected={2}/>
