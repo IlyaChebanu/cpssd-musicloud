@@ -29,29 +29,17 @@ const Header = memo(props => {
     e.preventDefault();
     const songState = {
       tempo: props.studio.tempo,
-      tracks: store.getState().studio.tracks
+      tracks: props.studio.tracks
     };
     /* At the moment, this just uses the hardcoded song ID in the state (1001). */
     /* The user who has edit permission for the song by default it Kamil. */
     /* You can add your uid and the sid 1001 to the Song_Editors table to */
     /* save from your account. */
     const res = await saveState(props.studio.songId, songState);
-    try {
-        if (res.status === 200) {
-          store.dispatch(showNotification({message: 'Song saved', type: 'info'}));
-        } else if (res.status === 401) {
-          store.dispatch(showNotification({message: 'Invalid credentials'}));
-        } else if (res.status === 403) {
-          store.dispatch(showNotification({message: 'You are not permitted to edit this song'}));
-        } else {
-          store.dispatch(showNotification({message: 'Unknown error has occurred'}));
-          console.error(res);
-        }
-      } catch (e) {
-          store.dispatch(showNotification('Fatal error'));
-          console.error(e);
+      if (res.status === 200) {
+        store.dispatch(showNotification({message: 'Song saved', type: 'info'}));
       }
-  }, [props.studio]);
+  }, [props.studio.tempo, props.studio.tracks, props.studio.songId]);
 
   function buildFileSelector() {
     const fileSelector = document.createElement('input');
