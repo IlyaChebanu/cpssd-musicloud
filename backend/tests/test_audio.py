@@ -1,6 +1,10 @@
+# pylint: disable=C0302, C0301, R0904
+"""
+Test suite for /audio endpoints.
+"""
 import unittest
-import mock
 import json
+import mock
 
 from jwt.exceptions import InvalidSignatureError
 
@@ -730,7 +734,7 @@ class AudioTests(unittest.TestCase):
         ]
         mocked_num_songs.return_value = 2
         mocked_songs.return_value = test_songs
-        mocked_user.return_value =[[1]]
+        mocked_user.return_value = [[1]]
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
             mock_token.return_value = {
                 'uid': -1,

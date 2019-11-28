@@ -1,6 +1,10 @@
+# pylint: disable=C0302, C0301, R0904
+"""
+Test suite for /auth endpoints.
+"""
 import unittest
-import mock
 import json
+import mock
 
 from jwt.exceptions import InvalidSignatureError
 

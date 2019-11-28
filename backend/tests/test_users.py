@@ -1,10 +1,11 @@
+# pylint: disable=C0302, C0301, R0904
 """
-Tests for the /users controller.
+Test suite for /users endpoints.
 """
 import unittest
-import mock
 import datetime
 import json
+import mock
 
 from mysql.connector.errors import IntegrityError
 from jwt.exceptions import InvalidSignatureError
@@ -706,7 +707,7 @@ class UserTests(unittest.TestCase):
     @mock.patch('backend.src.controllers.users.controllers.get_number_of_posts')
     @mock.patch('backend.src.controllers.users.controllers.get_number_of_likes')
     @mock.patch('backend.src.controllers.users.controllers.get_user_via_username')
-    def test_get_user_success(self, mocked_user, likes, posts, songs, following, follower):
+    def test_get_user_success(self, mocked_user, likes, posts, songs, following, follower):  # pylint: disable=R0913
         """
         Ensure getting a user's info is successful.
         """
@@ -2294,7 +2295,7 @@ class UserTests(unittest.TestCase):
                 'back_page': None,
                 'current_page': 1,
                 'next_page': "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0xLCJ0b3RhbF9wYWdlcyI6MiwidXNlcnNfcGVyX3BhZ2UiOjEsImN1cnJlbnRfcGFnZSI6Mn0.v2-mDpj6xdvash_c32QCw64PhAKCBnjPjoLkBiY7yKE",
-                'followers': [{"username": "username1","profiler": "http://fake.com","follow_back": 0}],
+                'followers': [{"username": "username1", "profiler": "http://fake.com", "follow_back": 0}],
                 'users_per_page': 1,
                 'total_pages': 2
             }
