@@ -6,7 +6,7 @@ matrix:
       install:
         - pip install -r backend/requirements.txt
       script:
-        - pytest --cov-fail-under=65 --cov=backend/src backend/tests && pylint backend/#
+        - pytest --cov-fail-under=65 --cov=backend/src backend/tests && pylint backend/
     - language: node_js
       before_script:
         - npm install
