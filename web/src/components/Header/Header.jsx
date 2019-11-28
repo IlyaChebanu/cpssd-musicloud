@@ -31,6 +31,10 @@ const Header = memo(props => {
       tempo: props.studio.tempo,
       tracks: store.getState().studio.tracks
     };
+    /* At the moment, this just uses the hardcoded song ID in the state (1001). */
+    /* The user who has edit permission for the song by default it Kamil. */
+    /* You can add your uid and the sid 1001 to the Song_Editors table to */
+    /* save from your account. */
     const res = await saveState(props.studio.songId, songState);
     try {
         if (res.status === 200) {
