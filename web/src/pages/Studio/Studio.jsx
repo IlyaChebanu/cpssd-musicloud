@@ -24,6 +24,7 @@ import Track from '../../components/Track/Track';
 
 import { saveState } from '../../helpers/api';
 import { useUpdateUserDetails } from '../../helpers/utils';
+import store from "../../store";
 
 const Studio = memo(props => {
   const { dispatch } = props;
@@ -333,16 +334,32 @@ const Studio = memo(props => {
     ]));
   }, [props.tracks]);
 
-  const handleSaveState = useCallback(async () => {
+  const handleSaveState = useCallback(async e => {
+    e.preventDefault();
     const songState = {
       tempo: props.studio.tempo,
-      tracks: props.studio.tracks
+      tracks: store.getState().studio.tracks
     };
+    /* At the moment, this just uses the hardcoded song ID in the state (1001). */
+    /* The user who has edit permission for the song by default it Kamil. */
+    /* You can add your uid and the sid 1001 to the Song_Editors table to */
+    /* save from your account. */
     const res = await saveState(props.studio.songId, songState);
-    if (res.status !== 200) {
-      console.error(res);
-      // TODO: Handle error
-    }
+    try {
+        if (res.status === 200) {
+          store.dispatch(showNotification({message: 'Song saved', type: 'info'}));
+        } else if (res.status === 401) {
+          store.dispatch(showNotification({message: 'Invalid credentials'}));
+        } else if (res.status === 403) {
+          store.dispatch(showNotification({message: 'You are not permitted to edit this song'}));
+        } else {
+          store.dispatch(showNotification({message: 'Unknown error has occurred'}));
+          console.error(res);
+        }
+      } catch (e) {
+          store.dispatch(showNotification('Fatal error'));
+          console.error(e);
+      }
   }, [props.studio]);
 
   const trackControlsStyle = useMemo(() => ({
@@ -350,10 +367,10 @@ const Studio = memo(props => {
   }), [props.studio.scrollY]);
 
   const handleAddNewSample = useCallback((sample) => {
-    var track = props.tracks[props.index]
-    track.samples.concat(sample)
+    var track = props.tracks[props.index];
+    track.samples.concat(sample);
     props.dispatch(setTrackAtIndex())
-  })
+  });
 
   return (
     <div className={styles.wrapper}>
