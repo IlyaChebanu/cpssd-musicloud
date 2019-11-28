@@ -24,6 +24,7 @@ import Track from '../../components/Track/Track';
 
 import { saveState } from '../../helpers/api';
 import { useUpdateUserDetails } from '../../helpers/utils';
+import store from "../../store";
 
 const Studio = memo(props => {
   const { dispatch } = props;
@@ -333,27 +334,31 @@ const Studio = memo(props => {
     ]));
   }, [props.tracks]);
 
-  const handleSaveState = useCallback(async () => {
+  const handleSaveState = useCallback(async e => {
+    e.preventDefault();
     const songState = {
       tempo: props.studio.tempo,
       tracks: props.studio.tracks
     };
+    /* At the moment, this just uses the hardcoded song ID in the state (1001). */
+    /* The user who has edit permission for the song by default it Kamil. */
+    /* You can add your uid and the sid 1001 to the Song_Editors table to */
+    /* save from your account. */
     const res = await saveState(props.studio.songId, songState);
-    if (res.status !== 200) {
-      console.error(res);
-      // TODO: Handle error
-    }
-  }, [props.studio]);
+      if (res.status === 200) {
+        store.dispatch(showNotification({message: 'Song saved', type: 'info'}));
+      }
+  }, [props.studio.tempo, props.studio.tracks, props.studio.songId]);
 
   const trackControlsStyle = useMemo(() => ({
     transform: `translateY(${-props.studio.scrollY}px)`
   }), [props.studio.scrollY]);
 
   const handleAddNewSample = useCallback((sample) => {
-    var track = props.tracks[props.index]
-    track.samples.concat(sample)
+    var track = props.tracks[props.index];
+    track.samples.concat(sample);
     props.dispatch(setTrackAtIndex())
-  })
+  });
 
   return (
     <div className={styles.wrapper}>
