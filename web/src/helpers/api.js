@@ -1,5 +1,36 @@
 import axios from 'axios';
 import store from '../store';
+import { showNotification } from '../actions/notificationsActions';
+import cookie from 'js-cookie';
+import { deleteToken as deleteTokenAction } from '../actions/userActions';
+import history from '../history';
+
+axios.interceptors.response.use(res => res, err => {
+  const state = store.getState();
+  const res = err.response;
+  if ([500, 422].includes(res.status)) {
+    store.dispatch(showNotification({
+      message: 'An unknown error has occured. Please contact the site owners.'
+    }));
+    console.error(err);
+  }
+  if (state.user.token) {
+    if (res.status === 401) {
+      store.dispatch(showNotification({
+        message: 'Session expired. Please log back in.'
+      }));
+      cookie.remove('token');
+      store.dispatch(deleteTokenAction);
+      history.push('/login');
+    }
+    if (res.status === 403) {
+      store.dispatch(showNotification({
+        message: 'Permission to perform action denied.'
+      }));
+    }
+  }
+  return err.response;
+});
 
 const API_URL = `http://dcumusicloud.com:5000/api`;
 
@@ -11,28 +42,31 @@ export const login = (username, password) => {
   return axios.post(
     `${API_URL}/v1/auth/login`,
     { username, password }
-  ).catch(e => e.response);
+  );
 };
 
 export const register = (email, username, password) => {
   return axios.post(
     `${API_URL}/v1/users`,
     { email, username, password },
-  ).catch(e => e.response);
+  );
 }
 
 export const reverify = email => {
   return axios.post(
     `${API_URL}/v1/users/reverify`,
     { email }
-  ).catch(e => e.response);
+  );
 }
 
-export const deleteToken = token => {
+export const deleteToken = () => {
   return axios.post(
     `${API_URL}/v1/auth/logout`,
-    { access_token: token }
-  ).catch(e => e.response);
+    {},
+    {
+      headers: getAuth()
+    }
+  );
 }
 
 const generatePresignedPost = (dir, filename, filetype, token) => {
@@ -46,7 +80,7 @@ const generatePresignedPost = (dir, filename, filetype, token) => {
     {
       headers: {Authorization: "Bearer " + token}
     }
-  ).catch(e => e.response);
+  );
 }
 
 const putMedia = (signedUrl, file, options) => {
@@ -58,7 +92,7 @@ export const uploadFile = async (dir, f, token, e) => {
   var url = '';
   try {
     const res = await generatePresignedPost(dir, f.name, f.type, token)
-    
+
     var options = {
       headers: {
         'Content-Type': f.type,
@@ -68,20 +102,20 @@ export const uploadFile = async (dir, f, token, e) => {
       var data = new FormData();
       data.append("file", f.file)
         const putAudio = async e1 => {
-          
+
           url = makeSignedUrl(res.data.signed_url)
-          
+
           const res2 = await putMedia(url, data, options)
-          
+
         }
         putAudio()
     }
   } catch (e) {
-    
+
     return e.response
   }
   return url.toString()
-  
+
 }
 
 // TODO: use extra params to make use of signed url without public access to the bucket
@@ -97,5 +131,15 @@ export const saveState = (songId, songState) => {
     {
       headers: getAuth()
     }
-  ).catch(e => e.response);
+  );
+}
+
+export const getUserDetails = username => {
+  console.log(getAuth());
+  return axios.get(
+    `${API_URL}/v1/users?username=${username}`,
+    {
+      headers: getAuth()
+    }
+  );
 }

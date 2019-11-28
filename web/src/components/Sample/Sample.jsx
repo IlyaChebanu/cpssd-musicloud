@@ -1,11 +1,10 @@
-import React, { memo, useState, useCallback, useMemo } from 'react';
+import React, { memo, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import styles from './Sample.module.scss';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 import { bufferStore } from '../../helpers/constants';
 import { lerp } from '../../helpers/utils';
-import store from '../../store';
 import { setSampleTime, setTrackAtIndex, setSelectedSample, setClipboard } from '../../actions/studioActions';
 import { dColours, colours } from '../../helpers/constants';
 import { HotKeys } from 'react-hotkeys';
@@ -27,7 +26,7 @@ const Sample = memo(props => {
         bars.push(Math.max(2, Math.abs(Math.floor(d * amp))));
       }
       return <svg className={styles.waveform}>
-        {bars.map((bar, i) => <rect x={(i+1) * 2} y={45 - bar / 2} style={{ height: `${bar}px` }} className={styles.bar}/>)}
+        {bars.map((bar, i) => <rect key={i} x={(i+1) * 2} y={45 - bar / 2} style={{ height: `${bar}px` }} className={styles.bar}/>)}
       </svg>
     }
   }, [buffer, props.tempo]);

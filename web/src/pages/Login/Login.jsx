@@ -5,11 +5,12 @@ import { connect } from 'react-redux'
 import styles from './Login.module.scss';
 import { Link as link } from 'react-router-dom';
 import { login } from '../../helpers/api';
-import { setToken } from '../../actions/userActions';
+import { setToken, setUsername as setUsernameAction } from '../../actions/userActions';
 import { ReactComponent as logo } from '../../assets/logo.svg';
 import InputField from '../../components/InputField';
 import Checkbox from '../../components/Checkbox';
 import SubmitButton from '../../components/SubmitButton';
+import jwt from 'jsonwebtoken';
 
 const Logo = memo(logo);
 const Link = memo(link);
@@ -33,15 +34,17 @@ const Login = memo(props => {
 
   const handleSubmit = useCallback(async e => {
     e.preventDefault();
-
+    setSubmitted(true);
     if (username && password) {
-      const res = await login(username, password);
       try {
+        const res = await login(username, password);
         if (res.status === 200) {
           if (rememberMe) {
             cookie.set('token', res.data.access_token);
           }
+          const decoded = jwt.decode(res.data.access_token);
           dispatch(setToken(res.data.access_token));
+          dispatch(setUsernameAction(decoded.username));
           history.push('/discover');
         } else if (res.status === 401) {
           setErrorText('Invalid credentails');
@@ -59,8 +62,6 @@ const Login = memo(props => {
         console.error(e);
       }
     }
-
-    setSubmitted(true);
   }, [username, password, rememberMe, dispatch, history]);
 
 
@@ -89,11 +90,6 @@ const Login = memo(props => {
   );
 });
 
-Login.propTypes = {
-  user: PropTypes.object.isRequired
-};
 
-const mapStateToProps = ({ user }) => ({ user });
-
-export default connect(mapStateToProps)(Login);
+export default connect()(Login);
 
