@@ -1,18 +1,21 @@
+"""
+Function to handle printing our of error information to api.log.
+"""
 import logging
 import datetime
 
 from ..config import LOGGING
 
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+LOGGER = logging.getLogger(__name__)
+LOGGER.setLevel(logging.INFO)
 
-formatter = logging.Formatter("%(message)s")
+FORMATTER = logging.Formatter("%(message)s")
 
-file_handler = logging.FileHandler("api.log")
-file_handler.setFormatter(formatter)
+FILE_HANDLER = logging.FileHandler("api.log")
+FILE_HANDLER.setFormatter(FORMATTER)
 
-logger.addHandler(file_handler)
+LOGGER.addHandler(FILE_HANDLER)
 
 
 def log(level, event_name, message):
@@ -44,7 +47,7 @@ def log(level, event_name, message):
             message
         )
 
-        logger.log(
+        LOGGER.log(
             level=level_code.get(level),
             msg=formatted_message
         )
