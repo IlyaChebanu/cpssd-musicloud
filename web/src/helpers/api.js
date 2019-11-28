@@ -50,14 +50,14 @@ export const register = (email, username, password) => {
     `${API_URL}/v1/users`,
     { email, username, password },
   );
-}
+};
 
 export const reverify = email => {
   return axios.post(
     `${API_URL}/v1/users/reverify`,
     { email }
   );
-}
+};
 
 export const deleteToken = () => {
   return axios.post(
@@ -67,9 +67,9 @@ export const deleteToken = () => {
       headers: getAuth()
     }
   );
-}
+};
 
-const generatePresignedPost = (dir, filename, filetype, token) => {
+const generatePresignedPost = (dir, filename, filetype) => {
   return axios.post(
     `${API_URL}/v1/s3/signed-form-post`,
     {
@@ -78,36 +78,36 @@ const generatePresignedPost = (dir, filename, filetype, token) => {
       fileType: filetype,
     },
     {
-      headers: {Authorization: "Bearer " + token}
+      headers: getAuth()
     }
   );
-}
+};
 
 const putMedia = (signedUrl, file, options) => {
   return axios.put(
     signedUrl, file, options).catch( e => e.response);
-}
+};
 
-export const uploadFile = async (dir, f, token, e) => {
+export const uploadFile = async (dir, f, e) => {
   var url = '';
   try {
-    const res = await generatePresignedPost(dir, f.name, f.type, token)
+    const res = await generatePresignedPost(dir, f.name, f.type);
 
     var options = {
       headers: {
         'Content-Type': f.type,
       }
-    }
+    };
     if (res.status === 200) {
       var data = new FormData();
-      data.append("file", f.file)
+      data.append("file", f.file);
         const putAudio = async e1 => {
 
-          url = makeSignedUrl(res.data.signed_url)
+          url = makeSignedUrl(res.data.signed_url);
 
           const res2 = await putMedia(url, data, options)
 
-        }
+        };
         putAudio()
     }
   } catch (e) {
@@ -116,13 +116,13 @@ export const uploadFile = async (dir, f, token, e) => {
   }
   return url.toString()
 
-}
+};
 
 // TODO: use extra params to make use of signed url without public access to the bucket
 const makeSignedUrl = (object) => {
-  let url = new URL(object.url + object.fields.key)
+  let url = new URL(object.url + object.fields.key);
   return url.href
-}
+};
 
 export const saveState = (songId, songState) => {
   return axios.post(
@@ -132,14 +132,13 @@ export const saveState = (songId, songState) => {
       headers: getAuth()
     }
   );
-}
+};
 
 export const getUserDetails = username => {
-  console.log(getAuth());
   return axios.get(
     `${API_URL}/v1/users?username=${username}`,
     {
       headers: getAuth()
     }
   );
-}
+};

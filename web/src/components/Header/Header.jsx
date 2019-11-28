@@ -1,6 +1,10 @@
-import React, { useCallback, memo } from 'react';
 import PropTypes from 'prop-types';
+import React, { useCallback, useState, memo } from 'react';
 import cookie from 'js-cookie';
+import styles from './Header.module.scss';
+import {deleteToken, setToken} from '../../actions/userActions';
+import {deleteToken as deleteTokenAPI, saveState} from '../../helpers/api';
+import { showNotification } from '../../actions/notificationsActions';
 import { connect } from 'react-redux';
 import { withRouter, Link } from 'react-router-dom';
 import styles from './Header.module.scss';
@@ -21,10 +25,22 @@ import exportIcon from '../../assets/icons/file_dropdown/export.svg';
 import generateIcon from '../../assets/icons/file_dropdown/generate.svg';
 import exitIcon from '../../assets/icons/file_dropdown/exit.svg';
 
-import { setTrackAtIndex } from '../../actions/studioActions';
-import store from '../../store';
-
 const Header = memo((props) => {
+  const handleSaveState = useCallback(async () => {
+    const songState = {
+      tempo: props.studio.tempo,
+      tracks: props.studio.tracks
+    };
+    /* At the moment, this just uses the hardcoded song ID in the state (1001). */
+    /* The user who has edit permission for the song by default it Kamil. */
+    /* You can add your uid and the sid 1001 to the Song_Editors table to */
+    /* save from your account. */
+    const res = await saveState(props.studio.songId, songState);
+      if (res.status === 200) {
+        store.dispatch(showNotification({message: 'Song saved', type: 'info'}));
+      }
+  }, [props.studio.tempo, props.studio.tracks, props.studio.songId]);
+
   function buildFileSelector() {
     // eslint-disable-next-line no-undef
     const fileSelector = document.createElement('input');
@@ -44,8 +60,10 @@ const Header = memo((props) => {
       cast.then(() => {
         const state = store.getState().studio;
 
+        var state = store.getState().studio;
 
-        const track = { ...state.tracks[state.selectedTrack] };
+
+        var track = { ...state.tracks[state.selectedTrack] };
         track.samples.push({
           url: fileSelector.files[0],
           id: 1156,
@@ -59,26 +77,25 @@ const Header = memo((props) => {
 
 
   const fileDropdownItems = [
-    { name: 'New', action: null, icon: newIcon },
-    { name: 'Open', icon: openIcon },
-    { name: 'Publish', icon: publishIcon },
-    { name: 'Save', icon: saveIcon },
-    { name: 'Import', icon: importIcon, action: handleSampleSelect },
-    { name: 'Export', icon: exportIcon },
-    { name: 'Generate', icon: generateIcon },
-    { name: 'Exit', icon: exitIcon },
+    { name: "New", action: null, icon: newIcon },
+    { name: "Open", icon: openIcon },
+    { name: "Publish", icon: publishIcon },
+    { name: "Save", icon: saveIcon, action: handleSaveState },
+    { name: "Import", icon: importIcon, action: handleSampleSelect },
+    { name: "Export", icon: exportIcon },
+    { name: "Generate", icon: generateIcon },
+    { name: "Exit", icon: exitIcon },
   ];
   const editDropdownItems = [
-    { name: 'Edit 1' },
-    { name: 'Edit 2' },
-    { name: 'Edit 3' },
-    { name: 'Edit 4' },
-    { name: 'Edit 5' },
-    { name: 'Edit 6' },
-    { name: 'Edit 7' },
-    { name: 'Edit 8' },
+    { name: "Edit 1" },
+    { name: "Edit 2" },
+    { name: "Edit 3" },
+    { name: "Edit 4" },
+    { name: "Edit 5" },
+    { name: "Edit 6" },
+    { name: "Edit 7" },
+    { name: "Edit 8" },
   ];
-
 
   const handleSignout = useCallback(
     () => {
@@ -96,6 +113,7 @@ const Header = memo((props) => {
       <div className={props.selected !== 0 ? styles.hide : styles.dropdownBlock}>
         <Dropdown items={fileDropdownItems} title="File" />
         <Dropdown items={editDropdownItems} title="Edit" />
+        {props.children}
       </div>
       <span>
 
