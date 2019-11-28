@@ -47,7 +47,7 @@ def auth_required(return_user=False, return_token=False):
                 log("error", "Server Error", traceback.format_exc())
                 return {"message": "Something has gone wrong!"}, 500
             if return_user:
-                kwargs["user"] = user
+                kwargs["user_data"] = user
             elif return_token:
                 kwargs["access_token"] = access_token
             result = func(*args, **kwargs)

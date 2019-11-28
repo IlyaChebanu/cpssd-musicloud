@@ -32,7 +32,7 @@ AUDIO = Blueprint('audio', __name__)
 @AUDIO.route("", methods=["POST"])
 @sql_err_catcher()
 @auth_required(return_user=True)
-def create_song(user):
+def create_song(user_data):
     """
     Endpoint for creating a new song.
     """
@@ -53,7 +53,7 @@ def create_song(user):
         return {"message": str(exc)}, 422
 
     row_id = insert_song(
-        user.get("uid"),
+        user_data.get("uid"),
         request.json.get("title"),
         0,
         datetime.datetime.utcnow(),
@@ -74,7 +74,7 @@ def create_song(user):
 @AUDIO.route("/state", methods=["POST"])
 @sql_err_catcher()
 @auth_required(return_user=True)
-def save_song(user):
+def save_song(user_data):
     """
     Endpoint for saving song state.
     """
@@ -97,7 +97,7 @@ def save_song(user):
         log("warning", "Request validation failed.", str(exc))
         return {"message": str(exc)}, 422
 
-    if permitted_to_edit(request.json.get("sid"), user.get("uid")):
+    if permitted_to_edit(request.json.get("sid"), user_data.get("uid")):
         insert_song_state(
             request.json.get("sid"),
             json.dumps(request.json.get("song_state")),
@@ -114,14 +114,14 @@ def save_song(user):
 @AUDIO.route("/state", methods=["GET"])
 @sql_err_catcher()
 @auth_required(return_user=True)
-def load_song(user):
+def load_song(user_data):
     """
     Endpoint for loading song state.
     """
     sid = request.args.get('sid')
     if not sid:
         return {"message": "sid param can't be empty!"}, 422
-    if permitted_to_edit(sid, user.get("uid")):
+    if permitted_to_edit(sid, user_data.get("uid")):
         return {"song_state": get_song_state(sid)}, 200
     return {"message": "You are not permitted to edit song: " + sid}, 403
 
@@ -302,7 +302,7 @@ def get_song():
 @AUDIO.route("/like", methods=["POST"])
 @sql_err_catcher()
 @auth_required(return_user=True)
-def like_song(user):
+def like_song(user_data):
     """
     Endpoint for liking a song.
     """
@@ -327,10 +327,10 @@ def like_song(user):
     except NoResults:
         return {"message": "Song does not exist!"}, 400
 
-    like_pair = get_like_pair(user.get("uid"), request.json.get("sid"))
+    like_pair = get_like_pair(user_data.get("uid"), request.json.get("sid"))
 
-    if (user.get("uid"), request.json.get("sid")) not in like_pair:
-        post_like(user.get("uid"), request.json.get("sid"))
+    if (user_data.get("uid"), request.json.get("sid")) not in like_pair:
+        post_like(user_data.get("uid"), request.json.get("sid"))
 
     return {"message": "Song liked"}, 200
 
@@ -338,7 +338,7 @@ def like_song(user):
 @AUDIO.route("/unlike", methods=["POST"])
 @sql_err_catcher()
 @auth_required(return_user=True)
-def unlike_song(user):
+def unlike_song(user_data):
     """
     Endpoint for unliking a song.
     """
@@ -358,21 +358,21 @@ def unlike_song(user):
         log("warning", "Request validation failed.", str(exc))
         return {"message": str(exc)}, 422
 
-    post_unlike(user.get("uid"), request.json.get("sid"))
+    post_unlike(user_data.get("uid"), request.json.get("sid"))
     return {"message": "Song unliked"}, 200
 
 
 @AUDIO.route("/editable_songs", methods=["GET"])
 @sql_err_catcher()
 @auth_required(return_user=True)
-def get_editable_songs(user):
+def get_editable_songs(user_data):
     """
     Endpoint for getting all the songs a user may edit.
     """
     next_page = request.args.get('next_page')
     back_page = request.args.get('back_page')
     if not next_page and not back_page:
-        total_songs = get_number_of_editable_songs_by_uid(user.get("uid"))
+        total_songs = get_number_of_editable_songs_by_uid(user_data.get("uid"))
 
         songs_per_page = request.args.get('songs_per_page')
         if not songs_per_page:
@@ -397,7 +397,7 @@ def get_editable_songs(user):
 
         start_index = (current_page * songs_per_page) - songs_per_page
         editable_songs = get_all_editable_songs_by_uid(
-            user.get("uid"), start_index, songs_per_page
+            user_data.get("uid"), start_index, songs_per_page
         )
         res = []
         for song in editable_songs:
@@ -449,7 +449,7 @@ def get_editable_songs(user):
     start_index = (current_page * songs_per_page) - songs_per_page
 
     editable_songs = get_all_editable_songs_by_uid(
-        user.get("uid"), start_index, songs_per_page
+        user_data.get("uid"), start_index, songs_per_page
     )
     res = []
     for song in editable_songs:
@@ -624,7 +624,7 @@ def get_liked_songs():
 @AUDIO.route("/publish", methods=["POST"])
 @sql_err_catcher()
 @auth_required(return_user=True)
-def publish_song(user):
+def publish_song(user_data):
     """
     Endpoint for updating a songs public state to public.
     """
@@ -644,7 +644,7 @@ def publish_song(user):
         log("warning", "Request validation failed.", str(exc))
         return {"message": str(exc)}, 422
 
-    if not permitted_to_edit(request.json.get("sid"), user.get("uid")):
+    if not permitted_to_edit(request.json.get("sid"), user_data.get("uid")):
         return {"message": "You can't publish that song!"}, 401
 
     update_published_status(1, request.json.get("sid"))
@@ -655,7 +655,7 @@ def publish_song(user):
 @AUDIO.route("/unpublish", methods=["POST"])
 @sql_err_catcher()
 @auth_required(return_user=True)
-def unpublish_song(user):
+def unpublish_song(user_data):
     """
     Endpoint for updating a songs public state to private.
     """
@@ -675,7 +675,7 @@ def unpublish_song(user):
         log("warning", "Request validation failed.", str(exc))
         return {"message": str(exc)}, 422
 
-    if not permitted_to_edit(request.json.get("sid"), user.get("uid")):
+    if not permitted_to_edit(request.json.get("sid"), user_data.get("uid")):
         return {"message": "You can't publish that song!"}, 401
 
     update_published_status(0, request.json.get("sid"))
@@ -686,7 +686,7 @@ def unpublish_song(user):
 @AUDIO.route("/compiled_url", methods=["PATCH"])
 @sql_err_catcher()
 @auth_required(return_user=True)
-def compiled_url(user):
+def compiled_url(user_data):
     """
     Endpoint for updating a songs compiled version URl.
     """
@@ -719,7 +719,7 @@ def compiled_url(user):
         log("warning", "Request validation failed.", str(exc))
         return {"message": str(exc)}, 422
 
-    if not permitted_to_edit(request.json.get("sid"), user.get("uid")):
+    if not permitted_to_edit(request.json.get("sid"), user_data.get("uid")):
         return {"message": "You can't update that song!"}, 401
 
     update_compiled_url(
@@ -733,7 +733,7 @@ def compiled_url(user):
 @AUDIO.route("/cover_art", methods=["PATCH"])
 @sql_err_catcher()
 @auth_required(return_user=True)
-def cover_url(user):
+def cover_url(user_data):
     """
     Endpoint for updating a songs cover art URl.
     """
@@ -762,7 +762,7 @@ def cover_url(user):
         log("warning", "Request validation failed.", str(exc))
         return {"message": str(exc)}, 422
 
-    if not permitted_to_edit(request.json.get("sid"), user.get("uid")):
+    if not permitted_to_edit(request.json.get("sid"), user_data.get("uid")):
         return {"message": "You can't update that song!"}, 401
 
     update_cover_url(request.json.get("sid"), request.json.get("url"))
