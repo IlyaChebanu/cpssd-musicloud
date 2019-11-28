@@ -272,4 +272,4 @@ class AuthTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(503, res.status_code)
+            self.assertEqual(500, res.status_code)

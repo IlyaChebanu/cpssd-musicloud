@@ -100,7 +100,7 @@ class AudioTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(503, res.status_code)
+            self.assertEqual(500, res.status_code)
 
     def test_create_song_fail_missing_title(self):
         """
@@ -229,7 +229,7 @@ class AudioTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(503, res.status_code)
+            self.assertEqual(500, res.status_code)
 
     def test_save_song_fail_missing_sid(self):
         """
@@ -461,7 +461,7 @@ class AudioTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(503, res.status_code)
+            self.assertEqual(500, res.status_code)
 
     def test_load_song_fail_missing_sid(self):
         """
@@ -967,7 +967,7 @@ class AudioTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(503, res.status_code)
+            self.assertEqual(500, res.status_code)
 
     @mock.patch('backend.src.controllers.audio.controllers.get_number_of_compiled_songs')
     def test_get_compiled_songs_fail_no_scroll_token_exceeded_last_page(self, mocked_num_songs):
@@ -1197,7 +1197,7 @@ class AudioTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(503, res.status_code)
+            self.assertEqual(500, res.status_code)
 
     @mock.patch('backend.src.controllers.audio.controllers.get_all_editable_songs_by_uid')
     @mock.patch('backend.src.controllers.audio.controllers.get_number_of_editable_songs_by_uid')
@@ -1441,7 +1441,7 @@ class AudioTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(503, res.status_code)
+            self.assertEqual(500, res.status_code)
 
     @mock.patch('backend.src.controllers.audio.controllers.get_number_of_editable_songs_by_uid')
     def test_get_editable_songs_fail_no_scroll_token_exceeded_last_page(self, mocked_num_songs):
@@ -1772,7 +1772,7 @@ class AudioTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(503, res.status_code)
+            self.assertEqual(500, res.status_code)
 
     @mock.patch('backend.src.controllers.audio.controllers.get_number_of_liked_songs_by_uid')
     def test_get_liked_songs_fail_no_scroll_token_exceeded_last_page(self, mocked_num_songs):
@@ -1933,7 +1933,7 @@ class AudioTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(503, res.status_code)
+            self.assertEqual(500, res.status_code)
 
     def test_like_fail_missing_sid(self):
         """
@@ -2055,7 +2055,7 @@ class AudioTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(503, res.status_code)
+            self.assertEqual(500, res.status_code)
 
     def test_unlike_fail_missing_sid(self):
         """
@@ -2178,7 +2178,7 @@ class AudioTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(503, res.status_code)
+            self.assertEqual(500, res.status_code)
 
     def test_publish_fail_missing_sid(self):
         """
@@ -2335,7 +2335,7 @@ class AudioTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(503, res.status_code)
+            self.assertEqual(500, res.status_code)
 
     def test_unpublish_fail_missing_sid(self):
         """
@@ -2495,7 +2495,7 @@ class AudioTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(503, res.status_code)
+            self.assertEqual(500, res.status_code)
 
     def test_patch_compiled_url_fail_missing_url(self):
         """
@@ -2843,7 +2843,7 @@ class AudioTests(unittest.TestCase):
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(503, res.status_code)
+            self.assertEqual(500, res.status_code)
 
     def test_patch_cover_art_fail_missing_url(self):
         """

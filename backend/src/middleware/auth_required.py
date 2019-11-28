@@ -21,9 +21,11 @@ def auth_required(return_user=False, return_token=False):
                 return {"message": "Token expired."}, 401
             except jwt.exceptions.InvalidSignatureError:
                 return {"message": "Server failed to decode token."}, 500
+            except jwt.exceptions.DecodeError:
+                return {"message": "Bad access_token."}, 401
             except Exception:
-                log("error", "MySQL query failed", traceback.format_exc())
-                return {"message": "MySQL unavailable."}, 503
+                log("error", "Server Error", traceback.format_exc())
+                return {"message": "Something has gone wrong!"}, 500
             if return_user:
                 kwargs["user"] = user
             elif return_token:

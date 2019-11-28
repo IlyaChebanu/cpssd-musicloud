@@ -1,9 +1,10 @@
 import React from 'react';
 import './App.css';
-import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
+import { Router, Route, Switch, Redirect } from 'react-router-dom';
 import history from './history';
 import { ReactComponent as Blob1 } from './assets/blob1.svg';
 import { ReactComponent as Blob2 } from './assets/blob2.svg';
+import NotificationManager from './components/NotificationManager';
 import Login from './pages/Login';
 import Discover from './pages/Discover';
 import Registration from './pages/Registration';
@@ -17,6 +18,7 @@ const App = () => {
     <Router history={history}>
       <Blob1 className='blob1'/>
       <Blob2 className='blob2'/>
+      <NotificationManager />
       <Switch>
         <Redirect from='/' to='/login' exact={true}/>
         <Route path="/login" component={Login}/>

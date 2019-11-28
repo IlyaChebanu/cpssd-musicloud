@@ -15,7 +15,7 @@ configure({
 const Track = memo(props => {
   const ticks = useMemo(() => {
     return [...Array(1000)].map((_, i) => {
-      return <rect x={i * 40} className={styles.tick}></rect>
+      return <rect key={i} x={i * 40} className={styles.tick}></rect>
     });
   }, []);
 
