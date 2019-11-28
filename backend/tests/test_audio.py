@@ -4,7 +4,7 @@ import json
 
 from jwt.exceptions import InvalidSignatureError
 
-from ..src import app
+from ..src import APP
 from ..src.models.errors import NoResults
 from .constants import TEST_TOKEN
 
@@ -14,7 +14,7 @@ class AudioTests(unittest.TestCase):
     Unit tests for /audio API endpoints.
     """
     def setUp(self):
-        self.test_client = app.test_client(self)
+        self.test_client = APP.test_client(self)
 
     @mock.patch('backend.src.controllers.audio.controllers.insert_song')
     def test_create_song_success(self, mocked_sid):

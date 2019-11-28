@@ -9,7 +9,7 @@ import json
 from mysql.connector.errors import IntegrityError
 from jwt.exceptions import InvalidSignatureError
 
-from ..src import app
+from ..src import APP
 from ..src.models.errors import NoResults
 from .constants import TEST_TOKEN
 
@@ -19,7 +19,7 @@ class UserTests(unittest.TestCase):
     Unit tests for /users API endpoints.
     """
     def setUp(self):
-        self.test_client = app.test_client(self)
+        self.test_client = APP.test_client(self)
 
     @mock.patch(
         'backend.src.controllers.users.controllers.get_user_via_username'
