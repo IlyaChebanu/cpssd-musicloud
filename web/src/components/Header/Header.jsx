@@ -1,9 +1,10 @@
-import React, { useCallback, memo } from 'react';
+import React, { useCallback, useState, memo } from 'react';
 import cookie from 'js-cookie';
 import PropTypes from 'prop-types';
 import styles from './Header.module.scss';
-import { deleteToken } from '../../actions/userActions';
-import { deleteToken as deleteTokenAPI } from '../../helpers/api';
+import {deleteToken, setToken} from '../../actions/userActions';
+import {deleteToken as deleteTokenAPI, saveState} from '../../helpers/api';
+import { showNotification } from '../../actions/notificationsActions';
 import { connect } from 'react-redux';
 import { withRouter, Link } from 'react-router-dom';
 import { ReactComponent as Logo } from '../../assets/logo.svg';
@@ -24,20 +25,44 @@ import exitIcon from '../../assets/icons/file_dropdown/exit.svg';
 
 const Header = memo(props => {
 
- const func = () => {
+  const func = () => {
     console.log("action New")
-  }
+  };
+
+  const handleSaveState = useCallback(async () => {
+    const songState = {
+      tempo: props.studio.tempo,
+      tracks: props.studio.tracks
+    };
+    console.log(songState);
+    const res = await saveState(props.studio.songId, songState);
+    try {
+        if (res.status === 200) {
+          showNotification({message: 'Song Saved'});
+        } else if (res.status === 401) {
+          showNotification({message: 'Invalid credentails'});
+        } else if (res.status === 403) {
+          showNotification({message: 'You are not permitted to edit this song'});
+        } else {
+          showNotification({message: 'Unknown error has occurred'});
+          console.error(res);
+        }
+      } catch (e) {
+          showNotification('Fatal error');
+          console.error(e);
+      }
+  }, [props.studio]);
 
   const fileDropdownItems = [
-    {name: "New", action: func, icon: newIcon },
+    {name: "New", action: func, icon: newIcon},
     {name: "Open", icon: openIcon},
     {name: "Publish", icon: publishIcon},
-    {name: "Save", icon: saveIcon},
+    {name: "Save", icon: saveIcon, action: handleSaveState},
     {name: "Import", icon: importIcon},
     {name: "Export", icon: exportIcon},
     {name: "Generate", icon: generateIcon},
     {name: "Exit", icon: exitIcon},
-  ]
+  ];
   const editDropdownItems = [
     {name: "Edit 1"},
     {name: "Edit 2"},
@@ -47,7 +72,7 @@ const Header = memo(props => {
     {name: "Edit 6"},
     {name: "Edit 7"},
     {name: "Edit 8"},
-  ]
+  ];
   const { dispatch, history } = props;
   const { token } = props.user;
 
@@ -93,7 +118,6 @@ Header.propTypes = {
 
 };
 
-const mapStateToProps = ({ user }) => ({ user });
+const mapStateToProps = ({ user, studio }) => ({ user, studio });
 
 export default withRouter(connect(mapStateToProps)(Header));
-

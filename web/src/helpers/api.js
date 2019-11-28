@@ -19,21 +19,21 @@ export const register = (email, username, password) => {
     `${API_URL}/v1/users`,
     { email, username, password },
   ).catch(e => e.response);
-}
+};
 
 export const reverify = email => {
   return axios.post(
     `${API_URL}/v1/users/reverify`,
     { email }
   ).catch(e => e.response);
-}
+};
 
 export const deleteToken = token => {
   return axios.post(
     `${API_URL}/v1/auth/logout`,
     { access_token: token }
   ).catch(e => e.response);
-}
+};
 
 const generatePresignedPost = (dir, filename, filetype, token) => {
   return axios.post(
@@ -47,12 +47,12 @@ const generatePresignedPost = (dir, filename, filetype, token) => {
       headers: {Authorization: "Bearer " + token}
     }
   ).catch(e => e.response);
-}
+};
 
 const putMedia = (signedUrl, file, options) => {
   return axios.put(
     signedUrl, file, options).catch( e => e.response);
-}
+};
 
 export const uploadFile = async (dir, f, token, e) => {
   try {
@@ -61,25 +61,25 @@ export const uploadFile = async (dir, f, token, e) => {
       headers: {
         'Content-Type': f.meta.type,
       }
-    }
+    };
     if (res.status === 200) {
       var data = new FormData();
-      data.append("file", f.file)
+      data.append("file", f.file);
         const putAudio = async e1 => {
           const res2 = await putMedia(makeSignedUrl(res.data.signed_url), data, options)
-        }
+        };
         putAudio()
     }
   } catch (e) {
     return e.response
   }
-}
+};
 
 // TODO: use extra params to make use of signed url without public access to the bucket
 const makeSignedUrl = (object) => {
-  let url = new URL(object.url + object.fields.key)
+  let url = new URL(object.url + object.fields.key);
   return url.href
-}
+};
 
 export const saveState = (songId, songState) => {
   return axios.post(
@@ -89,4 +89,4 @@ export const saveState = (songId, songState) => {
       headers: getAuth()
     }
   ).catch(e => e.response);
-}
+};
