@@ -11,7 +11,7 @@ from ...utils.logger import log
 
 S3 = Blueprint('s3', __name__)
 
-# edit to make use of conditions to allow signed url with private bucket
+# TODO - edit to make use of conditions to allow signed url with private bucket
 @S3.route("/signed-form-post", methods=["POST"])
 @sql_err_catcher()
 @auth_required(return_user=True)
