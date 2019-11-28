@@ -8,9 +8,11 @@ matrix:
       script:
         - pytest --cov-fail-under=65 --cov=backend/src backend/tests && pylint backend/
     - language: node_js
-      before_script:
+      install:
         - npm install web/
-      script: npm run lint web/
+      before_script:
+        - cd web/
+      script: npm run lint
 
 notifications:
   email: false
