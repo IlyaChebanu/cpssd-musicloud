@@ -25,30 +25,26 @@ import { setTrackAtIndex } from '../../actions/studioActions';
 import store from '../../store'
 
 const Header = memo(props => {
-  const func = () => {
-    console.log("action New")
-  };
-
-  const handleSaveState = useCallback(async () => {
+  const handleSaveState = useCallback(async e => {
+    e.preventDefault();
     const songState = {
       tempo: props.studio.tempo,
-      tracks: props.studio.tracks
+      tracks: store.getState().studio.tracks
     };
-    console.log(songState);
     const res = await saveState(props.studio.songId, songState);
     try {
         if (res.status === 200) {
-          showNotification({message: 'Song Saved'});
+          store.dispatch(showNotification({message: 'Song saved', type: 'info'}));
         } else if (res.status === 401) {
-          showNotification({message: 'Invalid credentails'});
+          store.dispatch(showNotification({message: 'Invalid credentials'}));
         } else if (res.status === 403) {
-          showNotification({message: 'You are not permitted to edit this song'});
+          store.dispatch(showNotification({message: 'You are not permitted to edit this song'}));
         } else {
-          showNotification({message: 'Unknown error has occurred'});
+          store.dispatch(showNotification({message: 'Unknown error has occurred'}));
           console.error(res);
         }
       } catch (e) {
-          showNotification('Fatal error');
+          store.dispatch(showNotification('Fatal error'));
           console.error(e);
       }
   }, [props.studio]);
