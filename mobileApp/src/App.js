@@ -5,27 +5,27 @@
  * @format
  * @flow
  */
-import React, { Component } from "react";
+import React, { Fragment, useEffect } from "react";
 import { Provider } from "react-redux";
 import store from "./Store";
 import Navigator, { middleware } from "./navigation/navigator";
 import { Platform, StyleSheet, Text, View } from "react-native";
 import Orientation from 'react-native-orientation';
+import SplashScreen from 'react-native-splash-screen';
 
 console.disableYellowBox = true;
-type Props = {};
-export default class App extends Component<Props> {
 
-  componentWillMount() {
+const App = () => {
+  useEffect(() => {
+    SplashScreen.hide();
     Orientation.lockToPortrait();
-  }
+  }, []);
 
-  render() {
-    return (
-      <Provider store={store}>
-        <Navigator />
-      </Provider>
-    );
-  }
+  return (
+    <Provider store={store}>
+      <Navigator />
+    </Provider>
+  )
 }
 
+export default App;
