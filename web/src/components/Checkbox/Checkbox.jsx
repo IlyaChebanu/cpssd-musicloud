@@ -34,4 +34,6 @@ Checkbox.defaultProps = {
   className: '',
 };
 
+Checkbox.displayName = 'Checkbox';
+
 export default Checkbox;

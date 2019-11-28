@@ -1,9 +1,16 @@
-import React, { memo, useCallback, useEffect, useMemo } from 'react';
+/* eslint-disable no-unused-vars */
+/* eslint-disable react/no-array-index-key */
+import React, {
+  memo, useCallback, useEffect, useMemo,
+} from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import styles from './Studio.module.scss';
 import Header from '../../components/Header';
-import { setTracks, setScroll, setTrackAtIndex, setScrollY } from '../../actions/studioActions';
+import {
+  setTracks, setScroll, setScrollY,
+} from '../../actions/studioActions';
 import { showNotification } from '../../actions/notificationsActions';
-import { connect } from 'react-redux';
 import kick from '../../assets/basic_sounds/kick.wav';
 import clap from '../../assets/basic_sounds/clap.wav';
 import crash from '../../assets/basic_sounds/crash.wav';
@@ -18,16 +25,15 @@ import TimelineControls from '../../components/TimelineControls';
 import SeekBar from '../../components/SeekBar';
 import TrackControls from '../../components/TrackControls';
 import Button from '../../components/Button';
-import PlayBackControls from '../../components/PlaybackControls'
+import PlayBackControls from '../../components/PlaybackControls';
 
 import Track from '../../components/Track/Track';
 
 import { saveState } from '../../helpers/api';
-import { useUpdateUserDetails } from '../../helpers/utils';
-import store from "../../store";
+import { useUpdateUserDetails } from '../../helpers/hooks';
 
-const Studio = memo(props => {
-  const { dispatch } = props;
+const Studio = memo((props) => {
+  const { dispatch, tracks, studio } = props;
 
   useUpdateUserDetails();
 
@@ -48,7 +54,7 @@ const Studio = memo(props => {
             volume: 0.06000000000000005,
             track: 0,
             buffer: {},
-            endTime: 297.74
+            endTime: 297.74,
           },
           {
             id: 'MC40OTQ2MzU1',
@@ -58,7 +64,7 @@ const Studio = memo(props => {
             track: 0,
             volume: 0.06000000000000005,
             buffer: {},
-            endTime: 298.34000000000003
+            endTime: 298.34000000000003,
           },
           {
             id: 'MC44NDMzNjU5',
@@ -68,9 +74,9 @@ const Studio = memo(props => {
             track: 0,
             volume: 0.06000000000000005,
             buffer: {},
-            endTime: 299.54
-          }
-        ]
+            endTime: 299.54,
+          },
+        ],
       },
       {
         volume: 0.1,
@@ -87,7 +93,7 @@ const Studio = memo(props => {
             volume: 0.06999999999999995,
             track: 1,
             buffer: {},
-            endTime: 298.59000000000003
+            endTime: 298.59000000000003,
           },
           {
             id: 'MC43MjcxOTk5',
@@ -97,9 +103,9 @@ const Studio = memo(props => {
             volume: 0.06999999999999995,
             track: 1,
             buffer: {},
-            endTime: 299.64
-          }
-        ]
+            endTime: 299.64,
+          },
+        ],
       },
       {
         volume: 0.1,
@@ -116,9 +122,9 @@ const Studio = memo(props => {
             volume: 0.050000000000000044,
             track: 2,
             buffer: {},
-            endTime: 298.80427083333336
-          }
-        ]
+            endTime: 298.80427083333336,
+          },
+        ],
       },
       {
         volume: 0.1,
@@ -135,7 +141,7 @@ const Studio = memo(props => {
             volume: 0.020000000000000018,
             track: 3,
             buffer: {},
-            endTime: 298.39
+            endTime: 298.39,
           },
           {
             id: 'MC40ODAyNjgz',
@@ -145,7 +151,7 @@ const Studio = memo(props => {
             volume: 0.020000000000000018,
             track: 3,
             buffer: {},
-            endTime: 298.69
+            endTime: 298.69,
           },
           {
             id: 'MC40NDQ2NTY3',
@@ -155,7 +161,7 @@ const Studio = memo(props => {
             volume: 0.020000000000000018,
             track: 3,
             buffer: {},
-            endTime: 298.99
+            endTime: 298.99,
           },
           {
             id: 'MC4yNzYwNDUw',
@@ -165,9 +171,9 @@ const Studio = memo(props => {
             volume: 0.020000000000000018,
             track: 3,
             buffer: {},
-            endTime: 299.29
-          }
-        ]
+            endTime: 299.29,
+          },
+        ],
       },
       {
         volume: 0.1,
@@ -184,7 +190,7 @@ const Studio = memo(props => {
             volume: 0.10999999999999999,
             track: 4,
             buffer: {},
-            endTime: 299.59000000000003
+            endTime: 299.59000000000003,
           },
           {
             id: 'MC43OTQwNDQ4',
@@ -194,9 +200,9 @@ const Studio = memo(props => {
             volume: 0.10999999999999999,
             track: 4,
             buffer: {},
-            endTime: 297.79
-          }
-        ]
+            endTime: 297.79,
+          },
+        ],
       },
       {
         volume: 0.1,
@@ -213,7 +219,7 @@ const Studio = memo(props => {
             track: 5,
             volume: 0.12,
             buffer: {},
-            endTime: 299.69
+            endTime: 299.69,
           },
           {
             id: 'MC40ODcwMjUy',
@@ -223,9 +229,9 @@ const Studio = memo(props => {
             track: 5,
             volume: 0.12,
             buffer: {},
-            endTime: 298.64
-          }
-        ]
+            endTime: 298.64,
+          },
+        ],
       },
       {
         volume: 0.1,
@@ -242,9 +248,9 @@ const Studio = memo(props => {
             volume: 0.12,
             track: 6,
             buffer: {},
-            endTime: 298.097125
-          }
-        ]
+            endTime: 298.097125,
+          },
+        ],
       },
       {
         volume: 0.1,
@@ -261,7 +267,7 @@ const Studio = memo(props => {
             volume: 0.12,
             track: 7,
             buffer: {},
-            endTime: 297.90875
+            endTime: 297.90875,
           },
           {
             id: 'MC40MTM2OTMy',
@@ -271,7 +277,7 @@ const Studio = memo(props => {
             volume: 0.12,
             track: 7,
             buffer: {},
-            endTime: 298.95875
+            endTime: 298.95875,
           },
           {
             id: 'MC4yNzU4NDM0',
@@ -281,9 +287,9 @@ const Studio = memo(props => {
             volume: 0.12,
             track: 7,
             buffer: {},
-            endTime: 299.40875
-          }
-        ]
+            endTime: 299.40875,
+          },
+        ],
       },
       {
         volume: 1,
@@ -300,65 +306,55 @@ const Studio = memo(props => {
             volume: 1,
             track: 8,
             buffer: {},
-            endTime: 299.5739791666667
-          }
-        ]
-      }
-    ]
+            endTime: 299.5739791666667,
+          },
+        ],
+      },
+    ]));
+  }, [dispatch]);
 
-    ));
-  }, []);
+  const handleScroll = useCallback((e) => {
+    dispatch(setScroll(e.target.scrollLeft));
+    dispatch(setScrollY(e.target.scrollTop));
+  }, [dispatch]);
 
-  const handleScroll = useCallback(e => {
-    props.dispatch(setScroll(e.target.scrollLeft));
-    props.dispatch(setScrollY(e.target.scrollTop));
-  }, []);
-
-  const tracks = useMemo(() => {
-    return props.tracks.map((t, i) => (
-      <Track index={i} track={t} key={i} className={styles.track} />
-    ));
-  }, [props.tracks]);
+  const renderableTracks = useMemo(() => tracks.map((t, i) => (
+    <Track index={i} track={t} key={i} className={styles.track} />
+  )), [tracks]);
 
   const handleAddNewTrack = useCallback(() => {
-    props.dispatch(setTracks([
-      ...props.tracks,
+    dispatch(setTracks([
+      ...tracks,
       {
         volume: 1,
         pan: 0,
         mute: false,
         solo: false,
         name: 'New track',
-        samples: []
-      }
+        samples: [],
+      },
     ]));
-  }, [props.tracks]);
+  }, [dispatch, tracks]);
 
-  const handleSaveState = useCallback(async e => {
+  const handleSaveState = useCallback(async (e) => {
     e.preventDefault();
     const songState = {
-      tempo: props.studio.tempo,
-      tracks: props.studio.tracks
+      tempo: studio.tempo,
+      tracks,
     };
     /* At the moment, this just uses the hardcoded song ID in the state (1001). */
     /* The user who has edit permission for the song by default it Kamil. */
     /* You can add your uid and the sid 1001 to the Song_Editors table to */
     /* save from your account. */
-    const res = await saveState(props.studio.songId, songState);
-      if (res.status === 200) {
-        store.dispatch(showNotification({message: 'Song saved', type: 'info'}));
-      }
-  }, [props.studio.tempo, props.studio.tracks, props.studio.songId]);
+    const res = await saveState(studio.songId, songState);
+    if (res.status === 200) {
+      dispatch(showNotification({ message: 'Song saved', type: 'info' }));
+    }
+  }, [studio.tempo, studio.songId, tracks, dispatch]);
 
   const trackControlsStyle = useMemo(() => ({
-    transform: `translateY(${-props.studio.scrollY}px)`
-  }), [props.studio.scrollY]);
-
-  const handleAddNewSample = useCallback((sample) => {
-    var track = props.tracks[props.index];
-    track.samples.concat(sample);
-    props.dispatch(setTrackAtIndex())
-  });
+    transform: `translateY(${-studio.scrollY}px)`,
+  }), [studio.scrollY]);
 
   return (
     <div className={styles.wrapper}>
@@ -375,10 +371,13 @@ const Studio = memo(props => {
         <div className={styles.sidebar}>
           <TimelineControls />
           <div style={trackControlsStyle}>
-            {props.tracks.map((track, i) => {
-              return <TrackControls key={i} track={track} index={i} />;
-            })}
-            <div className={`${styles.newTrack} ${props.tracks.length % 2 !== 1 ? styles.even : ''}`} onClick={handleAddNewTrack}>
+            {tracks.map((track, i) => <TrackControls key={i} track={track} index={i} />)}
+            <div
+              className={`${styles.newTrack} ${tracks.length % 2 !== 1 ? styles.even : ''}`}
+              onClick={handleAddNewTrack}
+              role="button"
+              tabIndex={0}
+            >
               Add new track
             </div>
           </div>
@@ -387,7 +386,7 @@ const Studio = memo(props => {
           <div className={styles.mainContent}>
             <Timeline />
             <div className={styles.tracks}>
-              {tracks}
+              {renderableTracks}
             </div>
           </div>
         </div>
@@ -398,8 +397,12 @@ const Studio = memo(props => {
 });
 
 Studio.propTypes = {
-
+  dispatch: PropTypes.func.isRequired,
+  tracks: PropTypes.arrayOf(PropTypes.object).isRequired,
+  studio: PropTypes.object.isRequired,
 };
+
+Studio.displayName = 'Studio';
 
 const mapStateToProps = ({ studio }) => ({ studio, tracks: studio.tracks });
 

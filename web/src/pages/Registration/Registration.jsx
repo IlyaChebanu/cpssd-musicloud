@@ -1,4 +1,7 @@
-import React, { useState, useMemo, useCallback, memo } from 'react';
+import React, {
+  useState, useMemo, useCallback, memo,
+} from 'react';
+import PropTypes from 'prop-types';
 import zxcvbn from 'zxcvbn';
 import { Link as link } from 'react-router-dom';
 import styles from './Registration.module.scss';
@@ -11,7 +14,7 @@ import { emailRe } from '../../helpers/constants';
 const Logo = memo(logo);
 const Link = memo(link);
 
-const Registration = memo(props => {
+const Registration = memo((props) => {
   const { history } = props;
 
   const [email, setEmail] = useState('');
@@ -26,23 +29,27 @@ const Registration = memo(props => {
     return <p>{strengths[zxcvbn(password).score]}</p>;
   }, [password]);
 
-  const emailBorder = useMemo(() => {
-    return submitted && !emailRe.test(email) ? '#b90539' : 'white';
-  }, [email, submitted]);
+  const emailBorder = useMemo(
+    () => (submitted && !emailRe.test(email) ? '#b90539' : 'white'),
+    [email, submitted],
+  );
 
-  const usernameBorder = useMemo(() => {
-    return submitted && !username ? '#b90539' : 'white';
-  }, [username, submitted]);
+  const usernameBorder = useMemo(
+    () => (submitted && !username ? '#b90539' : 'white'),
+    [username, submitted],
+  );
 
-  const passwordBorder = useMemo(() => {
-    return submitted && !password ? '#b90539' : 'white';
-  }, [password, submitted]);
+  const passwordBorder = useMemo(
+    () => (submitted && !password ? '#b90539' : 'white'),
+    [password, submitted],
+  );
 
-  const repeatPasswordBorder = useMemo(() => {
-    return submitted && (password !== repeatPassword || !repeatPassword) ? '#b90539' : 'white';
-  }, [repeatPassword, password, submitted]);
+  const repeatPasswordBorder = useMemo(
+    () => (submitted && (password !== repeatPassword || !repeatPassword) ? '#b90539' : 'white'),
+    [repeatPassword, password, submitted],
+  );
 
-  const handleSubmit = useCallback(async e => {
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
 
     if (username && emailRe.test(email) && password && repeatPassword === password) {
@@ -56,9 +63,9 @@ const Registration = memo(props => {
           setErrorText('Unknown error has occurred');
           console.error(res);
         }
-      } catch (e) {
+      } catch (err) {
         setErrorText('Fatal error');
-        console.error(e);
+        console.error(err);
       }
     }
 
@@ -68,19 +75,50 @@ const Registration = memo(props => {
   return (
     <div className={styles.wrapper}>
       <div className={styles.lCol}>
-        <Logo className={styles.logo} alt='MusiCloud logo' />
+        <Logo className={styles.logo} alt="MusiCloud logo" />
       </div>
       <div className={styles.rCol}>
         <div className={styles.formWrapper}>
           <h1>Sign up</h1>
           <p className={styles.registrationError}>{errorText}</p>
           <form onSubmit={handleSubmit}>
-            <InputField animate={true} onChange={setEmail} name='email' placeholder='Email' borderColour={emailBorder}/>
-            <InputField animate={true} onChange={setUsername} name='username' placeholder='Username' borderColour={usernameBorder}/>
-            <InputField animate={true} onChange={setPassword} name='password' placeholder='Password' borderColour={passwordBorder} password={true} sideContent={passwordStrength}/>
-            <InputField animate={true} onChange={setRepeatPassword} name='passwordRepeat' placeholder='Repeat password' borderColour={repeatPasswordBorder} password={true}/>
-            <SubmitButton text='Sign up'/>
-            <p>Already have an account? <Link to='/login'>Sign in!</Link></p>
+            <InputField
+              animate
+              onChange={setEmail}
+              name="email"
+              placeholder="Email"
+              borderColour={emailBorder}
+            />
+            <InputField
+              animate
+              onChange={setUsername}
+              name="username"
+              placeholder="Username"
+              borderColour={usernameBorder}
+            />
+            <InputField
+              animate
+              onChange={setPassword}
+              name="password"
+              placeholder="Password"
+              borderColour={passwordBorder}
+              password
+              sideContent={passwordStrength}
+            />
+            <InputField
+              animate
+              onChange={setRepeatPassword}
+              name="passwordRepeat"
+              placeholder="Repeat password"
+              borderColour={repeatPasswordBorder}
+              password
+            />
+            <SubmitButton text="Sign up" />
+            <p>
+              Already have an account?
+              {' '}
+              <Link to="/login">Sign in!</Link>
+            </p>
           </form>
         </div>
       </div>
@@ -88,5 +126,10 @@ const Registration = memo(props => {
   );
 });
 
-export default Registration;
+Registration.propTypes = {
+  history: PropTypes.object.isRequired,
+};
 
+Registration.displayName = 'Registration';
+
+export default Registration;

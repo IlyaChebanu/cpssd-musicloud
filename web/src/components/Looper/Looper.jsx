@@ -1,5 +1,5 @@
-/* eslint-disable no-undef */
 import React, { memo, useCallback, useMemo } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styles from './Looper.module.scss';
 import { setLoop } from '../../actions/studioActions';
@@ -84,6 +84,8 @@ Looper.propTypes = {
   gridSize: PropTypes.number.isRequired,
   dispatch: PropTypes.func.isRequired,
 };
+
+Looper.displayName = 'Looper';
 
 const mapStateToProps = ({ studio }) => ({
   loopStart: studio.loop.start,

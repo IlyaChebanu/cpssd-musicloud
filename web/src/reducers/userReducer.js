@@ -1,8 +1,8 @@
 import cookie from 'js-cookie';
-import history from '../history';
 import jwt from 'jsonwebtoken';
+import history from '../history';
 
-let token = cookie.get('token') || '';
+const token = cookie.get('token') || '';
 let username = '';
 if (token) {
   const decoded = jwt.decode(token);
@@ -16,40 +16,40 @@ if (token) {
 export default (state = {
   token,
   username,
-  profilePicUrl: ''
+  profilePicUrl: '',
 }, action) => {
   switch (action.type) {
-   case 'SET_TOKEN':
-    return {
-      ...state,
-      token: action.payload
-    }
-  case 'DELETE_TOKEN':
-    return {
-      ...state,
-      token: undefined
-    }
-  case 'SET_USERNAME':
-    return {
-      ...state,
-      username: action.username
-    }
-  case 'DELETE_USERNAME':
-    return {
-      ...state,
-      username: undefined
-    }
-  case 'SET_PROFILE_PIC_URL':
-    return {
-      ...state,
-      profilePicUrl: action.profilePicUrl
-    }
-  case 'DELETE_PROFILE_PIC_URL':
-    return {
-      ...state,
-      profilePicUrl: undefined
-    }
-  default:
-    return state
+    case 'SET_TOKEN':
+      return {
+        ...state,
+        token: action.payload,
+      };
+    case 'DELETE_TOKEN':
+      return {
+        ...state,
+        token: undefined,
+      };
+    case 'SET_USERNAME':
+      return {
+        ...state,
+        username: action.username,
+      };
+    case 'DELETE_USERNAME':
+      return {
+        ...state,
+        username: undefined,
+      };
+    case 'SET_PROFILE_PIC_URL':
+      return {
+        ...state,
+        profilePicUrl: action.profilePicUrl,
+      };
+    case 'DELETE_PROFILE_PIC_URL':
+      return {
+        ...state,
+        profilePicUrl: undefined,
+      };
+    default:
+      return state;
   }
- }
+};

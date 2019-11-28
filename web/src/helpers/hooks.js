@@ -5,7 +5,8 @@ import { setProfilePicUrl } from '../actions/userActions';
 import { showNotification } from '../actions/notificationsActions';
 
 
-export default () => {
+// eslint-disable-next-line import/prefer-default-export
+export const useUpdateUserDetails = () => {
   const { user } = store.getState();
   useEffect(() => {
     if (user.token) {

@@ -21,4 +21,6 @@ const FileUploader = memo(() => {
   );
 });
 
+FileUploader.displayName = 'FileUploader';
+
 export default FileUploader;

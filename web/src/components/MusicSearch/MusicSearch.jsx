@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, memo } from 'react';
 import PropTypes from 'prop-types';
 import styles from './MusicSearch.module.scss';
 import InputField from '../InputField';
@@ -6,7 +6,7 @@ import { ReactComponent as SortIcon } from '../../assets/icons/sort-alt-light.sv
 import { ReactComponent as SortDuotoneIcon } from '../../assets/icons/sort-duotone.svg';
 // import { ReactComponent as SortUpDuotoneIcon } from '../../assets/icons/sort-up-duotone.svg';
 
-const MusicSearch = (props) => {
+const MusicSearch = memo((props) => {
   const { className } = props;
 
   const [expanded, setExpanded] = useState(false);
@@ -40,7 +40,7 @@ const MusicSearch = (props) => {
       </span>
     </div>
   );
-};
+});
 
 MusicSearch.propTypes = {
   className: PropTypes.string,
@@ -49,5 +49,7 @@ MusicSearch.propTypes = {
 MusicSearch.defaultProps = {
   className: '',
 };
+
+MusicSearch.displayName = 'MusicSearch';
 
 export default MusicSearch;

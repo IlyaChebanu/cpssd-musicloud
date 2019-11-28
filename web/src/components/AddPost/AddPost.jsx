@@ -24,4 +24,6 @@ AddPost.defaultProps = {
   className: '',
 };
 
+AddPost.displayName = 'AddPost';
+
 export default AddPost;

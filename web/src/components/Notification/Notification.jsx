@@ -69,9 +69,11 @@ const Notification = memo((props) => {
 Notification.propTypes = {
   text: PropTypes.string.isRequired,
   duration: PropTypes.number.isRequired,
-  id: PropTypes.strin.isRequired,
+  id: PropTypes.string.isRequired,
   index: PropTypes.number.isRequired,
   dispatch: PropTypes.func.isRequired,
 };
+
+Notification.displayName = 'Notification';
 
 export default connect()(Notification);

@@ -6,5 +6,5 @@ import notificationsReducer from './notificationsReducer';
 export default combineReducers({
   user: userReducer,
   studio: studioReducer,
-  notifications: notificationsReducer
+  notifications: notificationsReducer,
 });

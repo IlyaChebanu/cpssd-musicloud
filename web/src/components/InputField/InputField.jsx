@@ -82,4 +82,6 @@ InputField.defaultProps = {
   animate: false,
 };
 
+InputField.displayName = 'InputField';
+
 export default InputField;

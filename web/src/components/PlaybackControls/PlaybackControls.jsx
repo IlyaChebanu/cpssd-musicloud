@@ -1,47 +1,50 @@
 import React, { useCallback, memo } from 'react';
-import cookie from 'js-cookie';
 import PropTypes from 'prop-types';
-import styles from './PlaybackControls.module.scss';
 import { connect } from 'react-redux';
-import { withRouter, Link } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
+import styles from './PlaybackControls.module.scss';
 import { ReactComponent as Play } from '../../assets/icons/play-circle-light.svg';
 import { ReactComponent as Pause } from '../../assets/icons/pause-circle-light.svg';
 import { ReactComponent as Back } from '../../assets/icons/go-back.svg';
 import { ReactComponent as Forward } from '../../assets/icons/go-forward.svg';
 import { ReactComponent as ToStart } from '../../assets/icons/to-start.svg';
 import Slider from '../Slider/Slider';
-import { setCurrentBeat, setScroll, stop, pause, play, setVolume } from '../../actions/studioActions';
+import {
+  setCurrentBeat, stop, pause, play,
+} from '../../actions/studioActions';
 
 
+const PlaybackControls = memo((props) => {
+  const { dispatch, studio } = props;
+  const { currentBeat, tempo, playing } = studio;
 
-const PlaybackControls = memo(props => {
   const handlePlay = useCallback(() => {
-    props.dispatch(play);
-  }, []);
+    dispatch(play);
+  }, [dispatch]);
 
   const handlePause = useCallback(() => {
-    props.dispatch(pause);
-  }, []);
+    dispatch(pause);
+  }, [dispatch]);
 
   const toStart = useCallback(() => {
-    props.dispatch(setCurrentBeat(1));
-    props.dispatch(stop);
-  }, []);
+    dispatch(setCurrentBeat(1));
+    dispatch(stop);
+  }, [dispatch]);
 
   const backward = useCallback(() => {
-    props.dispatch(setCurrentBeat(Math.max(1, Math.floor(props.studio.currentBeat - 1))))
-  }, [props.studio.currentBeat]);
+    dispatch(setCurrentBeat(Math.max(1, Math.floor(currentBeat - 1))));
+  }, [dispatch, currentBeat]);
 
   const forward = useCallback(() => {
-    props.dispatch(setCurrentBeat(Math.max(1, Math.floor(props.studio.currentBeat + 1))))
-  }, [props.studio.currentBeat]);
+    dispatch(setCurrentBeat(Math.max(1, Math.floor(currentBeat + 1))));
+  }, [currentBeat, dispatch]);
 
 
-  const curSecond = (props.studio.currentBeat - 1) / props.studio.tempo * 60;
-  var date = new Date(null);
+  const curSecond = ((currentBeat - 1) / tempo) * 60;
+  const date = new Date(null);
   date.setSeconds(curSecond);
-  date.setMilliseconds(curSecond * 1000 % 1000)
-  var timeString = date.toISOString().substr(11, 11);
+  date.setMilliseconds((curSecond * 1000) % 1000);
+  const timeString = date.toISOString().substr(11, 11);
 
   return (
     <div className={styles.footer}>
@@ -49,9 +52,9 @@ const PlaybackControls = memo(props => {
         <Slider />
         <ToStart className={styles.controlButton} onClick={toStart} />
         <Back className={styles.controlButton} onClick={backward} />
-        {props.studio.playing ?
-          <Pause className={styles.controlButton} onClick={handlePause} /> :
-          <Play className={styles.controlButton} onClick={handlePlay} />}
+        {playing
+          ? <Pause className={styles.controlButton} onClick={handlePause} />
+          : <Play className={styles.controlButton} onClick={handlePlay} />}
         <Forward className={styles.controlButton} onClick={forward} />
         <p>{timeString}</p>
       </span>
@@ -60,12 +63,13 @@ const PlaybackControls = memo(props => {
 });
 
 
-
 PlaybackControls.propTypes = {
-
+  dispatch: PropTypes.func.isRequired,
+  studio: PropTypes.object.isRequired,
 };
+
+PlaybackControls.displayName = 'PlaybackControls';
 
 const mapStateToProps = ({ studio }) => ({ studio });
 
 export default withRouter(connect(mapStateToProps)(PlaybackControls));
-

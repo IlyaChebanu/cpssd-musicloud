@@ -1,115 +1,151 @@
+/* eslint-disable react/no-array-index-key */
 import React, { memo, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import styles from './Sample.module.scss';
 import { connect } from 'react-redux';
 import _ from 'lodash';
-import { bufferStore } from '../../helpers/constants';
-import { lerp } from '../../helpers/utils';
-import { setSampleTime, setTrackAtIndex, setSelectedSample, setClipboard } from '../../actions/studioActions';
-import { dColours, colours } from '../../helpers/constants';
 import { HotKeys } from 'react-hotkeys';
+import styles from './Sample.module.scss';
+import { bufferStore, dColours, colours } from '../../helpers/constants';
+import { lerp } from '../../helpers/utils';
+import {
+  setSampleTime, setTrackAtIndex, setSelectedSample, setClipboard,
+} from '../../actions/studioActions';
 
-const Sample = memo(props => {
 
-  const buffer = useMemo(() => bufferStore[props.sample.url], [props.sample.url, props.sampleLoading]);
+const Sample = memo((props) => {
+  const {
+    sample, tempo, selectedSample, dispatch, gridSnapEnabled, gridSize, tracks,
+  } = props;
+
+  const buffer = useMemo(() => bufferStore[sample.url], [sample.url]);
 
   const waveform = useMemo(() => {
     if (buffer) {
       const data = buffer.getChannelData(0);
-      const beatsPerSecond = props.tempo / 60;
+      const beatsPerSecond = tempo / 60;
       const width = buffer.duration * beatsPerSecond * 40;
       const step = Math.ceil(width / 2);
       const amp = 80;
       const bars = [];
-      for (let i = 0; i < step; i++) {
+      for (let i = 0; i < step; i += 1) {
         const d = _.clamp(data[Math.floor(lerp(0, data.length, i / step))], -1, 1);
         bars.push(Math.max(2, Math.abs(Math.floor(d * amp))));
       }
-      return <svg className={styles.waveform}>
-        {bars.map((bar, i) => <rect key={i} x={(i+1) * 2} y={45 - bar / 2} style={{ height: `${bar}px` }} className={styles.bar}/>)}
-      </svg>
+      return (
+        <svg className={styles.waveform}>
+          {bars.map((bar, i) => <rect key={i} x={(i + 1) * 2} y={45 - bar / 2} style={{ height: `${bar}px` }} className={styles.bar} />)}
+        </svg>
+      );
     }
-  }, [buffer, props.tempo]);
+    return null;
+  }, [buffer, tempo]);
 
   const wrapperStyle = useMemo(() => {
-    const beatsPerSecond = props.tempo / 60;
-    const colourIdx = props.sample.track % dColours.length;
-    const selected = props.sample.id === props.selectedSample;
+    const beatsPerSecond = tempo / 60;
+    const colourIdx = sample.track % dColours.length;
+    const selected = sample.id === selectedSample;
     return {
       width: buffer ? buffer.duration * beatsPerSecond * 40 : 20,
-      backgroundColor: selected ? colours[colourIdx] : dColours[colourIdx]
+      backgroundColor: selected ? colours[colourIdx] : dColours[colourIdx],
     };
-  }, [props.tempo, buffer, props.sample.track, props.sample.id, props.selectedSample]);
+  }, [tempo, sample.track, sample.id, selectedSample, buffer]);
 
-  const handleDragSample = useCallback(e => {
-    props.dispatch(setSelectedSample(props.sample.id));
-    const initialMousePos = e.screenX;
+  const handleDragSample = useCallback((ev) => {
+    dispatch(setSelectedSample(props.sample.id));
+    const initialMousePos = ev.screenX;
     const initialTime = props.sample.time;
-    const handleMouseMove = e => {
+    const handleMouseMove = (e) => {
       e.preventDefault();
+      // eslint-disable-next-line no-undef
       const start = initialTime + (e.screenX - initialMousePos) / 40 / window.devicePixelRatio;
-      const numDecimalPlaces = Math.max(0, String(1 / props.gridSize).length - 2);
-      const time = props.gridSnapEnabled ? Number((Math.round((start) * props.gridSize) / props.gridSize).toFixed(numDecimalPlaces)) : start;
+      const numDecimalPlaces = Math.max(0, String(1 / gridSize).length - 2);
+      const time = gridSnapEnabled
+        ? Number((Math.round((start) * gridSize) / gridSize).toFixed(numDecimalPlaces))
+        : start;
 
       // Check for collisions with other samples
-      const timeEnd = time + props.sample.duration * (props.tempo / 60);
-      for (const sample of props.tracks[props.sample.track].samples) {
-        if (sample.id !== props.sample.id) {
-          const sampleEndTime = sample.time + sample.duration * (props.tempo / 60);
-          if (sample.time < timeEnd && sampleEndTime > time) {
+      const timeEnd = time + sample.duration * (tempo / 60);
+      // eslint-disable-next-line no-restricted-syntax
+      for (const s of tracks[sample.track].samples) {
+        if (s.id !== sample.id) {
+          const sampleEndTime = s.time + s.duration * (tempo / 60);
+          if (s.time < timeEnd && sampleEndTime > time) {
             return;
           }
         }
       }
 
-      props.dispatch(setSampleTime(time, props.sample.id));
-    }
+      dispatch(setSampleTime(time, sample.id));
+    };
     const handleDragStop = () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleDragStop);
-    }
+    };
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleDragStop);
-  }, [props.gridSnapEnabled, props.gridSize, props.sample, props.tracks, props.tempo]);
+  }, [
+    dispatch,
+    gridSize,
+    gridSnapEnabled,
+    props,
+    sample.duration,
+    sample.id,
+    sample.track,
+    tempo,
+    tracks,
+  ]);
 
   const deleteSample = useCallback(() => {
-    const track = props.tracks[props.sample.track];
-    track.samples = track.samples.filter(s => s.id !== props.sample.id);
-    props.dispatch(setTrackAtIndex(track, props.sample.track));
-  }, [props.tracks, props.sample]);
+    const track = tracks[sample.track];
+    track.samples = track.samples.filter((s) => s.id !== sample.id);
+    dispatch(setTrackAtIndex(track, props.sample.track));
+  }, [dispatch, props.sample.track, sample.id, sample.track, tracks]);
 
   const copySample = useCallback(() => {
-    props.dispatch(setClipboard(props.sample));
-  }, [props.sample]);
+    dispatch(setClipboard(sample));
+  }, [dispatch, sample]);
 
   const keyMap = {
-    COPY_SAMPLE: "ctrl+c",
-    DELETE_SAMPLE: "del",
+    COPY_SAMPLE: 'ctrl+c',
+    DELETE_SAMPLE: 'del',
   };
 
   const handlers = {
     DELETE_SAMPLE: deleteSample,
-    COPY_SAMPLE: copySample
+    COPY_SAMPLE: copySample,
   };
 
   return (
-      <HotKeys
-        allowChanges={true}
-        keyMap={keyMap}
-        handlers={handlers}
-        className={styles.wrapper}
-        style={{ ...wrapperStyle, ...props.style }}
-        onMouseDown={handleDragSample}
-      >
-        {waveform}
-      </HotKeys>
+    <HotKeys
+      allowChanges
+      keyMap={keyMap}
+      handlers={handlers}
+      className={styles.wrapper}
+      style={{ ...wrapperStyle, ...props.style }}
+      onMouseDown={handleDragSample}
+    >
+      {waveform}
+    </HotKeys>
   );
 });
 
 Sample.propTypes = {
   style: PropTypes.object,
+  sample: PropTypes.object.isRequired,
+  tempo: PropTypes.number.isRequired,
+  selectedSample: PropTypes.string.isRequired,
+  dispatch: PropTypes.func.isRequired,
+  gridSnapEnabled: PropTypes.bool.isRequired,
+  gridSize: PropTypes.number.isRequired,
+  tracks: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
+
+Sample.defaultProps = {
+  style: {},
+};
+
+Sample.displayName = 'Sample';
 
 const mapStateToProps = ({ studio }) => ({
   sampleLoading: studio.sampleLoading,
@@ -117,9 +153,7 @@ const mapStateToProps = ({ studio }) => ({
   gridSnapEnabled: studio.gridSnapEnabled,
   gridSize: studio.gridSize,
   tracks: studio.tracks,
-  tempo: studio.tempo,
   selectedSample: studio.selectedSample,
 });
 
 export default connect(mapStateToProps)(Sample);
-
