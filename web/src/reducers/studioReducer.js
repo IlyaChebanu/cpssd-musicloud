@@ -18,7 +18,7 @@ export default (
     volume: 1,
     sampleLoading: false,
     tracks: [],
-    selectedTrack: -1,
+    selectedTrack: 0,
     selectedSample: -1,
     clipboard: {}
   },

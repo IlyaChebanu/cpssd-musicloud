@@ -9,7 +9,7 @@ const SongCard = props => {
   return (
     <div className={styles.wrapper + (props.className ? ` ${props.className}` : '')}>
       <div className={styles.thumbWrapper}>
-        <img className={styles.thumbnail} src={CloudQuestion}/>
+        <img alt='song cover art' className={styles.thumbnail} src={CloudQuestion}/>
       </div>
       <div className={styles.details}>
         <p className={styles.title}>A song</p>

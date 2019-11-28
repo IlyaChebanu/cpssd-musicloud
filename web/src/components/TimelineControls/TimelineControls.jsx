@@ -1,9 +1,7 @@
-import React, { memo, useState, useCallback, useMemo } from 'react';
-import PropTypes from 'prop-types';
+import React, { memo, useState, useCallback } from 'react';
 import styles from './TimelineControls.module.scss';
 import { connect } from 'react-redux';
 import { setTempo, setGridSnapEnabled, setLoopEnabled } from '../../actions/studioActions';
-import store from '../../store';
 
 import { ReactComponent as Snap } from '../../assets/icons/magnet-light.svg';
 import { ReactComponent as SnapActive } from '../../assets/icons/magnet-regular.svg';
@@ -48,9 +46,6 @@ const TimelineControls = memo(props => {
     </div>
   );
 });
-
-TimelineControls.propTypes = {
-};
 
 const mapStateToProps = ({ studio }) => ({
   tempo: studio.tempo,

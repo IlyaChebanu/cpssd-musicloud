@@ -1,7 +1,8 @@
 import React, { memo, useCallback, useEffect, useMemo } from 'react';
 import styles from './Studio.module.scss';
 import Header from '../../components/Header';
-import { play, pause, stop, setTempo, setVolume, setTracks, setScroll, setScrollY } from '../../actions/studioActions';
+import { setTracks, setScroll, setTrackAtIndex, setScrollY } from '../../actions/studioActions';
+import { showNotification } from '../../actions/notificationsActions';
 import { connect } from 'react-redux';
 import kick from '../../assets/basic_sounds/kick.wav';
 import clap from '../../assets/basic_sounds/clap.wav';
@@ -19,14 +20,15 @@ import TrackControls from '../../components/TrackControls';
 import Button from '../../components/Button';
 import PlayBackControls from '../../components/PlaybackControls'
 
-import FileUploader from '../../components/FileUploader';
 import Track from '../../components/Track/Track';
 
 import { saveState } from '../../helpers/api';
+import { useUpdateUserDetails } from '../../helpers/utils';
 
 const Studio = memo(props => {
-
   const { dispatch } = props;
+
+  useUpdateUserDetails();
 
   useEffect(() => {
     dispatch(setTracks([
@@ -346,6 +348,12 @@ const Studio = memo(props => {
   const trackControlsStyle = useMemo(() => ({
     transform: `translateY(${-props.studio.scrollY}px)`
   }), [props.studio.scrollY]);
+
+  const handleAddNewSample = useCallback((sample) => {
+    var track = props.tracks[props.index]
+    track.samples.concat(sample)
+    props.dispatch(setTrackAtIndex())
+  })
 
   return (
     <div className={styles.wrapper}>

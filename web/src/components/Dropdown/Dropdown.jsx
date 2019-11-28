@@ -1,5 +1,4 @@
-import React, { useCallback, memo } from 'react';
-import { PropTypes } from 'prop-types';
+import React from 'react';
 import styles from './Dropdown.module.scss';
 
 
@@ -67,8 +66,5 @@ class Dropdown extends React.Component {
     );
   }
 }
-
-Dropdown.propTypes = {
-};
 
 export default Dropdown;

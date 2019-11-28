@@ -13,10 +13,13 @@ from ...utils.logger import log
 from ...utils import permitted_to_edit, gen_scroll_tokens
 from ...models.audio import (
     insert_song, insert_song_state, get_song_state, get_all_compiled_songs,
-    get_all_compiled_songs_by_uid, get_all_uncompiled_songs_by_uid, get_number_of_compiled_songs,
-    get_number_of_compiled_songs_by_uid, get_number_of_uncompiled_songs_by_uid, get_song_data
+    get_all_compiled_songs_by_uid, get_all_editable_songs_by_uid, get_number_of_compiled_songs,
+    get_number_of_compiled_songs_by_uid, get_number_of_editable_songs_by_uid, get_song_data, post_like,
+    post_unlike, get_number_of_liked_songs_by_uid, get_all_liked_songs_by_uid, get_like_pair, update_published_status,
+    update_compiled_url, update_cover_url
 )
-from ...models.users import get_user_via_username, get_user_via_uid
+from ...models.users import get_user_via_username
+from ...models.errors import NoResults
 
 audio = Blueprint('audio', __name__)
 
@@ -137,20 +140,26 @@ def get_compiled_songs():
                    }, 422
 
         start_index = (current_page * songs_per_page) - songs_per_page
-        compiled_songs = []
 
         if uid:
-            raw_compiled_songs = get_all_compiled_songs_by_uid(uid, start_index, songs_per_page)
-            for song in raw_compiled_songs:
-                song = list(song)
-                song[1] = username
-                compiled_songs.append(song)
+            compiled_songs = get_all_compiled_songs_by_uid(uid, start_index, songs_per_page)
         else:
-            raw_compiled_songs = get_all_compiled_songs(start_index, songs_per_page)
-            for song in raw_compiled_songs:
-                song = list(song)
-                song[1] = get_user_via_uid(song[1])[0][2]
-                compiled_songs.append(song)
+            compiled_songs = get_all_compiled_songs(start_index, songs_per_page)
+
+        res = []
+        for song in compiled_songs:
+            res.append({
+                "sid": song[0],
+                "username": song[1],
+                "title": song[2],
+                "duration": song[3],
+                "created": song[4],
+                "public": song[5],
+                "url": song[6],
+                "cover": song[7],
+                "genre": song[8],
+                "likes": song[9]
+            })
 
         jwt_payload = {
             "username": username,
@@ -166,7 +175,7 @@ def get_compiled_songs():
             "songs_per_page": songs_per_page,
             "next_page": next_page,
             "back_page": back_page,
-            "compiled_songs": compiled_songs,
+            "songs": res,
         }, 200
     elif next_page and back_page:
         return {"message": "You can't send both a 'next_page' token and a 'back_page' token."}, 422
@@ -181,21 +190,27 @@ def get_compiled_songs():
         songs_per_page = token.get("songs_per_page")
         total_pages = token.get("total_pages")
         start_index = (current_page * songs_per_page) - songs_per_page
-        compiled_songs = []
 
         if username:
             uid = get_user_via_username(username)[0][0]
-            raw_compiled_songs = get_all_compiled_songs_by_uid(uid, start_index, songs_per_page)
-            for song in raw_compiled_songs:
-                song = list(song)
-                song[1] = username
-                compiled_songs.append(song)
+            compiled_songs = get_all_compiled_songs_by_uid(uid, start_index, songs_per_page)
         else:
-            raw_compiled_songs = get_all_compiled_songs(start_index, songs_per_page)
-            for song in raw_compiled_songs:
-                song = list(song)
-                song[1] = get_user_via_uid(song[1])[0][2]
-                compiled_songs.append(song)
+            compiled_songs = get_all_compiled_songs(start_index, songs_per_page)
+
+        res = []
+        for song in compiled_songs:
+            res.append({
+                "sid": song[0],
+                "username": song[1],
+                "title": song[2],
+                "duration": song[3],
+                "created": song[4],
+                "public": song[5],
+                "url": song[6],
+                "cover": song[7],
+                "genre": song[8],
+                "likes": song[9]
+            })
 
         jwt_payload = {
             "username": username,
@@ -211,18 +226,99 @@ def get_compiled_songs():
             "songs_per_page": songs_per_page,
             "next_page": next_page,
             "back_page": back_page,
-            "compiled_songs": compiled_songs
+            "songs": res
         }, 200
 
 
-@audio.route("/uncompiled_songs", methods=["GET"])
+@audio.route("/song", methods=["GET"])
+@sql_err_catcher()
+@auth_required()
+def get_song():
+    sid = request.args.get('sid')
+    if not sid:
+        return {"message": "sid param can't be empty!"}, 422
+
+    song = get_song_data(sid)[0]
+    res = {
+        "sid": song[0],
+                "username": song[1],
+                "title": song[2],
+                "duration": song[3],
+                "created": song[4],
+                "public": song[5],
+                "url": song[6],
+                "cover": song[7],
+                "genre": song[8],
+                "likes": song[9]
+    }
+    return {"song": res}, 200
+
+
+@audio.route("/like", methods=["POST"])
 @sql_err_catcher()
 @auth_required(return_user=True)
-def get_uncompiled_songs(user):
+def like_song(user):
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "sid": {
+                "type": "integer",
+                "minimum": 1
+            }
+        },
+        "required": ["sid"]
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    try:
+        get_song_data(request.json.get("sid"))
+    except NoResults:
+        return {"message": "Song does not exist!"}, 400
+
+    like_pair = get_like_pair(user.get("uid"), request.json.get("sid"))
+
+    if (user.get("uid"), request.json.get("sid")) not in like_pair:
+        post_like(user.get("uid"), request.json.get("sid"))
+
+    return {"message": "Song liked"}, 200
+
+
+@audio.route("/unlike", methods=["POST"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def unlike_song(user):
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "sid": {
+                "type": "integer",
+                "minimum": 1
+            }
+        },
+        "required": ["sid"]
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    post_unlike(user.get("uid"), request.json.get("sid"))
+    return {"message": "Song unliked"}, 200
+
+
+@audio.route("/editable_songs", methods=["GET"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def get_editable_songs(user):
     next_page = request.args.get('next_page')
     back_page = request.args.get('back_page')
     if not next_page and not back_page:
-        total_songs = get_number_of_uncompiled_songs_by_uid(user.get("uid"))
+        total_songs = get_number_of_editable_songs_by_uid(user.get("uid"))
 
         songs_per_page = request.args.get('songs_per_page')
         if not songs_per_page:
@@ -239,16 +335,25 @@ def get_uncompiled_songs(user):
             total_pages = 1
         if current_page > total_pages:
             return {
-                       "message": "current_page exceeds the total number of pages available(" + str(total_pages) + ")."
-                   }, 422
+               "message": "current_page exceeds the total number of pages available(" + str(total_pages) + ")."
+            }, 422
 
         start_index = (current_page * songs_per_page) - songs_per_page
-        raw_uncompiled_songs = get_all_uncompiled_songs_by_uid(user.get("uid"), start_index, songs_per_page)
-        uncompiled_songs = []
-        for song in raw_uncompiled_songs:
-            song = list(song)
-            song[1] = user.get("username")
-            uncompiled_songs.append(song)
+        editable_songs = get_all_editable_songs_by_uid(user.get("uid"), start_index, songs_per_page)
+        res = []
+        for song in editable_songs:
+            res.append({
+                "sid": song[0],
+                "username": song[1],
+                "title": song[2],
+                "duration": song[3],
+                "created": song[4],
+                "public": song[5],
+                "url": song[6],
+                "cover": song[7],
+                "genre": song[8],
+                "likes": song[9]
+            })
 
         jwt_payload = {
             "total_pages": total_pages,
@@ -263,7 +368,7 @@ def get_uncompiled_songs(user):
             "songs_per_page": songs_per_page,
             "next_page": next_page,
             "back_page": back_page,
-            "uncompiled_songs": uncompiled_songs,
+            "songs": res,
         }, 200
     elif next_page and back_page:
         return {"message": "You can't send both a 'next_page' token and a 'back_page' token."}, 422
@@ -278,12 +383,22 @@ def get_uncompiled_songs(user):
         total_pages = token.get("total_pages")
         start_index = (current_page * songs_per_page) - songs_per_page
 
-        raw_uncompiled_songs = get_all_uncompiled_songs_by_uid(user.get("uid"), start_index, songs_per_page)
-        uncompiled_songs = []
-        for song in raw_uncompiled_songs:
-            song = list(song)
-            song[1] = user.get("username")
-            uncompiled_songs.append(song)
+        editable_songs = get_all_editable_songs_by_uid(user.get("uid"), start_index, songs_per_page)
+        res = []
+        for song in editable_songs:
+            res.append({
+                "sid": song[0],
+                "username": song[1],
+                "title": song[2],
+                "duration": song[3],
+                "created": song[4],
+                "public": song[5],
+                "url": song[6],
+                "cover": song[7],
+                "genre": song[8],
+                "likes": song[9]
+            })
+
 
         jwt_payload = {
             "total_pages": total_pages,
@@ -298,18 +413,248 @@ def get_uncompiled_songs(user):
             "songs_per_page": songs_per_page,
             "next_page": next_page,
             "back_page": back_page,
-            "uncompiled_songs": uncompiled_songs
+            "songs": res
         }, 200
 
 
-@audio.route("/song", methods=["GET"])
+@audio.route("/liked_songs", methods=["GET"])
 @sql_err_catcher()
 @auth_required()
-def get_song():
-    sid = request.args.get('sid')
-    if not sid:
-        return {"message": "sid param can't be empty!"}, 422
+def get_liked_songs():
+    next_page = request.args.get('next_page')
+    back_page = request.args.get('back_page')
+    if not next_page and not back_page:
+        username = request.args.get('username')
+        if not username:
+            return {"message": "username param can't be empty!"}, 422
 
-    res = get_song_data(sid)[0]
-    res[1] = get_user_via_uid(res[1])[0][2]
-    return {"song": res}, 200
+        uid = get_user_via_username(username)[0][0]
+        total_songs = get_number_of_liked_songs_by_uid(uid)
+
+        songs_per_page = request.args.get('songs_per_page')
+        if not songs_per_page:
+            songs_per_page = 50
+        songs_per_page = int(songs_per_page)
+
+        current_page = request.args.get('current_page')
+        if not current_page:
+            current_page = 1
+        current_page = int(current_page)
+
+        total_pages = (total_songs // songs_per_page)
+        if total_pages == 0:
+            total_pages = 1
+        if current_page > total_pages:
+            return {
+               "message": "current_page exceeds the total number of pages available(" + str(total_pages) + ")."
+            }, 422
+
+        start_index = (current_page * songs_per_page) - songs_per_page
+
+        liked_songs = get_all_liked_songs_by_uid(uid, start_index, songs_per_page)
+
+        res = []
+        for song in liked_songs:
+            res.append({
+                "sid": song[0],
+                "username": song[1],
+                "title": song[2],
+                "duration": song[3],
+                "created": song[4],
+                "public": song[5],
+                "url": song[6],
+                "cover": song[7],
+                "genre": song[8],
+                "likes": song[9]
+            })
+
+        jwt_payload = {
+            "username": username,
+            "total_pages": total_pages,
+            "songs_per_page": songs_per_page,
+        }
+
+        back_page, next_page = gen_scroll_tokens(current_page, total_pages, jwt_payload)
+
+        return {
+            "current_page": current_page,
+            "total_pages": total_pages,
+            "songs_per_page": songs_per_page,
+            "next_page": next_page,
+            "back_page": back_page,
+            "songs": res,
+        }, 200
+    elif next_page and back_page:
+        return {"message": "You can't send both a 'next_page' token and a 'back_page' token."}, 422
+    else:
+        token = next_page
+        if not token:
+            token = back_page
+        token = jwt.decode(token, JWT_SECRET, algorithms=['HS256'])
+
+        username = token.get("username")
+        current_page = token.get("current_page")
+        songs_per_page = token.get("songs_per_page")
+        total_pages = token.get("total_pages")
+        start_index = (current_page * songs_per_page) - songs_per_page
+
+        uid = get_user_via_username(username)[0][0]
+        liked_songs = get_all_liked_songs_by_uid(uid, start_index, songs_per_page)
+
+        res = []
+        for song in liked_songs:
+            res.append({
+                "sid": song[0],
+                "username": song[1],
+                "title": song[2],
+                "duration": song[3],
+                "created": song[4],
+                "public": song[5],
+                "url": song[6],
+                "cover": song[7],
+                "genre": song[8],
+                "likes": song[9]
+            })
+
+        jwt_payload = {
+            "username": username,
+            "total_pages": total_pages,
+            "songs_per_page": songs_per_page,
+        }
+
+        back_page, next_page = gen_scroll_tokens(current_page, total_pages, jwt_payload)
+
+        return {
+            "current_page": current_page,
+            "total_pages": total_pages,
+            "songs_per_page": songs_per_page,
+            "next_page": next_page,
+            "back_page": back_page,
+            "songs": res
+        }, 200
+
+
+@audio.route("/publish", methods=["POST"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def publish_song(user):
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "sid": {
+                "type": "integer",
+                "minimum": 1
+            }
+        },
+        "required": ["sid"]
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    if not permitted_to_edit(request.json.get("sid"), user.get("uid")):
+        return {"message": "You can't publish that song!"}, 401
+
+    update_published_status(1, request.json.get("sid"))
+
+    return {"message": "Song published."}, 200
+
+
+@audio.route("/unpublish", methods=["POST"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def unpublish_song(user):
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "sid": {
+                "type": "integer",
+                "minimum": 1
+            }
+        },
+        "required": ["sid"]
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    if not permitted_to_edit(request.json.get("sid"), user.get("uid")):
+        return {"message": "You can't publish that song!"}, 401
+
+    update_published_status(0, request.json.get("sid"))
+
+    return {"message": "Song unpublished."}, 200
+
+
+@audio.route("/compiled_url", methods=["PATCH"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def compiled_url(user):
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "sid": {
+                "type": "integer",
+                "minimum": 1
+            },
+            "url": {
+                "type": "string",
+                "pattern": "http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+",
+                "minLength": 1
+            },
+            "duration": {
+                "type": "integer",
+                "minimum": 0
+            }
+        },
+        "required": ["sid", "url", "duration"],
+        "minProperties": 3
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    if not permitted_to_edit(request.json.get("sid"), user.get("uid")):
+        return {"message": "You can't update that song!"}, 401
+
+    update_compiled_url(request.json.get("sid"), request.json.get("url"), request.json.get("duration"))
+    return {"message": "Compiled song URL updated."}, 200
+
+
+@audio.route("/cover_art", methods=["PATCH"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def cover_url(user):
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "sid": {
+                "type": "integer",
+                "minimum": 1
+            },
+            "url": {
+                "type": "string",
+                "pattern": "http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+",
+                "minLength": 1
+            }
+        },
+        "required": ["sid", "url"],
+        "minProperties": 2
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    if not permitted_to_edit(request.json.get("sid"), user.get("uid")):
+        return {"message": "You can't update that song!"}, 401
+
+    update_cover_url(request.json.get("sid"), request.json.get("url"))
+    return {"message": "Cover URL updated."}, 200
