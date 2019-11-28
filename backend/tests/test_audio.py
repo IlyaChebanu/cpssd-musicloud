@@ -1,10 +1,14 @@
+# pylint: disable=C0302, C0301, R0904
+"""
+Test suite for /audio endpoints.
+"""
 import unittest
-import mock
 import json
+import mock
 
 from jwt.exceptions import InvalidSignatureError
 
-from ..src import app
+from ..src import APP
 from ..src.models.errors import NoResults
 from .constants import TEST_TOKEN
 
@@ -14,7 +18,7 @@ class AudioTests(unittest.TestCase):
     Unit tests for /audio API endpoints.
     """
     def setUp(self):
-        self.test_client = app.test_client(self)
+        self.test_client = APP.test_client(self)
 
     @mock.patch('backend.src.controllers.audio.controllers.insert_song')
     def test_create_song_success(self, mocked_sid):
@@ -23,8 +27,8 @@ class AudioTests(unittest.TestCase):
         """
         mocked_sid.return_value = 1
         with mock.patch('backend.src.controllers.audio.controllers.insert_song_state'):
-            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-                vr.return_value = {
+            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+                mock_token.return_value = {
                     'uid': -1,
                     'email': 'username2@fakemail.noshow',
                     'username': 'username2',
@@ -65,8 +69,8 @@ class AudioTests(unittest.TestCase):
         """
         Ensure creating a song fails if the access_token is expired.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = ValueError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
             res = self.test_client.post(
                 "/api/v1/audio",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -79,8 +83,8 @@ class AudioTests(unittest.TestCase):
         Ensure creating a song fails if the access_token signature does not match
         the one configured on the server.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = InvalidSignatureError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
             res = self.test_client.post(
                 "/api/v1/audio",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -93,8 +97,8 @@ class AudioTests(unittest.TestCase):
         Ensure creating a song fails if some unknown error relating to the access_token
         occurs.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = Exception
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
             res = self.test_client.post(
                 "/api/v1/audio",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -106,8 +110,8 @@ class AudioTests(unittest.TestCase):
         """
         Ensure creating a song fails if a title is not sent.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -147,8 +151,8 @@ class AudioTests(unittest.TestCase):
         """
         mocked_edit.return_value = 1
         with mock.patch('backend.src.controllers.audio.controllers.insert_song_state'):
-            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-                vr.return_value = {
+            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+                mock_token.return_value = {
                     'uid': -1,
                     'email': 'username2@fakemail.noshow',
                     'username': 'username2',
@@ -194,8 +198,8 @@ class AudioTests(unittest.TestCase):
         """
         Ensure saving a song fails if the access_token is expired.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = ValueError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
             res = self.test_client.post(
                 "/api/v1/audio/state",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -208,8 +212,8 @@ class AudioTests(unittest.TestCase):
         Ensure saving a song fails if the access_token signature does not match
         the one configured on the server.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = InvalidSignatureError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
             res = self.test_client.post(
                 "/api/v1/audio/state",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -222,8 +226,8 @@ class AudioTests(unittest.TestCase):
         Ensure saving a song fails if some unknown error relating to the access_token
         occurs.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = Exception
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
             res = self.test_client.post(
                 "/api/v1/audio/state",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -235,8 +239,8 @@ class AudioTests(unittest.TestCase):
         """
         Ensure saving a song fails if a sid is not sent.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -284,8 +288,8 @@ class AudioTests(unittest.TestCase):
         """
         Ensure saving a song fails if a song_state is not sent.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -314,8 +318,8 @@ class AudioTests(unittest.TestCase):
         """
         Ensure saving a song fails if a song_state and sid is not sent.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -345,8 +349,8 @@ class AudioTests(unittest.TestCase):
         """
         mocked_edit.return_value = 0
         with mock.patch('backend.src.controllers.audio.controllers.insert_song_state'):
-            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-                vr.return_value = {
+            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+                mock_token.return_value = {
                     'uid': -1,
                     'email': 'username2@fakemail.noshow',
                     'username': 'username2',
@@ -384,8 +388,8 @@ class AudioTests(unittest.TestCase):
         """
         mocked_edit.return_value = 1
         mocked_state.return_value = {}
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -426,8 +430,8 @@ class AudioTests(unittest.TestCase):
         """
         Ensure loading a song fails if the access_token is expired.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = ValueError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
             res = self.test_client.get(
                 "/api/v1/audio/state",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -440,8 +444,8 @@ class AudioTests(unittest.TestCase):
         Ensure loading a song fails if the access_token signature does not match
         the one configured on the server.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = InvalidSignatureError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
             res = self.test_client.get(
                 "/api/v1/audio/state",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -454,8 +458,8 @@ class AudioTests(unittest.TestCase):
         Ensure loading a song fails if some unknown error relating to the access_token
         occurs.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = Exception
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
             res = self.test_client.get(
                 "/api/v1/audio/state",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -467,8 +471,8 @@ class AudioTests(unittest.TestCase):
         """
         Ensure loading a song fails if a sid is not sent.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -509,8 +513,8 @@ class AudioTests(unittest.TestCase):
         """
         mocked_edit.return_value = 0
         mocked_state.return_value = {}
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -546,8 +550,8 @@ class AudioTests(unittest.TestCase):
         ]
         mocked_num_songs.return_value = 2
         mocked_songs.return_value = test_songs
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username@fakemail.noshow',
                 'username': 'username',
@@ -607,8 +611,8 @@ class AudioTests(unittest.TestCase):
                 "nFPhjdBGNuX-_bQlWU1awOoo_YLvrDF9d6Q"
             )
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -671,8 +675,8 @@ class AudioTests(unittest.TestCase):
                 "Jo"
             )
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -730,9 +734,9 @@ class AudioTests(unittest.TestCase):
         ]
         mocked_num_songs.return_value = 2
         mocked_songs.return_value = test_songs
-        mocked_user.return_value =[[1]]
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        mocked_user.return_value = [[1]]
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username@fakemail.noshow',
                 'username': 'username',
@@ -809,8 +813,8 @@ class AudioTests(unittest.TestCase):
             ),
             "username": "username"
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -872,8 +876,8 @@ class AudioTests(unittest.TestCase):
             ),
             "username": "username2"
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -932,8 +936,8 @@ class AudioTests(unittest.TestCase):
         """
         Ensure getting a songs fails if the access_token is expired.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = ValueError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
             res = self.test_client.get(
                 "/api/v1/audio/compiled_songs",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -946,8 +950,8 @@ class AudioTests(unittest.TestCase):
         Ensure getting songs fails if the access_token signature does not match
         the one configured on the server.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = InvalidSignatureError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
             res = self.test_client.get(
                 "/api/v1/audio/compiled_songs",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -960,8 +964,8 @@ class AudioTests(unittest.TestCase):
         Ensure getting songs fails if some unknown error relating to the access_token
         occurs.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = Exception
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
             res = self.test_client.get(
                 "/api/v1/audio/compiled_songs",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -979,8 +983,8 @@ class AudioTests(unittest.TestCase):
             "current_page": 12,
             "posts_per_page": 1
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -1020,8 +1024,8 @@ class AudioTests(unittest.TestCase):
                 "8YYsYN3m9g-AzquyM"
             )
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -1050,8 +1054,8 @@ class AudioTests(unittest.TestCase):
         """
         test_song = [[1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, None, 8]]
         mocked_song.return_value = test_song
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -1082,8 +1086,8 @@ class AudioTests(unittest.TestCase):
         """
         Ensure user's can't get a song's info if they don't provide an sid.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -1122,8 +1126,8 @@ class AudioTests(unittest.TestCase):
         Ensure user's can't get a song's info if they provide a bad sid.
         """
         mocked_song.side_effect = NoResults
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -1162,8 +1166,8 @@ class AudioTests(unittest.TestCase):
         """
         Ensure getting song data fails if the access_token is expired.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = ValueError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
             res = self.test_client.get(
                 "/api/v1/audio/song",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -1176,8 +1180,8 @@ class AudioTests(unittest.TestCase):
         Ensure getting song data fails if the access_token signature does not match
         the one configured on the server.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = InvalidSignatureError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
             res = self.test_client.get(
                 "/api/v1/audio/song",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -1190,8 +1194,8 @@ class AudioTests(unittest.TestCase):
         Ensure getting song data fails if some unknown error relating to the access_token
         occurs.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = Exception
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
             res = self.test_client.get(
                 "/api/v1/audio/song",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -1211,8 +1215,8 @@ class AudioTests(unittest.TestCase):
         ]
         mocked_num_songs.return_value = 2
         mocked_songs.return_value = test_songs
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username@fakemail.noshow',
                 'username': 'username',
@@ -1284,8 +1288,8 @@ class AudioTests(unittest.TestCase):
                 ".bNW1teHPVxJgLLi_2MHodcdC8djnsu-QU_9m_AE5Sfc"
             )
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -1346,8 +1350,8 @@ class AudioTests(unittest.TestCase):
                 "PvUPb8m3ldR3tOfX26YQjMM1bczO05d4-vuuXarl90"
             )
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -1406,8 +1410,8 @@ class AudioTests(unittest.TestCase):
         """
         Ensure getting editable songs fails if the access_token is expired.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = ValueError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
             res = self.test_client.get(
                 "/api/v1/audio/editable_songs",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -1420,8 +1424,8 @@ class AudioTests(unittest.TestCase):
         Ensure getting editable songs fails if the access_token signature does not match
         the one configured on the server.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = InvalidSignatureError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
             res = self.test_client.get(
                 "/api/v1/audio/editable_songs",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -1434,8 +1438,8 @@ class AudioTests(unittest.TestCase):
         Ensure getting editable songs fails if some unknown error relating to the access_token
         occurs.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = Exception
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
             res = self.test_client.get(
                 "/api/v1/audio/editable_songs",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -1453,8 +1457,8 @@ class AudioTests(unittest.TestCase):
             "current_page": 12,
             "posts_per_page": 1
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -1494,8 +1498,8 @@ class AudioTests(unittest.TestCase):
                 "8YYsYN3m9g-AzquyM"
             )
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -1532,8 +1536,8 @@ class AudioTests(unittest.TestCase):
         mocked_num_songs.return_value = 2
         mocked_songs.return_value = test_songs
         mocked_user.return_value = [[1]]
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username@fakemail.noshow',
                 'username': 'username',
@@ -1612,8 +1616,8 @@ class AudioTests(unittest.TestCase):
             ),
             "username": "username"
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -1677,8 +1681,8 @@ class AudioTests(unittest.TestCase):
             ),
             "username": "username2"
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -1737,8 +1741,8 @@ class AudioTests(unittest.TestCase):
         """
         Ensure getting liked songs fails if the access_token is expired.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = ValueError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
             res = self.test_client.get(
                 "/api/v1/audio/liked_songs",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -1751,8 +1755,8 @@ class AudioTests(unittest.TestCase):
         Ensure getting liked songs fails if the access_token signature does not match
         the one configured on the server.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = InvalidSignatureError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
             res = self.test_client.get(
                 "/api/v1/audio/liked_songs",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -1765,8 +1769,8 @@ class AudioTests(unittest.TestCase):
         Ensure getting liked songs fails if some unknown error relating to the access_token
         occurs.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = Exception
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
             res = self.test_client.get(
                 "/api/v1/audio/liked_songs",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -1784,8 +1788,8 @@ class AudioTests(unittest.TestCase):
             "current_page": 12,
             "posts_per_page": 1
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -1825,8 +1829,8 @@ class AudioTests(unittest.TestCase):
                 "8YYsYN3m9g-AzquyM"
             )
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -1859,8 +1863,8 @@ class AudioTests(unittest.TestCase):
         }
         with mock.patch("backend.src.controllers.audio.controllers.get_song_data"):
             with mock.patch("backend.src.controllers.audio.controllers.post_like"):
-                with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-                    vr.return_value = {
+                with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+                    mock_token.return_value = {
                         'uid': -2,
                         'email': 'username2@fakemail.noshow',
                         'username': 'username2',
@@ -1898,8 +1902,8 @@ class AudioTests(unittest.TestCase):
         """
         Ensure likeing fails if the access_token is expired.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = ValueError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
             res = self.test_client.post(
                 "/api/v1/audio/like",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -1912,8 +1916,8 @@ class AudioTests(unittest.TestCase):
         Ensure likeing fails if the access_token signature does not match
         the one configured on the server.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = InvalidSignatureError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
             res = self.test_client.post(
                 "/api/v1/audio/like",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -1926,8 +1930,8 @@ class AudioTests(unittest.TestCase):
         Ensure likeing fails if some unknown error relating to the access_token
         occurs.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = Exception
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
             res = self.test_client.post(
                 "/api/v1/audio/like",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -1940,8 +1944,8 @@ class AudioTests(unittest.TestCase):
         Ensure likeing fails if no sid is sent.
         """
         test_req_data = {}
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -2,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -1981,8 +1985,8 @@ class AudioTests(unittest.TestCase):
             "sid": 1,
         }
         with mock.patch("backend.src.controllers.audio.controllers.post_unlike"):
-            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-                vr.return_value = {
+            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+                mock_token.return_value = {
                     'uid': -2,
                     'email': 'username2@fakemail.noshow',
                     'username': 'username2',
@@ -2020,8 +2024,8 @@ class AudioTests(unittest.TestCase):
         """
         Ensure unlikeing fails if the access_token is expired.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = ValueError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
             res = self.test_client.post(
                 "/api/v1/audio/unlike",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -2034,8 +2038,8 @@ class AudioTests(unittest.TestCase):
         Ensure unlikeing fails if the access_token signature does not match
         the one configured on the server.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = InvalidSignatureError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
             res = self.test_client.post(
                 "/api/v1/audio/unlike",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -2048,8 +2052,8 @@ class AudioTests(unittest.TestCase):
         Ensure unlikeing fails if some unknown error relating to the access_token
         occurs.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = Exception
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
             res = self.test_client.post(
                 "/api/v1/audio/unlike",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -2062,8 +2066,8 @@ class AudioTests(unittest.TestCase):
         Ensure unlikeing fails if no sid is sent.
         """
         test_req_data = {}
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -2,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -2104,8 +2108,8 @@ class AudioTests(unittest.TestCase):
         }
         with mock.patch("backend.src.controllers.audio.controllers.permitted_to_edit"):
             with mock.patch("backend.src.controllers.audio.controllers.update_published_status"):
-                with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-                    vr.return_value = {
+                with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+                    mock_token.return_value = {
                         'uid': -2,
                         'email': 'username2@fakemail.noshow',
                         'username': 'username2',
@@ -2143,8 +2147,8 @@ class AudioTests(unittest.TestCase):
         """
         Ensure publishing fails if the access_token is expired.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = ValueError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
             res = self.test_client.post(
                 "/api/v1/audio/publish",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -2157,8 +2161,8 @@ class AudioTests(unittest.TestCase):
         Ensure publishing fails if the access_token signature does not match
         the one configured on the server.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = InvalidSignatureError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
             res = self.test_client.post(
                 "/api/v1/audio/publish",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -2171,8 +2175,8 @@ class AudioTests(unittest.TestCase):
         Ensure publishing fails if some unknown error relating to the access_token
         occurs.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = Exception
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
             res = self.test_client.post(
                 "/api/v1/audio/publish",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -2185,8 +2189,8 @@ class AudioTests(unittest.TestCase):
         Ensure publishing fails if no sid is sent.
         """
         test_req_data = {}
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -2,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -2227,8 +2231,8 @@ class AudioTests(unittest.TestCase):
             "sid": 1,
         }
         mocked_editor_check.return_value = False
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -2,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -2261,8 +2265,8 @@ class AudioTests(unittest.TestCase):
         }
         with mock.patch("backend.src.controllers.audio.controllers.permitted_to_edit"):
             with mock.patch("backend.src.controllers.audio.controllers.update_published_status"):
-                with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-                    vr.return_value = {
+                with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+                    mock_token.return_value = {
                         'uid': -2,
                         'email': 'username2@fakemail.noshow',
                         'username': 'username2',
@@ -2300,8 +2304,8 @@ class AudioTests(unittest.TestCase):
         """
         Ensure unpublishing fails if the access_token is expired.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = ValueError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
             res = self.test_client.post(
                 "/api/v1/audio/unpublish",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -2314,8 +2318,8 @@ class AudioTests(unittest.TestCase):
         Ensure unpublishing fails if the access_token signature does not match
         the one configured on the server.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = InvalidSignatureError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
             res = self.test_client.post(
                 "/api/v1/audio/unpublish",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -2328,8 +2332,8 @@ class AudioTests(unittest.TestCase):
         Ensure unpublishing fails if some unknown error relating to the access_token
         occurs.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = Exception
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
             res = self.test_client.post(
                 "/api/v1/audio/unpublish",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -2342,8 +2346,8 @@ class AudioTests(unittest.TestCase):
         Ensure unpublishing fails if no sid is sent.
         """
         test_req_data = {}
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -2,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -2384,8 +2388,8 @@ class AudioTests(unittest.TestCase):
             "sid": 1,
         }
         mocked_editor_check.return_value = False
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -2,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -2421,8 +2425,8 @@ class AudioTests(unittest.TestCase):
         }
         mocked_editor_check.return_value = True
         with mock.patch('backend.src.controllers.audio.controllers.update_compiled_url'):
-            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-                vr.return_value = {
+            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+                mock_token.return_value = {
                     'uid': -1,
                     'email': 'username2@fakemail.noshow',
                     'username': 'username2',
@@ -2460,8 +2464,8 @@ class AudioTests(unittest.TestCase):
         """
         Ensure patching the URL for a compiled song fails if the access_token is expired.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = ValueError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
             res = self.test_client.patch(
                 "/api/v1/audio/compiled_url",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -2474,8 +2478,8 @@ class AudioTests(unittest.TestCase):
         Ensure patching the URL for a compiled song fails if the access_token signature does not match
         the one configured on the server.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = InvalidSignatureError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
             res = self.test_client.patch(
                 "/api/v1/audio/compiled_url",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -2488,8 +2492,8 @@ class AudioTests(unittest.TestCase):
         Ensure patching the URL for a compiled song fails if some unknown error relating to the access_token
         occurs.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = Exception
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
             res = self.test_client.patch(
                 "/api/v1/audio/compiled_url",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -2501,8 +2505,8 @@ class AudioTests(unittest.TestCase):
         """
         Ensure patching the URL for a compiled song fails if the user doesn't send a URL.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -2544,8 +2548,8 @@ class AudioTests(unittest.TestCase):
         """
         Ensure patching the URL for a compiled song fails if the user doesn't send a valid URL.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -2576,8 +2580,8 @@ class AudioTests(unittest.TestCase):
         """
         Ensure patching the URL for a compiled song fails if the user doesn't send a sid.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -2619,8 +2623,8 @@ class AudioTests(unittest.TestCase):
         """
         Ensure patching the URL for a compiled song fails if the user doesn't send a valid sid.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -2651,8 +2655,8 @@ class AudioTests(unittest.TestCase):
         """
         Ensure patching the URL for a compiled song fails if the user doesn't send a duration.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -2694,8 +2698,8 @@ class AudioTests(unittest.TestCase):
         """
         Ensure patching the URL for a compiled song fails if the user doesn't send a valid duration.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -2733,8 +2737,8 @@ class AudioTests(unittest.TestCase):
             "url": "http://fake.com"
         }
         mocked_editor_check.return_value = False
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -2,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -2769,8 +2773,8 @@ class AudioTests(unittest.TestCase):
         }
         mocked_editor_check.return_value = True
         with mock.patch('backend.src.controllers.audio.controllers.update_cover_url'):
-            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-                vr.return_value = {
+            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+                mock_token.return_value = {
                     'uid': -1,
                     'email': 'username2@fakemail.noshow',
                     'username': 'username2',
@@ -2808,8 +2812,8 @@ class AudioTests(unittest.TestCase):
         """
         Ensure patching the URL for a song's cover art fails if the access_token is expired.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = ValueError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
             res = self.test_client.patch(
                 "/api/v1/audio/cover_art",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -2822,8 +2826,8 @@ class AudioTests(unittest.TestCase):
         Ensure patching the URL for a song's cover art fails if the access_token signature does not match
         the one configured on the server.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = InvalidSignatureError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
             res = self.test_client.patch(
                 "/api/v1/audio/cover_art",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -2836,8 +2840,8 @@ class AudioTests(unittest.TestCase):
         Ensure patching the URL for a song's cover art fails if some unknown error relating to the access_token
         occurs.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = Exception
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
             res = self.test_client.patch(
                 "/api/v1/audio/cover_art",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -2849,8 +2853,8 @@ class AudioTests(unittest.TestCase):
         """
         Ensure patching the URL for a song's cover art fails if the user doesn't send a URL.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -2890,8 +2894,8 @@ class AudioTests(unittest.TestCase):
         """
         Ensure patching the URL for a song's cover art fails if the user doesn't send a valid URL.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -2921,8 +2925,8 @@ class AudioTests(unittest.TestCase):
         """
         Ensure patching the URL for a song's cover art fails if the user doesn't send a sid.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -2962,8 +2966,8 @@ class AudioTests(unittest.TestCase):
         """
         Ensure patching the URL for a song's cover art fails if the user doesn't send a valid sid.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -2999,8 +3003,8 @@ class AudioTests(unittest.TestCase):
             "url": "http://fake.com"
         }
         mocked_editor_check.return_value = False
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -2,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',

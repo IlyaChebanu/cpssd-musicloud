@@ -9,3 +9,4 @@ jsonschema
 flask-cors
 pytest-cov
 boto3
+pylint

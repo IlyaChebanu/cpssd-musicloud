@@ -1,3 +1,6 @@
+"""
+Test constants.
+"""
 TEST_TOKEN = (
     'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0yLCJlbWFpbCI6InVz'
     'ZXJuYW1lMkBmYWtlbWFpbC5ub3Nob3ciLCJ1c2VybmFtZSI6InVzZXJuYW1lMiIsI'

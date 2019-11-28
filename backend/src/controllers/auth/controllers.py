@@ -1,3 +1,6 @@
+"""
+/auth API controller code.
+"""
 import datetime
 
 import jwt
@@ -16,12 +19,15 @@ from ...models.auth import insert_login, delete_login
 from ...middleware.auth_required import auth_required
 from ...middleware.sql_err_catcher import sql_err_catcher
 
-auth = Blueprint('auth', __name__)
+AUTH = Blueprint('auth', __name__)
 
 
-@auth.route('/verify', methods=["GET"])
+@AUTH.route('/verify', methods=["GET"])
 @sql_err_catcher()
 def verify():
+    """
+    Endpoint for verifying a user's email.
+    """
     code = request.args.get('code')
     if len(code) != 64:
         return {"message": "Invalid code."}, 400
@@ -33,9 +39,12 @@ def verify():
     return send_file('controllers/auth/success.html'), 200
 
 
-@auth.route('/login', methods=["POST"])
+@AUTH.route('/login', methods=["POST"])
 @sql_err_catcher()
 def login():
+    """
+    Endpoint for logging in.
+    """
     expected_body = {
         "type": "object",
         "properties": {
@@ -83,9 +92,12 @@ def login():
     return {"access_token": access_token.decode('utf-8')}, 200
 
 
-@auth.route('/logout', methods=["POST"])
+@AUTH.route('/logout', methods=["POST"])
 @sql_err_catcher()
 @auth_required(return_token=True)
 def logout(access_token):
+    """
+    Endpoint for logging out.
+    """
     delete_login(access_token)
     return {"message": "User has been successfully logged out!"}, 200
