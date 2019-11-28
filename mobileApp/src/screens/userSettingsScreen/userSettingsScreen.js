@@ -15,6 +15,7 @@ import { patchUserDetails } from "../../api/usersAPI";
 import { getInvalidUserSettingsDetails } from "../../utils/helpers";
 import ToggleSwitch from '../../components/toggleSwitch/toggleSwitch';
 import Orientation from 'react-native-orientation';
+import { writeDataToStorage, SETTINGS_PORTRAIT_DATA_KEY } from "../../utils/localStorage";
 
 class UserSettingsScreen extends React.Component {
     constructor(props) {
@@ -87,6 +88,7 @@ class UserSettingsScreen extends React.Component {
 
     toggleOrientation(isOn) {
         this.props.setIsPortrait(isOn)
+        writeDataToStorage(isOn, SETTINGS_PORTRAIT_DATA_KEY)
         if (isOn) {
             Orientation.lockToPortrait();
         } else if (!isOn) {
