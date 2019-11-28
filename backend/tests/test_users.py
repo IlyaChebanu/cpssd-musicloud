@@ -1,3 +1,6 @@
+"""
+Tests for the /users controller.
+"""
 import unittest
 import mock
 import datetime
@@ -18,7 +21,9 @@ class UserTests(unittest.TestCase):
     def setUp(self):
         self.test_client = app.test_client(self)
 
-    @mock.patch('backend.src.controllers.users.controllers.get_user_via_username')
+    @mock.patch(
+        'backend.src.controllers.users.controllers.get_user_via_username'
+    )
     def test_registration_success(self, uid_mock):
         """
         Ensure user's can register correctly.
@@ -29,9 +34,15 @@ class UserTests(unittest.TestCase):
             "email": "username@fakemail.noshow",
             "password": "1234"
         }
-        with mock.patch("backend.src.controllers.users.controllers.insert_verification"):
-            with mock.patch('backend.src.controllers.users.controllers.insert_user'):
-                with mock.patch('backend.src.controllers.users.controllers.send_mail'):
+        with mock.patch(
+                "backend.src.controllers.users.controllers.insert_verification"
+        ):
+            with mock.patch(
+                    'backend.src.controllers.users.controllers.insert_user'
+            ):
+                with mock.patch(
+                        'backend.src.controllers.users.controllers.send_mail'
+                ):
                     res = self.test_client.post(
                         "/api/v1/users",
                         json=test_req_data,
@@ -226,8 +237,10 @@ class UserTests(unittest.TestCase):
             "email": "username@fakemail.noshow",
             "password": "1234"
         }
-        with mock.patch('backend.src.controllers.users.controllers.argon2.hash') as f:
-            f.side_effect = Exception()
+        with mock.patch(
+                'backend.src.controllers.users.controllers.argon2.hash'
+        ) as file:
+            file.side_effect = Exception()
             res = self.test_client.post(
                 "/api/v1/users",
                 json=test_req_data,
@@ -260,8 +273,8 @@ class UserTests(unittest.TestCase):
             "email": "username@fakemail.noshow",
             "password": "1234"
         }
-        with mock.patch('backend.src.controllers.users.controllers.insert_user') as f:
-            f.side_effect = IntegrityError()
+        with mock.patch('backend.src.controllers.users.controllers.insert_user') as file:
+            file.side_effect = IntegrityError()
             res = self.test_client.post(
                 "/api/v1/users",
                 json=test_req_data,
@@ -352,8 +365,8 @@ class UserTests(unittest.TestCase):
             "username": "username",
         }
         with mock.patch("backend.src.controllers.users.controllers.post_follow"):
-            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-                vr.return_value = {
+            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+                mock_token.return_value = {
                     'uid': -2,
                     'email': 'username2@fakemail.noshow',
                     'username': 'username2',
@@ -391,8 +404,8 @@ class UserTests(unittest.TestCase):
         """
         Ensure following fails if the access_token is expired.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = ValueError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
             res = self.test_client.post(
                 "/api/v1/users/follow",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -405,8 +418,8 @@ class UserTests(unittest.TestCase):
         Ensure following fails if the access_token signature does not match
         the one configured on the server.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = InvalidSignatureError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
             res = self.test_client.post(
                 "/api/v1/users/follow",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -419,8 +432,8 @@ class UserTests(unittest.TestCase):
         Ensure following fails if some unknown error relating to the access_token
         occurs.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = Exception
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
             res = self.test_client.post(
                 "/api/v1/users/follow",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -433,8 +446,8 @@ class UserTests(unittest.TestCase):
         Ensure following fails if no username is sent.
         """
         test_req_data = {}
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -2,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -475,8 +488,8 @@ class UserTests(unittest.TestCase):
         test_req_data = {
             "username": "iDon'tExist'",
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -2,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -507,8 +520,8 @@ class UserTests(unittest.TestCase):
         test_req_data = {
             "username": "username",
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -541,8 +554,8 @@ class UserTests(unittest.TestCase):
         test_req_data = {
             "username": "username",
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -2,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -580,8 +593,8 @@ class UserTests(unittest.TestCase):
         """
         Ensure unfollowing fails if the access_token is expired.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = ValueError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
             res = self.test_client.post(
                 "/api/v1/users/unfollow",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -594,8 +607,8 @@ class UserTests(unittest.TestCase):
         Ensure unfollowing fails if the access_token signature does not match
         the one configured on the server.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = InvalidSignatureError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
             res = self.test_client.post(
                 "/api/v1/users/unfollow",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -608,8 +621,8 @@ class UserTests(unittest.TestCase):
         Ensure unfollowing fails if some unknown error relating to the access_token
         occurs.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = Exception
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
             res = self.test_client.post(
                 "/api/v1/users/unfollow",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -621,8 +634,8 @@ class UserTests(unittest.TestCase):
         """
         Ensure unfollowing fails if no username is sent.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -2,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -664,8 +677,8 @@ class UserTests(unittest.TestCase):
         test_req_data = {
             "username": "iDon'tExist'",
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -2,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -706,8 +719,8 @@ class UserTests(unittest.TestCase):
         test_req_data = {
             "username": "username",
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -2,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -753,8 +766,8 @@ class UserTests(unittest.TestCase):
         """
         Ensure getting a user's info fails if the access_token is expired.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = ValueError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
             res = self.test_client.get(
                 "/api/v1/users",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -767,8 +780,8 @@ class UserTests(unittest.TestCase):
         Ensure getting a user's info fails if the access_token signature does not match
         the one configured on the server.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = InvalidSignatureError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
             res = self.test_client.get(
                 "/api/v1/users",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -781,8 +794,8 @@ class UserTests(unittest.TestCase):
         Ensure getting a user's info fails if some unknown error relating to the access_token
         occurs.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = Exception
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
             res = self.test_client.get(
                 "/api/v1/users",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -794,8 +807,8 @@ class UserTests(unittest.TestCase):
         """
         Ensure getting a user's info fails if no username is provided.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -2,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -837,8 +850,8 @@ class UserTests(unittest.TestCase):
         test_req_data = {
             "username": "iDon'tExist'",
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -2,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -1124,8 +1137,8 @@ class UserTests(unittest.TestCase):
             "password": "1234",
             "code": 10000000
         }
-        with mock.patch('backend.src.controllers.users.controllers.argon2.hash') as f:
-            f.side_effect = Exception()
+        with mock.patch('backend.src.controllers.users.controllers.argon2.hash') as file:
+            file.side_effect = Exception()
             res = self.test_client.post(
                 "/api/v1/users/reset",
                 json=test_req_data,
@@ -1215,8 +1228,8 @@ class UserTests(unittest.TestCase):
             "message": "A message",
         }
         with mock.patch('backend.src.controllers.users.controllers.make_post'):
-            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-                vr.return_value = {
+            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+                mock_token.return_value = {
                     'uid': -1,
                     'email': 'username2@fakemail.noshow',
                     'username': 'username2',
@@ -1254,8 +1267,8 @@ class UserTests(unittest.TestCase):
         """
         Ensure posting fails if the access_token is expired.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = ValueError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
             res = self.test_client.post(
                 "/api/v1/users/post",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -1268,8 +1281,8 @@ class UserTests(unittest.TestCase):
         Ensure posting fails if the access_token signature does not match
         the one configured on the server.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = InvalidSignatureError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
             res = self.test_client.post(
                 "/api/v1/users/post",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -1282,8 +1295,8 @@ class UserTests(unittest.TestCase):
         Ensure posting fails if some unknown error relating to the access_token
         occurs.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = Exception
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
             res = self.test_client.post(
                 "/api/v1/users/post",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -1307,8 +1320,8 @@ class UserTests(unittest.TestCase):
             "username": "username",
             "posts_per_page": 1
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -1355,8 +1368,8 @@ class UserTests(unittest.TestCase):
                 "uQ"
             )
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -1403,8 +1416,8 @@ class UserTests(unittest.TestCase):
                 "8YYsYN3m9g-AzquyM"
             )
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -1449,8 +1462,8 @@ class UserTests(unittest.TestCase):
         """
         Ensure getting a user's posts fails if the access_token is expired.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = ValueError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
             res = self.test_client.get(
                 "/api/v1/users/posts",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -1463,8 +1476,8 @@ class UserTests(unittest.TestCase):
         Ensure getting a user's posts fails if the access_token signature does not match
         the one configured on the server.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = InvalidSignatureError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
             res = self.test_client.get(
                 "/api/v1/users/posts",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -1477,8 +1490,8 @@ class UserTests(unittest.TestCase):
         Ensure getting a user's posts fails if some unknown error relating to the access_token
         occurs.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = Exception
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
             res = self.test_client.get(
                 "/api/v1/users/posts",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -1490,8 +1503,8 @@ class UserTests(unittest.TestCase):
         """
         Ensure getting posts fails if no username or scroll tokens were provided.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -1533,8 +1546,8 @@ class UserTests(unittest.TestCase):
         Ensure getting posts fails if the user provided a bad username.
         """
         mocked_user.side_effect = NoResults
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -1573,8 +1586,8 @@ class UserTests(unittest.TestCase):
             "current_page": 12,
             "posts_per_page": 1
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -1614,8 +1627,8 @@ class UserTests(unittest.TestCase):
                 "8YYsYN3m9g-AzquyM"
             )
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -1654,8 +1667,8 @@ class UserTests(unittest.TestCase):
                 with mock.patch('backend.src.controllers.users.controllers.insert_verification'):
                     with mock.patch('backend.src.controllers.users.controllers.send_mail'):
                         with mock.patch('backend.src.controllers.users.controllers.reset_email'):
-                            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-                                vr.return_value = {
+                            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+                                mock_token.return_value = {
                                     'uid': -1,
                                     'email': 'username2@fakemail.noshow',
                                     'username': 'username2',
@@ -1691,8 +1704,8 @@ class UserTests(unittest.TestCase):
         }
         with mock.patch('backend.src.controllers.users.controllers.get_user_via_username'):
             with mock.patch('backend.src.controllers.users.controllers.reset_password'):
-                with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-                    vr.return_value = {
+                with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+                    mock_token.return_value = {
                         'uid': -1,
                         'email': 'username2@fakemail.noshow',
                         'username': 'username2',
@@ -1735,8 +1748,8 @@ class UserTests(unittest.TestCase):
                     with mock.patch('backend.src.controllers.users.controllers.send_mail'):
                         with mock.patch('backend.src.controllers.users.controllers.reset_email'):
                             with mock.patch('backend.src.controllers.users.controllers.reset_password'):
-                                with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-                                    vr.return_value = {
+                                with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+                                    mock_token.return_value = {
                                         'uid': -1,
                                         'email': 'username2@fakemail.noshow',
                                         'username': 'username2',
@@ -1774,8 +1787,8 @@ class UserTests(unittest.TestCase):
         """
         Ensure patch user fails if the access_token is expired.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = ValueError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
             res = self.test_client.patch(
                 "/api/v1/users",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -1788,8 +1801,8 @@ class UserTests(unittest.TestCase):
         Ensure patch user fails if the access_token signature does not match
         the one configured on the server.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = InvalidSignatureError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
             res = self.test_client.patch(
                 "/api/v1/users",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -1802,8 +1815,8 @@ class UserTests(unittest.TestCase):
         Ensure patch_user fails if some unknown error relating to the access_token
         occurs.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = Exception
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
             res = self.test_client.patch(
                 "/api/v1/users",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -1819,8 +1832,8 @@ class UserTests(unittest.TestCase):
             "email": "",
             "current_password": "1234"
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -1850,8 +1863,8 @@ class UserTests(unittest.TestCase):
             "password": "",
             "current_password": "1234"
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -1880,8 +1893,8 @@ class UserTests(unittest.TestCase):
         test_req_data = {
             "current_password": "1234"
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -1907,8 +1920,8 @@ class UserTests(unittest.TestCase):
         """
         Ensure patch user fails if the user doesn't send there current password.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -1950,8 +1963,8 @@ class UserTests(unittest.TestCase):
         """
         Ensure patch user fails if the user doesn't send any valid values.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -1993,8 +2006,8 @@ class UserTests(unittest.TestCase):
         """
         mocked_verify.return_value = False
         with mock.patch('backend.src.controllers.users.controllers.get_user_via_username'):
-            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-                vr.return_value = {
+            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+                mock_token.return_value = {
                     'uid': -1,
                     'email': 'username2@fakemail.noshow',
                     'username': 'username2',
@@ -2028,8 +2041,8 @@ class UserTests(unittest.TestCase):
             "email": "username",
             "current_password": "1234"
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -2062,10 +2075,10 @@ class UserTests(unittest.TestCase):
             "current_password": "1234"
         }
         with mock.patch('backend.src.controllers.users.controllers.get_user_via_username'):
-            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-                with mock.patch('backend.src.controllers.users.controllers.argon2.hash') as f:
-                    f.side_effect = Exception()
-                    vr.return_value = {
+            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+                with mock.patch('backend.src.controllers.users.controllers.argon2.hash') as file:
+                    file.side_effect = Exception()
+                    mock_token.return_value = {
                         'uid': -1,
                         'email': 'username2@fakemail.noshow',
                         'username': 'username2',
@@ -2095,8 +2108,8 @@ class UserTests(unittest.TestCase):
             "url": "http://image.fake"
         }
         with mock.patch('backend.src.controllers.users.controllers.update_profiler_url'):
-            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-                vr.return_value = {
+            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+                mock_token.return_value = {
                     'uid': -1,
                     'email': 'username2@fakemail.noshow',
                     'username': 'username2',
@@ -2134,8 +2147,8 @@ class UserTests(unittest.TestCase):
         """
         Ensure patching user's profile pic URL fails if the access_token is expired.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = ValueError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
             res = self.test_client.patch(
                 "/api/v1/users/profiler",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -2148,8 +2161,8 @@ class UserTests(unittest.TestCase):
         Ensure patching user's profile pic URL fails if the access_token signature does not match
         the one configured on the server.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = InvalidSignatureError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
             res = self.test_client.patch(
                 "/api/v1/users/profiler",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -2162,8 +2175,8 @@ class UserTests(unittest.TestCase):
         Ensure patching a user's profile pic URL fails if some unknown error relating to the access_token
         occurs.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = Exception
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
             res = self.test_client.patch(
                 "/api/v1/users/profiler",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -2175,8 +2188,8 @@ class UserTests(unittest.TestCase):
         """
         Ensure patching a user's profile pic URL fails if the user doesn't send a URL.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -2213,8 +2226,8 @@ class UserTests(unittest.TestCase):
         """
         Ensure patching a user's profile pic URL fails if the user doesn't send a valid URL.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -2255,8 +2268,8 @@ class UserTests(unittest.TestCase):
             "username": "username",
             "users_per_page": 1
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -2302,8 +2315,8 @@ class UserTests(unittest.TestCase):
                 "6Mn0.v2-mDpj6xdvash_c32QCw64PhAKCBnjPjoLkBiY7yKE"
             )
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -2349,8 +2362,8 @@ class UserTests(unittest.TestCase):
                 "CZI3BHh0jru5EhqmfH000KybZ2ZY"
             )
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -2395,8 +2408,8 @@ class UserTests(unittest.TestCase):
         """
         Ensure getting a user's followers fails if the access_token is expired.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = ValueError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
             res = self.test_client.get(
                 "/api/v1/users/posts",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -2409,8 +2422,8 @@ class UserTests(unittest.TestCase):
         Ensure getting a user's followers fails if the access_token signature does not match
         the one configured on the server.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = InvalidSignatureError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
             res = self.test_client.get(
                 "/api/v1/users/posts",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -2423,8 +2436,8 @@ class UserTests(unittest.TestCase):
         Ensure getting a user's followers fails if some unknown error relating to the access_token
         occurs.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = Exception
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
             res = self.test_client.get(
                 "/api/v1/users/posts",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -2436,8 +2449,8 @@ class UserTests(unittest.TestCase):
         """
         Ensure getting followers fails if no username or scroll tokens were provided.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -2479,8 +2492,8 @@ class UserTests(unittest.TestCase):
         Ensure getting followers fails if the user provided a bad username.
         """
         mocked_user.side_effect = NoResults
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -2519,8 +2532,8 @@ class UserTests(unittest.TestCase):
             "current_page": 12,
             "users_per_page": 1
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -2560,8 +2573,8 @@ class UserTests(unittest.TestCase):
                 "8YYsYN3m9g-AzquyM"
             )
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -2599,8 +2612,8 @@ class UserTests(unittest.TestCase):
             "username": "username",
             "users_per_page": 1
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -2646,8 +2659,8 @@ class UserTests(unittest.TestCase):
                 "6Mn0.v2-mDpj6xdvash_c32QCw64PhAKCBnjPjoLkBiY7yKE"
             )
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -2693,8 +2706,8 @@ class UserTests(unittest.TestCase):
                 "CZI3BHh0jru5EhqmfH000KybZ2ZY"
             )
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -2739,8 +2752,8 @@ class UserTests(unittest.TestCase):
         """
         Ensure getting a user's followings fails if the access_token is expired.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = ValueError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
             res = self.test_client.get(
                 "/api/v1/users/following",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -2753,8 +2766,8 @@ class UserTests(unittest.TestCase):
         Ensure getting a user's followings fails if the access_token signature does not match
         the one configured on the server.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = InvalidSignatureError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
             res = self.test_client.get(
                 "/api/v1/users/following",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -2767,8 +2780,8 @@ class UserTests(unittest.TestCase):
         Ensure getting a user's followings fails if some unknown error relating to the access_token
         occurs.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = Exception
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
             res = self.test_client.get(
                 "/api/v1/users/following",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -2780,8 +2793,8 @@ class UserTests(unittest.TestCase):
         """
         Ensure getting followings fails if no username or scroll tokens were provided.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -2823,8 +2836,8 @@ class UserTests(unittest.TestCase):
         Ensure getting followings fails if the user provided a bad username.
         """
         mocked_user.side_effect = NoResults
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -2863,8 +2876,8 @@ class UserTests(unittest.TestCase):
             "current_page": 12,
             "users_per_page": 1
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',
@@ -2904,8 +2917,8 @@ class UserTests(unittest.TestCase):
                 "8YYsYN3m9g-AzquyM"
             )
         }
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.return_value = {
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
                 'uid': -1,
                 'email': 'username2@fakemail.noshow',
                 'username': 'username2',

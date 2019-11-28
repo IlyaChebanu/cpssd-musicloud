@@ -34,8 +34,8 @@ class AuthTests(unittest.TestCase):
                     query_string=test_req_data,
                     follow_redirects=True
                 )
-                with open("backend/src/controllers/auth/success.html", "rb") as f:
-                    expexcted_page = f.read()
+                with open("backend/src/controllers/auth/success.html", "rb") as file:
+                    expexcted_page = file.read()
                     self.assertEqual(200, res.status_code)
                     self.assertEqual(expexcted_page, res.data)
 
@@ -199,8 +199,8 @@ class AuthTests(unittest.TestCase):
         Ensure user's can logout correctly.
         """
         with mock.patch('backend.src.controllers.auth.controllers.delete_login'):
-            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-                vr.return_value = {
+            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+                mock_token.return_value = {
                     'uid': -1,
                     'email': 'username2@fakemail.noshow',
                     'username': 'username2',
@@ -237,8 +237,8 @@ class AuthTests(unittest.TestCase):
         """
         Ensure getting a logout request fails if the access_token is expired.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = ValueError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
             res = self.test_client.post(
                 "/api/v1/auth/logout",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -251,8 +251,8 @@ class AuthTests(unittest.TestCase):
         Ensure getting a logout request fails if the access_token signature does not match
         the one configured on the server.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = InvalidSignatureError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
             res = self.test_client.post(
                 "/api/v1/auth/logout",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -265,8 +265,8 @@ class AuthTests(unittest.TestCase):
         Ensure getting a logout request fails if some unknown error relating to the access_token
         occurs.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = Exception
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
             res = self.test_client.post(
                 "/api/v1/auth/logout",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
