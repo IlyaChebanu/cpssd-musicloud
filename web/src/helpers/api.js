@@ -12,7 +12,6 @@ axios.interceptors.response.use((res) => res, (err) => {
     store.dispatch(showNotification({
       message: 'An unknown error has occured. Please contact the site owners.',
     }));
-    console.error(err);
   }
   if (state.user.token) {
     if (res.status === 401) {
