@@ -1,41 +1,46 @@
+/* eslint-disable no-undef */
 import React, { memo, useCallback, useMemo } from 'react';
-import styles from './Looper.module.scss';
 import { connect } from 'react-redux';
+import styles from './Looper.module.scss';
 import { setLoop } from '../../actions/studioActions';
 import { ReactComponent as Arrow } from '../../assets/icons/arrow-up-light.svg';
 
 
-const Looper = memo(props => {
-  const { loopStart, loopEnd, loopEnabled, gridSnapEnabled, gridSize, dispatch } = props;
+const Looper = memo((props) => {
+  const {
+    loopStart, loopEnd, loopEnabled, gridSnapEnabled, gridSize, dispatch,
+  } = props;
 
-  const handleDragLArrow = useCallback(e => {
-    const mouseStartPos = e.screenX;
+  const handleDragLArrow = useCallback((ev) => {
+    const mouseStartPos = ev.screenX;
     const initialLoopStart = loopStart;
-    const handleMouseMove = e => {
+    const handleMouseMove = (e) => {
       e.preventDefault();
       const start = initialLoopStart + (e.screenX - mouseStartPos) / 40 / window.devicePixelRatio;
       const numDecimalPlaces = Math.max(0, String(1 / gridSize).length - 2);
       dispatch(setLoop({
         start: Math.min(
           loopEnd - 1,
-          gridSnapEnabled ? (Math.round((start) * gridSize) / gridSize).toFixed(numDecimalPlaces) : start
+          gridSnapEnabled
+            ? (Math.round((start) * gridSize) / gridSize).toFixed(numDecimalPlaces)
+            : start,
         ),
-        stop: loopEnd
+        stop: loopEnd,
       }));
-    }
+    };
     const handleDragStop = () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleDragStop);
-    }
+    };
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleDragStop);
-  }, [loopStart, loopEnd, gridSnapEnabled, gridSize]);
+  }, [loopStart, gridSize, dispatch, loopEnd, gridSnapEnabled]);
 
-  const handleDragRArrow = useCallback(e => {
-    const mouseStartPos = e.screenX;
+  const handleDragRArrow = useCallback((ev) => {
+    const mouseStartPos = ev.screenX;
     const initialLoopEnd = loopEnd;
-    const handleMouseMove = e => {
+    const handleMouseMove = (e) => {
       e.preventDefault();
       const stop = initialLoopEnd + (e.screenX - mouseStartPos) / 40 / window.devicePixelRatio;
       const numDecimalPlaces = Math.max(0, String(1 / gridSize).length - 2);
@@ -43,34 +48,42 @@ const Looper = memo(props => {
         start: loopStart,
         stop: Math.max(
           loopStart + 1,
-          gridSnapEnabled ? (Math.round((stop) * gridSize) / gridSize).toFixed(numDecimalPlaces) : stop
-        )
+          gridSnapEnabled
+            ? (Math.round((stop) * gridSize) / gridSize).toFixed(numDecimalPlaces)
+            : stop,
+        ),
       }));
-    }
+    };
     const handleDragStop = () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleDragStop);
-    }
+    };
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleDragStop);
-  }, [loopEnd, loopStart, gridSnapEnabled, gridSize]);
+  }, [loopEnd, gridSize, dispatch, loopStart, gridSnapEnabled]);
 
-  const wrapperStyle = useMemo(() => {
-    return {
-      transform: `translate(${(loopStart - 1) * 40}px, 0)`,
-      width: `${(loopEnd - loopStart) * 40}px`,
-    };
-  }, [loopStart, loopEnd]);
+  const wrapperStyle = useMemo(() => ({
+    transform: `translate(${(loopStart - 1) * 40}px, 0)`,
+    width: `${(loopEnd - loopStart) * 40}px`,
+  }), [loopStart, loopEnd]);
 
   return (
     <div className={`${styles.wrapper} ${loopEnabled ? styles.loopEnabled : ''}`} style={wrapperStyle}>
-      <Arrow onMouseDown={handleDragLArrow}/>
-      <Arrow onMouseDown={handleDragRArrow}/>
+      <Arrow onMouseDown={handleDragLArrow} />
+      <Arrow onMouseDown={handleDragRArrow} />
     </div>
   );
 });
 
+Looper.propTypes = {
+  loopStart: PropTypes.number.isRequired,
+  loopEnd: PropTypes.number.isRequired,
+  loopEnabled: PropTypes.bool.isRequired,
+  gridSnapEnabled: PropTypes.bool.isRequired,
+  gridSize: PropTypes.number.isRequired,
+  dispatch: PropTypes.func.isRequired,
+};
 
 const mapStateToProps = ({ studio }) => ({
   loopStart: studio.loop.start,
@@ -81,4 +94,3 @@ const mapStateToProps = ({ studio }) => ({
 });
 
 export default connect(mapStateToProps)(Looper);
-

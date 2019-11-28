@@ -1,145 +1,145 @@
-export const play = dispatch => {
+export const play = (dispatch) => {
   dispatch({
-    type: 'STUDIO_PLAY'
+    type: 'STUDIO_PLAY',
   });
 };
 
-export const pause = dispatch => {
+export const pause = (dispatch) => {
   dispatch({
-    type: 'STUDIO_PAUSE'
+    type: 'STUDIO_PAUSE',
   });
 };
 
-export const stop = dispatch => {
+export const stop = (dispatch) => {
   dispatch({
-    type: 'STUDIO_STOP'
+    type: 'STUDIO_STOP',
   });
 };
 
-export const playingStartTime = time => dispatch => {
+export const playingStartTime = (time) => (dispatch) => {
   dispatch({
     type: 'PLAYING_START_TIME',
-    time
+    time,
   });
 };
 
-export const playingStartBeat = beat => dispatch => {
+export const playingStartBeat = (beat) => (dispatch) => {
   dispatch({
     type: 'PLAYING_START_BEAT',
-    beat
+    beat,
   });
 };
 
-export const setCurrentBeat = beat => dispatch => {
+export const setCurrentBeat = (beat) => (dispatch) => {
   dispatch({
     type: 'SET_CURRENT_BEAT',
-    beat
+    beat,
   });
 };
 
-export const setTempo = tempo => dispatch => {
+export const setTempo = (tempo) => (dispatch) => {
   dispatch({
     type: 'SET_TEMPO',
-    tempo
+    tempo,
   });
 };
 
-export const setTracks = tracks => dispatch => {
+export const setTracks = (tracks) => (dispatch) => {
   dispatch({
     type: 'SET_TRACKS',
-    tracks
+    tracks,
   });
 };
 
-export const setTrackAtIndex = (track, index) => dispatch => {
+export const setTrackAtIndex = (track, index) => (dispatch) => {
   dispatch({
     type: 'SET_TRACK',
     track,
-    index
+    index,
   });
 };
 
-export const setSampleLoading = bool => dispatch => {
+export const setSampleLoading = (bool) => (dispatch) => {
   dispatch({
     type: 'SET_SAMPLE_LOADING',
-    bool
+    bool,
   });
 };
 
-export const setVolume = volume => dispatch => {
+export const setVolume = (volume) => (dispatch) => {
   dispatch({
     type: 'SET_VOLUME',
-    volume
+    volume,
   });
 };
 
-export const setScroll = scroll => dispatch => {
+export const setScroll = (scroll) => (dispatch) => {
   dispatch({
     type: 'SET_SCROLL',
-    scroll
+    scroll,
   });
 };
 
-export const setScrollY = scroll => dispatch => {
+export const setScrollY = (scroll) => (dispatch) => {
   dispatch({
     type: 'SET_SCROLL_Y',
-    scroll
+    scroll,
   });
 };
 
-export const setLoop = obj => dispatch => {
+export const setLoop = (obj) => (dispatch) => {
   dispatch({
     type: 'SET_LOOP',
-    obj
+    obj,
   });
 };
 
-export const setLoopEnabled = bool => dispatch => {
+export const setLoopEnabled = (bool) => (dispatch) => {
   dispatch({
     type: 'SET_LOOP_ENABLED',
-    bool
+    bool,
   });
 };
 
-export const setGridSize = gridSize => dispatch => {
+export const setGridSize = (gridSize) => (dispatch) => {
   dispatch({
     type: 'SET_GRID_SIZE',
-    gridSize
+    gridSize,
   });
 };
 
-export const setGridSnapEnabled = bool => dispatch => {
+export const setGridSnapEnabled = (bool) => (dispatch) => {
   dispatch({
     type: 'SET_GRID_SNAP_ENABLED',
-    bool
+    bool,
   });
 };
 
-export const setSampleTime = (time, id) => dispatch => {
+export const setSampleTime = (time, id) => (dispatch) => {
   dispatch({
     type: 'SET_SAMPLE_TIME',
     time,
-    id
+    id,
   });
 };
 
-export const setSelectedTrack = track => dispatch => {
+export const setSelectedTrack = (track) => (dispatch) => {
   dispatch({
     type: 'SET_SELECTED_TRACK',
-    track
+    track,
   });
 };
 
-export const setSelectedSample = id => dispatch => {
+export const setSelectedSample = (id) => (dispatch) => {
   dispatch({
     type: 'SET_SELECTED_SAMPLE',
-    id
+    id,
   });
 };
 
-export const setClipboard = sample => dispatch => {
+export const setClipboard = (sample) => (dispatch) => {
   dispatch({
     type: 'SET_CLIPBOARD',
-    sample
+    sample,
   });
 };

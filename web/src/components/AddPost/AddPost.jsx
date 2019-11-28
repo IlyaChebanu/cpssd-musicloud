@@ -4,22 +4,24 @@ import styles from './AddPost.module.scss';
 import InputField from '../InputField';
 import SubmitButton from '../SubmitButton';
 
-// TODO: Connect to redux
-
-const AddPost = props => {
+const AddPost = (props) => {
+  const { className } = props;
   return (
-    <div className={styles.wrapper + (props.className ? ` ${props.className}` : '')}>
+    <div className={`${styles.wrapper} ${className}`}>
       <span className={styles.addPost}>
-        <InputField className={styles.input} name="new_post" placeholder="Write something"/>
-        <SubmitButton className={styles.postButton} text='Post'/>
+        <InputField className={styles.input} name="new_post" placeholder="Write something" />
+        <SubmitButton className={styles.postButton} text="Post" />
       </span>
     </div>
   );
 };
 
 AddPost.propTypes = {
-  className: PropTypes.string
+  className: PropTypes.string,
+};
+
+AddPost.defaultProps = {
+  className: '',
 };
 
 export default AddPost;
-
