@@ -10,6 +10,7 @@ matrix:
     - language: node_js
       node_js:
         - node
+      cache: npm
       install:
         - npm install web/
       before_script:
