@@ -1,70 +1,36 @@
-import React from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import styles from './Dropdown.module.scss';
 
 
-class Dropdown extends React.Component {
+const Dropdown = (props) => {
+  const [displayMenu, setDisplayMenu] = useState(false);
 
-  constructor(props) {
-    super(props);
+  const showDropdown = useCallback(() => {
+    setDisplayMenu(true);
+  }, [setDisplayMenu]);
 
-    this.state = {
-      displayMenu: false,
-      props: props,
-    };
-    this.showDropdownMenu = this.showDropdownMenu.bind(this);
-    this.hideDropdownMenu = this.hideDropdownMenu.bind(this);
-    this.toDoList = this.setDropdown.bind(this)
-  };
+  const hideDropdown = useCallback(() => {
+    setDisplayMenu(false);
+  }, [setDisplayMenu]);
 
+  const menuItems = useMemo(() => props.items.map(item => (
+    <li onClick={() => {
+      item.action();
+      setDisplayMenu(false);
+    }}>
+      <img className={styles.icon} src={item.icon} alt="dropdown item icon"></img><p>{item.name}</p>
+    </li>
+  )), [props.items]);
 
+  return (
+    <div className={styles.dropdown} onBlur={hideDropdown}>
+      <div className={styles.button} onClick={showDropdown}>{props.title}</div>
 
-  setDropdown() {
-
-    return this.state.props.items.map(item =>
-
-      <li onClick={item.action}>
-        <img className={styles.icon} src={item.icon}></img><p>{item.name}</p>
-      </li>
-
-
-    );
-  }
-
-
-  showDropdownMenu(event) {
-    event.preventDefault();
-    this.setState({ displayMenu: true }, () => {
-      document.addEventListener('click', this.hideDropdownMenu);
-    });
-  }
-
-  hideDropdownMenu() {
-    this.setState({ displayMenu: false }, () => {
-      document.removeEventListener('click', this.hideDropdownMenu);
-    });
-  }
-
-
-
-  render() {
-    return (
-      <div className={styles.dropdown} style={{ width: "50px" }} >
-        <div className={styles.button} onClick={this.showDropdownMenu}>{this.state.props.title}</div>
-
-        {this.state.displayMenu ? (
-          <ul>
-            {this.toDoList()}
-          </ul>
-        ) :
-          (
-            null
-          )
-        }
-
-      </div>
-
-    );
-  }
-}
+      {displayMenu && <ul>
+        {menuItems}
+      </ul>}
+    </div>
+  );
+};
 
 export default Dropdown;

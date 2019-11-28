@@ -25,8 +25,7 @@ import { setTrackAtIndex } from '../../actions/studioActions';
 import store from '../../store'
 
 const Header = memo(props => {
-  const handleSaveState = useCallback(async e => {
-    e.preventDefault();
+  const handleSaveState = useCallback(async () => {
     const songState = {
       tempo: props.studio.tempo,
       tracks: props.studio.tracks
