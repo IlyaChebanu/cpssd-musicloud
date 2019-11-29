@@ -592,7 +592,10 @@ def create_playlist(uid, title):
         uid,
         title,
     )
-    query(sql, args)
+    row_id = query(sql, args, get_insert_row_id=True)
+    if not row_id:
+        raise NoResults
+    return row_id
 
 
 def delete_playlist(pid):

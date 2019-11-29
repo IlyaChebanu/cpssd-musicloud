@@ -721,9 +721,9 @@ def create_a_playlist(user_data):
         log("warning", "Request validation failed.", str(exc))
         return {"message": str(exc)}, 422
 
-    create_playlist(user_data.get("uid"), request.json.get("title"))
+    pid = create_playlist(user_data.get("uid"), request.json.get("title"))
 
-    return {"message": "Playlist created"}, 200
+    return {"message": "Playlist created", "pid": pid}, 200
 
 
 @AUDIO.route("/playlist", methods=["DELETE"])
