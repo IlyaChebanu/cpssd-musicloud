@@ -27,7 +27,8 @@ from ...models.audio import (
     update_cover_url, create_playlist, get_playlist, delete_playlist_data,
     delete_playlist, get_playlists, get_number_of_playlists,
     get_number_of_songs_in_playlist, get_playlist_data, add_to_playlist,
-    remove_from_playlist, get_from_playlist
+    remove_from_playlist, get_from_playlist, update_playlist_timestamp,
+    update_playlist_name
 )
 from ...models.users import get_user_via_username
 from ...models.errors import NoResults
@@ -867,6 +868,47 @@ def get_my_playlists(user_data):
     }, 200
 
 
+@AUDIO.route("/playlist", methods=["PATCH"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def rename_playlist(user_data):
+    """
+    Endpoint for renaming a playlist.
+    """
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "pid": {
+                "type": "integer",
+                "minimum": 1
+            },
+            "title": {
+                "type": "string",
+                "minLength": 1
+            }
+        },
+        "required": ["pid", "title"]
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    pid = request.json.get("pid")
+
+    try:
+        ownder_uid = get_playlist(pid)[0][1]
+    except IndexError:
+        return {"message": "Invalid pid"}, 422
+    if ownder_uid != user_data.get("uid"):
+        return {"message": "Not permitted to rename that playlist"}, 401
+
+    update_playlist_name(request.json.get('pid'), request.json.get('title'))
+    update_playlist_timestamp(request.json.get('pid'))
+    return {"message": "Playlist renamed"}, 200
+
+
 @AUDIO.route("/playlist_songs", methods=["GET"])
 @sql_err_catcher()
 @auth_required(return_user=True)
@@ -1030,6 +1072,7 @@ def add_song_to_playlist(user_data):  # pylint: disable=R0911
         return {"message": "Song already in playlist"}, 422
     except NoResults:
         add_to_playlist(request.json.get('pid'), request.json.get('sid'))
+        update_playlist_timestamp(request.json.get('pid'))
         return {"message": "Song added"}, 200
 
 
@@ -1068,4 +1111,5 @@ def remove_song_from_playlist(user_data):
         return {"message": "Not permitted to add to that playlist"}, 401
 
     remove_from_playlist(request.json.get('pid'), request.json.get('sid'))
+    update_playlist_timestamp(request.json.get('pid'))
     return {"message": "Song removed"}, 200

@@ -803,3 +803,44 @@ def get_from_playlist(pid, sid):
     if not res:
         raise NoResults
     return res
+
+
+def update_playlist_timestamp(pid):
+    """
+    Change the updated timestamp for a particular playlist.
+    :param pid:
+    Int - ID of the playlist who's timestamp we are updating.
+    :return:
+    None - Updates the timestamp and returns None.
+    """
+    sql = (
+        "UPDATE Playlists "
+        "SET updated=CURRENT_TIMESTAMP "
+        "WHERE pid = %s"
+    )
+    args = (
+        pid,
+    )
+    query(sql, args)
+
+
+def update_playlist_name(pid, title):
+    """
+    Change the name for a particular playlist.
+    :param pid:
+    Int - ID of the playlist who's name we are updating.
+    :param title:
+    Str - The new name of our playlist.
+    :return:
+    None - Updates the name and returns None.
+    """
+    sql = (
+        "UPDATE Playlists "
+        "SET title=%s "
+        "WHERE pid = %s"
+    )
+    args = (
+        title,
+        pid,
+    )
+    query(sql, args)
