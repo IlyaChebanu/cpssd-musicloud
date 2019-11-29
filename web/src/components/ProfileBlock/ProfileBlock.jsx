@@ -1,11 +1,24 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { memo } from 'react';
+import React, { memo, useCallback} from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import styles from './ProfileBlock.module.scss';
 import SubmitButton from '../SubmitButton';
+import { connect } from 'react-redux';
 
-const ProfileBlock = memo(({ className }) => (
+const ProfileBlock = memo((props) => {
+
+  const { history, className } = props;
+
+  // TODO: Properly redirect to the settings page, not currently working
+  const goToSettings = useCallback(
+    () => {
+      history.push('/settings');
+    },
+    [history],
+  );
+
+  return (
 
   <div className={`${styles.wrapper} ${className}`}>
     <div className={styles.topWrapper}>
@@ -32,18 +45,18 @@ const ProfileBlock = memo(({ className }) => (
           <p className={styles.class}>likes</p>
         </div>
       </div>
-      <SubmitButton className={styles.followButton} text="Settings" />
+      <SubmitButton onClick={goToSettings} className={styles.followButton} text="Settings" />
     </div>
-
     <div>
       <p className={styles.username}>Napstalgic</p>
     </div>
-
   </div>
-));
+)});
+
 
 ProfileBlock.propTypes = {
   className: PropTypes.string,
+  history: PropTypes.object.isRequired,
 };
 
 ProfileBlock.defaultProps = {
@@ -52,4 +65,4 @@ ProfileBlock.defaultProps = {
 
 ProfileBlock.displayName = 'ProfileBlock';
 
-export default ProfileBlock;
+export default connect()(ProfileBlock);
