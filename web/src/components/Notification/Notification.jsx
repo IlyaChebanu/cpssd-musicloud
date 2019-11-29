@@ -1,11 +1,17 @@
-import React, { memo, useState, useEffect, useCallback, useMemo } from 'react';
+import React, {
+  memo, useState, useEffect, useCallback, useMemo,
+} from 'react';
 import PropTypes from 'prop-types';
-import styles from './Notification.module.scss';
 import { connect } from 'react-redux';
+import styles from './Notification.module.scss';
 import { removeNotification } from '../../actions/notificationsActions';
 import { ReactComponent as CloseIcon } from '../../assets/icons/times-light.svg';
 
-const Notification = memo(props => {
+const Notification = memo((props) => {
+  const {
+    duration, id, index, dispatch, text,
+  } = props;
+
   const [fadeOut, setFadeOut] = useState(false);
   const [fadeTimer, setFadeTimer] = useState();
   const [selfDestructTimer, setSelfDestructTimer] = useState();
@@ -19,28 +25,26 @@ const Notification = memo(props => {
   const setTimers = useCallback(() => {
     setFadeTimer(setTimeout(() => {
       setFadeOut(true);
-    }, props.duration - 400));
+    }, duration - 400));
 
     setSelfDestructTimer(setTimeout(() => {
-      props.dispatch(removeNotification(props.id));
-    }, props.duration));
-  }, []);
+      dispatch(removeNotification(id));
+    }, duration));
+  }, [duration, id, dispatch]);
 
   const handleClick = useCallback(() => {
     setFadeOut(true);
     setTimeout(() => {
-      props.dispatch(removeNotification(props.id));
+      dispatch(removeNotification(id));
     }, 400);
-  });
+  }, [dispatch, id]);
 
 
   useEffect(setTimers, []);
 
-  const positioningStyle = useMemo(() => {
-    return {
-      transform: `translateY(${95 * (props.index)}px)`
-    }
-  }, [props.index]);
+  const positioningStyle = useMemo(() => ({
+    transform: `translateY(${95 * (index)}px)`,
+  }), [index]);
 
   return (
     <div
@@ -49,13 +53,14 @@ const Notification = memo(props => {
       onMouseLeave={setTimers}
       onClick={handleClick}
       style={positioningStyle}
+      role="alert"
     >
       <div className={styles.top}>
         <p>ERROR!</p>
         <CloseIcon />
       </div>
       <div className={styles.errorText}>
-        {props.text}
+        {text}
       </div>
     </div>
   );
@@ -63,8 +68,12 @@ const Notification = memo(props => {
 
 Notification.propTypes = {
   text: PropTypes.string.isRequired,
-  duration: PropTypes.number.isRequired
+  duration: PropTypes.number.isRequired,
+  id: PropTypes.string.isRequired,
+  index: PropTypes.number.isRequired,
+  dispatch: PropTypes.func.isRequired,
 };
 
-export default connect()(Notification);
+Notification.displayName = 'Notification';
 
+export default connect()(Notification);

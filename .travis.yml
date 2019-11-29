@@ -1,10 +1,21 @@
-language: python
-python:
-  - "3.6"
+matrix:
+  include:
+    - language: python
+      python:
+        - "3.6"
+      install:
+        - pip install -r backend/requirements.txt
+      script:
+        - pytest --cov-fail-under=65 --cov=backend/src backend/tests && pylint backend/
+    - language: node_js
+      node_js:
+        - node
+      cache: npm
+      install:
+        - npm install web/
+      before_script:
+        - cd web/
+      script: npm run lint
 
 notifications:
   email: false
-
-install:
-  - pip install -r backend/requirements.txt
-script: pytest --cov-fail-under=65 --cov=backend/src backend/tests && pylint backend/

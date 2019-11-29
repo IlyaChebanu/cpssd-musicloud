@@ -1,19 +1,22 @@
-import React from 'react';
+import React, { memo } from 'react';
 import PropTypes from 'prop-types';
 import styles from './CircularImage.module.scss';
 
-const CircularImage = props => {
-  return (
-    <div className={styles.circularImage + (props.className ? ` ${props.className}` : '')}>
-      <img src={props.src}/>
-    </div>
-  );
-};
+const CircularImage = memo(({ src, className }) => (
+  <div className={`${styles.circularImage} ${className}`}>
+    <img alt="avatar" src={src} />
+  </div>
+));
 
 CircularImage.propTypes = {
-  src: PropTypes.any,
+  src: PropTypes.string.isRequired,
   className: PropTypes.string,
 };
 
-export default CircularImage;
+CircularImage.defaultProps = {
+  className: '',
+};
 
+CircularImage.displayName = 'CircularImage';
+
+export default CircularImage;
