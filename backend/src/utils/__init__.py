@@ -10,3 +10,5 @@ from .refresh_token import refresh_token
 from .verify_and_refresh import verify_and_refresh
 from .permitted_to_edit import permitted_to_edit
 from .gen_scroll_tokens import gen_scroll_tokens
+from .gen_song_object import gen_song_object
+from .gen_playlist_object import gen_playlist_object

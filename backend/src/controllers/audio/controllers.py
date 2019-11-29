@@ -1,3 +1,4 @@
+# pylint: disable=C0302
 """
 /audio API controller code.
 """
@@ -13,7 +14,9 @@ from ...config import JWT_SECRET
 from ...middleware.auth_required import auth_required
 from ...middleware.sql_err_catcher import sql_err_catcher
 from ...utils.logger import log
-from ...utils import permitted_to_edit, gen_scroll_tokens
+from ...utils import (
+    permitted_to_edit, gen_scroll_tokens, gen_song_object, gen_playlist_object
+)
 from ...models.audio import (
     insert_song, insert_song_state, get_song_state, get_all_compiled_songs,
     get_all_compiled_songs_by_uid, get_all_editable_songs_by_uid,
@@ -21,7 +24,10 @@ from ...models.audio import (
     get_number_of_editable_songs_by_uid, get_song_data, post_like, post_unlike,
     get_number_of_liked_songs_by_uid, get_all_liked_songs_by_uid,
     get_like_pair, update_published_status, update_compiled_url,
-    update_cover_url
+    update_cover_url, create_playlist, get_playlist, delete_playlist_data,
+    delete_playlist, get_playlists, get_number_of_playlists,
+    get_number_of_songs_in_playlist, get_playlist_data, add_to_playlist,
+    remove_from_playlist, get_from_playlist
 )
 from ...models.users import get_user_via_username
 from ...models.errors import NoResults
@@ -178,18 +184,7 @@ def get_compiled_songs():  # pylint: disable=R0912,R0915
 
         res = []
         for song in compiled_songs:
-            res.append({
-                "sid": song[0],
-                "username": song[1],
-                "title": song[2],
-                "duration": song[3],
-                "created": song[4],
-                "public": song[5],
-                "url": song[6],
-                "cover": song[7],
-                "genre": song[8],
-                "likes": song[9]
-            })
+            res.append(gen_song_object(song))
 
         jwt_payload = {
             "username": username,
@@ -239,18 +234,7 @@ def get_compiled_songs():  # pylint: disable=R0912,R0915
 
     res = []
     for song in compiled_songs:
-        res.append({
-            "sid": song[0],
-            "username": song[1],
-            "title": song[2],
-            "duration": song[3],
-            "created": song[4],
-            "public": song[5],
-            "url": song[6],
-            "cover": song[7],
-            "genre": song[8],
-            "likes": song[9]
-        })
+        res.append(gen_song_object(song))
 
     jwt_payload = {
         "username": username,
@@ -284,18 +268,7 @@ def get_song():
         return {"message": "sid param can't be empty!"}, 422
 
     song = get_song_data(sid)[0]
-    res = {
-        "sid": song[0],
-                "username": song[1],
-                "title": song[2],
-                "duration": song[3],
-                "created": song[4],
-                "public": song[5],
-                "url": song[6],
-                "cover": song[7],
-                "genre": song[8],
-                "likes": song[9]
-    }
+    res = gen_song_object(song)
     return {"song": res}, 200
 
 
@@ -401,18 +374,7 @@ def get_editable_songs(user_data):
         )
         res = []
         for song in editable_songs:
-            res.append({
-                "sid": song[0],
-                "username": song[1],
-                "title": song[2],
-                "duration": song[3],
-                "created": song[4],
-                "public": song[5],
-                "url": song[6],
-                "cover": song[7],
-                "genre": song[8],
-                "likes": song[9]
-            })
+            res.append(gen_song_object(song))
 
         jwt_payload = {
             "total_pages": total_pages,
@@ -453,18 +415,7 @@ def get_editable_songs(user_data):
     )
     res = []
     for song in editable_songs:
-        res.append({
-            "sid": song[0],
-            "username": song[1],
-            "title": song[2],
-            "duration": song[3],
-            "created": song[4],
-            "public": song[5],
-            "url": song[6],
-            "cover": song[7],
-            "genre": song[8],
-            "likes": song[9]
-        })
+        res.append(gen_song_object(song))
 
 
     jwt_payload = {
@@ -532,18 +483,7 @@ def get_liked_songs():
 
         res = []
         for song in liked_songs:
-            res.append({
-                "sid": song[0],
-                "username": song[1],
-                "title": song[2],
-                "duration": song[3],
-                "created": song[4],
-                "public": song[5],
-                "url": song[6],
-                "cover": song[7],
-                "genre": song[8],
-                "likes": song[9]
-            })
+            res.append(gen_song_object(song))
 
         jwt_payload = {
             "username": username,
@@ -588,18 +528,7 @@ def get_liked_songs():
 
     res = []
     for song in liked_songs:
-        res.append({
-            "sid": song[0],
-            "username": song[1],
-            "title": song[2],
-            "duration": song[3],
-            "created": song[4],
-            "public": song[5],
-            "url": song[6],
-            "cover": song[7],
-            "genre": song[8],
-            "likes": song[9]
-        })
+        res.append(gen_song_object(song))
 
     jwt_payload = {
         "username": username,
@@ -767,3 +696,376 @@ def cover_url(user_data):
 
     update_cover_url(request.json.get("sid"), request.json.get("url"))
     return {"message": "Cover URL updated."}, 200
+
+
+@AUDIO.route("/playlist", methods=["POST"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def create_a_playlist(user_data):
+    """
+    Endpoint for creating a playlist.
+    """
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "title": {
+                "type": "string",
+                "minLength": 1
+            }
+        },
+        "required": ["title"]
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    create_playlist(user_data.get("uid"), request.json.get("title"))
+
+    return {"message": "Playlist created"}, 200
+
+
+@AUDIO.route("/playlist", methods=["DELETE"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def delete_my_playlist(user_data):
+    """
+    Endpoint for deleting a playlist.
+    """
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "pid": {
+                "type": "integer",
+                "minimum": 1
+            }
+        },
+        "required": ["pid"]
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    pid = request.json.get("pid")
+
+    try:
+        ownder_uid = get_playlist(pid)[0][1]
+    except IndexError:
+        return {"message": "Invalid pid"}, 422
+    if ownder_uid != user_data.get("uid"):
+        return {"message": "Not permitted to delete that playlist"}, 401
+
+    delete_playlist_data(pid)
+    delete_playlist(pid)
+
+    return {"message": "Playlist deleted"}, 200
+
+
+@AUDIO.route("/playlist", methods=["GET"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def get_my_playlists(user_data):
+    """
+    Endpoint for getting all a user's playlists.
+    """
+    next_page = request.args.get('next_page')
+    back_page = request.args.get('back_page')
+    uid = user_data.get("uid")
+    if not next_page and not back_page:
+        total_playlists = get_number_of_playlists(uid)
+
+        playlists_per_page = request.args.get('playlists_per_page')
+        if not playlists_per_page:
+            playlists_per_page = 50
+        playlists_per_page = int(playlists_per_page)
+
+        current_page = request.args.get('current_page')
+        if not current_page:
+            current_page = 1
+        current_page = int(current_page)
+
+        total_pages = (total_playlists // playlists_per_page)
+        if total_pages == 0:
+            total_pages = 1
+        if current_page > total_pages:
+            return {
+                "message": (
+                    "current_page exceeds the total number of pages available("
+                    + str(total_pages) + ")."
+                )
+            }, 422
+
+        start_index = (current_page * playlists_per_page) - playlists_per_page
+
+        playlists = get_playlists(uid, start_index, playlists_per_page)
+
+        res = []
+        for playlist in playlists:
+            res.append(gen_playlist_object(playlist))
+
+        jwt_payload = {
+            "current_page": current_page,
+            "total_pages": total_pages,
+            "playlists_per_page": playlists_per_page,
+        }
+
+        back_page, next_page = gen_scroll_tokens(
+            current_page, total_pages, jwt_payload
+        )
+
+        return {
+            "current_page": current_page,
+            "total_pages": total_pages,
+            "playlists_per_page": playlists_per_page,
+            "next_page": next_page,
+            "back_page": back_page,
+            "playlists": res,
+        }, 200
+    if next_page and back_page:
+        return {
+            "message": (
+                "You can't send both a 'next_page' token and a 'back_page' "
+                "token."
+            )
+        }, 422
+    token = next_page
+    if not token:
+        token = back_page
+    token = jwt.decode(token, JWT_SECRET, algorithms=['HS256'])
+
+    current_page = token.get("current_page")
+    playlists_per_page = token.get("playlists_per_page")
+    total_pages = token.get("total_pages")
+    start_index = (current_page * playlists_per_page) - playlists_per_page
+
+    playlists = get_playlists(uid, start_index, playlists_per_page)
+
+    res = []
+    for playlist in playlists:
+        res.append(gen_playlist_object(playlist))
+
+    jwt_payload = {
+        "current_page": current_page,
+        "total_pages": total_pages,
+        "playlists_per_page": playlists_per_page,
+    }
+
+    back_page, next_page = gen_scroll_tokens(
+        current_page, total_pages, jwt_payload
+    )
+
+    return {
+        "current_page": current_page,
+        "total_pages": total_pages,
+        "playlists_per_page": playlists_per_page,
+        "next_page": next_page,
+        "back_page": back_page,
+        "playlists": res
+    }, 200
+
+
+@AUDIO.route("/playlist_songs", methods=["GET"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def get_my_playlist_songs(user_data):  # pylint: disable=R0911
+    """
+    Endpoint for getting all the songs in a playlist.
+    """
+    next_page = request.args.get('next_page')
+    back_page = request.args.get('back_page')
+    if not next_page and not back_page:
+        pid = request.args.get('pid')
+        if not pid:
+            return {"message": "No PID sent"}, 422
+        pid = int(pid)
+
+        total_songs = get_number_of_songs_in_playlist(pid)
+
+        try:
+            ownder_uid = get_playlist(pid)[0][1]
+        except IndexError:
+            return {"message": "Invalid pid"}, 422
+        if ownder_uid != user_data.get("uid"):
+            return {"message": "Not permitted see that playlist"}, 401
+
+        songs_per_page = request.args.get('songs_per_page')
+        if not songs_per_page:
+            songs_per_page = 50
+        songs_per_page = int(songs_per_page)
+
+        current_page = request.args.get('current_page')
+        if not current_page:
+            current_page = 1
+        current_page = int(current_page)
+
+        total_pages = (total_songs // songs_per_page)
+        if total_pages == 0:
+            total_pages = 1
+        if current_page > total_pages:
+            return {
+                "message": (
+                    "current_page exceeds the total number of pages available("
+                    + str(total_pages) + ")."
+                )
+            }, 422
+
+        start_index = (current_page * songs_per_page) - songs_per_page
+
+        songs = get_playlist_data(pid, start_index, songs_per_page)
+
+        res = []
+        for song in songs:
+            res.append(gen_song_object(song))
+
+        jwt_payload = {
+            "pid": pid,
+            "current_page": current_page,
+            "total_pages": total_pages,
+            "songs_per_page": songs_per_page,
+        }
+
+        back_page, next_page = gen_scroll_tokens(
+            current_page, total_pages, jwt_payload
+        )
+
+        return {
+            "current_page": current_page,
+            "total_pages": total_pages,
+            "songs_per_page": songs_per_page,
+            "next_page": next_page,
+            "back_page": back_page,
+            "songs": res,
+        }, 200
+    if next_page and back_page:
+        return {
+            "message": (
+                "You can't send both a 'next_page' token and a 'back_page' "
+                "token."
+            )
+        }, 422
+    token = next_page
+    if not token:
+        token = back_page
+    token = jwt.decode(token, JWT_SECRET, algorithms=['HS256'])
+
+    pid = token.get("pid")
+    current_page = token.get("current_page")
+    songs_per_page = token.get("songs_per_page")
+    total_pages = token.get("total_pages")
+    start_index = (current_page * songs_per_page) - songs_per_page
+
+    songs = get_playlist_data(pid, start_index, songs_per_page)
+
+    res = []
+    for song in songs:
+        res.append(gen_song_object(song))
+
+    jwt_payload = {
+        "pid": pid,
+        "current_page": current_page,
+        "total_pages": total_pages,
+        "songs_per_page": songs_per_page,
+    }
+
+    back_page, next_page = gen_scroll_tokens(
+        current_page, total_pages, jwt_payload
+    )
+
+    return {
+        "current_page": current_page,
+        "total_pages": total_pages,
+        "songs_per_page": songs_per_page,
+        "next_page": next_page,
+        "back_page": back_page,
+        "songs": res
+    }, 200
+
+
+@AUDIO.route("/playlist_songs", methods=["POST"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def add_song_to_playlist(user_data):  # pylint: disable=R0911
+    """
+    Endpoint for adding a sing to a playlist.
+    """
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "pid": {
+                "type": "integer",
+                "minimum": 1
+            },
+            "sid": {
+                "type": "integer",
+                "minimum": 1
+            }
+        },
+        "required": ["pid", "sid"]
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    try:
+        ownder_uid = get_playlist(request.json.get('pid'))[0][1]
+    except IndexError:
+        return {"message": "Invalid pid"}, 422
+    if ownder_uid != user_data.get("uid"):
+        return {"message": "Not permitted to add to that playlist"}, 401
+
+    try:
+        song_data = get_song_data(request.json.get('sid'))[0]
+        if not song_data[5] or not song_data[6]:
+            return {"message": "That song is private"}, 401
+    except NoResults:
+        return {"message": "Invalid sid"}, 422
+
+    try:
+        get_from_playlist(request.json.get('pid'), request.json.get('sid'))
+        return {"message": "Song already in playlist"}, 422
+    except NoResults:
+        add_to_playlist(request.json.get('pid'), request.json.get('sid'))
+        return {"message": "Song added"}, 200
+
+
+@AUDIO.route("/playlist_songs", methods=["DELETE"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def remove_song_from_playlist(user_data):
+    """
+    Endpoint for adding a sing to a playlist.
+    """
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "pid": {
+                "type": "integer",
+                "minimum": 1
+            },
+            "sid": {
+                "type": "integer",
+                "minimum": 1
+            }
+        },
+        "required": ["pid", "sid"]
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    try:
+        ownder_uid = get_playlist(request.json.get('pid'))[0][1]
+    except IndexError:
+        return {"message": "Invalid pid"}, 422
+    if ownder_uid != user_data.get("uid"):
+        return {"message": "Not permitted to add to that playlist"}, 401
+
+    remove_from_playlist(request.json.get('pid'), request.json.get('sid'))
+    return {"message": "Song removed"}, 200
