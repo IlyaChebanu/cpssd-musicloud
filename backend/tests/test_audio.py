@@ -3579,13 +3579,13 @@ class AudioTests(unittest.TestCase):
             )
             self.assertEqual(500, res.status_code)
 
-    @mock.patch('backend.src.controllers.audio.controllers.get_number_of_songs_in_playlist')
-    def test_get_my_playlists_fail_no_scroll_token_exceeded_last_page(self, mocked_num_songs):
+    @mock.patch('backend.src.controllers.audio.controllers.get_number_of_playlists')
+    def test_get_my_playlists_fail_no_scroll_token_exceeded_last_page(self, mocked_num_playlists):
         """
         Ensure getting a users playlists fails if the user tries to access a
         page that doesn't exist.
         """
-        mocked_num_songs.return_value = 2
+        mocked_num_playlists.return_value = 2
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
             mock_token.return_value = {
                 'uid': -1,
