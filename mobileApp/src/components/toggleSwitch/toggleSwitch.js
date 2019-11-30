@@ -5,9 +5,17 @@ import styles from './styles';
 
 
 export default class ToggleSwitch extends React.Component {
-    static calculateDimensions() {
+    static calculateDimensions(size) {
+        let width, height, circleWidth, circleHeight, translateX
+        if (size) {
+            width = size.width
+            height = size.height
+            circleWidth= size.circleWidth
+            circleHeight = size.circleHeight
+            translateX = size.translateX
+        }
         return ({
-            width: 63, height: 36, circleWidth: 27, circleHeight: 27, translateX: 39,
+            width: width ? width : 63, height: height ? height: 36, circleWidth: circleWidth ? circleWidth : 27, circleHeight: circleHeight ? circleHeight : 27, translateX: translateX ? translateX : 39,
         });
     }
 
