@@ -837,7 +837,7 @@ def following():
 @USERS.route("/timeline", methods=["GET"])
 @sql_err_catcher()
 @auth_required(return_user=True)
-def timeline(user_data):
+def timeline(user_data):  # pylint:disable=R0912
     """
     Endpoint to get all a user's timeline.
     """

@@ -611,24 +611,42 @@ def get_follower_names(fid, start_index, users_per_page):
     return query(sql, args, True)
 
 
-def get_timeline(uid, start_index, users_per_page):
+def get_timeline(uid, start_index, items_per_page):
+    """
+    Creates a timeline list from the user's following data.
+    :param uid:
+    Int - Uid of the user who's timeline we want.
+    :param start_index:
+    Int - Start index for the page.
+    :param items_per_page:
+    Int - Number of items that will be returned.
+    :return:
+    List - Contains lists of song & post data in reverse chronological order
+    from user's the selected user follows.
+    """
     sql = (
         "SELECT * FROM ((SELECT sid, "
         "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as usernanme"
         ", title, duration, created, public,"
-        "published AS time, url, cover, NULL AS message, 'song' AS type FROM "
-        "Songs WHERE uid = %s AND public=1) UNION (SELECT NULL AS sid, "
+        "published AS time, url, cover, NULL AS message, "
+        "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid ) "
+        "as likes, 'song' AS type FROM "
+        "Songs WHERE uid IN "
+        "(SELECT Followers.following FROM Followers WHERE follower=%s)"
+        " AND public=1) UNION (SELECT NULL AS sid, "
         "(SELECT username FROM Users WHERE Posts.uid=Users.uid) as usernanme"
         ", NULL AS title,"
         "NULL AS duration, NULL AS created, NULL AS public, time, NULL AS url,"
-        "NULL AS cover, message, 'post' AS type FROM Posts WHERE uid = %s)"
-        ") AS Sp ORDER BY `time` DESC LIMIT %s, %s;"
+        "NULL AS cover, message, NULL AS likes, 'post' AS type FROM Posts "
+        "WHERE uid IN "
+        "(SELECT Followers.following FROM Followers WHERE follower=%s)"
+        ")) AS Sp ORDER BY `time` DESC LIMIT %s, %s;"
     )
     args = (
         uid,
         uid,
         start_index,
-        users_per_page,
+        items_per_page,
     )
     return query(sql, args, True)
 
@@ -638,16 +656,25 @@ def get_timeline_length(uid):
         "SELECT COUNT(*) FROM ((SELECT sid, "
         "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as usernanme"
         ", title, duration, created, public,"
-        "published AS time, url, cover, NULL AS message, 'song' AS type FROM "
-        "Songs WHERE uid = %s AND public=1) UNION (SELECT NULL AS sid, "
+        "published AS time, url, cover, NULL AS message, "
+        "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid ) "
+        "as likes, 'song' AS type FROM "
+        "Songs WHERE uid IN "
+        "(SELECT Followers.following FROM Followers WHERE follower=%s)"
+        " AND public=1) UNION (SELECT NULL AS sid, "
         "(SELECT username FROM Users WHERE Posts.uid=Users.uid) as usernanme"
         ", NULL AS title,"
         "NULL AS duration, NULL AS created, NULL AS public, time, NULL AS url,"
-        "NULL AS cover, message, 'post' AS type FROM Posts WHERE uid = %s)"
-        ") AS Sp ORDER BY `time` DESC;"
+        "NULL AS cover, message, NULL AS likes, 'post' AS type FROM Posts "
+        "WHERE uid IN "
+        "(SELECT Followers.following FROM Followers WHERE follower=%s)"
+        ")) AS Sp ORDER BY `time` DESC;"
     )
     args = (
         uid,
         uid,
     )
-    return query(sql, args, True)[0][0]
+    res = query(sql, args, True)
+    if not res:
+        return 0
+    return res[0][0]

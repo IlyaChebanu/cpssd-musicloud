@@ -18,8 +18,8 @@ def gen_timeline_song_object(song_list):
         "duration": song_list[3],
         "created": song_list[4],
         "public": song_list[5],
-        "url": song_list[6],
-        "cover": song_list[7],
-        "likes": song_list[8],
-        "type": song_list[-1]
+        "url": song_list[7],
+        "cover": song_list[8],
+        "likes": song_list[10],
+        "type": song_list[11]
     }
