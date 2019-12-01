@@ -16,14 +16,18 @@ from jsonschema import validate, ValidationError
 
 from ...config import HOST, RESET_TIMEOUT, JWT_SECRET
 from ...utils.logger import log
-from ...utils import random_string, send_mail, gen_scroll_tokens
+from ...utils import (
+    random_string, send_mail, gen_scroll_tokens, gen_timeline_post_object,
+    gen_timeline_song_object
+)
 from ...models.users import (
     insert_user, get_user_via_username, get_user_via_email, make_post,
     create_reset, get_reset_request, delete_reset, post_follow, post_unfollow,
     reset_password, update_reset, get_number_of_posts, get_posts,
     get_follower_count, get_song_count, get_number_of_likes,
     get_following_count, get_following_pair, reset_user_verification,
-    reset_email, update_profiler_url, get_following_names, get_follower_names
+    reset_email, update_profiler_url, get_following_names, get_follower_names,
+    get_timeline, get_timeline_length
 )
 from ...models.verification import insert_verification, get_verification
 from ...middleware.auth_required import auth_required
@@ -827,4 +831,110 @@ def following():
         "next_page": next_page,
         "back_page": back_page,
         "following": res
+    }, 200
+
+
+@USERS.route("/timeline", methods=["GET"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def timeline(user_data):
+    """
+    Endpoint to get all a user's timeline.
+    """
+    next_page = request.args.get('next_page')
+    back_page = request.args.get('back_page')
+    uid = user_data.get("uid")
+    if not next_page and not back_page:
+        items_per_page = request.args.get('items_per_page')
+        if not items_per_page:
+            items_per_page = 50
+        items_per_page = int(items_per_page)
+
+        current_page = request.args.get('current_page')
+        if not current_page:
+            current_page = 1
+        current_page = int(current_page)
+
+        total_items = get_timeline_length(uid)
+        total_pages = (total_items // items_per_page)
+        if total_pages == 0:
+            total_pages = 1
+        if current_page > total_pages:
+            return {
+                "message": (
+                    "current_page exceeds the total number of pages available("
+                    + str(total_pages) + ")."
+                )
+            }, 422
+
+        start_index = (current_page * items_per_page) - items_per_page
+        timeline_items = get_timeline(uid, start_index, items_per_page)
+
+        res = []
+        for item in timeline_items:
+            if item[-1] == "song":
+                res.append(gen_timeline_song_object(item))
+            else:
+                res.append(gen_timeline_post_object(item))
+
+        jwt_payload = {
+            "total_pages": total_pages,
+            "items_per_page": items_per_page,
+        }
+
+        back_page, next_page = gen_scroll_tokens(
+            current_page, total_pages, jwt_payload
+        )
+
+        return {
+            "current_page": current_page,
+            "total_pages": total_pages,
+            "items_per_page": items_per_page,
+            "next_page": next_page,
+            "back_page": back_page,
+            "timeline": res
+        }, 200
+    if next_page and back_page:
+        return {
+            "message": (
+                "You can't send both a 'next_page' token and a 'back_page' "
+                "token."
+            )
+        }, 422
+
+    token = next_page
+    if not token:
+        token = back_page
+    token = jwt.decode(token, JWT_SECRET, algorithms=['HS256'])
+
+    current_page = token.get("current_page")
+    items_per_page = token.get("items_per_page")
+    total_pages = token.get("total_pages")
+    start_index = (current_page * items_per_page) - items_per_page
+
+    timeline_items = get_timeline(uid, start_index, items_per_page)
+
+    res = []
+    for item in timeline_items:
+        if item[-1] == "song":
+            res.append(gen_timeline_song_object(item))
+        else:
+            res.append(gen_timeline_post_object(item))
+
+    jwt_payload = {
+        "total_pages": total_pages,
+        "items_per_page": items_per_page,
+    }
+
+    back_page, next_page = gen_scroll_tokens(
+        current_page, total_pages, jwt_payload
+    )
+
+    return {
+        "current_page": current_page,
+        "total_pages": total_pages,
+        "items_per_page": items_per_page,
+        "next_page": next_page,
+        "back_page": back_page,
+        "timeline": res
     }, 200

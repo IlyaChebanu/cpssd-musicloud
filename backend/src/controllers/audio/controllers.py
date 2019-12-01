@@ -28,7 +28,7 @@ from ...models.audio import (
     delete_playlist, get_playlists, get_number_of_playlists,
     get_number_of_songs_in_playlist, get_playlist_data, add_to_playlist,
     remove_from_playlist, get_from_playlist, update_playlist_timestamp,
-    update_playlist_name
+    update_playlist_name, update_publised_timestamp
 )
 from ...models.users import get_user_via_username
 from ...models.errors import NoResults
@@ -578,6 +578,10 @@ def publish_song(user_data):
         return {"message": "You can't publish that song!"}, 401
 
     update_published_status(1, request.json.get("sid"))
+    update_publised_timestamp(
+        request.json.get("sid"),
+        str(datetime.datetime.utcnow())
+    )
 
     return {"message": "Song published."}, 200
 
@@ -609,6 +613,7 @@ def unpublish_song(user_data):
         return {"message": "You can't publish that song!"}, 401
 
     update_published_status(0, request.json.get("sid"))
+    update_publised_timestamp(request.json.get("sid"), None)
 
     return {"message": "Song unpublished."}, 200
 
@@ -808,7 +813,6 @@ def get_my_playlists(user_data):
             res.append(gen_playlist_object(playlist))
 
         jwt_payload = {
-            "current_page": current_page,
             "total_pages": total_pages,
             "playlists_per_page": playlists_per_page,
         }
@@ -849,7 +853,6 @@ def get_my_playlists(user_data):
         res.append(gen_playlist_object(playlist))
 
     jwt_payload = {
-        "current_page": current_page,
         "total_pages": total_pages,
         "playlists_per_page": playlists_per_page,
     }
@@ -964,7 +967,6 @@ def get_my_playlist_songs(user_data):  # pylint: disable=R0911
 
         jwt_payload = {
             "pid": pid,
-            "current_page": current_page,
             "total_pages": total_pages,
             "songs_per_page": songs_per_page,
         }
@@ -1007,7 +1009,6 @@ def get_my_playlist_songs(user_data):  # pylint: disable=R0911
 
     jwt_payload = {
         "pid": pid,
-        "current_page": current_page,
         "total_pages": total_pages,
         "songs_per_page": songs_per_page,
     }

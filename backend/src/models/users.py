@@ -609,3 +609,45 @@ def get_follower_names(fid, start_index, users_per_page):
         users_per_page,
     )
     return query(sql, args, True)
+
+
+def get_timeline(uid, start_index, users_per_page):
+    sql = (
+        "SELECT * FROM ((SELECT sid, "
+        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as usernanme"
+        ", title, duration, created, public,"
+        "published AS time, url, cover, NULL AS message, 'song' AS type FROM "
+        "Songs WHERE uid = %s AND public=1) UNION (SELECT NULL AS sid, "
+        "(SELECT username FROM Users WHERE Posts.uid=Users.uid) as usernanme"
+        ", NULL AS title,"
+        "NULL AS duration, NULL AS created, NULL AS public, time, NULL AS url,"
+        "NULL AS cover, message, 'post' AS type FROM Posts WHERE uid = %s)"
+        ") AS Sp ORDER BY `time` DESC LIMIT %s, %s;"
+    )
+    args = (
+        uid,
+        uid,
+        start_index,
+        users_per_page,
+    )
+    return query(sql, args, True)
+
+
+def get_timeline_length(uid):
+    sql = (
+        "SELECT COUNT(*) FROM ((SELECT sid, "
+        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as usernanme"
+        ", title, duration, created, public,"
+        "published AS time, url, cover, NULL AS message, 'song' AS type FROM "
+        "Songs WHERE uid = %s AND public=1) UNION (SELECT NULL AS sid, "
+        "(SELECT username FROM Users WHERE Posts.uid=Users.uid) as usernanme"
+        ", NULL AS title,"
+        "NULL AS duration, NULL AS created, NULL AS public, time, NULL AS url,"
+        "NULL AS cover, message, 'post' AS type FROM Posts WHERE uid = %s)"
+        ") AS Sp ORDER BY `time` DESC;"
+    )
+    args = (
+        uid,
+        uid,
+    )
+    return query(sql, args, True)[0][0]

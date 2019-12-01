@@ -844,3 +844,23 @@ def update_playlist_name(pid, title):
         pid,
     )
     query(sql, args)
+
+
+def update_publised_timestamp(sid, timestamp):
+    """
+    Change the published timestamp for a particular song.
+    :param sid:
+    Int - ID of the song who's timestamp we are updating.
+    :return:
+    None - Updates the timestamp and returns None.
+    """
+    sql = (
+        "UPDATE Songs "
+        "SET published = %s "
+        "WHERE sid = %s"
+    )
+    args = (
+        timestamp,
+        sid,
+    )
+    query(sql, args)
