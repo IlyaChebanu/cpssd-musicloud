@@ -23,7 +23,7 @@ const Sample = memo((props) => {
     if (buffer) {
       const data = buffer.getChannelData(0);
       const beatsPerSecond = tempo / 60;
-      const width = buffer.duration * beatsPerSecond * 40;
+      const width = buffer.duration * beatsPerSecond * (40 * gridSize);
       const step = Math.ceil(width / 2);
       const amp = 80;
       const bars = [];
@@ -38,17 +38,17 @@ const Sample = memo((props) => {
       );
     }
     return null;
-  }, [buffer, tempo]);
+  }, [buffer, gridSize, tempo]);
 
   const wrapperStyle = useMemo(() => {
     const beatsPerSecond = tempo / 60;
     const colourIdx = sample.track % dColours.length;
     const selected = sample.id === selectedSample;
     return {
-      width: buffer ? buffer.duration * beatsPerSecond * 40 : 20,
+      width: buffer ? buffer.duration * beatsPerSecond * (40 * gridSize) : 20,
       backgroundColor: selected ? colours[colourIdx] : dColours[colourIdx],
     };
-  }, [tempo, sample.track, sample.id, selectedSample, buffer]);
+  }, [tempo, sample.track, sample.id, selectedSample, buffer, gridSize]);
 
   const handleDragSample = useCallback((ev) => {
     dispatch(setSelectedSample(props.sample.id));
@@ -56,8 +56,7 @@ const Sample = memo((props) => {
     const initialTime = props.sample.time;
     const handleMouseMove = (e) => {
       e.preventDefault();
-      // eslint-disable-next-line no-undef
-      const start = initialTime + (e.screenX - initialMousePos) / 40 / window.devicePixelRatio;
+      const start = initialTime + (e.screenX - initialMousePos) / (40 * gridSize) / window.devicePixelRatio;
       const numDecimalPlaces = Math.max(0, String(1 / gridSize).length - 2);
       const time = gridSnapEnabled
         ? Number((Math.round((start) * gridSize) / gridSize).toFixed(numDecimalPlaces))
@@ -84,17 +83,7 @@ const Sample = memo((props) => {
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleDragStop);
-  }, [
-    dispatch,
-    gridSize,
-    gridSnapEnabled,
-    props,
-    sample.duration,
-    sample.id,
-    sample.track,
-    tempo,
-    tracks,
-  ]);
+  }, [dispatch, gridSize, gridSnapEnabled, props.sample.id, props.sample.time, sample.duration, sample.id, sample.track, tempo, tracks]);
 
   const deleteSample = useCallback(() => {
     const track = tracks[sample.track];

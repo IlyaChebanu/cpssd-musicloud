@@ -13,25 +13,41 @@ configure({
   allowCombinationSubmatches: true,
 });
 
+const Ticks = memo(({ gridSize }) => {
+  const ticks = useMemo(() => (
+    [...Array(1000)]
+      .map((__, i) => <rect key={i} x={i * (40 / gridSize)} className={styles.tick} />)
+  ), [gridSize]);
+  return (
+    <svg className={styles.gridLines}>
+      {ticks}
+    </svg>
+  );
+});
+
+Ticks.propTypes = {
+  gridSize: PropTypes.number.isRequired,
+};
+
+Ticks.displayName = 'Ticks';
+
 const Track = memo((props) => {
   const {
-    index, dispatch, clipboard, track, tempo, className,
+    index, dispatch, clipboard, track, tempo, className, gridSize,
   } = props;
-
-  const ticks = useMemo(() => (
-    [...Array(1000)].map((__, i) => <rect key={i} x={i * 40} className={styles.tick} />)
-  ), []);
 
   const getSample = useCallback((sample) => (
     <Sample
       sample={{ ...sample, track: index }}
       style={{
         position: 'absolute',
-        transform: `translateX(${(sample.time - 1) * 40}px)`,
+        transform: `translateX(${(sample.time - 1) * (40 * gridSize)}px)`,
       }}
       key={sample.id}
     />
-  ), [index]);
+  ), [gridSize, index]);
+
+  const samples = useMemo(() => track.samples.map(getSample), [getSample, track.samples]);
 
   const handleSetSelected = useCallback(() => {
     dispatch(setSelectedTrack(index));
@@ -65,10 +81,9 @@ const Track = memo((props) => {
       className={`${styles.wrapper} ${index % 2 ? styles.even : ''} ${className}`}
       onMouseDown={handleSetSelected}
     >
-      <svg className={styles.gridLines}>
-        {ticks}
-      </svg>
-      {track.samples.map(getSample)}
+      <Ticks gridSize={1} />
+      {/* {track.samples.map(getSample)} */}
+      {samples}
     </HotKeys>
   );
 });
@@ -80,6 +95,7 @@ Track.propTypes = {
   clipboard: PropTypes.object.isRequired,
   tempo: PropTypes.number.isRequired,
   className: PropTypes.string,
+  gridSize: PropTypes.number.isRequired,
 };
 
 Track.defaultProps = {
@@ -94,6 +110,8 @@ const mapStateToProps = ({ studio }) => ({
   selectedTrack: studio.selectedTrack,
   clipboard: studio.clipboard,
   tempo: studio.tempo,
+  test: studio.test,
+  gridSize: studio.gridSize,
 });
 
 export default connect(mapStateToProps)(Track);

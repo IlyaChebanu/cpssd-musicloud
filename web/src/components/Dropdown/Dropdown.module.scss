@@ -10,7 +10,7 @@
         padding: 0;
         top:45px;
         left: 0px;
-        width: 150px;
+        // width: 150px;
         background-color: #5f6065;
         z-index: 13;
         position: absolute;
@@ -36,6 +36,7 @@
         p {
             margin: 0;
             padding: 8px;
+            white-space: nowrap;
         }
     }
     li:last-child {
@@ -43,21 +44,21 @@
     }
     li:hover {
         background-color: #3d4044;
-
+        cursor: pointer;
         color: white;
     }
 
 
-    p:hover {
-        padding-left: 12px;
-        color: #ff003d;
-        cursor: pointer;
-    }
+    // p:hover {
+    //     padding-left: 12px;
+    //     color: #ff003d;
+    //     cursor: pointer;
+    // }
 
     .button{
         cursor: pointer;
         height:18px;
-        padding:12px;
+        // padding:12px;
         border-radius:5px;
 
         color:white;

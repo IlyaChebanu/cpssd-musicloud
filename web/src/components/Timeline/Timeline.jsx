@@ -1,18 +1,20 @@
 /* eslint-disable react/no-array-index-key */
 import React, { memo, useMemo } from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import styles from './Timeline.module.scss';
 import Looper from '../Looper';
 
-const Timeline = memo(() => {
+const Timeline = memo(({ gridSize }) => {
   const ticks = useMemo(() => (
     [...Array(1000)].map((_, i) => <rect key={i} x={i * 40} y={24} className={styles.tick} />)
   ), []);
 
   const numbers = useMemo(() => (
     [...Array(1000)].map((_, i) => (
-      <text key={i} x={i * 40 + 5} y={24} className={styles.nums}>{i + 1}</text>
+      <text key={i} x={i * (40 * gridSize) + 5} y={24} className={styles.nums}>{i + 1}</text>
     ))
-  ), []);
+  ), [gridSize]);
 
   return (
     <div className={styles.wrapper}>
@@ -26,6 +28,14 @@ const Timeline = memo(() => {
   );
 });
 
+Timeline.propTypes = {
+  gridSize: PropTypes.number.isRequired,
+};
+
 Timeline.displayName = 'Timeline';
 
-export default Timeline;
+const mapStateToProps = ({ studio }) => ({
+  gridSize: studio.gridSize,
+});
+
+export default connect(mapStateToProps)(Timeline);

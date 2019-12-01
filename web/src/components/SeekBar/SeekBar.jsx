@@ -8,7 +8,7 @@ import { setCurrentBeat, play, pause } from '../../actions/studioActions';
 
 const SeekBar = memo((props) => {
   const {
-    currentBeat, scroll, playing, dispatch,
+    currentBeat, scroll, playing, dispatch, gridSize,
   } = props;
 
   const handleDragStart = useCallback((ev) => {
@@ -19,7 +19,10 @@ const SeekBar = memo((props) => {
       e.preventDefault();
       dispatch(
         setCurrentBeat(
-          Math.max(1, startBeat + (e.screenX - mousePosOffset) / 40 / window.devicePixelRatio),
+          Math.max(
+            1,
+            startBeat + (e.screenX - mousePosOffset) / (40 * gridSize) / window.devicePixelRatio,
+          ),
         ),
       );
     };
@@ -34,23 +37,23 @@ const SeekBar = memo((props) => {
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleDragStop);
-  }, [currentBeat, dispatch, playing]);
+  }, [currentBeat, dispatch, gridSize, playing]);
 
   const iconStyle = useMemo(() => {
-    const pos = -7 + 220 + (currentBeat - 1) * 40 - scroll;
+    const pos = -7 + 220 + (currentBeat - 1) * (40 * gridSize) - scroll;
     return {
       transform: `translate(${pos}px, -0px)`,
       opacity: pos >= 213 ? 1 : 0,
     };
-  }, [currentBeat, scroll]);
+  }, [currentBeat, gridSize, scroll]);
 
   const barStyle = useMemo(() => {
-    const pos = 220 + (currentBeat - 1) * 40 - scroll;
+    const pos = 220 + (currentBeat - 1) * (40 * gridSize) - scroll;
     return {
       transform: `translate(${pos}px, 60px)`,
       opacity: pos >= 220 ? 1 : 0,
     };
-  }, [currentBeat, scroll]);
+  }, [currentBeat, gridSize, scroll]);
 
   return (
     <div className={styles.wrapper}>
@@ -65,6 +68,7 @@ SeekBar.propTypes = {
   scroll: PropTypes.number.isRequired,
   playing: PropTypes.bool.isRequired,
   dispatch: PropTypes.func.isRequired,
+  gridSize: PropTypes.number.isRequired,
 };
 
 SeekBar.displayName = 'SeekBar';
@@ -73,6 +77,7 @@ const mapStateToProps = ({ studio }) => ({
   currentBeat: studio.currentBeat,
   scroll: studio.scroll,
   playing: studio.playing,
+  gridSize: studio.gridSize,
 });
 
 export default connect(mapStateToProps)(SeekBar);
