@@ -3450,10 +3450,7 @@ class AudioTests(unittest.TestCase):
                 }
             ]
             expected_body = {
-                'back_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJjdXJyZW5'
-                             '0X3BhZ2UiOjEsInRvdGFsX3BhZ2VzIjoyLCJwbGF5bGlzdHN'
-                             'fcGVyX3BhZ2UiOjF9.VyWhw-jn2_TrczBkgIxSilEwIAM9OB'
-                             'QrAPZahLBxl48',
+                'back_page': "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b3RhbF9wYWdlcyI6MiwicGxheWxpc3RzX3Blcl9wYWdlIjoxLCJjdXJyZW50X3BhZ2UiOjF9.G8PqwN7lPAz3aesIEyQyeYabxWNYnOoKUoHnjNqUy5E",
                 'current_page': 2,
                 'next_page': None,
                 'playlists': expected_playlist,
@@ -3518,10 +3515,7 @@ class AudioTests(unittest.TestCase):
             expected_body = {
                 'back_page': None,
                 'current_page': 1,
-                'next_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJjdXJyZW5'
-                             '0X3BhZ2UiOjIsInRvdGFsX3BhZ2VzIjoyLCJwbGF5bGlzdHN'
-                             'fcGVyX3BhZ2UiOjF9.6cfxATKMuNb3I2cOOY7GjwtKHRhqKq'
-                             'JQNa9cstcIxtc',
+                'next_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b3RhbF9wYWdlcyI6MiwicGxheWxpc3RzX3Blcl9wYWdlIjoxLCJjdXJyZW50X3BhZ2UiOjJ9._rEtPtZw29cBFwrkhdO19YqaNpb4xW0FNlikcB3hYa4',
                 'playlists': expected_playlist,
                 'playlists_per_page': 1,
                 'total_pages': 2
@@ -4058,9 +4052,9 @@ class AudioTests(unittest.TestCase):
                 }
             ]
             expected_body = {
-                'back_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwaWQiOjEsImN1cnJlbnRfcGFnZSI6MSwidG90YWxfcGFnZXMiOjMsInNvbmdzX3Blcl9wYWdlIjoxfQ.cxLaMllmwj-uBnk7WqUc96HaziF-HQ7m_LWWkixQr5I',
+                'back_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwaWQiOjEsInRvdGFsX3BhZ2VzIjozLCJzb25nc19wZXJfcGFnZSI6MSwiY3VycmVudF9wYWdlIjoxfQ.b-F2ekNAvBDT_-l8oqBWVn6ZSeI_S1Yqf61YeT300R4',
                 'current_page': 2,
-                'next_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwaWQiOjEsImN1cnJlbnRfcGFnZSI6MywidG90YWxfcGFnZXMiOjMsInNvbmdzX3Blcl9wYWdlIjoxfQ.keniZUaxHbJIOCyILylJZtYFL8jeYS5_49LuxN3xQf8',
+                'next_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwaWQiOjEsInRvdGFsX3BhZ2VzIjozLCJzb25nc19wZXJfcGFnZSI6MSwiY3VycmVudF9wYWdlIjozfQ.lSJlboBm5mBfTUClYR_gkHDYhtAp-dxGcoXd8eqhjrc',
                 'songs': expected_songs,
                 'songs_per_page': 1,
                 'total_pages': 3
@@ -4121,7 +4115,7 @@ class AudioTests(unittest.TestCase):
             expected_body = {
                 'back_page': None,
                 'current_page': 1,
-                'next_page': "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwaWQiOjEsImN1cnJlbnRfcGFnZSI6MiwidG90YWxfcGFnZXMiOjMsInNvbmdzX3Blcl9wYWdlIjoxfQ.sA7IN_8VD3OcOMTToP6iqTwKX6iNljKhTVWrcFBUNpA",
+                'next_page': "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwaWQiOjEsInRvdGFsX3BhZ2VzIjozLCJzb25nc19wZXJfcGFnZSI6MSwiY3VycmVudF9wYWdlIjoyfQ.-Kdo3fOKSO6s_ZQmP1w2Mn7_mJDdcDWvAh9fE_FD2i8",
                 'songs': expected_songs,
                 'songs_per_page': 1,
                 'total_pages': 3

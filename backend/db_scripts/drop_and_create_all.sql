@@ -27,6 +27,7 @@ CREATE TABLE `musicloud_db`.`Songs` (
     `duration` INT NOT NULL,
     `created` DATETIME NOT NULL,
     `public` TINYINT NOT NULL DEFAULT 0,
+    `published` DATETIME,
     `url` VARCHAR(255),
     `cover` VARCHAR(255),
     `genre` VARCHAR(50),
