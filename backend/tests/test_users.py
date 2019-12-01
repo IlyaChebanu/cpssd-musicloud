@@ -3079,7 +3079,7 @@ class UserTests(unittest.TestCase):
             )
             self.assertEqual(200, res.status_code)
             expected_body = {
-                'back_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b3RhbF9wYWdlcyI6MiwiaXRlbXNfcGVyX3BhZ2UiOjEsImN1cnJlbnRfcGFnZSI6MX0.eptlXF2rXVtYOOcHZ5lmSV9K_EkF75L68diSw5rcZSk',
+                'back_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzb25nc19vbmx5IjpudWxsLCJwb3N0c19vbmx5IjpudWxsLCJ0b3RhbF9wYWdlcyI6MiwiaXRlbXNfcGVyX3BhZ2UiOjEsImN1cnJlbnRfcGFnZSI6MX0.7CrnzsMiSzCA9IYbSg_qCXnmzmUxmM4YOSnaav2QqUA',
                 'current_page': 2,
                 'next_page': None,
                 'timeline': [
@@ -3148,7 +3148,7 @@ class UserTests(unittest.TestCase):
             expected_body = {
                 'back_page': None,
                 'current_page': 1,
-                'next_page': "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b3RhbF9wYWdlcyI6MiwiaXRlbXNfcGVyX3BhZ2UiOjEsImN1cnJlbnRfcGFnZSI6Mn0.KzmYqNxQ3f01wsTxVFIexfuUghov2mmvarVW8p17wEE",
+                'next_page': "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzb25nc19vbmx5IjpudWxsLCJwb3N0c19vbmx5IjpudWxsLCJ0b3RhbF9wYWdlcyI6MiwiaXRlbXNfcGVyX3BhZ2UiOjEsImN1cnJlbnRfcGFnZSI6Mn0.w2RCi7sKxkE0IubkvV-rxwMMSUMLJ3Q4izIOVnEJ0RM",
                 'timeline': [
                     {
                         'cover': 'http://cover.com',
@@ -3161,7 +3161,7 @@ class UserTests(unittest.TestCase):
                         'type': 'song',
                         'url': 'http://fake.com',
                         'username': 'username'
-                     }
+                    }
                 ],
                 'items_per_page': 1,
                 'total_pages': 2

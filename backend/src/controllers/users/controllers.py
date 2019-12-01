@@ -27,7 +27,9 @@ from ...models.users import (
     get_follower_count, get_song_count, get_number_of_likes,
     get_following_count, get_following_pair, reset_user_verification,
     reset_email, update_profiler_url, get_following_names, get_follower_names,
-    get_timeline, get_timeline_length
+    get_timeline, get_timeline_length, get_timeline_posts_only,
+    get_timeline_posts_only_length, get_timeline_song_only,
+    get_timeline_song_only_length
 )
 from ...models.verification import insert_verification, get_verification
 from ...middleware.auth_required import auth_required
@@ -837,7 +839,7 @@ def following():
 @USERS.route("/timeline", methods=["GET"])
 @sql_err_catcher()
 @auth_required(return_user=True)
-def timeline(user_data):  # pylint:disable=R0912
+def timeline(user_data):  # pylint:disable=R0912, R0914, R0915
     """
     Endpoint to get all a user's timeline.
     """
@@ -845,6 +847,18 @@ def timeline(user_data):  # pylint:disable=R0912
     back_page = request.args.get('back_page')
     uid = user_data.get("uid")
     if not next_page and not back_page:
+        songs_only = request.args.get('songs_only')
+        posts_only = request.args.get('posts_only')
+        if songs_only and posts_only:
+            return {
+                "current_page": 1,
+                "total_pages": 1,
+                "items_per_page": 50,
+                "next_page": None,
+                "back_page": None,
+                "timeline": []
+            }, 200
+
         items_per_page = request.args.get('items_per_page')
         if not items_per_page:
             items_per_page = 50
@@ -855,7 +869,13 @@ def timeline(user_data):  # pylint:disable=R0912
             current_page = 1
         current_page = int(current_page)
 
-        total_items = get_timeline_length(uid)
+        if songs_only:
+            total_items = get_timeline_song_only_length(uid)
+        elif posts_only:
+            total_items = get_timeline_posts_only_length(uid)
+        else:
+            total_items = get_timeline_length(uid)
+
         total_pages = (total_items // items_per_page)
         if total_pages == 0:
             total_pages = 1
@@ -868,7 +888,17 @@ def timeline(user_data):  # pylint:disable=R0912
             }, 422
 
         start_index = (current_page * items_per_page) - items_per_page
-        timeline_items = get_timeline(uid, start_index, items_per_page)
+
+        if songs_only:
+            timeline_items = get_timeline_song_only(
+                uid, start_index, items_per_page
+            )
+        elif posts_only:
+            timeline_items = get_timeline_posts_only(
+                uid, start_index, items_per_page
+            )
+        else:
+            timeline_items = get_timeline(uid, start_index, items_per_page)
 
         res = []
         for item in timeline_items:
@@ -878,6 +908,8 @@ def timeline(user_data):  # pylint:disable=R0912
                 res.append(gen_timeline_post_object(item))
 
         jwt_payload = {
+            "songs_only": songs_only,
+            "posts_only": posts_only,
             "total_pages": total_pages,
             "items_per_page": items_per_page,
         }
@@ -907,12 +939,23 @@ def timeline(user_data):  # pylint:disable=R0912
         token = back_page
     token = jwt.decode(token, JWT_SECRET, algorithms=['HS256'])
 
+    songs_only = token.get("songs_only")
+    posts_only = token.get("posts_only")
     current_page = token.get("current_page")
     items_per_page = token.get("items_per_page")
     total_pages = token.get("total_pages")
     start_index = (current_page * items_per_page) - items_per_page
 
-    timeline_items = get_timeline(uid, start_index, items_per_page)
+    if songs_only:
+        timeline_items = get_timeline_song_only(
+            uid, start_index, items_per_page
+        )
+    elif posts_only:
+        timeline_items = get_timeline_posts_only(
+            uid, start_index, items_per_page
+        )
+    else:
+        timeline_items = get_timeline(uid, start_index, items_per_page)
 
     res = []
     for item in timeline_items:
@@ -922,6 +965,8 @@ def timeline(user_data):  # pylint:disable=R0912
             res.append(gen_timeline_post_object(item))
 
     jwt_payload = {
+        "songs_only": songs_only,
+        "posts_only": posts_only,
         "total_pages": total_pages,
         "items_per_page": items_per_page,
     }
