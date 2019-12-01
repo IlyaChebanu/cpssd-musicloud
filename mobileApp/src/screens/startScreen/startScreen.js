@@ -6,7 +6,8 @@ import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import MultiPurposeButton from "../../components/multiPurposeButton/multiPurposeButton";
-import { readStorageData, TOKEN_DATA_KEY, USERNAME_DATA_KEY } from "../../utils/localStorage";
+import { readStorageData, TOKEN_DATA_KEY, USERNAME_DATA_KEY, SETTINGS_PORTRAIT_DATA_KEY } from "../../utils/localStorage";
+import Orientation from 'react-native-orientation';
 
 class StartScreen extends React.Component {
   constructor(props) {
@@ -20,6 +21,11 @@ class StartScreen extends React.Component {
   async loadCorrectFlow() {
     let token = await readStorageData(TOKEN_DATA_KEY)
     let username = await readStorageData(USERNAME_DATA_KEY)
+    let portraitMode = await readStorageData(SETTINGS_PORTRAIT_DATA_KEY)
+    this.props.setIsPortrait(portraitMode)
+    if (!portraitMode) {
+      Orientation.unlockAllOrientations();
+    }
     if (token != null) {
       this.props.setAuthToken(token)
       this.props.setUsername(username)
