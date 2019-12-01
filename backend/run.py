@@ -4,8 +4,8 @@ This is the kick-off function for the backend flask REST API server.
 import traceback
 from wsgiref.simple_server import make_server
 
-from backend.src import APP
-from backend.src.utils import log
+from .src import APP
+from .src.utils import log
 
 
 if __name__ == "__main__":
