@@ -33,6 +33,19 @@
   position: relative;
 }
 
+.songPicker {
+  max-width: 1800px;
+  width: 1800px;
+  height: fit-content;
+  justify-content: center;
+  display: flex;
+  margin-top: 200px;
+  margin-bottom: 200px;
+  position: relative;
+  overflow-y: hidden;
+  
+}
+
 .scrollableMain {
   width: calc(100% - 220px);
   height: 100%;
@@ -42,8 +55,10 @@
 
 .mainContent {
   width: 150%;
+  // height: 100%;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
   margin-bottom: 100px;
+  // overflow-y: scroll;
 }
 
 .newTrack {
@@ -75,6 +90,8 @@
   width: calc(100vw - 220px);
   overflow-x: scroll;
   overflow-y: hidden;
+  // height: fit-content;
+  // overflow-y: scroll;
 }
 
 .track:last-child {
