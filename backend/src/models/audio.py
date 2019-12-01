@@ -170,7 +170,7 @@ def get_all_compiled_songs(start_index, songs_per_page):
     :param start_index:
     Int - Represents the start index of a new page.
     :param songs_per_page:
-    Int - Represents the end index of a new page.
+    Int - Represents the number of items on the new page.
     :return:
     List - Containing lists of song data.
     """
@@ -196,7 +196,7 @@ def get_all_compiled_songs_by_uid(uid, start_index, songs_per_page):
     :param start_index:
     Int - Represents the start index of a new page.
     :param songs_per_page:
-    Int - Represents the end index of a new page.
+    Int - Represents the number of items on the new page.
     :return:
     List - Containing lists of song data.
     """
@@ -224,7 +224,7 @@ def get_all_editable_songs_by_uid(uid, start_index, songs_per_page):
     :param start_index:
     Int - Represents the start index of a new page.
     :param songs_per_page:
-    Int - Represents the end index of a new page.
+    Int - Represents the number of items on the new page.
     :return:
     List - Containing lists of song data.
     """
@@ -461,7 +461,7 @@ def get_all_liked_songs_by_uid(uid, start_index, songs_per_page):
     :param start_index:
     Int - Represents the start index of a new page.
     :param songs_per_page:
-    Int - Represents the end index of a new page.
+    Int - Represents the number of items on the new page.
     :return:
     List - Containing lists of song data.
     """
@@ -569,5 +569,278 @@ def update_cover_url(sid, url):
     args = (
         url,
         sid,
+    )
+    query(sql, args)
+
+
+def create_playlist(uid, title):
+    """
+    Creates a new playlist in the DB.
+    :param uid:
+    Int - Uid of the user creating the playlist.
+    :param title:
+    Str - Title of the playlist.
+    :return:
+    None - Creates playlist in DB and returns None.
+    """
+    sql = (
+        "INSERT INTO Playlists "
+        "(uid, title) "
+        "VALUES (%s, %s)"
+    )
+    args = (
+        uid,
+        title,
+    )
+    row_id = query(sql, args, get_insert_row_id=True)
+    if not row_id:
+        raise NoResults
+    return row_id
+
+
+def delete_playlist(pid):
+    """
+    Deletes a playlist in the DB.
+    :param pid:
+    Int - Pid of the playlist being deleted.
+    :return:
+    None - Deletes the playlist in DB and returns None.
+    """
+    sql = (
+        "DELETE FROM Playlists "
+        "WHERE pid=%s"
+    )
+    args = (
+        pid,
+    )
+    query(sql, args)
+
+
+def delete_playlist_data(pid):
+    """
+    Deletes a playlists song data in the DB.
+    :param pid:
+    Int - Pid of the playlist who's data is being deleted.
+    :return:
+    None - Deletes the playlist data in DB and returns None.
+    """
+    sql = (
+        "DELETE FROM Playlist_State "
+        "WHERE pid=%s"
+    )
+    args = (
+        pid,
+    )
+    query(sql, args)
+
+
+def get_playlist(pid):
+    """
+    Get all the playlist data for a single playlist.
+    :param pid:
+    Int - ID of the playlist who's data we are retrieving.
+    :return:
+    List - Containing 1 list of playlist data.
+    """
+    sql = (
+        "SELECT * FROM Playlists WHERE pid = %s;"
+    )
+    args = (
+        pid,
+    )
+    return query(sql, args, True)
+
+
+def get_playlists(uid, start_index, playlists_per_page):
+    """
+    Get all the playlists the selected user has created.
+    :param uid:
+    Int - Uid of the user who's playlists we want to get.
+    :param start_index:
+    Int - Represents the start index of a new page.
+    :param playlists_per_page:
+    Int - Represents the number of items on the new page.
+    :return:
+    List - Containing lists of playlist data.
+    """
+    sql = (
+        "SELECT pid,"
+        "(SELECT username FROM Users WHERE Playlists.uid=Users.uid)"
+        "as usernanme, title, created, updated FROM Playlists "
+        "WHERE uid = %s LIMIT %s, %s;"
+    )
+    args = (
+        uid,
+        start_index,
+        playlists_per_page,
+    )
+    return query(sql, args, True)
+
+
+def get_playlist_data(pid, start_index, songs_per_page):
+    """
+    Return all of the songs in a playlist using pagination.
+    :param pid:
+    Int - ID of the playlist who's songs we are returning.
+    :param start_index:
+    Int - Represents the start index of a new page.
+    :param songs_per_page:
+    Int - Represents the number of items on the new page.
+    :return:
+    List - Contains dicts of song data.
+    """
+    sql = (
+        "SELECT Songs.sid, "
+        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as usernanme,"
+        "title, duration, created, public, url, cover, "
+        "(SELECT COUNT(*) FROM Song_Likes WHERE "
+        "Songs.sid = Song_Likes.sid) as likes FROM Songs "
+        "INNER JOIN Playlist_State ON "
+        "Playlist_State.sid = Songs.sid WHERE Playlist_State.pid = %s "
+        "AND Songs.public = 1 LIMIT %s, %s;"
+    )
+    args = (
+        pid,
+        start_index,
+        songs_per_page,
+    )
+    return query(sql, args, True)
+
+
+def get_number_of_playlists(uid):
+    """
+    Return the number of all a user's playlists.
+    :return:
+    Int - Number of playlists a user has in DB.
+    """
+    sql = (
+        "SELECT COUNT(*) FROM Playlists "
+        "WHERE uid = %s"
+    )
+    args = (
+        uid,
+    )
+    return query(sql, args, True)[0][0]
+
+
+def get_number_of_songs_in_playlist(pid):
+    """
+    Return the number of songs in a playlist.
+    :return:
+    Int - Number of songs in a playlist.
+    """
+    sql = (
+        "SELECT COUNT(*) FROM Playlist_State "
+        "WHERE pid = %s"
+    )
+    args = (
+        pid,
+    )
+    return query(sql, args, True)[0][0]
+
+
+def add_to_playlist(pid, sid):
+    """
+    Add a song to a playlist in the DB.
+    :param pid:
+    Int - ID of the playlist we are adding a song to.
+    :param sid:
+    Str - ID of the song we are adding.
+    :return:
+    None - Adds the song to the playlist in the DB and returns None.
+    """
+    sql = (
+        "INSERT INTO Playlist_State "
+        "(pid, sid) "
+        "VALUES (%s, %s)"
+    )
+    args = (
+        pid,
+        sid,
+    )
+    query(sql, args)
+
+
+def remove_from_playlist(pid, sid):
+    """
+    Remove a song from a playlist in the DB.
+    :param pid:
+    Int - ID of the playlist we are removing a song from.
+    :param sid:
+    Str - ID of the song we are removing.
+    :return:
+    None - Removes the song from the playlist in the DB and returns None.
+    """
+    sql = (
+        "DELETE FROM Playlist_State "
+        "WHERE pid=%s AND sid=%s"
+    )
+    args = (
+        pid,
+        sid,
+    )
+    query(sql, args)
+
+
+def get_from_playlist(pid, sid):
+    """
+    Get a playlist relation from the DB.
+    :param pid:
+    Int - ID of the playlist we are searching.
+    :param sid:
+    Int - ID of the song we are looking for.
+    :return:
+    List - Contains 1 list if the relation exists, otherwise is empty.
+    """
+    sql = (
+        "SELECT * FROM Playlist_State WHERE pid=%s AND sid=%s"
+    )
+    args = (
+        pid,
+        sid,
+    )
+    res = query(sql, args, True)
+    if not res:
+        raise NoResults
+    return res
+
+
+def update_playlist_timestamp(pid):
+    """
+    Change the updated timestamp for a particular playlist.
+    :param pid:
+    Int - ID of the playlist who's timestamp we are updating.
+    :return:
+    None - Updates the timestamp and returns None.
+    """
+    sql = (
+        "UPDATE Playlists "
+        "SET updated=CURRENT_TIMESTAMP "
+        "WHERE pid = %s"
+    )
+    args = (
+        pid,
+    )
+    query(sql, args)
+
+
+def update_playlist_name(pid, title):
+    """
+    Change the name for a particular playlist.
+    :param pid:
+    Int - ID of the playlist who's name we are updating.
+    :param title:
+    Str - The new name of our playlist.
+    :return:
+    None - Updates the name and returns None.
+    """
+    sql = (
+        "UPDATE Playlists "
+        "SET title=%s "
+        "WHERE pid = %s"
+    )
+    args = (
+        title,
+        pid,
     )
     query(sql, args)

@@ -581,8 +581,7 @@ class AudioTests(unittest.TestCase):
                     "public": 1,
                     "url": None,
                     "cover": None,
-                    "genre": None,
-                    "likes": 8
+                    "likes": None
                 }
             ]
             expected_body = {
@@ -643,8 +642,7 @@ class AudioTests(unittest.TestCase):
                     "public": 1,
                     "url": None,
                     "cover": None,
-                    "genre": None,
-                    "likes": 8
+                    "likes": None
                 }
             ]
             expected_body = {
@@ -707,8 +705,7 @@ class AudioTests(unittest.TestCase):
                     "public": 1,
                     "url": None,
                     "cover": None,
-                    "genre": None,
-                    "likes": 8
+                    "likes": None
                 }
             ]
             expected_body = {
@@ -770,8 +767,7 @@ class AudioTests(unittest.TestCase):
                     "public": 1,
                     "url": None,
                     "cover": None,
-                    "genre": None,
-                    "likes": 8
+                    "likes": None
                 },
                 {
                     "sid": 2,
@@ -782,8 +778,7 @@ class AudioTests(unittest.TestCase):
                     "public": 1,
                     "url": None,
                     "cover": None,
-                    "genre": None,
-                    "likes": 8
+                    "likes": None
                 }
             ]
             expected_body = {
@@ -845,8 +840,7 @@ class AudioTests(unittest.TestCase):
                     "public": 1,
                     "url": None,
                     "cover": None,
-                    "genre": None,
-                    "likes": 8
+                    "likes": None
                 }
             ]
             expected_body = {
@@ -908,8 +902,7 @@ class AudioTests(unittest.TestCase):
                     "public": 1,
                     "url": None,
                     "cover": None,
-                    "genre": None,
-                    "likes": 8
+                    "likes": None
                 }
             ]
             expected_body = {
@@ -1079,7 +1072,7 @@ class AudioTests(unittest.TestCase):
                 follow_redirects=True
             )
             self.assertEqual(200, res.status_code)
-            expected_body = {'song': {'sid': 1, 'username': 'username', 'title': 'A test song', 'duration': 0, 'created': 'Wed, 13 Nov 2019 17:07:39 GMT', 'public': 1, 'url': None, 'cover': None, 'genre': None, 'likes': 8}}
+            expected_body = {'song': {'sid': 1, 'username': 'username', 'title': 'A test song', 'duration': 0, 'created': 'Wed, 13 Nov 2019 17:07:39 GMT', 'public': 1, 'url': None, 'cover': None, 'likes': None}}
             self.assertEqual(expected_body, json.loads(res.data))
 
     def test_get_song_data_fail_missing_sid(self):
@@ -1246,8 +1239,7 @@ class AudioTests(unittest.TestCase):
                     "public": 1,
                     "url": None,
                     "cover": None,
-                    "genre": None,
-                    "likes": 8
+                    "likes": None
                 },
                 {
                     "sid": 2,
@@ -1258,8 +1250,7 @@ class AudioTests(unittest.TestCase):
                     "public": 1,
                     "url": None,
                     "cover": None,
-                    "genre": None,
-                    "likes": 8
+                    "likes": None
                 }
             ]
             expected_body = {
@@ -1320,8 +1311,7 @@ class AudioTests(unittest.TestCase):
                     "public": 1,
                     "url": None,
                     "cover": None,
-                    "genre": None,
-                    "likes": 8
+                    "likes": None
                 }
             ]
             expected_body = {
@@ -1382,8 +1372,7 @@ class AudioTests(unittest.TestCase):
                     "public": 1,
                     "url": None,
                     "cover": None,
-                    "genre": None,
-                    "likes": 8
+                    "likes": None
                 }
             ]
             expected_body = {
@@ -1571,8 +1560,7 @@ class AudioTests(unittest.TestCase):
                     "public": 1,
                     "url": None,
                     "cover": None,
-                    "genre": None,
-                    "likes": 8
+                    "likes": None
                 },
                 {
                     "sid": 2,
@@ -1583,8 +1571,7 @@ class AudioTests(unittest.TestCase):
                     "public": 1,
                     "url": None,
                     "cover": None,
-                    "genre": None,
-                    "likes": 8
+                    "likes": None
                 }
             ]
             expected_body = {
@@ -1648,8 +1635,7 @@ class AudioTests(unittest.TestCase):
                     "public": 1,
                     "url": None,
                     "cover": None,
-                    "genre": None,
-                    "likes": 8
+                    "likes": None
                 }
             ]
             expected_body = {
@@ -1713,8 +1699,7 @@ class AudioTests(unittest.TestCase):
                     "public": 1,
                     "url": None,
                     "cover": None,
-                    "genre": None,
-                    "likes": 8
+                    "likes": None
                 }
             ]
             expected_body = {
@@ -3027,3 +3012,1989 @@ class AudioTests(unittest.TestCase):
             self.assertEqual(401, res.status_code)
             expected_body = {"message": "You can't update that song!"}
             self.assertEqual(expected_body, json.loads(res.data))
+
+    @mock.patch('backend.src.controllers.audio.controllers.create_playlist')
+    def test_create_a_playlist_success(self, mocked_pid):
+        """
+        Ensure creating a playlist works.
+        """
+        test_req_data = {
+            "title": "test"
+        }
+        mocked_pid.return_value = 1
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.post(
+                "/api/v1/audio/playlist",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(200, res.status_code)
+            expected_body = {'message': 'Playlist created', 'pid': 1}
+            self.assertEqual(expected_body, json.loads(res.data))
+
+    def test_create_a_playlist_fail_missing_access_token(self):
+        """
+        Ensure creating a playlist fails if no access_token is sent.
+        """
+        res = self.test_client.post(
+            "/api/v1/audio/playlist",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_create_a_playlist_fail_access_token_expired(self):
+        """
+        Ensure creating a playlist fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
+            res = self.test_client.post(
+                "/api/v1/audio/playlist",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_create_a_playlist_fail_bad_access_token_signature(self):
+        """
+        Ensure creating a playlist fails if the access_token signature does
+        not match the one configured on the server.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
+            res = self.test_client.post(
+                "/api/v1/audio/playlist",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_create_a_playlist_fail_unknown_access_token_issue(self):
+        """
+        Ensure creating a playlist fails if some unknown error relating to the
+        access_token occurs.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
+            res = self.test_client.post(
+                "/api/v1/audio/playlist",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_create_a_playlist_fail_missing_title(self):
+        """
+        Ensure creating a playlist fails if a title is not sent.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.post(
+                "/api/v1/audio/playlist",
+                json={},
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+            test_req_data = {
+                "title": ""
+            }
+            res = self.test_client.post(
+                "/api/v1/audio/playlist",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_playlist')
+    def test_delete_my_playlist_success(self, mocked_uid):
+        """
+        Ensure deleting a playlist works.
+        """
+        test_req_data = {
+            "pid": 1
+        }
+        mocked_uid.return_value = [[None, -1]]
+        with mock.patch('backend.src.controllers.audio.controllers.delete_playlist_data'):
+            with mock.patch('backend.src.controllers.audio.controllers.delete_playlist'):
+                with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+                    mock_token.return_value = {
+                        'uid': -1,
+                        'email': 'username2@fakemail.noshow',
+                        'username': 'username2',
+                        'verified': 1,
+                        'random_value': (
+                            'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                            'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                            'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                            'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                            'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                            'zeyvzkssMFUTdeEvzbKu'
+                        )
+                    }
+                    res = self.test_client.delete(
+                        "/api/v1/audio/playlist",
+                        json=test_req_data,
+                        headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                        follow_redirects=True
+                    )
+                    self.assertEqual(200, res.status_code)
+                    expected_body = {'message': 'Playlist deleted'}
+                    self.assertEqual(expected_body, json.loads(res.data))
+
+    def test_delete_my_playlist_fail_missing_access_token(self):
+        """
+        Ensure deleting a playlist fails if no access_token is sent.
+        """
+        res = self.test_client.delete(
+            "/api/v1/audio/playlist",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_delete_my_playlist_fail_access_token_expired(self):
+        """
+        Ensure deleting a playlist fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
+            res = self.test_client.delete(
+                "/api/v1/audio/playlist",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_delete_my_playlist_fail_bad_access_token_signature(self):
+        """
+        Ensure deleting a playlist fails if the access_token signature does
+        not match the one configured on the server.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
+            res = self.test_client.delete(
+                "/api/v1/audio/playlist",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_delete_my_playlist_fail_unknown_access_token_issue(self):
+        """
+        Ensure deleting a playlist fails if some unknown error relating to the
+        access_token occurs.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
+            res = self.test_client.delete(
+                "/api/v1/audio/playlist",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_delete_my_playlist_fail_missing_pid(self):
+        """
+        Ensure deleting a playlist fails if a pid is not sent.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.delete(
+                "/api/v1/audio/playlist",
+                json={},
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+            test_req_data = {
+                "pid": None
+            }
+            res = self.test_client.delete(
+                "/api/v1/audio/playlist",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_playlist')
+    def test_delete_my_playlist_fail_invalid_pid(self, mock_raise):
+        """
+        Ensure deleting a playlist fails if the pid sent is invalid.
+        """
+        test_req_data = {
+            "pid": 1
+        }
+        mock_raise.side_effect = IndexError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.delete(
+                "/api/v1/audio/playlist",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_playlist')
+    def test_delete_my_playlist_fail_not_permitted(self, mock_uid):
+        """
+        Ensure deleting a playlist fails if the user is not permitted to edit
+        the playlist.
+        """
+        test_req_data = {
+            "pid": 1
+        }
+        mock_uid.return_value = [[None, 1]]
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.delete(
+                "/api/v1/audio/playlist",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_playlists')
+    @mock.patch('backend.src.controllers.audio.controllers.get_number_of_playlists')
+    def test_get_my_playlists_success_no_scroll_token(self, mocked_num_playlists, mocked_playlists):
+        """
+        Ensure getting all playlists for the current user is successful without
+        scroll tokens.
+        """
+        test_playlists = [
+            [
+                1,
+                "Kamil",
+                "A new title",
+                "Fri, 29 Nov 2019 12:04:20 GMT",
+                "Fri, 29 Nov 2019 16:30:30 GMT"
+            ],
+            [
+                2,
+                "Kamil",
+                "A super duper very new title",
+                "Fri, 29 Nov 2019 12:04:21 GMT",
+                "Fri, 29 Nov 2019 16:30:31 GMT"
+            ]
+        ]
+        mocked_num_playlists.return_value = 2
+        mocked_playlists.return_value = test_playlists
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username@fakemail.noshow',
+                'username': 'username',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.get(
+                "/api/v1/audio/playlist",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(200, res.status_code)
+            expected_playlists = [
+                {
+                    "created": "Fri, 29 Nov 2019 12:04:20 GMT",
+                    "pid": 1,
+                    "title": "A new title",
+                    "updated": "Fri, 29 Nov 2019 16:30:30 GMT",
+                    "username": "Kamil"
+                },
+                {
+                    "created": "Fri, 29 Nov 2019 12:04:21 GMT",
+                    "pid": 2,
+                    "title": "A super duper very new title",
+                    "updated": "Fri, 29 Nov 2019 16:30:31 GMT",
+                    "username": "Kamil"
+                }
+            ]
+            expected_body = {
+                'back_page': None,
+                'playlists': expected_playlists,
+                'current_page': 1,
+                'next_page': None,
+                'playlists_per_page': 50,
+                'total_pages': 1
+            }
+            self.assertEqual(expected_body, json.loads(res.data))
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_playlists')
+    def test_get_my_playlists_success_next_scroll_token(self, mocked_playlists):
+        """
+        Ensure getting all playlists for the current user is successful with a next page scroll token.
+        """
+        test_playlists = [
+            [
+                2,
+                "Kamil",
+                "A super duper very new title",
+                "Fri, 29 Nov 2019 12:04:21 GMT",
+                "Fri, 29 Nov 2019 16:30:31 GMT"
+            ]
+        ]
+        mocked_playlists.return_value = test_playlists
+        test_req_data = {
+            "next_page": (
+                "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJjdXJyZW50X3BhZ2UiOjIs"
+                "InRvdGFsX3BhZ2VzIjoyLCJwbGF5bGlzdHNfcGVyX3BhZ2UiOjF9.6cfxATKM"
+                "uNb3I2cOOY7GjwtKHRhqKqJQNa9cstcIxtc"
+            )
+        }
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.get(
+                "/api/v1/audio/playlist",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(200, res.status_code)
+            expected_playlist = [
+                {
+                    "created": "Fri, 29 Nov 2019 12:04:21 GMT",
+                    "pid": 2,
+                    "title": "A super duper very new title",
+                    "updated": "Fri, 29 Nov 2019 16:30:31 GMT",
+                    "username": "Kamil"
+                }
+            ]
+            expected_body = {
+                'back_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJjdXJyZW5'
+                             '0X3BhZ2UiOjEsInRvdGFsX3BhZ2VzIjoyLCJwbGF5bGlzdHN'
+                             'fcGVyX3BhZ2UiOjF9.VyWhw-jn2_TrczBkgIxSilEwIAM9OB'
+                             'QrAPZahLBxl48',
+                'current_page': 2,
+                'next_page': None,
+                'playlists': expected_playlist,
+                'playlists_per_page': 1,
+                'total_pages': 2
+            }
+            self.assertEqual(expected_body, json.loads(res.data))
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_playlists')
+    def test_get_my_playlists_success_back_scroll_token(self, mocked_playlists):
+        """
+        Ensure getting all playlists for the current user is successful with a back page scroll token.
+        """
+        test_playlist = [
+            [
+                1,
+                "Kamil",
+                "A new title",
+                "Fri, 29 Nov 2019 12:04:20 GMT",
+                "Fri, 29 Nov 2019 16:30:30 GMT"
+            ]
+        ]
+        mocked_playlists.return_value = test_playlist
+        test_req_data = {
+            "back_page": (
+                "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJjdXJyZW50X3BhZ2UiOjEs"
+                "InRvdGFsX3BhZ2VzIjoyLCJwbGF5bGlzdHNfcGVyX3BhZ2UiOjF9.VyWhw-jn"
+                "2_TrczBkgIxSilEwIAM9OBQrAPZahLBxl48"
+            )
+        }
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.get(
+                "/api/v1/audio/playlist",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(200, res.status_code)
+            expected_playlist = [
+                {
+                    "created": "Fri, 29 Nov 2019 12:04:20 GMT",
+                    "pid": 1,
+                    "title": "A new title",
+                    "updated": "Fri, 29 Nov 2019 16:30:30 GMT",
+                    "username": "Kamil"
+                }
+            ]
+            expected_body = {
+                'back_page': None,
+                'current_page': 1,
+                'next_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJjdXJyZW5'
+                             '0X3BhZ2UiOjIsInRvdGFsX3BhZ2VzIjoyLCJwbGF5bGlzdHN'
+                             'fcGVyX3BhZ2UiOjF9.6cfxATKMuNb3I2cOOY7GjwtKHRhqKq'
+                             'JQNa9cstcIxtc',
+                'playlists': expected_playlist,
+                'playlists_per_page': 1,
+                'total_pages': 2
+            }
+            self.assertEqual(expected_body, json.loads(res.data))
+
+    def test_get_my_playlists_fail_missing_access_token(self):
+        """
+        Ensure getting a users playlists fails if no access_token is sent.
+        """
+        res = self.test_client.get(
+            "/api/v1/audio/playlist",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_get_my_playlists_fail_access_token_expired(self):
+        """
+        Ensure getting a users playlists fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
+            res = self.test_client.get(
+                "/api/v1/audio/playlist",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_get_my_playlists_fail_bad_access_token_signature(self):
+        """
+        Ensure getting a users playlists fails if the access_token signature
+        does not match the one configured on the server.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
+            res = self.test_client.get(
+                "/api/v1/audio/playlist",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_get_my_playlists_fail_unknown_access_token_issue(self):
+        """
+        Ensure getting a users playlists fails if some unknown error relating
+        to the access_token occurs.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
+            res = self.test_client.get(
+                "/api/v1/audio/playlist",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_number_of_playlists')
+    def test_get_my_playlists_fail_no_scroll_token_exceeded_last_page(self, mocked_num_playlists):
+        """
+        Ensure getting a users playlists fails if the user tries to access a
+        page that doesn't exist.
+        """
+        mocked_num_playlists.return_value = 2
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            test_req_data = {
+                "current_page": 12,
+                "songs_per_page": 1
+            }
+            res = self.test_client.get(
+                "/api/v1/audio/playlist",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    def test_get_my_playlists_fail_sent_both_tokens(self):
+        """
+        Ensure getting a users playlists fails if the user tries to send a
+        next_page & back_page token.
+        """
+        test_req_data = {
+            "next_page": (
+                "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0xLCJ0b"
+                "3RhbF9wYWdlcyI6MiwicG9zdHNfcGVyX3BhZ2UiOjEsImN1cnJlbnR"
+                "fcGFnZSI6Mn0.rOexY_eF1nUjFJvpDbbbTTgpoVjxIh9ZbVs0Q6ggR"
+                "uQ"
+            ),
+            "back_page": (
+                "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0x"
+                "LCJ0b3RhbF9wYWdlcyI6MiwicG9zdHNfcGVyX3BhZ2UiOjEsI"
+                "mN1cnJlbnRfcGFnZSI6MX0.pkQCRbBgvwuozzSG6LK-kFGuxT"
+                "8YYsYN3m9g-AzquyM"
+            )
+        }
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.get(
+                "/api/v1/audio/playlist",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_playlist')
+    def test_rename_playlist_success(self, mocked_uid):
+        """
+        Ensure Renaming a playlist works.
+        """
+        test_req_data = {
+            "pid": 1,
+            "title": "title"
+        }
+        mocked_uid.return_value = [[None, -1]]
+        with mock.patch('backend.src.controllers.audio.controllers.update_playlist_name'):
+            with mock.patch('backend.src.controllers.audio.controllers.update_playlist_timestamp'):
+                with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+                    mock_token.return_value = {
+                        'uid': -1,
+                        'email': 'username2@fakemail.noshow',
+                        'username': 'username2',
+                        'verified': 1,
+                        'random_value': (
+                            'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                            'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                            'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                            'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                            'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                            'zeyvzkssMFUTdeEvzbKu'
+                        )
+                    }
+                    res = self.test_client.patch(
+                        "/api/v1/audio/playlist",
+                        json=test_req_data,
+                        headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                        follow_redirects=True
+                    )
+                    self.assertEqual(200, res.status_code)
+                    expected_body = {'message': 'Playlist renamed'}
+                    self.assertEqual(expected_body, json.loads(res.data))
+
+    def test_rename_playlist_fail_missing_access_token(self):
+        """
+        Ensure Renaming a playlist fails if no access_token is sent.
+        """
+        res = self.test_client.patch(
+            "/api/v1/audio/playlist",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_rename_playlist_fail_access_token_expired(self):
+        """
+        Ensure renaming a playlist fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
+            res = self.test_client.patch(
+                "/api/v1/audio/playlist",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_rename_playlist_fail_bad_access_token_signature(self):
+        """
+        Ensure renaming a playlist fails if the access_token signature does
+        not match the one configured on the server.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
+            res = self.test_client.patch(
+                "/api/v1/audio/playlist",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_rename_playlist_fail_unknown_access_token_issue(self):
+        """
+        Ensure renaming a playlist fails if some unknown error relating to the
+        access_token occurs.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
+            res = self.test_client.patch(
+                "/api/v1/audio/playlist",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_rename_playlist_fail_missing_pid(self):
+        """
+        Ensure renaming a playlist fails if a pid is not sent.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            test_req_data = {
+                "pid": None,
+                "title": "different title"
+            }
+            res = self.test_client.patch(
+                "/api/v1/audio/playlist",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+            test_req_data = {
+                "pid": None,
+                "title": "different title"
+            }
+            res = self.test_client.patch(
+                "/api/v1/audio/playlist",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    def test_rename_playlist_fail_missing_title(self):
+        """
+        Ensure renaming a playlist fails if a title is not sent.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            test_req_data = {
+                "pid": 1
+            }
+            res = self.test_client.patch(
+                "/api/v1/audio/playlist",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+            test_req_data = {
+                "pid": 1,
+                "title": ""
+            }
+            res = self.test_client.patch(
+                "/api/v1/audio/playlist",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    def test_rename_playlist_fail_missing_title_and_pid(self):
+        """
+        Ensure renaming a playlist fails if a title and pid are not sent.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.patch(
+                "/api/v1/audio/playlist",
+                json={},
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+            test_req_data = {
+                "pid": None,
+                "title": ""
+            }
+            res = self.test_client.patch(
+                "/api/v1/audio/playlist",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_playlist')
+    def test_rename_playlist_fail_invalid_pid(self, mock_raise):
+        """
+        Ensure renaming a playlist fails if the pid sent is invalid.
+        """
+        test_req_data = {
+            "pid": 1,
+            "title": "title"
+        }
+        mock_raise.side_effect = IndexError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.patch(
+                "/api/v1/audio/playlist",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_playlist')
+    def test_rename_playlist_fail_not_permitted(self, mock_uid):
+        """
+        Ensure renaming a playlist fails if the user is not permitted to edit
+        the playlist.
+        """
+        test_req_data = {
+            "pid": 1,
+            "title": "title"
+        }
+        mock_uid.return_value = [[None, 1]]
+        with mock.patch(
+                'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.patch(
+                "/api/v1/audio/playlist",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_playlist')
+    @mock.patch('backend.src.controllers.audio.controllers.get_playlist_data')
+    @mock.patch('backend.src.controllers.audio.controllers.get_number_of_songs_in_playlist')
+    def test_get_my_playlists_songs_success_no_scroll_token(self, mocked_num_songs, mocked_songs, mock_uid):
+        """
+        Ensure getting all the songs in a playlist is successful without scroll
+        tokens.
+        """
+        test_songs = [
+            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, None, 8],
+            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, None, 8]
+        ]
+        mocked_num_songs.return_value = 2
+        mocked_songs.return_value = test_songs
+        mock_uid.return_value = [[None, -1]]
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username@fakemail.noshow',
+                'username': 'username',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            test_req_data = {
+                "pid": 1
+            }
+            res = self.test_client.get(
+                "/api/v1/audio/playlist_songs",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(200, res.status_code)
+            expected_songs = [
+                {
+                    "sid": 1,
+                    "username": "username",
+                    "title": "A test song",
+                    "duration": 0,
+                    "created": "Wed, 13 Nov 2019 17:07:39 GMT",
+                    "public": 1,
+                    "url": None,
+                    "cover": None,
+                    "likes": None
+                },
+                {
+                    "sid": 2,
+                    "username": "username",
+                    "title": "A very test song",
+                    "duration": 0,
+                    "created": "Wed, 13 Nov 2019 17:07:40 GMT",
+                    "public": 1,
+                    "url": None,
+                    "cover": None,
+                    "likes": None
+                }
+            ]
+            expected_body = {
+                'back_page': None,
+                'songs': expected_songs,
+                'current_page': 1,
+                'next_page': None,
+                'songs_per_page': 50,
+                'total_pages': 1
+            }
+            self.assertEqual(expected_body, json.loads(res.data))
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_playlist_data')
+    def test_get_my_playlists_songs_success_next_scroll_token(self, mocked_songs):
+        """
+        Ensure getting all the songs in a playlist is successful with a next page scroll token.
+        """
+        test_songs = [
+            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, None, 8]
+        ]
+        mocked_songs.return_value = test_songs
+        test_req_data = {
+            "next_page": (
+                "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwaWQiOjEsImN1cnJlbnRf"
+                "cGFnZSI6MiwidG90YWxfcGFnZXMiOjMsInNvbmdzX3Blcl9wYWdlIjoxfQ.sA"
+                "7IN_8VD3OcOMTToP6iqTwKX6iNljKhTVWrcFBUNpA"
+            )
+        }
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.get(
+                "/api/v1/audio/playlist_songs",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(200, res.status_code)
+            expected_songs = [
+                {
+                    "sid": 2,
+                    "username": "username",
+                    "title": "A very test song",
+                    "duration": 0,
+                    "created": "Wed, 13 Nov 2019 17:07:40 GMT",
+                    "public": 1,
+                    "url": None,
+                    "cover": None,
+                    "likes": None
+                }
+            ]
+            expected_body = {
+                'back_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwaWQiOjEsImN1cnJlbnRfcGFnZSI6MSwidG90YWxfcGFnZXMiOjMsInNvbmdzX3Blcl9wYWdlIjoxfQ.cxLaMllmwj-uBnk7WqUc96HaziF-HQ7m_LWWkixQr5I',
+                'current_page': 2,
+                'next_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwaWQiOjEsImN1cnJlbnRfcGFnZSI6MywidG90YWxfcGFnZXMiOjMsInNvbmdzX3Blcl9wYWdlIjoxfQ.keniZUaxHbJIOCyILylJZtYFL8jeYS5_49LuxN3xQf8',
+                'songs': expected_songs,
+                'songs_per_page': 1,
+                'total_pages': 3
+            }
+            self.assertEqual(expected_body, json.loads(res.data))
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_playlist_data')
+    def test_get_my_playlists_songs_success_back_scroll_token(self, mocked_songs):
+        """
+        Ensure getting all the songs in a playlist is successful with a back page scroll token.
+        """
+        test_songs = [
+            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, None, 8]
+        ]
+        mocked_songs.return_value = test_songs
+        test_req_data = {
+            "back_page": (
+                'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwaWQiOjEsImN1cnJlbnRf'
+                'cGFnZSI6MSwidG90YWxfcGFnZXMiOjMsInNvbmdzX3Blcl9wYWdlIjoxfQ.cx'
+                'LaMllmwj-uBnk7WqUc96HaziF-HQ7m_LWWkixQr5I'
+            )
+        }
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.get(
+                "/api/v1/audio/playlist_songs",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(200, res.status_code)
+            expected_songs = [
+                {
+                    "sid": 1,
+                    "username": "username",
+                    "title": "A test song",
+                    "duration": 0,
+                    "created": "Wed, 13 Nov 2019 17:07:39 GMT",
+                    "public": 1,
+                    "url": None,
+                    "cover": None,
+                    "likes": None
+                }
+            ]
+            expected_body = {
+                'back_page': None,
+                'current_page': 1,
+                'next_page': "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwaWQiOjEsImN1cnJlbnRfcGFnZSI6MiwidG90YWxfcGFnZXMiOjMsInNvbmdzX3Blcl9wYWdlIjoxfQ.sA7IN_8VD3OcOMTToP6iqTwKX6iNljKhTVWrcFBUNpA",
+                'songs': expected_songs,
+                'songs_per_page': 1,
+                'total_pages': 3
+            }
+            self.assertEqual(expected_body, json.loads(res.data))
+
+    def test_get_my_playlists_songs_fail_missing_access_token(self):
+        """
+        Ensure getting all the songs in a playlist fails if no access_token is sent.
+        """
+        res = self.test_client.get(
+            "/api/v1/audio/playlist_songs",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_get_my_playlists_songs_fail_access_token_expired(self):
+        """
+        Ensure getting all the songs in a playlist fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
+            res = self.test_client.get(
+                "/api/v1/audio/playlist_songs",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_get_my_playlists_songs_fail_bad_access_token_signature(self):
+        """
+        Ensure getting all the songs in a playlist fails if the access_token
+        signature does not match the one configured on the server.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
+            res = self.test_client.get(
+                "/api/v1/audio/playlist_songs",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_get_my_playlists_songs_fail_unknown_access_token_issue(self):
+        """
+        Ensure getting all the songs in a playlist fails if some unknown error
+        relating to the access_token occurs.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
+            res = self.test_client.get(
+                "/api/v1/audio/playlist_songs",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_playlist')
+    @mock.patch('backend.src.controllers.audio.controllers.get_number_of_songs_in_playlist')
+    def test_get_my_playlists_songs_fail_no_scroll_token_exceeded_last_page(self, mocked_num_songs, mock_uid):
+        """
+        Ensure getting all the songs in a playlist fails if the user tries to
+        access a page that doesn't exist.
+        """
+        mocked_num_songs.return_value = 2
+        mock_uid.return_value = [[None, -1]]
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            test_req_data = {
+                "pid": 1,
+                "current_page": 12,
+                "songs_per_page": 1
+            }
+            res = self.test_client.get(
+                "/api/v1/audio/playlist_songs",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    def test_get_my_playlists_songs_fail_sent_both_tokens(self):
+        """
+        Ensure getting all the songs in a playlist fails if the user tries to
+        send a next_page & back_page token.
+        """
+        test_req_data = {
+            "next_page": (
+                "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0xLCJ0b"
+                "3RhbF9wYWdlcyI6MiwicG9zdHNfcGVyX3BhZ2UiOjEsImN1cnJlbnR"
+                "fcGFnZSI6Mn0.rOexY_eF1nUjFJvpDbbbTTgpoVjxIh9ZbVs0Q6ggR"
+                "uQ"
+            ),
+            "back_page": (
+                "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0x"
+                "LCJ0b3RhbF9wYWdlcyI6MiwicG9zdHNfcGVyX3BhZ2UiOjEsI"
+                "mN1cnJlbnRfcGFnZSI6MX0.pkQCRbBgvwuozzSG6LK-kFGuxT"
+                "8YYsYN3m9g-AzquyM"
+            )
+        }
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.get(
+                "/api/v1/audio/playlist_songs",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_playlist')
+    def test_get_my_playlists_songs_fail_invalid_pid(self, mock_raise):
+        """
+        Ensure getting all the songs in a playlist fails if the pid sent is
+        invalid.
+        """
+        test_req_data = {
+            "pid": 1
+        }
+        mock_raise.side_effect = IndexError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.get(
+                "/api/v1/audio/playlist_songs",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_number_of_songs_in_playlist')
+    @mock.patch('backend.src.controllers.audio.controllers.get_playlist')
+    def test_get_my_playlists_songs_fail_not_permitted(self, mock_uid, mocked_num_songs):
+        """
+        Ensure getting all the songs in a playlist fails if the user is not
+        permitted to edit the playlist.
+        """
+        test_req_data = {
+            "pid": 1
+        }
+        mock_uid.return_value = [[None, 1]]
+        mocked_num_songs.return_value = 2
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.get(
+                "/api/v1/audio/playlist_songs",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_get_my_playlists_songs_fail_missing_pid(self):
+        """
+        Ensure getting all the songs in a playlist fails if a pid or scroll
+        tokens are not sent.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.get(
+                "/api/v1/audio/playlist_songs",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+            test_req_data = {
+                "pid": None
+            }
+            res = self.test_client.get(
+                "/api/v1/audio/playlist_songs",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_from_playlist')
+    @mock.patch('backend.src.controllers.audio.controllers.get_song_data')
+    @mock.patch('backend.src.controllers.audio.controllers.get_playlist')
+    def test_add_song_to_playlist_success(self, mocked_uid, mocked_song_data, mocked_raise):
+        """
+        Ensure adding songs to a playlist works.
+        """
+        test_req_data = {
+            "pid": 1,
+            "sid": 1
+        }
+        mocked_uid.return_value = [[None, -1]]
+        mocked_song_data.return_value = [
+            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, "http://fake.com", None, None, 8]
+        ]
+        mocked_raise.side_effect = NoResults
+        with mock.patch('backend.src.controllers.audio.controllers.add_to_playlist'):
+            with mock.patch('backend.src.controllers.audio.controllers.update_playlist_timestamp'):
+                with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+                    mock_token.return_value = {
+                        'uid': -1,
+                        'email': 'username2@fakemail.noshow',
+                        'username': 'username2',
+                        'verified': 1,
+                        'random_value': (
+                            'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                            'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                            'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                            'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                            'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                            'zeyvzkssMFUTdeEvzbKu'
+                        )
+                    }
+                    res = self.test_client.post(
+                        "/api/v1/audio/playlist_songs",
+                        json=test_req_data,
+                        headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                        follow_redirects=True
+                    )
+                    self.assertEqual(200, res.status_code)
+                    expected_body = {'message': 'Song added'}
+                    self.assertEqual(expected_body, json.loads(res.data))
+
+    def test_add_song_to_playlist_fail_missing_access_token(self):
+        """
+        Ensure adding songs to a playlist fails if no access_token is sent.
+        """
+        res = self.test_client.post(
+            "/api/v1/audio/playlist_songs",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_add_song_to_playlist_fail_access_token_expired(self):
+        """
+        Ensure adding songs to a playlist fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
+            res = self.test_client.post(
+                "/api/v1/audio/playlist_songs",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_add_song_to_playlist_fail_bad_access_token_signature(self):
+        """
+        Ensure adding songs to a playlist fails if the access_token signature
+        does not match the one configured on the server.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
+            res = self.test_client.post(
+                "/api/v1/audio/playlist_songs",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_add_song_to_playlist_fail_unknown_access_token_issue(self):
+        """
+        Ensure adding songs to a playlist fails if some unknown error relating
+        to the access_token occurs.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
+            res = self.test_client.post(
+                "/api/v1/audio/playlist_songs",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_add_song_to_playlist_fail_missing_pid(self):
+        """
+        Ensure adding songs to a playlist fails if a pid is not sent.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            test_req_data = {
+                "sid": 1
+            }
+            res = self.test_client.post(
+                "/api/v1/audio/playlist_songs",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+            test_req_data = {
+                "pid": None,
+                "sid": 1
+            }
+            res = self.test_client.post(
+                "/api/v1/audio/playlist_songs",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    def test_add_song_to_playlist_fail_missing_sid(self):
+        """
+        Ensure adding songs to a playlist fails if a title is not sent.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            test_req_data = {
+                "pid": 1
+            }
+            res = self.test_client.post(
+                "/api/v1/audio/playlist_songs",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+            test_req_data = {
+                "pid": 1,
+                "sid": None
+            }
+            res = self.test_client.post(
+                "/api/v1/audio/playlist_songs",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    def test_add_song_to_playlist_fail_missing_sid_and_pid(self):
+        """
+        Ensure adding songs to a playlist fails if a title and pid are not
+        sent.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.post(
+                "/api/v1/audio/playlist_songs",
+                json={},
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+            test_req_data = {
+                "pid": None,
+                "sid": None
+            }
+            res = self.test_client.post(
+                "/api/v1/audio/playlist_songs",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_playlist')
+    def test_add_song_to_playlist_fail_invalid_pid(self, mock_raise):
+        """
+        Ensure adding songs to a playlist fails if the pid sent is invalid.
+        """
+        test_req_data = {
+            "pid": 1,
+            "sid": 1
+        }
+        mock_raise.side_effect = IndexError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.post(
+                "/api/v1/audio/playlist_songs",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_playlist')
+    def test_add_song_to_playlist_fail_not_permitted(self, mock_uid):
+        """
+        Ensure adding songs to a playlist fails if the user is not permitted to
+        edit the playlist.
+        """
+        test_req_data = {
+            "pid": 1,
+            "sid": 1
+        }
+        mock_uid.return_value = [[None, 1]]
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.post(
+                "/api/v1/audio/playlist_songs",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_song_data')
+    @mock.patch('backend.src.controllers.audio.controllers.get_playlist')
+    def test_add_song_to_playlist_fail_invalid_sid(self, mocked_uid, mocke_raise):
+        """
+        Ensure adding songs to a playlist fails if the sid sent is invalid.
+        """
+        test_req_data = {
+            "pid": 1,
+            "sid": 1
+        }
+        mocked_uid.return_value = [[None, -1]]
+        mocke_raise.side_effect = NoResults
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.post(
+                "/api/v1/audio/playlist_songs",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_from_playlist')
+    @mock.patch('backend.src.controllers.audio.controllers.get_song_data')
+    @mock.patch('backend.src.controllers.audio.controllers.get_playlist')
+    def test_add_song_to_playlist_fail_song_private(self, mock_uid, mocked_song_data, mocked_playlist_item):
+        """
+        Ensure adding songs to a playlist fails if the user is not permitted to
+        edit the playlist.
+        """
+        test_req_data = {
+            "pid": 1,
+            "sid": 1
+        }
+        mock_uid.return_value = [[None, -1]]
+        mocked_song_data.return_value = [
+            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, "http://fake.com", None, None, 8]
+        ]
+        mocked_playlist_item.return_value = [
+            [1, 1]
+        ]
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.post(
+                "/api/v1/audio/playlist_songs",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_playlist')
+    def test_remove_song_from_playlist_success(self, mocked_uid):
+        """
+        Ensure removing songs from a playlist works.
+        """
+        test_req_data = {
+            "pid": 1,
+            "sid": 1
+        }
+        mocked_uid.return_value = [[None, -1]]
+        with mock.patch('backend.src.controllers.audio.controllers.remove_from_playlist'):
+            with mock.patch('backend.src.controllers.audio.controllers.update_playlist_timestamp'):
+                with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+                    mock_token.return_value = {
+                        'uid': -1,
+                        'email': 'username2@fakemail.noshow',
+                        'username': 'username2',
+                        'verified': 1,
+                        'random_value': (
+                            'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                            'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                            'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                            'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                            'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                            'zeyvzkssMFUTdeEvzbKu'
+                        )
+                    }
+                    res = self.test_client.delete(
+                        "/api/v1/audio/playlist_songs",
+                        json=test_req_data,
+                        headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                        follow_redirects=True
+                    )
+                    self.assertEqual(200, res.status_code)
+                    expected_body = {'message': 'Song removed'}
+                    self.assertEqual(expected_body, json.loads(res.data))
+
+    def test_remove_song_from_playlist_fail_missing_access_token(self):
+        """
+        Ensure removing songs from a playlist fails if no access_token is sent.
+        """
+        res = self.test_client.delete(
+            "/api/v1/audio/playlist_songs",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_remove_song_from_playlist_fail_access_token_expired(self):
+        """
+        Ensure removing songs from a playlist fails if the access_token is
+        expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
+            res = self.test_client.delete(
+                "/api/v1/audio/playlist_songs",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_remove_song_from_playlist_fail_bad_access_token_signature(self):
+        """
+        Ensure removing songs from a playlist fails if the access_token
+        signature does not match the one configured on the server.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
+            res = self.test_client.delete(
+                "/api/v1/audio/playlist_songs",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_remove_song_from_playlist_fail_unknown_access_token_issue(self):
+        """
+        Ensure removing songs from a playlist fails if some unknown error
+        relating to the access_token occurs.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
+            res = self.test_client.delete(
+                "/api/v1/audio/playlist_songs",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_remove_song_from_playlist_fail_missing_pid(self):
+        """
+        Ensure removing songs from a playlist fails if a pid is not sent.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            test_req_data = {
+                "sid": 1
+            }
+            res = self.test_client.delete(
+                "/api/v1/audio/playlist_songs",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+            test_req_data = {
+                "pid": None,
+                "sid": 1
+            }
+            res = self.test_client.delete(
+                "/api/v1/audio/playlist_songs",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    def test_remove_song_from_playlist_fail_missing_sid(self):
+        """
+        Ensure removing songs from a playlist fails if a title is not sent.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            test_req_data = {
+                "pid": 1
+            }
+            res = self.test_client.delete(
+                "/api/v1/audio/playlist_songs",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+            test_req_data = {
+                "pid": 1,
+                "sid": None
+            }
+            res = self.test_client.delete(
+                "/api/v1/audio/playlist_songs",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    def test_remove_song_from_playlist_fail_missing_sid_and_pid(self):
+        """
+        Ensure removing songs from a playlist fails if a title and pid are not
+        sent.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.delete(
+                "/api/v1/audio/playlist_songs",
+                json={},
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+            test_req_data = {
+                "pid": None,
+                "sid": None
+            }
+            res = self.test_client.delete(
+                "/api/v1/audio/playlist_songs",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_playlist')
+    def test_remove_song_from_playlist_fail_invalid_pid(self, mock_raise):
+        """
+        Ensure removing songs from a playlist fails if the pid sent is invalid.
+        """
+        test_req_data = {
+            "pid": 1,
+            "sid": 1
+        }
+        mock_raise.side_effect = IndexError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.delete(
+                "/api/v1/audio/playlist_songs",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_playlist')
+    def test_remove_song_from_playlist_fail_not_permitted(self, mock_uid):
+        """
+        Ensure removing songs from a playlist fails if the user is not
+        permitted to edit the playlist.
+        """
+        test_req_data = {
+            "pid": 1,
+            "sid": 1
+        }
+        mock_uid.return_value = [[None, 1]]
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.delete(
+                "/api/v1/audio/playlist_songs",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)

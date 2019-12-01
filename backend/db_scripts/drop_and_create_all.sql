@@ -8,6 +8,8 @@ DROP TABLE `musicloud_db`.`Followers`;
 DROP TABLE `musicloud_db`.`Song_State`;
 DROP TABLE `musicloud_db`.`Users`;
 DROP TABLE `musicloud_db`.`Songs`;
+DROP TABLE `musicloud_db`.`Playlists`;
+DROP TABLE `musicloud_db`.`Playlist_State`;
 
 CREATE TABLE `musicloud_db`.`Users` (
     `uid` INT UNIQUE NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -84,4 +86,20 @@ CREATE TABLE `musicloud_db`.`Song_State` (
     `state` JSON NOT NULL,
     `time_updated` DATETIME NOT NULL,
     FOREIGN KEY (sid) REFERENCES Songs(sid)
+);
+
+CREATE TABLE `musicloud_db`.`Playlists` (
+    `pid` INT UNIQUE NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `uid` INT NOT NULL,
+    `title` VARCHAR(100) NOT NULL,
+    `created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (uid) REFERENCES Users(uid)
+);
+
+CREATE TABLE `musicloud_db`.`Playlist_State` (
+    `pid` INT  NOT NULL,
+    `sid` INT NOT NULL,
+    FOREIGN KEY (sid) REFERENCES Songs(sid),
+    FOREIGN KEY (pid) REFERENCES Playlists(pid)
 );

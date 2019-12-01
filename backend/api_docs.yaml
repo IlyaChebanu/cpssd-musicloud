@@ -1529,9 +1529,6 @@ paths:
                     cover:
                       type: "string"
                       example: "None"
-                    genre:
-                      type: "string"
-                      example: "None"
                     likes:
                       type: "string"
                       example: 8
@@ -1652,9 +1649,6 @@ paths:
                       type: "string"
                       example: "None"
                     cover:
-                      type: "string"
-                      example: "None"
-                    genre:
                       type: "string"
                       example: "None"
                     likes:
@@ -1782,9 +1776,6 @@ paths:
                       type: "string"
                       example: "None"
                     cover:
-                      type: "string"
-                      example: "None"
-                    genre:
                       type: "string"
                       example: "None"
                     likes:
@@ -2155,9 +2146,6 @@ paths:
                   cover:
                     type: "string"
                     example: "None"
-                  genre:
-                    type: "string"
-                    example: "None"
                   likes:
                     type: "string"
                     example: 8
@@ -2411,4 +2399,574 @@ paths:
               message:
                 type: "string"
                 example: "MySQL unavailable."
+                
+  /audio/playlist:
+    post:
+      tags:
+      - "audio"
+      summary: "Create a new playlist"
+      description: "Create an empty playlist you can add songs too later"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "Send the name of the new playlist"
+          required: true
+          schema:
+            type: "object"
+            properties:
+              title:
+                type: "string"
+                example: "A great playlist"
+      responses:
+        200:
+          description: "Playlist Created"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Playlist created"
+              pid:
+                type: "integer"
+                example: 1
+        401:
+          description: "Access_token missing or expired."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Request missing access_token."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable"
+    delete:
+      tags:
+      - "audio"
+      summary: "Delete a playlist"
+      description: "Deletes the request playlist if the user has permission to delete it."
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "Send the pid of the playlist you want to delete."
+          required: true
+          schema:
+            type: "object"
+            properties:
+              pid:
+                type: "integer"
+                example: 1
+      responses:
+        200:
+          description: "Playlist Deleted"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Playlist deleted"
+        401:
+          description: "Access_token missing or expired."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Request missing access_token."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable"
+    get:
+      tags:
+      - "audio"
+      summary: "Get all of your playlists."
+      description: "This endpoint takes several arguments and returns a subset of the playlists, of a particular user. The arguments that can be provided are as follows:\n\n \"playlists_per_page\" = If a 'next_page' or 'back_page' argument is not sent, then this an optional argument you may send. This is used to adjust the number of playlists you will get back per page of results.\n\n \"current_page\" = If a 'next_page' or 'back_page' argument is not sent, then this is an optional argument you may send. This is used to navigate through each of the pages of results. If this argument is not sent, the default page of results returned will be page 1.\n\n \"next_page\" = If this value is sent, then a back_page value should not be sent. This value should be set to a 'next_page' token. These tokens are returned by standard requests to support infinited scrolling. Making a request with this token requires no other value to be passed as it encodes all required data for the next request.\n\n \"back_page\" = If this value is sent, then a next_page value should not be sent. This value should be set to a 'back_page' token. These tokens are returned by standard requests to support infinited scrolling. Making a request with this token requires no other value to be passed as it encodes all required data for the next request."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "query"
+          name: "current_page"
+          type: "string"
+          required: false
+          description: "The page of results you wish to view."
+        - in: "query"
+          name: "playlists_per_page"
+          type: "string"
+          required: false
+          description: "The number of playlists you wish to have per page of results."
+        - in: "query"
+          name: "next_page"
+          type: "string"
+          required: false
+          description: "A next page token to get the next page of results."
+        - in: "query"
+          name: "back_page"
+          type: "string"
+          required: false
+          description: "A back_page token to get the previous page of results."
+      responses:
+        200:
+          description: "Query made successfully"
+          schema:
+            type: "object"
+            properties:
+              back_page:
+                type: "string"
+                example: "will be null or a token"
+              current_page:
+                type: "integer"
+                example: 1
+              next_page:
+                type: "string"
+                example: "will be null or a token"
+              playlists:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    pid:
+                      type: "integer"
+                      example: 1
+                    username:
+                      type: "string"
+                      example: "AUsername"
+                    title:
+                      type: "string"
+                      example: "A Playlist"
+                    created:
+                      type: "string"
+                      example: '2019-11-29 15:15:35.533935'
+                    updated:
+                      type: "string"
+                      example: '2019-11-29 15:15:35.533935'
+              playlists_per_page:
+                type: "integer"
+                example: 50
+              total_pages:
+                type: "integer"
+                example: 2
+        401:
+          description: "User's token has expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Failed to decode token."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+    patch:
+      tags:
+      - "audio"
+      summary: "Rename a playlist"
+      description: "Rename one of your existing playlists."
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "Send the new name of the playlist & the pid"
+          required: true
+          schema:
+            type: "object"
+            properties:
+              title:
+                type: "string"
+                example: "A great playlist"
+              pid:
+                type: "integer"
+                example: 1
+      responses:
+        200:
+          description: "Playlist Renamed"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Playlist renamed"
+        401:
+          description: "Access_token missing or expired."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Request missing access_token."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable"
+                
+  /audio/playlist_songs:
+    post:
+      tags:
+      - "audio"
+      summary: "Add a song to your playlist"
+      description: "Add a song to a playlist you own"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "Send the pid of the playlist you want to add to & the sid of the song you wish to add."
+          required: true
+          schema:
+            type: "object"
+            properties:
+              pid:
+                type: "integer"
+                example: 1
+              sid:
+                type: "integer"
+                example: 1
+      responses:
+        200:
+          description: "Song Added"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Song added"
+        401:
+          description: "Access_token missing or expired."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Request missing access_token."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable"
+    delete:
+      tags:
+      - "audio"
+      summary: "Delete a song from your playlist"
+      description: "Deletes the request song from the selected playlist if the user has permission to delete it."
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "Send the pid of the playlist you want to delete from & the sid of the song you wish to delete from it."
+          required: true
+          schema:
+            type: "object"
+            properties:
+              pid:
+                type: "integer"
+                example: 1
+              sid:
+                type: "integer"
+                example: 1
+      responses:
+        200:
+          description: "Song deleted from playlist."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Song removed"
+        401:
+          description: "Access_token missing or expired."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Request missing access_token."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable"
+    get:
+      tags:
+      - "audio"
+      summary: "Get all of the songs in a selected playlist."
+      description: "This endpoint takes several arguments and returns a subset of the songs in a playlist, of a particular user. The arguments that can be provided are as follows:\n\n \"pid\" = If a 'next_page' or 'back_page' argument is not sent, then this is a mandatory argument you must send. This should be set to the pid of the playlist who's songs you are trying to view. \n\n \"songs_per_page\" = If a 'next_page' or 'back_page' argument is not sent, then this an optional argument you may send. This is used to adjust the number of songs you will get back per page of results.\n\n \"current_page\" = If a 'next_page' or 'back_page' argument is not sent, then this is an optional argument you may send. This is used to navigate through each of the pages of results. If this argument is not sent, the default page of results returned will be page 1.\n\n \"next_page\" = If this value is sent, then a back_page value should not be sent. This value should be set to a 'next_page' token. These tokens are returned by standard requests to support infinited scrolling. Making a request with this token requires no other value to be passed as it encodes all required data for the next request.\n\n \"back_page\" = If this value is sent, then a next_page value should not be sent. This value should be set to a 'back_page' token. These tokens are returned by standard requests to support infinited scrolling. Making a request with this token requires no other value to be passed as it encodes all required data for the next request."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "query"
+          name: "pid"
+          type: "integer"
+          required: false
+          description: "PID of the playlist who's songs you wish to retrieve"
+        - in: "query"
+          name: "current_page"
+          type: "string"
+          required: false
+          description: "The page of results you wish to view."
+        - in: "query"
+          name: "songs_per_page"
+          type: "string"
+          required: false
+          description: "The number of playlists you wish to have per page of results."
+        - in: "query"
+          name: "next_page"
+          type: "string"
+          required: false
+          description: "A next page token to get the next page of results."
+        - in: "query"
+          name: "back_page"
+          type: "string"
+          required: false
+          description: "A back_page token to get the previous page of results."
+      responses:
+        200:
+          description: "Query made successfully"
+          schema:
+            type: "object"
+            properties:
+              back_page:
+                type: "string"
+                example: "will be null or a token"
+              current_page:
+                type: "integer"
+                example: 1
+              next_page:
+                type: "string"
+                example: "will be null or a token"
+              songs:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    sid:
+                      type: "integer"
+                      example: 1
+                    username:
+                      type: "string"
+                      example: "testUser"
+                    title:
+                      type: "string"
+                      example: "A test song"
+                    duration:
+                      type: "integer"
+                      example: 1
+                    created:
+                      type: "string"
+                      example: "Wed, 13 Nov 2019 17:07:39 GMT"
+                    public:
+                      type: "integer"
+                      example: 1
+                    url:
+                      type: "string"
+                      example: "None"
+                    cover:
+                      type: "string"
+                      example: "None"
+                    likes:
+                      type: "string"
+                      example: 8
+              songs_per_page:
+                type: "integer"
+                example: 50
+              total_pages:
+                type: "integer"
+                example: 2
+        401:
+          description: "User's token has expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Failed to decode token."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+                
 x-aws-api-id: 'fvg2nhhlzk'
