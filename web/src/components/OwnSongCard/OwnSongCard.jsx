@@ -1,11 +1,11 @@
 import React, { memo } from 'react';
 import PropTypes from 'prop-types';
-import styles from './SongCard.module.scss';
+import styles from './OwnSongCard.module.scss';
 import ProfilePicture from '../../assets/profiler.jpg';
-import CircularImage from '../CircularImage';
+import CircularImage from '../CircularImage/CircularImage';
 import CloudQuestion from '../../assets/cloud-question.jpg';
 
-const SongCard = memo((props) => {
+const OwnSongCard = memo((props) => {
   const { className, profiler } = props;
   return (
 
@@ -14,25 +14,23 @@ const SongCard = memo((props) => {
       <img alt="song cover art" className={styles.thumbnail} src={CloudQuestion} />
     </div>
     <div className={styles.details}>
-      <p className={styles.title}>A song</p>
-      <span>
-        <CircularImage className={styles.profilePic} src={ProfilePicture} />
-        <p className={styles.username}>Napstalgic</p>
-      </span>
+      <p className={styles.title}>{props.songName}</p>
     </div>
   </div>
   )
 }
 );
 
-SongCard.propTypes = {
+OwnSongCard.propTypes = {
   className: PropTypes.string,
+  songName: PropTypes.string,
 };
 
-SongCard.defaultProps = {
+OwnSongCard.defaultProps = {
   className: '',
+  songName: '',
 };
 
-SongCard.displayName = 'SongCard';
+OwnSongCard.displayName = 'OwnSongCard';
 
-export default SongCard;
+export default OwnSongCard;

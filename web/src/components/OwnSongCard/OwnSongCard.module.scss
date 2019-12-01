@@ -1,0 +1,39 @@
+.wrapper {
+  height: 233px;
+  width: 150px;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 25px;
+  background-color: #54565A;
+}
+
+.title {
+  font-weight: 700;
+  color: white;
+  font-size: 14px;
+  
+  margin: 8px;
+  
+}
+
+.details {
+  display: flex;
+  position: relative;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.thumbWrapper {
+  width: 150px;
+  height: 190px;
+  overflow: hidden;
+  border-radius: 25px;
+  position: relative;
+  display: inline-block;
+
+  img {
+    width: auto;
+    height: 100%;
+    margin-left: -50%;
+  }
+}

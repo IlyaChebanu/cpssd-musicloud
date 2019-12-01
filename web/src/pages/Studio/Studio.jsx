@@ -26,7 +26,7 @@ import SeekBar from '../../components/SeekBar';
 import TrackControls from '../../components/TrackControls';
 import Button from '../../components/Button';
 import PlayBackControls from '../../components/PlaybackControls';
-
+import SongPicker from '../../components/SongPicker'
 import Track from '../../components/Track/Track';
 
 import { saveState } from '../../helpers/api';
@@ -37,8 +37,7 @@ const Studio = memo((props) => {
 
   useUpdateUserDetails();
 
-  useEffect(() => {
-    dispatch(setTracks([
+  const exampleSong = [
       {
         volume: 0.1,
         mute: false,
@@ -310,8 +309,16 @@ const Studio = memo((props) => {
           },
         ],
       },
-    ]));
-  }, [dispatch]);
+    ]
+  //   ));
+  // }, [dispatch]);
+    
+  
+
+  // useEffect(() => {
+  //   dispatch(setTracks([  
+  //   ]))
+  // }, [dispatch]);
 
   const handleScroll = useCallback((e) => {
     dispatch(setScroll(e.target.scrollLeft));
@@ -355,9 +362,10 @@ const Studio = memo((props) => {
   const trackControlsStyle = useMemo(() => ({
     transform: `translateY(${-studio.scrollY}px)`,
   }), [studio.scrollY]);
-
+  
   return (
     <div className={styles.wrapper}>
+
       <Header selected={0}>
         <Button
           className={styles.saveButton}
@@ -368,8 +376,8 @@ const Studio = memo((props) => {
       </Header>
       <div className={styles.contentWrapper}>
         <SeekBar />
-        <div className={styles.sidebar}>
-          <TimelineControls />
+        <div  className={styles.sidebar}>
+          <TimelineControls/>
           <div style={trackControlsStyle}>
             {tracks.map((track, i) => <TrackControls key={i} track={track} index={i} />)}
             <div
@@ -385,13 +393,17 @@ const Studio = memo((props) => {
         <div className={styles.scrollableMain} onScroll={handleScroll}>
           <div className={styles.mainContent}>
             <Timeline />
+            <div className={styles.songPicker}>
+        <SongPicker exampleSong={exampleSong} songs={[]}/>
+      </div>
+
             <div className={styles.tracks}>
               {renderableTracks}
             </div>
           </div>
         </div>
       </div>
-      <PlayBackControls />
+      <PlayBackControls style={{"pointer-events":"none"}}/>
     </div>
   );
 });
