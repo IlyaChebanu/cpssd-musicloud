@@ -863,6 +863,8 @@ def update_silence_notificaitons_status(uid, status):
     :param uid:
     Int - Uid of the user you wish to change the silence_notificaitons status
     of.
+    :param status:
+    Int - 0 for send notifications, 1 for mute notifications.
     :return:
     None - Updates the user's silence_notificaitons status and returns None.
     """

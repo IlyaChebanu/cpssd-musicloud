@@ -1,3 +1,4 @@
+# pylint: disable=C0302
 """
 /users API controller code.
 """
@@ -29,7 +30,7 @@ from ...models.users import (
     reset_email, update_profiler_url, get_following_names, get_follower_names,
     get_timeline, get_timeline_length, get_timeline_posts_only,
     get_timeline_posts_only_length, get_timeline_song_only,
-    get_timeline_song_only_length
+    get_timeline_song_only_length, update_silence_notificaitons_status
 )
 from ...models.verification import insert_verification, get_verification
 from ...middleware.auth_required import auth_required
@@ -258,7 +259,8 @@ def user():
         "following": following_data,
         "songs": songs,
         "posts": user_posts,
-        "likes": likes
+        "likes": likes,
+        "notification_status": user_data[0][6]
     }, 200
 
 
@@ -983,3 +985,35 @@ def timeline(user_data):  # pylint:disable=R0912, R0914, R0915
         "back_page": back_page,
         "timeline": res
     }, 200
+
+
+@USERS.route("/notifications", methods=["PATCH"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def patch_notification_status(user_data):
+    """
+    Endpoint to change a user's notification preferences.
+    """
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "status": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1
+            }
+        },
+        "required": ["status"],
+        "minProperties": 1
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    update_silence_notificaitons_status(
+        user_data.get("uid"), request.json.get("status")
+    )
+
+    return {"message": "Notification preferences updated"}, 200

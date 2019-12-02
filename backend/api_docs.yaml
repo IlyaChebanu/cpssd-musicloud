@@ -559,6 +559,9 @@ paths:
               username:
                 type: "string"
                 example: "TestUser"
+              notification_status:
+                type: "integer"
+                example: 0
         401:
           description: "Access_token expired"
           schema:
@@ -721,6 +724,73 @@ paths:
               message:
                 type: "string"
                 example: "Duplicate entry"
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Error while hashing password."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+                
+  /users/notifications:
+    patch:
+      tags:
+      - "users"
+      summary: "Mute/Unmute a user's notifications"
+      description: "Changes the user's notification status between muted(0) & unmuted(1).\n\nThe status sent may only be 1 or 0."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "Authorization Header"
+        description: "This is where you should set your access_token."
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "Notification status\n\n0 - Unmuted\n\n1 - muted"
+        schema:
+          type: "object"
+          properties:
+            status:
+              type: "integer"
+              example: 0
+      responses:
+        200:
+          description: "Status updated"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Notification preferences updated"
+        401:
+          description: "Bad credentials."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Incorrect password!"
         422:
           description: "Malformed request body."
           schema:
