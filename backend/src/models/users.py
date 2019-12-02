@@ -812,3 +812,67 @@ def get_timeline_song_only_length(uid):
     if not res:
         return 0
     return res[0][0]
+
+
+def register_device_for_notifications(did, uid):
+    """
+    Adds a device to the notifications table.
+    :param did:
+    Int - Unique ID of the mobile device.
+    :param uid:
+    Int - Uid of the user who owns the device.
+    :return:
+    None - Adds device to the notifications table and returns None.
+    """
+    sql = (
+        "INSERT INTO Notifications "
+        "(did, uid) "
+        "VALUES (%s, %s);"
+    )
+    args = (
+        did,
+        uid,
+    )
+    query(sql, args)
+
+
+def unregister_device_for_notifications(did, uid):
+    """
+    Removes a device from the notifications table.
+    :param did:
+    Int - Unique ID of the mobile device.
+    :param uid:
+    Int - Uid of the user who owns the device.
+    :return:
+    None - Removes the device from the notifications table and returns None.
+    """
+    sql = (
+        "DELETE FROM Notifications "
+        "WHERE did=%s AND uid=%s"
+    )
+    args = (
+        did,
+        uid,
+    )
+    query(sql, args)
+
+
+def update_silence_notificaitons_status(uid, status):
+    """
+    Update the silence_notificaitons column in the Users table.
+    :param uid:
+    Int - Uid of the user you wish to change the silence_notificaitons status
+    of.
+    :return:
+    None - Updates the user's silence_notificaitons status and returns None.
+    """
+    sql = (
+        "UPDATE Users "
+        "SET silence_notificaitons = %s "
+        "WHERE uid = %s"
+    )
+    args = (
+        status,
+        uid,
+    )
+    query(sql, args)
