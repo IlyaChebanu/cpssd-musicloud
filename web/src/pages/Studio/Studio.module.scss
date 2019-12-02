@@ -7,6 +7,22 @@
   overflow: hidden;
 }
 
+.trackControls {
+  width: 220px;
+}
+
+.content {
+  width: 100%;
+  overflow-y: hidden;
+  display: flex;
+  min-height: 100%;
+}
+
+.scrollable {
+  height: calc(100vh - 200px);
+  overflow-y: scroll;
+}
+
 .sidebar {
   width: 220px;
   height: 100%;
@@ -26,10 +42,8 @@
 
 .mainContent {
   width: 150%;
-  // height: 100%;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
   margin-bottom: 100px;
-  // overflow-y: scroll;
 }
 
 .newTrack {
@@ -58,8 +72,9 @@
 }
 
 .tracks {
-  height: calc(100vh - 200px);
-  overflow-y: scroll;
+  width: calc(100vw - 220px);
+  overflow-x: scroll;
+  overflow-y: hidden;
 }
 
 .track:last-child {

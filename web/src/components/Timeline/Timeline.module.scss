@@ -1,5 +1,5 @@
 .outerWrap {
-  display: flex;
+  display: inline-flex;
 }
 
 .wrapper {
@@ -16,7 +16,7 @@
   width: 100%;
 
   .bottom {
-    width: 40000px;
+    width: 100%;
     height: 1px;
     fill: #838383;
   }

@@ -4,7 +4,6 @@ import styles from './MusicSearch.module.scss';
 import InputField from '../InputField';
 import { ReactComponent as SortIcon } from '../../assets/icons/sort-alt-light.svg';
 import { ReactComponent as SortDuotoneIcon } from '../../assets/icons/sort-duotone.svg';
-// import { ReactComponent as SortUpDuotoneIcon } from '../../assets/icons/sort-up-duotone.svg';
 
 const MusicSearch = memo((props) => {
   const { className } = props;

@@ -40,7 +40,7 @@ const TimelineControls = memo((props) => {
 
   const handleGridSnapClick = useCallback(() => {
     dispatch(setGridSnapEnabled(!gridSnapEnabled));
-  }, [dispatch, gridSnapEnabled])
+  }, [dispatch, gridSnapEnabled]);
 
   const handleLoopClick = useCallback(() => {
     dispatch(setLoopEnabled(!loopEnabled));
