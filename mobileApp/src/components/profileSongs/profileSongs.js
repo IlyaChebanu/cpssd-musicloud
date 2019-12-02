@@ -38,11 +38,19 @@ class ProfileSongs extends React.Component {
     // this.props.navigation.navigate('Player')
   }
 
+  handleFollowerClick() {
+    this.props.handleFollowersClick()
+  }
+  
+  handleFollowingClick() {
+    this.props.handleFollowingsClick()
+  }
+
   renderheader() {
     return (
       <View style={styles.container}>
         <Text style={styles.profileTitleText}>{"PROFILE"}</Text>
-        <ProfileComponent accessToken={this.props.accessToken} username={this.props.username} />
+        <ProfileComponent handleFollowerClick={this.handleFollowerClick.bind(this)} handleFollowingClick={this.handleFollowingClick.bind(this)} accessToken={this.props.accessToken} username={this.props.username} />
         <Text style={styles.titleText}>{"Songs"}</Text>
         {this.state.songsData.length === 0 ? <Text style={styles.noSongsText}>{'User has no songs yet'}</Text> : null}
       </View>
