@@ -395,7 +395,7 @@ paths:
       tags:
       - "auth"
       summary: "Login using a username and a password"
-      description: "By passing a user's username along with their password to this request as part of the request body, if the user exists in the database, an access token will be returned to them. The user should be verified in order to log in."
+      description: "By passing a user's username along with their password to this request as part of the request body, if the user exists in the database, an access token will be returned to them. The user should be verified in order to log in.\n\nIf a device ID (did) is sent in the request body, it will be saved for the purpose of sending push notifications later (OPTIONAL)."
       consumes:
       - "application/json"
       produces:
@@ -404,7 +404,7 @@ paths:
       - in: "body"
         name: "body"
         description: "User to be logged in."
-        required: true
+        required: false
         schema:
           type: "object"
           properties:
@@ -414,6 +414,9 @@ paths:
             password:
               type: "string"
               example: "SecurePassword"
+            did:
+              type: "string"
+              example: "efoewjoigreong24235f"
       responses:
         200:
           description: "Logged in"
@@ -461,7 +464,7 @@ paths:
       tags:
       - "auth"
       summary: "Deauthorise a token"
-      description: "By passing an access_token to this endpoint in the request header, the corrisponding token will be removed the Logins table. This means that the passed token will no longer be valid for use with access_token protected endpoints."
+      description: "By passing an access_token to this endpoint in the request header, the corrisponding token will be removed the Logins table. This means that the passed token will no longer be valid for use with access_token protected endpoints. \n\nIf a device ID (did) is sent in the request body, it will be used for the purpose of stopping push notifications being sent later (OPTIONAL)."
       consumes:
       - "application/json"
       produces:
@@ -472,6 +475,16 @@ paths:
           description: "This is where you should set your access_token."
           required: true
           type: "string"
+        - in: "body"
+          name: "body"
+          description: "Device ID to be removed from the Notifications table"
+          required: false
+          schema:
+            type: "object"
+            properties:
+              did:
+                type: "string"
+                example: "efoewjoigreong24235f"
       responses:
         200:
           description: "successful query"
