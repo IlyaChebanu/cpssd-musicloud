@@ -16,7 +16,7 @@ const Looper = memo((props) => {
     const initialLoopStart = loopStart;
     const handleMouseMove = (e) => {
       e.preventDefault();
-      const start = initialLoopStart + (e.screenX - mouseStartPos) / 40 / window.devicePixelRatio;
+      const start = initialLoopStart + (e.screenX - mouseStartPos) / (40 * gridSize) / window.devicePixelRatio;
       const numDecimalPlaces = Math.max(0, String(1 / gridSize).length - 2);
       dispatch(setLoop({
         start: Math.min(
@@ -42,7 +42,7 @@ const Looper = memo((props) => {
     const initialLoopEnd = loopEnd;
     const handleMouseMove = (e) => {
       e.preventDefault();
-      const stop = initialLoopEnd + (e.screenX - mouseStartPos) / 40 / window.devicePixelRatio;
+      const stop = initialLoopEnd + (e.screenX - mouseStartPos) / (40 * gridSize) / window.devicePixelRatio;
       const numDecimalPlaces = Math.max(0, String(1 / gridSize).length - 2);
       dispatch(setLoop({
         start: loopStart,
@@ -64,9 +64,9 @@ const Looper = memo((props) => {
   }, [loopEnd, gridSize, dispatch, loopStart, gridSnapEnabled]);
 
   const wrapperStyle = useMemo(() => ({
-    transform: `translate(${(loopStart - 1) * 40}px, 0)`,
-    width: `${(loopEnd - loopStart) * 40}px`,
-  }), [loopStart, loopEnd]);
+    transform: `translate(${(loopStart - 1) * (40 * gridSize)}px, 0)`,
+    width: `${(loopEnd - loopStart) * (40 * gridSize)}px`,
+  }), [loopStart, gridSize, loopEnd]);
 
   return (
     <div className={`${styles.wrapper} ${loopEnabled ? styles.loopEnabled : ''}`} style={wrapperStyle}>

@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 export default (
   state = {
     loop: {
@@ -74,14 +75,17 @@ export default (
         tracks,
       };
     case 'SET_SAMPLE_TIME':
-      tracks = [...state.tracks];
-      tracks.forEach((track) => {
-        track.samples.forEach((s) => {
-          const sample = { ...s };
+      tracks = state.tracks.map((track) => {
+        track.samples = track.samples.map((sample) => {
           if (sample.id === action.id) {
-            sample.time = action.time;
+            return {
+              ...sample,
+              time: action.time,
+            };
           }
+          return sample;
         });
+        return track;
       });
       return {
         ...state,
