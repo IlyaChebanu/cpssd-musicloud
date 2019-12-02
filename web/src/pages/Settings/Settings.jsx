@@ -72,14 +72,14 @@ const Settings = memo((props) => {
         <h1>User settings</h1>
         <p className={styles.settingsError}>{errorText}</p>
         <form onSubmit={handleSubmit}>
-          <title className={styles.sectionTitle}>Provide current password (required)</title>
+          <title className={styles.sectionTitle}>Current password</title>
           <InputField animate onChange={setPassword} name="password" placeholder="Password" borderColour={passwordBorder} password />
           <title className={styles.sectionTitle}>Change email</title>
           <InputField animate onChange={setEmail} name="email" placeholder="Email" borderColour={emailBorder} />
           <title className={styles.sectionTitle}>Change password</title>
           <InputField animate onChange={setNewPassword} name="newPassword" placeholder="New password" borderColour={newPasswordBorder} password sideContent={passwordStrength} />
           <InputField animate onChange={setRepeatPassword} name="passwordRepeat" placeholder="Repeat password" borderColour={repeatPasswordBorder} password />
-          <SubmitButton text="Save changes" />
+          <SubmitButton className={styles.submit} text="Save changes" />
         </form>
       </div>
     </div>
