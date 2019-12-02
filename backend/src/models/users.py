@@ -218,13 +218,13 @@ def get_followers(uid):
     return query(sql, args, True)
 
 
-def get_following_pair(username_a, username_b):
+def get_following_pair(uid_a, uid_b):
     """
     Get a specific follow relation from the DB.
-    :param username_a:
-    Str - Username of the user who is the follower.
-    :param username_b:
-    Str - Username of the user who is being followed.
+    :param uid_a:
+    Int - Uid of the user who is the follower.
+    :param uid_b:
+    Int - Uid of the user who is being followed.
     :return:
     List - Empty if follow relation doesn't exists, else contains 1 list with,
     user a's uid & user b's uid.
@@ -234,8 +234,8 @@ def get_following_pair(username_a, username_b):
         "WHERE follower = %s AND following = %s"
     )
     args = (
-        username_a,
-        username_b,
+        uid_a,
+        uid_b,
     )
     return query(sql, args, True)
 

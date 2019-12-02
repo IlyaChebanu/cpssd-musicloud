@@ -67,11 +67,11 @@ def follow(user_data):
         return {"message": "You cannot follow your self"}, 422
 
     other_user_followers = get_following_pair(
-        user_data.get("username"), other_user[2]
+        user_data.get("uid"), other_user[0]
     )
 
-    if (user_data.get("username"), other_user[2]) not in other_user_followers:
-        post_follow(user_data.get("username"), other_user[2])
+    if (user_data.get("uid"), other_user[0]) not in other_user_followers:
+        post_follow(user_data.get("uid"), other_user[0])
 
     return {
         "message": "You are now following: " + request.json.get("username")
@@ -103,10 +103,10 @@ def unfollow(user_data):
 
     other_user = get_user_via_username(request.json.get("username"))[0]
 
-    if other_user[2] == user_data.get("username"):
+    if other_user[0] == user_data.get("uid"):
         return {"message": "You cannot unfollow your self"}, 422
 
-    post_unfollow(user_data.get("username"), other_user[2])
+    post_unfollow(user_data.get("uid"), other_user[0])
 
     return {
         "message": (
