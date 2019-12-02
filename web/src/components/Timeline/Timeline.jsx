@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styles from './Timeline.module.scss';
 import Looper from '../Looper';
+import TimelineControls from '../TimelineControls';
 
 const Timeline = memo(({ gridSize }) => {
   const ticks = useMemo(() => (
@@ -17,13 +18,16 @@ const Timeline = memo(({ gridSize }) => {
   ), [gridSize]);
 
   return (
-    <div className={styles.wrapper}>
-      <svg className={styles.ticks}>
-        <rect y={29} className={styles.bottom} />
-        {ticks}
-        {numbers}
-      </svg>
-      <Looper />
+    <div className={styles.outerWrap}>
+      <TimelineControls />
+      <div className={styles.wrapper}>
+        <svg className={styles.ticks}>
+          <rect y={29} className={styles.bottom} />
+          {ticks}
+          {numbers}
+        </svg>
+        <Looper />
+      </div>
     </div>
   );
 });

@@ -353,7 +353,9 @@ const Studio = memo((props) => {
   }, [studio.tempo, studio.songId, tracks, dispatch]);
 
   const trackControlsStyle = useMemo(() => ({
-    transform: `translateY(${-studio.scrollY}px)`,
+    // transform: `translateY(${-studio.scrollY}px)`,
+    overflow: 'scroll',
+    height: 'calc(100vh - 200px)',
   }), [studio.scrollY]);
 
   return (
@@ -368,28 +370,28 @@ const Studio = memo((props) => {
       </Header>
       <div className={styles.contentWrapper}>
         <SeekBar />
-        <div className={styles.sidebar}>
-          <TimelineControls />
-          <div style={trackControlsStyle}>
-            {tracks.map((track, i) => <TrackControls key={i} track={track} index={i} />)}
-            <div
-              className={`${styles.newTrack} ${tracks.length % 2 !== 1 ? styles.even : ''}`}
-              onClick={handleAddNewTrack}
-              role="button"
-              tabIndex={0}
-            >
-              Add new track
-            </div>
+        {/* <TimelineControls /> */}
+        <Timeline />
+        <div style={trackControlsStyle}>
+          {tracks.map((track, i) => <TrackControls key={i} track={track} index={i} />)}
+          <div
+            className={`${styles.newTrack} ${tracks.length % 2 !== 1 ? styles.even : ''}`}
+            onClick={handleAddNewTrack}
+            role="button"
+            tabIndex={0}
+          >
+            Add new track
           </div>
         </div>
-        <div className={styles.scrollableMain} onScroll={handleScroll}>
+        {/* <div className={styles.sidebar}>
+        </div> */}
+        {/* <div className={styles.scrollableMain} onScroll={handleScroll}>
           <div className={styles.mainContent}>
-            <Timeline />
             <div className={styles.tracks}>
               {renderableTracks}
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
       <PlayBackControls />
     </div>

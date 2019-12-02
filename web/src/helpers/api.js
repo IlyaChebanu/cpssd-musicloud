@@ -8,7 +8,7 @@ import history from '../history';
 axios.interceptors.response.use((res) => res, (err) => {
   const state = store.getState();
   const res = err.response;
-  if ([500, 422].includes(res.status)) {
+  if (!res || [500, 422].includes(res.status)) {
     store.dispatch(showNotification({
       message: 'An unknown error has occured. Please contact the site owners.',
     }));
