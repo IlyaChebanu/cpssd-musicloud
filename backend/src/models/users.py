@@ -878,3 +878,17 @@ def update_silence_notificaitons_status(uid, status):
         uid,
     )
     query(sql, args)
+
+
+def get_dids_for_a_user(uid):
+    sql = (
+        "SELECT did FROM Notifications "
+        "WHERE uid = %s"
+    )
+    args = (
+        uid,
+    )
+    res = query(sql, args, True)
+    if not res:
+        raise NoResults
+    return res

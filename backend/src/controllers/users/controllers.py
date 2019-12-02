@@ -16,10 +16,11 @@ from flask import request
 from jsonschema import validate, ValidationError
 
 from ...config import HOST, RESET_TIMEOUT, JWT_SECRET
+from ...models.errors import NoResults
 from ...utils.logger import log
 from ...utils import (
     random_string, send_mail, gen_scroll_tokens, gen_timeline_post_object,
-    gen_timeline_song_object
+    gen_timeline_song_object, notification_sender
 )
 from ...models.users import (
     insert_user, get_user_via_username, get_user_via_email, make_post,
@@ -30,7 +31,8 @@ from ...models.users import (
     reset_email, update_profiler_url, get_following_names, get_follower_names,
     get_timeline, get_timeline_length, get_timeline_posts_only,
     get_timeline_posts_only_length, get_timeline_song_only,
-    get_timeline_song_only_length, update_silence_notificaitons_status
+    get_timeline_song_only_length, update_silence_notificaitons_status,
+    get_dids_for_a_user
 )
 from ...models.verification import insert_verification, get_verification
 from ...middleware.auth_required import auth_required
@@ -73,6 +75,17 @@ def follow(user_data):
 
     if (user_data.get("uid"), other_user[0]) not in other_user_followers:
         post_follow(user_data.get("uid"), other_user[0])
+
+    if other_user[6] == 0:
+        try:
+            dids = []
+            for did in get_dids_for_a_user(user_data.get("uid")):
+                dids += did
+            message = other_user[6] + " has started following you."
+            notification_sender(message, dids)
+        except NoResults:
+            pass
+
 
     return {
         "message": "You are now following: " + request.json.get("username")
@@ -390,6 +403,16 @@ def post(user_data):
 
     time_issued = datetime.datetime.utcnow()
     make_post(user_data.get("uid"), request.json.get("message"), time_issued)
+
+    if other_user[6] == 0:
+        try:
+            dids = []
+            for did in get_dids_for_a_user(user_data.get("uid")):
+                dids += did
+            message = other_user[6] + " has started following you."
+            notification_sender(message, dids)
+        except NoResults:
+            pass
 
     return {"message": "Message posted."}, 200
 

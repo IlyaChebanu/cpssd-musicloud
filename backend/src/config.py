@@ -15,9 +15,9 @@ MYSQL_CONFIG = {
 
 # SMTP setup for sending email.
 SMTP_CONFIG = {
-    'user': 'AKIAQ6AXMYJ4ZNBXYUXU',
-    'password': 'BN4RQDDWAa8iVy267EV13lcb4IGprwtrar/Z5YIof+R1',
-    'server': 'email-smtp.eu-west-1.amazonaws.com'
+    'user': os.environ['MUSICLOUD_SMTP_USER'],
+    'password': os.environ['MUSICLOUD_SMTP_PASSWORD'],
+    'server': os.environ['MUSICLOUD_SMTP_SERVER'],
 }
 
 # Host domain for our service.
@@ -28,9 +28,9 @@ JWT_SECRET = os.environ['MUSICLOUD_JWT_SECRET']
 
 # AWS S3 bucket credentials.
 AWS_CREDS = {
-    'AWSAccessKeyId': 'AKIAJQLWCAHOITMBWRJA',
-    'AWSSecretAccessKey': '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',
-    'Bucket': 'dcumusicloudbucket'
+    'AWSAccessKeyId': os.environ['MUSICLOUD_AWS_ACCESS_KEY_ID'],
+    'AWSSecretAccessKey': os.environ['MUSICLOUD_AWS_ACCESS_KEY'],
+    'Bucket': os.environ['MUSICLOUD_AWS_BUCKET'],
 }
 
 # This option controls how long users have to enter a password reset code
@@ -42,3 +42,6 @@ BUCKET_URL = "https://dcumusicloudbucket.s3-eu-west-1.amazonaws.com/"
 
 # Toggle Logging
 LOGGING = True
+
+# Pushy API key
+PUSHY_KEY = os.environ['MUSICLOUD_PUSHY_KEY']
