@@ -5,9 +5,11 @@ export function getCompiledSongs(token, username, songs_per_page) {
     let url = `${API_URL}api/v1/audio/compiled_songs`;
     if (songs_per_page) {
         url = url + `?songs_per_page=${songs_per_page}`
-    }
-    if (username) {
-        url = url + `&username=${username}`
+        if (username) {
+            url = url + `&username=${username}`
+        }
+    } else if (username) {
+        url = url + `?username=${username}`
     }
     var request = new Request(url, {
         method: "GET",
