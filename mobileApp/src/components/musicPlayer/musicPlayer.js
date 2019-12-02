@@ -115,12 +115,12 @@ export default class MusicPlayer extends React.Component {
                     <Image source={goBackButton} style={styles.goBackButton} />
                 </TouchableOpacity>
                 <View style={styles.textContainer}>
-                    <Text style={styles.songNameText}>{this.state.songData[2]}</Text>
+                    <Text style={styles.songNameText}>{this.state.songData.title}</Text>
                     <TouchableOpacity onPress={() => this.handleProfileClick()} >
                         <View style={styles.profileContainer}>
                             {this.props.profilePic ? <Image style={styles.profilePic} source={{ uri: this.props.profilePic }} /> :
                                 <Image style={styles.profilePic} source={profilePic} />}
-                            <Text style={styles.songAuthorText}>{this.state.songData[1]}</Text>
+                            <Text style={styles.songAuthorText}>{this.state.songData.username}</Text>
                         </View>
                     </TouchableOpacity>
                 </View>
