@@ -11,6 +11,15 @@ export default StyleSheet.create({
         paddingLeft: 20,
         paddingRight: 20,
     },
+    logoContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    arrowBack: {
+        marginRight: 10,
+        resizeMode: 'contain',
+        width: 32,
+    },
     logo: {
         resizeMode: 'contain',
         width: 160,
