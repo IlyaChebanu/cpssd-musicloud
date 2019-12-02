@@ -4,20 +4,49 @@ import _ from 'lodash';
 import {
   playingStartTime, setCurrentBeat, playingStartBeat, setSampleLoading,
 } from '../actions/studioActions';
-import getSampleTimes from '../helpers/getSampleTimes';
-import { globalSongGain, audioContext, bufferStore } from '../helpers/constants';
+// import getSampleTimes from '../helpers/getSampleTimes';
+import {
+  globalSongGain, audioContext, bufferStore,
+} from '../helpers/constants';
 
 const LOOKAHEAD = 25; // ms
 const OVERLAP = 100/* ms */ / 1000;
 
-const scheduleSample = (store, sample) => {
-  const state = store.getState().studio;
-  const [startTime, endTime, offset] = getSampleTimes(audioContext, state, sample);
-  const source = audioContext.createBufferSource();
+const getSampleTimes = (context, state, sample) => {
+  const secondsPerBeat = 60 / state.tempo;
+  const beatsPerSecond = state.tempo / 60;
+  const { currentBeat } = state;
+
+  let sampleTime = sample.time;
+  // Use 100ms lookahead to set sampleTime if we're near the end of the loop
+  if (
+    state.loopEnabled
+    && sample.time < currentBeat
+    && currentBeat > state.loop.stop - 0.1 * beatsPerSecond
+  ) {
+    sampleTime = state.loop.stop + sample.time - state.loop.start;
+  }
+
+  const startTime = context.currentTime + (sampleTime - currentBeat) * secondsPerBeat;
+  const offset = Math.max(0, (currentBeat - sampleTime) * secondsPerBeat);
+  const endTime = (
+    context.currentTime + sample.duration + (sampleTime - currentBeat) * secondsPerBeat
+  );
+  return [startTime, endTime, offset];
+};
+
+
+export const scheduleSample = (state, sample, context = audioContext, offline = false) => {
+  const [startTime, endTime, offset] = getSampleTimes(
+    context,
+    offline ? { currentBeat: 0 } : state,
+    sample,
+  );
+  const source = context.createBufferSource();
   source.buffer = sample.buffer;
 
-  const gain = audioContext.createGain();
-  const pan = audioContext.createStereoPanner();
+  const gain = context.createGain();
+  const pan = context.createStereoPanner();
   source.connect(pan);
   pan.connect(gain);
   gain.connect(globalSongGain);
@@ -29,8 +58,8 @@ const scheduleSample = (store, sample) => {
   if (!solo) {
     volume = track.mute ? 0 : sample.volume;
   }
-  gain.gain.setValueAtTime(volume, audioContext.currentTime);
-  pan.pan.setValueAtTime(track.pan, audioContext.currentTime);
+  gain.gain.setValueAtTime(volume, 0);
+  pan.pan.setValueAtTime(track.pan, 0);
 
   source.start(startTime, offset);
   source.stop(endTime);
@@ -92,7 +121,7 @@ export default (store) => {
       // Schedule samples
       schedulableSamples.forEach((sample) => {
         if (!(sample.id in scheduledSamples)) {
-          const source = scheduleSample(store, sample);
+          const source = scheduleSample(state, sample);
           scheduledSamples[sample.id] = { ...sample, ...source };
         }
       });
