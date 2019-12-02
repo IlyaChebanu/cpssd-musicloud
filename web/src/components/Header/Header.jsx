@@ -115,6 +115,7 @@ const Header = memo((props) => {
     anchor.download = 'audio.wav';
     anchor.click();
     window.URL.revokeObjectURL(url);
+    document.body.removeChild(anchor);
   }, [studio]);
 
 
