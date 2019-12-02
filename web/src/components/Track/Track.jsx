@@ -82,7 +82,6 @@ const Track = memo((props) => {
       onMouseDown={handleSetSelected}
     >
       <Ticks gridSize={1} />
-      {/* {track.samples.map(getSample)} */}
       {samples}
     </HotKeys>
   );
