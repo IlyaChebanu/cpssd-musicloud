@@ -36,7 +36,7 @@ const getSampleTimes = (context, state, sample) => {
 };
 
 
-export const scheduleSample = (state, sample, context = audioContext, offline = false) => {
+const scheduleSample = (state, sample, context = audioContext, offline = false) => {
   const [startTime, endTime, offset] = getSampleTimes(
     context,
     offline ? { ...state, currentBeat: 0 } : state,
@@ -64,6 +64,34 @@ export const scheduleSample = (state, sample, context = audioContext, offline = 
   source.start(startTime, offline ? 0 : offset);
   source.stop(endTime);
   return { source, gain, pan };
+};
+
+export const renderTracks = (studio) => {
+  const samples = [];
+  studio.tracks.forEach((track) => {
+    track.samples.forEach((sample, i) => {
+      sample.volume = track.volume;
+      sample.track = i;
+      sample.buffer = bufferStore[sample.url];
+      samples.push(sample);
+    });
+  });
+
+  const getEndTime = (sample) => sample.time + (sample.duration * (studio.tempo / 60));
+  const latestSample = _.maxBy(samples, (sample) => getEndTime(sample));
+  const songDuration = getEndTime(latestSample) * (60 / studio.tempo);
+
+  const offlineAudioContext = new (
+    window.OfflineAudioContext || window.webkitOfflineAudioContext
+  )(2, songDuration * 44100, 44100);
+  offlineAudioContext.globalGain = offlineAudioContext.createGain();
+  offlineAudioContext.globalGain.connect(offlineAudioContext.destination);
+
+  samples.forEach((sample) => {
+    scheduleSample(studio, sample, offlineAudioContext, true);
+  });
+
+  return offlineAudioContext.startRendering();
 };
 
 export default (store) => {

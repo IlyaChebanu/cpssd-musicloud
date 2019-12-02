@@ -15,7 +15,6 @@ import { ReactComponent as SignOutIcon } from '../../assets/icons/sign-out-alt-l
 import ProfilePicture from '../../assets/profiler.jpg';
 import CircularImage from '../CircularImage';
 import Dropdown from '../Dropdown';
-import { bufferStore } from '../../helpers/constants';
 
 import newIcon from '../../assets/icons/file_dropdown/new.svg';
 import openIcon from '../../assets/icons/file_dropdown/open.svg';
@@ -26,7 +25,7 @@ import exportIcon from '../../assets/icons/file_dropdown/export.svg';
 import generateIcon from '../../assets/icons/file_dropdown/generate.svg';
 import exitIcon from '../../assets/icons/file_dropdown/exit.svg';
 import { setTrackAtIndex } from '../../actions/studioActions';
-import { scheduleSample } from '../../middleware/audioRedux';
+import { renderTracks } from '../../middleware/audioRedux';
 
 
 const Header = memo((props) => {
@@ -79,27 +78,7 @@ const Header = memo((props) => {
   }, [dispatch, fileSelector, studio]);
 
   const exportAction = useCallback(async () => {
-    const samples = [];
-    studio.tracks.forEach((track) => {
-      track.samples.forEach((sample, i) => {
-        sample.volume = track.volume;
-        sample.track = i;
-        sample.buffer = bufferStore[sample.url];
-        samples.push(sample);
-      });
-    });
-    const getEndTime = (sample) => sample.time + (sample.duration * (studio.tempo / 60));
-    const latestSample = _.maxBy(samples, (sample) => getEndTime(sample));
-    const songDuration = getEndTime(latestSample) * (60 / studio.tempo);
-    const offlineAudioContext = new (
-      window.OfflineAudioContext || window.webkitOfflineAudioContext
-    )(2, songDuration * 44100, 44100);
-    offlineAudioContext.globalGain = offlineAudioContext.createGain();
-    offlineAudioContext.globalGain.connect(offlineAudioContext.destination);
-    samples.forEach((sample) => {
-      scheduleSample(studio, sample, offlineAudioContext, true);
-    });
-    const renderedBuffer = await offlineAudioContext.startRendering();
+    const renderedBuffer = await renderTracks(studio);
     const wav = toWav(renderedBuffer);
 
     const anchor = document.createElement('a');
