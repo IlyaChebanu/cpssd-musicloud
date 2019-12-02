@@ -6,7 +6,7 @@ import {
 } from '../actions/studioActions';
 // import getSampleTimes from '../helpers/getSampleTimes';
 import {
-  globalSongGain, audioContext, bufferStore,
+  audioContext, bufferStore,
 } from '../helpers/constants';
 
 const LOOKAHEAD = 25; // ms
@@ -39,7 +39,7 @@ const getSampleTimes = (context, state, sample) => {
 export const scheduleSample = (state, sample, context = audioContext, offline = false) => {
   const [startTime, endTime, offset] = getSampleTimes(
     context,
-    offline ? { currentBeat: 0 } : state,
+    offline ? { ...state, currentBeat: 0 } : state,
     sample,
   );
   const source = context.createBufferSource();
@@ -49,7 +49,7 @@ export const scheduleSample = (state, sample, context = audioContext, offline = 
   const pan = context.createStereoPanner();
   source.connect(pan);
   pan.connect(gain);
-  gain.connect(globalSongGain);
+  gain.connect(context.globalGain);
 
   const track = state.tracks[sample.track];
   const soloTrack = _.findIndex(state.tracks, 'solo');
@@ -61,7 +61,7 @@ export const scheduleSample = (state, sample, context = audioContext, offline = 
   gain.gain.setValueAtTime(volume, 0);
   pan.pan.setValueAtTime(track.pan, 0);
 
-  source.start(startTime, offset);
+  source.start(startTime, offline ? 0 : offset);
   source.stop(endTime);
   return { source, gain, pan };
 };
@@ -214,7 +214,7 @@ export default (store) => {
         break;
 
       case 'SET_VOLUME':
-        globalSongGain.gain.setValueAtTime(action.volume, audioContext.currentTime);
+        audioContext.globalGain.gain.setValueAtTime(action.volume, audioContext.currentTime);
         break;
 
       default:
