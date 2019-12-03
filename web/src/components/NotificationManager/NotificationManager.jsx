@@ -15,6 +15,7 @@ const NotificationManager = memo(({ notifications }) => (
         text={notification.message}
         duration={notification.duration}
         id={notification.id}
+        type={notification.type}
       />
     ))}
   </div>
