@@ -28,5 +28,10 @@ export function setFollowing(following) {
     }
 }
 
-
+export function setIsPortrait(isPortrait) {
+    return {
+        type: actionsTypes.SET_IS_PORTRAIT,
+        isPortrait
+    }
+}
 

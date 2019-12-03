@@ -1,14 +1,14 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/no-array-index-key */
 import React, {
-  memo, useCallback, useEffect, useMemo,
+  memo, useCallback, useEffect, useMemo, useRef,
 } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styles from './Studio.module.scss';
 import Header from '../../components/Header';
 import {
-  setTracks, setScroll, setScrollY,
+  setTracks, setScroll, setScrollY, setGridWidth,
 } from '../../actions/studioActions';
 import { showNotification } from '../../actions/notificationsActions';
 import kick from '../../assets/basic_sounds/kick.wav';
@@ -36,6 +36,25 @@ const Studio = memo((props) => {
   const { dispatch, tracks, studio } = props;
 
   useUpdateUserDetails();
+
+  const tracksRef = useRef();
+
+  useEffect(() => {
+    const latest = tracks.reduce((m, track) => {
+      const sampleMax = track.samples.reduce((sm, sample) => {
+        const endTime = sample.time + (sample.duration * (studio.tempo / 60));
+        return Math.max(endTime, sm);
+      }, 1);
+      return Math.max(sampleMax, m);
+    }, 1);
+    const width = Math.max(
+      latest,
+      tracksRef.current
+        ? tracksRef.current.getBoundingClientRect().width / (40 * studio.gridSize)
+        : 0,
+    );
+    dispatch(setGridWidth(width));
+  }, [dispatch, tracks, studio.gridSize, studio.tempo, tracksRef]);
 
   useEffect(() => {
     dispatch(setTracks([
@@ -315,12 +334,7 @@ const Studio = memo((props) => {
 
   const handleScroll = useCallback((e) => {
     dispatch(setScroll(e.target.scrollLeft));
-    dispatch(setScrollY(e.target.scrollTop));
   }, [dispatch]);
-
-  const renderableTracks = useMemo(() => tracks.map((t, i) => (
-    <Track index={i} track={t} key={i} className={styles.track} />
-  )), [tracks]);
 
   const handleAddNewTrack = useCallback(() => {
     dispatch(setTracks([
@@ -352,9 +366,13 @@ const Studio = memo((props) => {
     }
   }, [studio.tempo, studio.songId, tracks, dispatch]);
 
-  const trackControlsStyle = useMemo(() => ({
-    transform: `translateY(${-studio.scrollY}px)`,
-  }), [studio.scrollY]);
+  const renderableTracks = useMemo(() => tracks.map((t, i) => (
+    <Track index={i} track={t} key={i} className={styles.track} />
+  )), [tracks]);
+
+  const trackControls = useMemo(() => tracks.map((track, i) => (
+    <TrackControls key={i} track={track} index={i} />
+  )), [tracks]);
 
   return (
     <div className={styles.wrapper}>
@@ -368,24 +386,21 @@ const Studio = memo((props) => {
       </Header>
       <div className={styles.contentWrapper}>
         <SeekBar />
-        <div className={styles.sidebar}>
-          <TimelineControls />
-          <div style={trackControlsStyle}>
-            {tracks.map((track, i) => <TrackControls key={i} track={track} index={i} />)}
-            <div
-              className={`${styles.newTrack} ${tracks.length % 2 !== 1 ? styles.even : ''}`}
-              onClick={handleAddNewTrack}
-              role="button"
-              tabIndex={0}
-            >
-              Add new track
+        <Timeline />
+        <div className={styles.scrollable}>
+          <div className={styles.content}>
+            <div className={styles.trackControls}>
+              {trackControls}
+              <div
+                className={`${styles.newTrack} ${tracks.length % 2 !== 1 ? styles.even : ''}`}
+                onClick={handleAddNewTrack}
+                role="button"
+                tabIndex={0}
+              >
+                Add new track
+              </div>
             </div>
-          </div>
-        </div>
-        <div className={styles.scrollableMain} onScroll={handleScroll}>
-          <div className={styles.mainContent}>
-            <Timeline />
-            <div className={styles.tracks}>
+            <div className={styles.tracks} onScroll={handleScroll} ref={tracksRef}>
               {renderableTracks}
             </div>
           </div>

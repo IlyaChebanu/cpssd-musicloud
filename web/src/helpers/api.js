@@ -7,7 +7,7 @@ import history from '../history';
 
 axios.interceptors.response.use((res) => res, (err) => {
   const state = store.getState();
-  const res = err.response;
+  const res = err.response || { status: null };
   if ([500, 422].includes(res.status)) {
     store.dispatch(showNotification({
       message: 'An unknown error has occured. Please contact the site owners.',
@@ -28,7 +28,7 @@ axios.interceptors.response.use((res) => res, (err) => {
       }));
     }
   }
-  return err.response;
+  return res;
 });
 
 const API_URL = 'http://dcumusicloud.com:5000/api';

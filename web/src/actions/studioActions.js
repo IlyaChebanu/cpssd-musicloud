@@ -108,6 +108,13 @@ export const setGridSize = (gridSize) => (dispatch) => {
   });
 };
 
+export const setGridWidth = (width) => (dispatch) => {
+  dispatch({
+    type: 'SET_GRID_WIDTH',
+    width,
+  });
+};
+
 export const setGridSnapEnabled = (bool) => (dispatch) => {
   dispatch({
     type: 'SET_GRID_SNAP_ENABLED',

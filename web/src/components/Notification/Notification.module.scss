@@ -14,6 +14,18 @@
   &.fadeOut {
     opacity: 0;
   }
+
+  &.info {
+    border-color: #51829f;
+
+    p {
+      color: #51829f;
+    }
+
+    svg {
+      color: #51829f;
+    }
+  }
 }
 
 .top {

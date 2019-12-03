@@ -218,13 +218,13 @@ def get_followers(uid):
     return query(sql, args, True)
 
 
-def get_following_pair(username_a, username_b):
+def get_following_pair(uid_a, uid_b):
     """
     Get a specific follow relation from the DB.
-    :param username_a:
-    Str - Username of the user who is the follower.
-    :param username_b:
-    Str - Username of the user who is being followed.
+    :param uid_a:
+    Int - Uid of the user who is the follower.
+    :param uid_b:
+    Int - Uid of the user who is being followed.
     :return:
     List - Empty if follow relation doesn't exists, else contains 1 list with,
     user a's uid & user b's uid.
@@ -234,8 +234,8 @@ def get_following_pair(username_a, username_b):
         "WHERE follower = %s AND following = %s"
     )
     args = (
-        username_a,
-        username_b,
+        uid_a,
+        uid_b,
     )
     return query(sql, args, True)
 
@@ -609,3 +609,206 @@ def get_follower_names(fid, start_index, users_per_page):
         users_per_page,
     )
     return query(sql, args, True)
+
+
+def get_timeline(uid, start_index, items_per_page):
+    """
+    Creates a timeline list from the user's following data.
+    :param uid:
+    Int - Uid of the user who's timeline we want.
+    :param start_index:
+    Int - Start index for the page.
+    :param items_per_page:
+    Int - Number of items that will be returned.
+    :return:
+    List - Contains lists of song & post data in reverse chronological order
+    from user's the selected user follows.
+    """
+    sql = (
+        "SELECT * FROM ((SELECT sid, "
+        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as usernanme"
+        ", title, duration, created, public,"
+        "published AS time, url, cover, NULL AS message, "
+        "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid ) "
+        "as likes, 'song' AS type FROM "
+        "Songs WHERE uid IN "
+        "(SELECT Followers.following FROM Followers WHERE follower=%s)"
+        " AND public=1) UNION (SELECT NULL AS sid, "
+        "(SELECT username FROM Users WHERE Posts.uid=Users.uid) as usernanme"
+        ", NULL AS title,"
+        "NULL AS duration, NULL AS created, NULL AS public, time, NULL AS url,"
+        "NULL AS cover, message, NULL AS likes, 'post' AS type FROM Posts "
+        "WHERE uid IN "
+        "(SELECT Followers.following FROM Followers WHERE follower=%s)"
+        ")) AS Sp ORDER BY `time` DESC LIMIT %s, %s;"
+    )
+    args = (
+        uid,
+        uid,
+        start_index,
+        items_per_page,
+    )
+    res = query(sql, args, True)
+    if not res:
+        return []
+    return res
+
+
+def get_timeline_length(uid):
+    """
+    Return the length of a user's timeline
+    :param uid:
+    Int - Uid of the user who's timeline we are interested in.
+    :return:
+    Int - Number of items in that list.
+    """
+    sql = (
+        "SELECT COUNT(*) FROM ((SELECT sid, "
+        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as usernanme"
+        ", title, duration, created, public,"
+        "published AS time, url, cover, NULL AS message, "
+        "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid ) "
+        "as likes, 'song' AS type FROM "
+        "Songs WHERE uid IN "
+        "(SELECT Followers.following FROM Followers WHERE follower=%s)"
+        " AND public=1) UNION (SELECT NULL AS sid, "
+        "(SELECT username FROM Users WHERE Posts.uid=Users.uid) as usernanme"
+        ", NULL AS title,"
+        "NULL AS duration, NULL AS created, NULL AS public, time, NULL AS url,"
+        "NULL AS cover, message, NULL AS likes, 'post' AS type FROM Posts "
+        "WHERE uid IN "
+        "(SELECT Followers.following FROM Followers WHERE follower=%s)"
+        ")) AS Sp ORDER BY `time` DESC;"
+    )
+    args = (
+        uid,
+        uid,
+    )
+    res = query(sql, args, True)
+    if not res:
+        return 0
+    return res[0][0]
+
+
+def get_timeline_posts_only(uid, start_index, items_per_page):
+    """
+    Creates a post only timeline list from the user's following data.
+    :param uid:
+    Int - Uid of the user who's timeline we want.
+    :param start_index:
+    Int - Start index for the page.
+    :param items_per_page:
+    Int - Number of items that will be returned.
+    :return:
+    List - Contains lists of post data in reverse chronological order
+    from user's the selected user follows.
+    """
+    sql = (
+        "SELECT * FROM ((SELECT NULL AS sid, "
+        "(SELECT username FROM Users WHERE Posts.uid=Users.uid) as usernanme"
+        ", NULL AS title,"
+        "NULL AS duration, NULL AS created, NULL AS public, time, NULL AS url,"
+        "NULL AS cover, message, NULL AS likes, 'post' AS type FROM Posts "
+        "WHERE uid IN "
+        "(SELECT Followers.following FROM Followers WHERE follower=%s)"
+        ")) AS Sp ORDER BY `time` DESC LIMIT %s, %s;"
+    )
+    args = (
+        uid,
+        start_index,
+        items_per_page,
+    )
+    res = query(sql, args, True)
+    if not res:
+        return []
+    return res
+
+
+def get_timeline_posts_only_length(uid):
+    """
+    Return the length of a user's post only timeline
+    :param uid:
+    Int - Uid of the user who's timeline we are interested in.
+    :return:
+    Int - Number of items in that list.
+    """
+    sql = (
+        "SELECT COUNT(*) FROM ((SELECT NULL AS sid, "
+        "(SELECT username FROM Users WHERE Posts.uid=Users.uid) as usernanme"
+        ", NULL AS title,"
+        "NULL AS duration, NULL AS created, NULL AS public, time, NULL AS url,"
+        "NULL AS cover, message, NULL AS likes, 'post' AS type FROM Posts "
+        "WHERE uid IN "
+        "(SELECT Followers.following FROM Followers WHERE follower=%s)"
+        ")) AS Sp ORDER BY `time` DESC;"
+    )
+    args = (
+        uid,
+    )
+    res = query(sql, args, True)
+    if not res:
+        return 0
+    return res[0][0]
+
+
+def get_timeline_song_only(uid, start_index, items_per_page):
+    """
+    Creates a song only timeline list from the user's following data.
+    :param uid:
+    Int - Uid of the user who's timeline we want.
+    :param start_index:
+    Int - Start index for the page.
+    :param items_per_page:
+    Int - Number of items that will be returned.
+    :return:
+    List - Contains lists of song data in reverse chronological order
+    from user's the selected user follows.
+    """
+    sql = (
+        "SELECT * FROM ((SELECT sid, "
+        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as usernanme"
+        ", title, duration, created, public,"
+        "published AS time, url, cover, NULL AS message, "
+        "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid ) "
+        "as likes, 'song' AS type FROM "
+        "Songs WHERE uid IN "
+        "(SELECT Followers.following FROM Followers WHERE follower=%s)"
+        " AND public=1)) AS Sp ORDER BY `time` DESC LIMIT %s, %s;"
+    )
+    args = (
+        uid,
+        start_index,
+        items_per_page,
+    )
+    res = query(sql, args, True)
+    if not res:
+        return []
+    return res
+
+
+def get_timeline_song_only_length(uid):
+    """
+    Return the length of a user's song only timeline
+    :param uid:
+    Int - Uid of the user who's timeline we are interested in.
+    :return:
+    Int - Number of items in that list.
+    """
+    sql = (
+        "SELECT COUNT(*) FROM ((SELECT sid, "
+        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as usernanme"
+        ", title, duration, created, public,"
+        "published AS time, url, cover, NULL AS message, "
+        "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid ) "
+        "as likes, 'song' AS type FROM "
+        "Songs WHERE uid IN "
+        "(SELECT Followers.following FROM Followers WHERE follower=%s)"
+        " AND public=1)) AS Sp ORDER BY `time` DESC;"
+    )
+    args = (
+        uid,
+    )
+    res = query(sql, args, True)
+    if not res:
+        return 0
+    return res[0][0]

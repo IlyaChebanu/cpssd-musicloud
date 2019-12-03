@@ -96,38 +96,50 @@ const TrackControls = memo((props) => {
     dispatch(setSelectedTrack(index));
   }, [dispatch, index]);
 
+  const barStyle = useMemo(() => {
+    const colour = index % 2 ? '#303237' : '#36393D';
+    return {
+      backgroundColor: selectedTrack === index ? colours[index % colours.length] : colour,
+    };
+  }, [index, selectedTrack]);
+
   return (
-    <div className={`${styles.wrapper} ${props.index % 2 ? styles.even : ''}`} onMouseDown={handleSetSelected} role="row" tabIndex={0}>
-      {selectedTrack === index && (
-        <div
-          className={styles.selectedBar}
-          style={{ backgroundColor: colours[index % colours.length] }}
-        />
-      )}
-      <div className={styles.title}>
-        <input type="text" value={track.name} onChange={handleTrackNameChange} />
-      </div>
-      <div className={styles.buttons}>
-        <span>
-          <Knob onMouseDown={handleTrackVolume} style={volumeStyle} />
-          <p>Vol</p>
-        </span>
-        <span>
-          <Knob onMouseDown={handleTrackPan} style={panStyle} />
-          <p>Pan</p>
-        </span>
-        <span>
-          {track.mute || (soloTrack !== -1 && soloTrack !== index)
-            ? <MuteActive onClick={handleTrackMute} />
-            : <Mute onClick={handleTrackMute} />}
-          <p>Mute</p>
-        </span>
-        <span>
-          {track.solo
-            ? <SoloActive onClick={handleTrackSolo} />
-            : <Solo onClick={handleTrackSolo} />}
-          <p>Solo</p>
-        </span>
+    <div
+      className={styles.outerWrap}
+      onClick={handleSetSelected}
+      role="row"
+      tabIndex={0}
+    >
+      <div
+        className={`${styles.selectBar} ${selectedTrack === index ? styles.selected : ''}`}
+        style={barStyle}
+      />
+      <div className={`${styles.wrapper} ${props.index % 2 ? styles.even : ''}`}>
+        <div className={styles.title}>
+          <input type="text" value={track.name} onChange={handleTrackNameChange} />
+        </div>
+        <div className={styles.buttons}>
+          <span>
+            <Knob onMouseDown={handleTrackVolume} style={volumeStyle} />
+            <p>Vol</p>
+          </span>
+          <span>
+            <Knob onMouseDown={handleTrackPan} style={panStyle} />
+            <p>Pan</p>
+          </span>
+          <span>
+            {track.mute || (soloTrack !== -1 && soloTrack !== index)
+              ? <MuteActive onClick={handleTrackMute} />
+              : <Mute onClick={handleTrackMute} />}
+            <p>Mute</p>
+          </span>
+          <span>
+            {track.solo
+              ? <SoloActive onClick={handleTrackSolo} />
+              : <Solo onClick={handleTrackSolo} />}
+            <p>Solo</p>
+          </span>
+        </div>
       </div>
     </div>
   );

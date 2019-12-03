@@ -23,7 +23,7 @@ const Sample = memo((props) => {
     if (buffer) {
       const data = buffer.getChannelData(0);
       const beatsPerSecond = tempo / 60;
-      const width = buffer.duration * beatsPerSecond * 40;
+      const width = buffer.duration * beatsPerSecond * (40 * gridSize);
       const step = Math.ceil(width / 2);
       const amp = 80;
       const bars = [];
@@ -33,22 +33,30 @@ const Sample = memo((props) => {
       }
       return (
         <svg className={styles.waveform}>
-          {bars.map((bar, i) => <rect key={i} x={(i + 1) * 2} y={45 - bar / 2} style={{ height: `${bar}px` }} className={styles.bar} />)}
+          {bars.map((bar, i) => (
+            <rect
+              key={i}
+              x={(i + 1) * 2}
+              y={45 - bar / 2}
+              style={{ height: `${bar}px` }}
+              className={styles.bar}
+            />
+          ))}
         </svg>
       );
     }
     return null;
-  }, [buffer, tempo]);
+  }, [buffer, gridSize, tempo]);
 
   const wrapperStyle = useMemo(() => {
     const beatsPerSecond = tempo / 60;
     const colourIdx = sample.track % dColours.length;
     const selected = sample.id === selectedSample;
     return {
-      width: buffer ? buffer.duration * beatsPerSecond * 40 : 20,
+      width: buffer ? buffer.duration * beatsPerSecond * (40 * gridSize) : 20,
       backgroundColor: selected ? colours[colourIdx] : dColours[colourIdx],
     };
-  }, [tempo, sample.track, sample.id, selectedSample, buffer]);
+  }, [tempo, sample.track, sample.id, selectedSample, buffer, gridSize]);
 
   const handleDragSample = useCallback((ev) => {
     dispatch(setSelectedSample(props.sample.id));
@@ -56,24 +64,13 @@ const Sample = memo((props) => {
     const initialTime = props.sample.time;
     const handleMouseMove = (e) => {
       e.preventDefault();
-      // eslint-disable-next-line no-undef
-      const start = initialTime + (e.screenX - initialMousePos) / 40 / window.devicePixelRatio;
+      const start = (
+        initialTime + (e.screenX - initialMousePos) / (40 * gridSize) / window.devicePixelRatio
+      );
       const numDecimalPlaces = Math.max(0, String(1 / gridSize).length - 2);
       const time = gridSnapEnabled
         ? Number((Math.round((start) * gridSize) / gridSize).toFixed(numDecimalPlaces))
         : start;
-
-      // Check for collisions with other samples
-      const timeEnd = time + sample.duration * (tempo / 60);
-      // eslint-disable-next-line no-restricted-syntax
-      for (const s of tracks[sample.track].samples) {
-        if (s.id !== sample.id) {
-          const sampleEndTime = s.time + s.duration * (tempo / 60);
-          if (s.time < timeEnd && sampleEndTime > time) {
-            return;
-          }
-        }
-      }
 
       dispatch(setSampleTime(time, sample.id));
     };
@@ -84,17 +81,7 @@ const Sample = memo((props) => {
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleDragStop);
-  }, [
-    dispatch,
-    gridSize,
-    gridSnapEnabled,
-    props,
-    sample.duration,
-    sample.id,
-    sample.track,
-    tempo,
-    tracks,
-  ]);
+  }, [dispatch, gridSize, gridSnapEnabled, props.sample.id, props.sample.time, sample.id]);
 
   const deleteSample = useCallback(() => {
     const track = tracks[sample.track];
@@ -152,8 +139,8 @@ const mapStateToProps = ({ studio }) => ({
   tempo: studio.tempo,
   gridSnapEnabled: studio.gridSnapEnabled,
   gridSize: studio.gridSize,
-  tracks: studio.tracks,
   selectedSample: studio.selectedSample,
+  tracks: studio.tracks,
 });
 
 export default connect(mapStateToProps)(Sample);

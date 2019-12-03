@@ -13,6 +13,9 @@ import HeaderComponent from "../../components/headerComponent/headerComponent";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { patchUserDetails } from "../../api/usersAPI";
 import { getInvalidUserSettingsDetails } from "../../utils/helpers";
+import ToggleSwitch from '../../components/toggleSwitch/toggleSwitch';
+import Orientation from 'react-native-orientation';
+import { writeDataToStorage, SETTINGS_PORTRAIT_DATA_KEY } from "../../utils/localStorage";
 
 class UserSettingsScreen extends React.Component {
     constructor(props) {
@@ -41,19 +44,19 @@ class UserSettingsScreen extends React.Component {
     }
 
     setEmailTextInput(text) {
-        this.setState({ email: text })
+        this.setState({ email: text });
     }
 
     setOldPasswordTextInput(text) {
-        this.setState({ oldPassword: text })
+        this.setState({ oldPassword: text });
     }
 
     setNewPasswordTextInput(text) {
-        this.setState({ newPassword: text })
+        this.setState({ newPassword: text });
     }
 
     setNewPasswordRepeatTextInput(text) {
-        this.setState({ newPasswordRepeat: text })
+        this.setState({ newPasswordRepeat: text });
     }
 
     toggleOldPasswordMask() {
@@ -69,17 +72,27 @@ class UserSettingsScreen extends React.Component {
     }
 
     handleSaveChangesClick() {
-        let invalidFields = getInvalidUserSettingsDetails(this.state.oldPassword, this.state.email, this.state.newPassword, this.state.newPasswordRepeat)
+        let invalidFields = getInvalidUserSettingsDetails(this.state.oldPassword, this.state.email, this.state.newPassword, this.state.newPasswordRepeat);
         if (invalidFields.length === 0) {
             patchUserDetails(this.state.oldPassword, this.state.newPassword, this.state.email, this.props.token).then(response => {
-                if (response.status===200) {
-                    this.showAlert('Success', response.data.message)
+                if (response.status === 200) {
+                    this.showAlert('Success', response.data.message);
                 } else {
-                    this.showAlert('Error', (response.data.message))
+                    this.showAlert('Error', (response.data.message));
                 }
-            })
+            });
         } else {
-            this.showAlert('Error', "Invalid: " + invalidFields.join(', '))
+            this.showAlert('Error', "Invalid: " + invalidFields.join(', '));
+        }
+    }
+
+    toggleOrientation(isOn) {
+        this.props.setIsPortrait(isOn)
+        writeDataToStorage(isOn, SETTINGS_PORTRAIT_DATA_KEY)
+        if (isOn) {
+            Orientation.lockToPortrait();
+        } else if (!isOn) {
+            Orientation.unlockAllOrientations();
         }
     }
 
@@ -126,13 +139,20 @@ class UserSettingsScreen extends React.Component {
                                 style={{ "marginBottom": 20 }}
                                 labelName={"New Password Repeat"} />
 
+                            <MultiPurposeButton
+                                handleButtonClick={this.handleSaveChangesClick.bind(this)}
+                                style={styles.saveButton}
+                                buttonName={"Save Changes"}
+                            />
+                            <View style={styles.orientationContainer}>
+                                <Text style={styles.orientationText}>{'Lock Portrait Orientation'}</Text>
+                                <ToggleSwitch
+                                    isOn={this.props.isPortrait}
+                                    onToggle={(isOn) => this.toggleOrientation(isOn)}
+                                />
+                            </View>
                         </KeyboardAwareScrollView>
 
-                        <MultiPurposeButton
-                            handleButtonClick={this.handleSaveChangesClick.bind(this)}
-                            style={styles.saveButton}
-                            buttonName={"Save Changes"}
-                        />
                     </View>
                 </View>
             </SafeAreaView>
@@ -143,6 +163,7 @@ class UserSettingsScreen extends React.Component {
 function mapStateToProps(state) {
     return {
         token: state.home.token,
+        isPortrait: state.user.isPortrait,
     };
 }
 

@@ -2940,3 +2940,357 @@ class UserTests(unittest.TestCase):
                 follow_redirects=True
             )
             self.assertEqual(422, res.status_code)
+
+    @mock.patch('backend.src.controllers.users.controllers.get_timeline')
+    @mock.patch('backend.src.controllers.users.controllers.get_timeline_length')
+    def test_get_timeline_success_no_scroll_token(self, mocked_num_items, mocked_items):
+        """
+        Ensure getting timelines is successful without scroll tokens.
+        """
+        mocked_num_items.return_value = 2
+        mocked_items.return_value = [
+            [
+                1,
+                "username",
+                "a song",
+                155000,
+                "1986-08-09 11:22:40",
+                1,
+                "2019-12-01 15:38:12",
+                "http://fake.com",
+                "http://cover.com",
+                None,
+                8,
+                "song"
+            ],
+            [
+                None,
+                "username",
+                None,
+                None,
+                None,
+                None,
+                "2019-12-01 15:36:48",
+                None,
+                None,
+                "a message",
+                None,
+                "post"
+            ]
+        ]
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.get(
+                "/api/v1/users/timeline",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(200, res.status_code)
+            expected_body = {
+                'back_page': None,
+                'current_page': 1,
+                'next_page': None,
+                'timeline': [
+                    {
+                        'cover': 'http://cover.com',
+                        'created': '1986-08-09 11:22:40',
+                        'duration': 155000,
+                        'likes': 8,
+                        'public': 1,
+                        'sid': 1,
+                        'title': 'a song',
+                        'type': 'song',
+                        'url': 'http://fake.com',
+                        'username': 'username'
+                    },
+                    {
+                        "created": "2019-12-01 15:36:48",
+                        "message": "a message",
+                        "type": "post",
+                        "username": "username"
+                    }
+                ],
+                'items_per_page': 50,
+                'total_pages': 1
+            }
+            self.assertEqual(expected_body, json.loads(res.data))
+
+    @mock.patch('backend.src.controllers.users.controllers.get_timeline')
+    def test_get_timeline_success_next_scroll_token(self, mocked_items):
+        """
+        Ensure getting timelines is successful with a next page scroll token.
+        """
+        mocked_items.return_value = [
+            [
+                None,
+                "username",
+                None,
+                None,
+                None,
+                None,
+                "2019-12-01 15:36:48",
+                None,
+                None,
+                "a message",
+                None,
+                "post"
+            ]
+        ]
+        test_req_data = {
+            "next_page": (
+                "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b3RhbF9wYWdlcyI6Miwi"
+                "aXRlbXNfcGVyX3BhZ2UiOjEsImN1cnJlbnRfcGFnZSI6Mn0.KzmYqNxQ3f01w"
+                "sTxVFIexfuUghov2mmvarVW8p17wEE"
+            )
+        }
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.get(
+                "/api/v1/users/timeline",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(200, res.status_code)
+            expected_body = {
+                'back_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzb25nc19vbmx5IjpudWxsLCJwb3N0c19vbmx5IjpudWxsLCJ0b3RhbF9wYWdlcyI6MiwiaXRlbXNfcGVyX3BhZ2UiOjEsImN1cnJlbnRfcGFnZSI6MX0.7CrnzsMiSzCA9IYbSg_qCXnmzmUxmM4YOSnaav2QqUA',
+                'current_page': 2,
+                'next_page': None,
+                'timeline': [
+                    {
+                        "created": "2019-12-01 15:36:48",
+                        "message": "a message",
+                        "type": "post",
+                        "username": "username"
+                    }
+                ],
+                'items_per_page': 1,
+                'total_pages': 2
+            }
+            self.assertEqual(expected_body, json.loads(res.data))
+
+    @mock.patch('backend.src.controllers.users.controllers.get_timeline')
+    def test_get_timeline_success_back_scroll_token(self, mocked_followers):
+        """
+        Ensure getting timelines is successful with a back page scroll token.
+        """
+        mocked_followers.return_value = [
+            [
+                1,
+                "username",
+                "a song",
+                155000,
+                "1986-08-09 11:22:40",
+                1,
+                "2019-12-01 15:38:12",
+                "http://fake.com",
+                "http://cover.com",
+                None,
+                8,
+                "song"
+            ]
+        ]
+        test_req_data = {
+            "back_page": (
+                'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b3RhbF9wYWdlcyI6Miwi'
+                'aXRlbXNfcGVyX3BhZ2UiOjEsImN1cnJlbnRfcGFnZSI6MX0.eptlXF2rXVtYO'
+                'OcHZ5lmSV9K_EkF75L68diSw5rcZSk'
+            )
+        }
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.get(
+                "/api/v1/users/timeline",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(200, res.status_code)
+            expected_body = {
+                'back_page': None,
+                'current_page': 1,
+                'next_page': "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzb25nc19vbmx5IjpudWxsLCJwb3N0c19vbmx5IjpudWxsLCJ0b3RhbF9wYWdlcyI6MiwiaXRlbXNfcGVyX3BhZ2UiOjEsImN1cnJlbnRfcGFnZSI6Mn0.w2RCi7sKxkE0IubkvV-rxwMMSUMLJ3Q4izIOVnEJ0RM",
+                'timeline': [
+                    {
+                        'cover': 'http://cover.com',
+                        'created': '1986-08-09 11:22:40',
+                        'duration': 155000,
+                        'likes': 8,
+                        'public': 1,
+                        'sid': 1,
+                        'title': 'a song',
+                        'type': 'song',
+                        'url': 'http://fake.com',
+                        'username': 'username'
+                    }
+                ],
+                'items_per_page': 1,
+                'total_pages': 2
+            }
+            self.assertEqual(expected_body, json.loads(res.data))
+
+    def test_get_timeline_fail_missing_access_token(self):
+        """
+        Ensure getting a user's timeline fails if no access_token is sent.
+        """
+        res = self.test_client.get(
+            "/api/v1/users/timeline",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_get_timeline_fail_access_token_expired(self):
+        """
+        Ensure getting a user's timeline fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
+            res = self.test_client.get(
+                "/api/v1/users/timeline",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_get_timeline_fail_bad_access_token_signature(self):
+        """
+        Ensure getting a user's timeline fails if the access_token signature
+        does not match the one configured on the server.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
+            res = self.test_client.get(
+                "/api/v1/users/timeline",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_get_timeline_fail_unknown_access_token_issue(self):
+        """
+        Ensure getting a user's timeline fails if some unknown error relating
+        to the access_token occurs.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
+            res = self.test_client.get(
+                "/api/v1/users/timeline",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    @mock.patch('backend.src.controllers.users.controllers.get_timeline_length')
+    def test_get_timeline_fail_no_scroll_token_exceeded_last_page(self, mocked_num_items):
+        """
+        Ensure getting timelines fails if the user tries to access a page that
+        doesn't exist.
+        """
+        mocked_num_items.return_value = 2
+        test_req_data = {
+            "current_page": 12,
+            "items_per_page": 1
+        }
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.get(
+                "/api/v1/users/timeline",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    def test_get_timeline_fail_sent_both_tokens(self):
+        """
+        Ensure getting timelines fails if the user tries to send a next_page &
+        back_page token.
+        """
+        test_req_data = {
+            "next_page": (
+                "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0xLCJ0b"
+                "3RhbF9wYWdlcyI6MiwicG9zdHNfcGVyX3BhZ2UiOjEsImN1cnJlbnR"
+                "fcGFnZSI6Mn0.rOexY_eF1nUjFJvpDbbbTTgpoVjxIh9ZbVs0Q6ggR"
+                "uQ"
+            ),
+            "back_page": (
+                "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0x"
+                "LCJ0b3RhbF9wYWdlcyI6MiwicG9zdHNfcGVyX3BhZ2UiOjEsI"
+                "mN1cnJlbnRfcGFnZSI6MX0.pkQCRbBgvwuozzSG6LK-kFGuxT"
+                "8YYsYN3m9g-AzquyM"
+            )
+        }
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.get(
+                "/api/v1/users/timeline",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)

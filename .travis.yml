@@ -11,10 +11,10 @@ matrix:
       node_js:
         - node
       cache: npm
+      before_install:
+        - cd web
       install:
-        - npm install web/
-      before_script:
-        - cd web/
+        - npm install
       script: npm run lint
 
 notifications:

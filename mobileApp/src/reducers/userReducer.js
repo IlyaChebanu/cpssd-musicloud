@@ -1,6 +1,6 @@
 import * as Actions from '../actions/actionTypes'
 
-let initialState = { picUrl: '', userData: {}, otherUserData: {}, viewingProfile: false, following: {} };
+let initialState = { picUrl: '', userData: {}, otherUserData: {}, viewingProfile: false, following: {}, isPortrait: true, };
 
 const UserReducer = (state = initialState, action) => {
 
@@ -20,6 +20,10 @@ const UserReducer = (state = initialState, action) => {
         case Actions.SET_FOLLOWING:
             return Object.assign({}, state, {
                 following: action.following
+            });
+        case Actions.SET_IS_PORTRAIT:
+            return Object.assign({}, state, {
+                isPortrait: action.isPortrait
             });
         default:
             return state;
