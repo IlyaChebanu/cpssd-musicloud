@@ -1,16 +1,18 @@
-import React, { useState, useMemo, memo, useCallback } from 'react';
+import React, {
+  useState, useMemo, memo, useCallback,
+} from 'react';
 import zxcvbn from 'zxcvbn';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import styles from './Settings.module.scss';
 import Header from '../../components/Header';
 import InputField from '../../components/InputField';
 import SubmitButton from '../../components/SubmitButton';
 import { emailRe } from '../../helpers/constants';
 import { showNotification } from '../../actions/notificationsActions';
-import PropTypes from "prop-types";
-import { connect } from "react-redux";
-import { patchUserDetails } from "../../helpers/api";
+import { patchUserDetails } from '../../helpers/api';
 
-const Settings = memo(props => {
+const Settings = memo((props) => {
   const { dispatch, history } = props;
 
   const [email, setEmail] = useState('');
@@ -25,78 +27,68 @@ const Settings = memo(props => {
     return <p>{strengths[zxcvbn(newPassword).score]}</p>;
   }, [newPassword]);
 
-  const emailBorder = useMemo(() => {
-    return submitted && email && !emailRe.test(email) ? '#b90539' : 'white';
-  }, [email, submitted]);
+  const emailBorder = useMemo(() => (submitted && email && !emailRe.test(email) ? '#b90539' : 'white'), [email, submitted]);
 
-  const passwordBorder = useMemo(() => {
-    return submitted && !password ? '#b90539' : 'white';
-  }, [password, submitted]);
+  const passwordBorder = useMemo(() => (submitted && !password ? '#b90539' : 'white'), [password, submitted]);
 
-  const newPasswordBorder = useMemo(() => {
-    return submitted && newPassword && (newPassword !== repeatPassword || !repeatPassword)? '#b90539' : 'white';
-  }, [newPassword, submitted]);
+  const newPasswordBorder = useMemo(() => (submitted && newPassword && (newPassword !== repeatPassword || !repeatPassword) ? '#b90539' : 'white'), [newPassword, repeatPassword, submitted]);
 
-  const repeatPasswordBorder = useMemo(() => {
-    return submitted && newPassword && (newPassword !== repeatPassword || !repeatPassword) ? '#b90539' : 'white';
-  }, [repeatPassword, newPassword, submitted]);
+  const repeatPasswordBorder = useMemo(() => (submitted && newPassword && (newPassword !== repeatPassword || !repeatPassword) ? '#b90539' : 'white'), [repeatPassword, newPassword, submitted]);
 
   const handleSubmit = useCallback(async (e) => {
-      e.preventDefault();
-      let reqData = {};
-      if (!(password)) {
-        dispatch(showNotification({ message: 'Please enter your current password' }));
-      } else if (!(newPassword || email)) {
-        dispatch(showNotification({ message: 'You haven\'t entered any new values' }));
-      } else {
-        reqData.current_password = password;
-        if (newPassword && !repeatPassword) {
-          dispatch(showNotification({message: 'Please repeat your new password'}));
-        } else if (newPassword !== repeatPassword) {
-          dispatch(showNotification({message: 'Passwords do not match'}));
-        } else if (newPassword && repeatPassword && (newPassword === repeatPassword)) {
-          reqData.password = newPassword;
-        }
-        if (email && !emailRe.test(email)) {
-          dispatch(showNotification({message: 'Invalid email address'}));
-        } else if (email && emailRe.test(email)) {
-          reqData.email = email;
-        }
-        console.log(reqData);
-        console.log(!emailRe.test(email));
-        const res = await patchUserDetails(reqData);
-        if (res.status === 200) {
-          dispatch(showNotification({ message: 'Account updated', type: 'info' }));
-          history.push('/profile');
-        }
+    e.preventDefault();
+    const reqData = {};
+    if (!(password)) {
+      dispatch(showNotification({ message: 'Please enter your current password' }));
+    } else if (!(newPassword || email)) {
+      dispatch(showNotification({ message: 'You haven\'t entered any new values' }));
+    } else {
+      reqData.current_password = password;
+      if (newPassword && !repeatPassword) {
+        dispatch(showNotification({ message: 'Please repeat your new password' }));
+      } else if (newPassword !== repeatPassword) {
+        dispatch(showNotification({ message: 'Passwords do not match' }));
+      } else if (newPassword && repeatPassword && (newPassword === repeatPassword)) {
+        reqData.password = newPassword;
       }
-      setSubmitted(true);
+      if (email && !emailRe.test(email)) {
+        dispatch(showNotification({ message: 'Invalid email address' }));
+      } else if (email && emailRe.test(email)) {
+        reqData.email = email;
+      }
+      const res = await patchUserDetails(reqData);
+      if (res.status === 200) {
+        dispatch(showNotification({ message: 'Account updated', type: 'info' }));
+        history.push('/profile');
+      }
+    }
+    setSubmitted(true);
   }, [dispatch, history, email, password, newPassword, repeatPassword]);
 
   return (
-    <div className={styles.wrapper}>      
-    <Header selected={2}/>
-        <div className={styles.formWrapper}>
-          <h1>User settings</h1>
-          <p className={styles.settingsError}>{errorText}</p>
-          <form onSubmit={handleSubmit}>
-            <title className={styles.sectionTitle}>Provide current password (required)</title>
-            <InputField animate={true} onChange={setPassword} name='password' placeholder='Password' borderColour={passwordBorder} password={true} />
-            <title className={styles.sectionTitle}>Change email</title>
-            <InputField animate={true} onChange={setEmail} name='email' placeholder='Email' borderColour={emailBorder}/>
-            <title className={styles.sectionTitle}>Change password</title>
-            <InputField animate={true} onChange={setNewPassword} name='newPassword' placeholder='New password' borderColour={newPasswordBorder} password={true} sideContent={passwordStrength}/>
-            <InputField animate={true} onChange={setRepeatPassword} name='passwordRepeat' placeholder='Repeat password' borderColour={repeatPasswordBorder} password={true}/>
-            <SubmitButton text='Save changes'/>
-          </form>
-        </div>
+    <div className={styles.wrapper}>
+      <Header selected={2} />
+      <div className={styles.formWrapper}>
+        <h1>User settings</h1>
+        <p className={styles.settingsError}>{errorText}</p>
+        <form onSubmit={handleSubmit}>
+          <title className={styles.sectionTitle}>Provide current password (required)</title>
+          <InputField animate onChange={setPassword} name="password" placeholder="Password" borderColour={passwordBorder} password />
+          <title className={styles.sectionTitle}>Change email</title>
+          <InputField animate onChange={setEmail} name="email" placeholder="Email" borderColour={emailBorder} />
+          <title className={styles.sectionTitle}>Change password</title>
+          <InputField animate onChange={setNewPassword} name="newPassword" placeholder="New password" borderColour={newPasswordBorder} password sideContent={passwordStrength} />
+          <InputField animate onChange={setRepeatPassword} name="passwordRepeat" placeholder="Repeat password" borderColour={repeatPasswordBorder} password />
+          <SubmitButton text="Save changes" />
+        </form>
       </div>
+    </div>
   );
 });
 
 Settings.propTypes = {
   dispatch: PropTypes.func.isRequired,
-  history: PropTypes.object.isRequired
+  history: PropTypes.object.isRequired,
 };
 
 Settings.displayName = 'Settings';

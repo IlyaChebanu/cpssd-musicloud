@@ -13,7 +13,7 @@ import Registration from './pages/Registration/Registration';
 import Reverify from './pages/Reverify/Reverify';
 import Studio from './pages/Studio/Studio';
 import Profile from './pages/Profile/Profile';
-import Settings from './pages/Settings/Settings'
+import Settings from './pages/Settings/Settings';
 
 
 const App = () => (
