@@ -86,7 +86,7 @@ def follow(user_data):
             for did in get_dids_for_a_user(user_data.get("uid")):
                 dids += did
             message = other_user[6] + " has started following you."
-            notification_sender(message, dids)
+            notification_sender(message, dids, "New Follower")
         except NoResults:
             pass
 
@@ -415,7 +415,7 @@ def post(user_data):
         for did in notify_post_dids(user_data.get("uid")):
             dids += did
         message = user_data.get("username") + " just posted."
-        notification_sender(message, dids)
+        notification_sender(message, dids, "New Post")
     except NoResults:
         pass
 

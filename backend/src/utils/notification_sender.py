@@ -8,7 +8,7 @@ import requests
 from backend.src.config import PUSHY_KEY
 
 
-def notification_sender(message, dids):
+def notification_sender(message, dids, title):
     """
     Generic function to send push notifications with the Pushy API.
     """
@@ -20,6 +20,7 @@ def notification_sender(message, dids):
         },
         'to': dids,
         'data': {
+            'title': title,
             'message': message
         }
     })
