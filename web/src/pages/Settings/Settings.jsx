@@ -11,7 +11,7 @@ import { connect } from "react-redux";
 import { patchUserDetails } from "../../helpers/api";
 
 const Settings = memo(props => {
-  const { dispatch } = props;
+  const { dispatch, history } = props;
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -26,7 +26,7 @@ const Settings = memo(props => {
   }, [newPassword]);
 
   const emailBorder = useMemo(() => {
-    return submitted && !emailRe.test(email) ? '#b90539' : 'white';
+    return submitted && email && !emailRe.test(email) ? '#b90539' : 'white';
   }, [email, submitted]);
 
   const passwordBorder = useMemo(() => {
@@ -34,11 +34,11 @@ const Settings = memo(props => {
   }, [password, submitted]);
 
   const newPasswordBorder = useMemo(() => {
-    return submitted && !newPassword ? '#b90539' : 'white';
+    return submitted && newPassword && (newPassword !== repeatPassword || !repeatPassword)? '#b90539' : 'white';
   }, [newPassword, submitted]);
 
   const repeatPasswordBorder = useMemo(() => {
-    return submitted && (newPassword !== repeatPassword || !repeatPassword) ? '#b90539' : 'white';
+    return submitted && newPassword && (newPassword !== repeatPassword || !repeatPassword) ? '#b90539' : 'white';
   }, [repeatPassword, newPassword, submitted]);
 
   const handleSubmit = useCallback(async (e) => {
@@ -67,10 +67,11 @@ const Settings = memo(props => {
         const res = await patchUserDetails(reqData);
         if (res.status === 200) {
           dispatch(showNotification({ message: 'Account updated', type: 'info' }));
-    }
+          history.push('/profile');
+        }
       }
       setSubmitted(true);
-  }, [dispatch, email, password, newPassword, repeatPassword]);
+  }, [dispatch, history, email, password, newPassword, repeatPassword]);
 
   return (
     <div className={styles.wrapper}>      
@@ -85,7 +86,7 @@ const Settings = memo(props => {
             <InputField animate={true} onChange={setEmail} name='email' placeholder='Email' borderColour={emailBorder}/>
             <title className={styles.sectionTitle}>Change password</title>
             <InputField animate={true} onChange={setNewPassword} name='newPassword' placeholder='New password' borderColour={newPasswordBorder} password={true} sideContent={passwordStrength}/>
-            <InputField animate={true} onChange={setRepeatPassword} name='passwordRepeat' placeholder='Repeat password' borderColour={repeatPasswordBorder} password={true}/> 
+            <InputField animate={true} onChange={setRepeatPassword} name='passwordRepeat' placeholder='Repeat password' borderColour={repeatPasswordBorder} password={true}/>
             <SubmitButton text='Save changes'/>
           </form>
         </div>
@@ -94,7 +95,8 @@ const Settings = memo(props => {
 });
 
 Settings.propTypes = {
-  dispatch: PropTypes.func.isRequired
+  dispatch: PropTypes.func.isRequired,
+  history: PropTypes.object.isRequired
 };
 
 Settings.displayName = 'Settings';

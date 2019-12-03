@@ -43,7 +43,7 @@ const ProfileBlock = memo((props) => {
           <p className={styles.class}>likes</p>
         </div>
       </div>
-      <form onClick={goToSettings}>
+      <form className={styles.followButton} onSubmit={goToSettings}>
         <SubmitButton className={styles.followButton} text="Settings" />
       </form>
     </div>
