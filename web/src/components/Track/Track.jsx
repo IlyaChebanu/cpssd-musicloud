@@ -13,13 +13,13 @@ configure({
   allowCombinationSubmatches: true,
 });
 
-const Ticks = memo(({ gridSize }) => {
+const Ticks = memo(({ gridSize, gridWidth }) => {
   const ticks = useMemo(() => (
-    [...Array(1000)]
-      .map((__, i) => <rect key={i} x={i * (40 / gridSize)} className={styles.tick} />)
-  ), [gridSize]);
+    [...Array(Math.ceil(gridWidth * gridSize))]
+      .map((__, i) => <rect key={i} x={i * 40} className={styles.tick} />)
+  ), [gridSize, gridWidth]);
   return (
-    <svg className={styles.gridLines}>
+    <svg className={styles.gridLines} style={{ width: Math.ceil(gridWidth * gridSize) * 40 }}>
       {ticks}
     </svg>
   );
@@ -27,13 +27,14 @@ const Ticks = memo(({ gridSize }) => {
 
 Ticks.propTypes = {
   gridSize: PropTypes.number.isRequired,
+  gridWidth: PropTypes.number.isRequired,
 };
 
 Ticks.displayName = 'Ticks';
 
 const Track = memo((props) => {
   const {
-    index, dispatch, clipboard, track, tempo, className, gridSize,
+    index, dispatch, clipboard, track, tempo, className, gridSize, gridWidth,
   } = props;
 
   const getSample = useCallback((sample) => (
@@ -73,6 +74,10 @@ const Track = memo((props) => {
     PASTE_SAMPLE: pasteSample,
   };
 
+  const widthStyle = useMemo(() => ({
+    width: Math.ceil(gridWidth * gridSize) * 40,
+  }), [gridSize, gridWidth]);
+
   return (
     <HotKeys
       allowChanges
@@ -80,8 +85,9 @@ const Track = memo((props) => {
       handlers={handlers}
       className={`${styles.wrapper} ${index % 2 ? styles.even : ''} ${className}`}
       onMouseDown={handleSetSelected}
+      style={widthStyle}
     >
-      <Ticks gridSize={1} />
+      <Ticks gridSize={gridSize} gridWidth={gridWidth} />
       {samples}
     </HotKeys>
   );
@@ -95,6 +101,7 @@ Track.propTypes = {
   tempo: PropTypes.number.isRequired,
   className: PropTypes.string,
   gridSize: PropTypes.number.isRequired,
+  gridWidth: PropTypes.number.isRequired,
 };
 
 Track.defaultProps = {
@@ -111,6 +118,7 @@ const mapStateToProps = ({ studio }) => ({
   tempo: studio.tempo,
   test: studio.test,
   gridSize: studio.gridSize,
+  gridWidth: studio.gridWidth,
 });
 
 export default connect(mapStateToProps)(Track);

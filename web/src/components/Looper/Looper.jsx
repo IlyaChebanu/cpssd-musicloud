@@ -16,7 +16,9 @@ const Looper = memo((props) => {
     const initialLoopStart = loopStart;
     const handleMouseMove = (e) => {
       e.preventDefault();
-      const start = initialLoopStart + (e.screenX - mouseStartPos) / (40 * gridSize) / window.devicePixelRatio;
+      const start = (
+        initialLoopStart + (e.screenX - mouseStartPos) / (40 * gridSize) / window.devicePixelRatio
+      );
       const numDecimalPlaces = Math.max(0, String(1 / gridSize).length - 2);
       dispatch(setLoop({
         start: Math.min(
@@ -42,7 +44,9 @@ const Looper = memo((props) => {
     const initialLoopEnd = loopEnd;
     const handleMouseMove = (e) => {
       e.preventDefault();
-      const stop = initialLoopEnd + (e.screenX - mouseStartPos) / (40 * gridSize) / window.devicePixelRatio;
+      const stop = (
+        initialLoopEnd + (e.screenX - mouseStartPos) / (40 * gridSize) / window.devicePixelRatio
+      );
       const numDecimalPlaces = Math.max(0, String(1 / gridSize).length - 2);
       dispatch(setLoop({
         start: loopStart,

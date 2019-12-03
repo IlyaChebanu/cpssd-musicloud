@@ -7,6 +7,7 @@ export default (
     },
     songId: 1001,
     gridSize: 1,
+    gridWidth: 1,
     gridSnapEnabled: true,
     loopEnabled: true,
     scroll: 0,
@@ -75,21 +76,20 @@ export default (
         tracks,
       };
     case 'SET_SAMPLE_TIME':
-      tracks = state.tracks.map((track) => {
-        track.samples = track.samples.map((sample) => {
-          if (sample.id === action.id) {
-            return {
-              ...sample,
-              time: action.time,
-            };
-          }
-          return sample;
-        });
-        return track;
-      });
       return {
         ...state,
-        tracks,
+        tracks: state.tracks.map((track) => {
+          track.samples = track.samples.map((sample) => {
+            if (sample.id === action.id) {
+              return {
+                ...sample,
+                time: action.time,
+              };
+            }
+            return sample;
+          });
+          return track;
+        }),
       };
     case 'SET_SAMPLE_LOADING':
       return {
@@ -125,6 +125,11 @@ export default (
       return {
         ...state,
         gridSize: action.gridSize,
+      };
+    case 'SET_GRID_WIDTH':
+      return {
+        ...state,
+        gridWidth: action.width,
       };
     case 'SET_GRID_SNAP_ENABLED':
       return {
