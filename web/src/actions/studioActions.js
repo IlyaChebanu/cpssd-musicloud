@@ -150,3 +150,10 @@ export const setClipboard = (sample) => (dispatch) => {
     sample,
   });
 };
+
+export const setSongTitle = (title) => (dispatch) => {
+  dispatch({
+    type: 'SET_SONG_TITLE',
+    title,
+  });
+};

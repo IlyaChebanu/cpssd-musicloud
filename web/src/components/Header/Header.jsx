@@ -26,6 +26,7 @@ import generateIcon from '../../assets/icons/file_dropdown/generate.svg';
 import exitIcon from '../../assets/icons/file_dropdown/exit.svg';
 import { setTrackAtIndex } from '../../actions/studioActions';
 import { renderTracks } from '../../middleware/audioRedux';
+import { encodeMp3, forceDownload } from '../../helpers/utils';
 
 
 const Header = memo((props) => {
@@ -79,22 +80,9 @@ const Header = memo((props) => {
 
   const exportAction = useCallback(async () => {
     const renderedBuffer = await renderTracks(studio);
-    const wav = toWav(renderedBuffer);
+    const encoded = toWav(renderedBuffer);
 
-    const anchor = document.createElement('a');
-    document.body.appendChild(anchor);
-    anchor.style = 'display: none';
-
-    const blob = new window.Blob([new DataView(wav)], {
-      type: 'audio/wav',
-    });
-
-    const url = window.URL.createObjectURL(blob);
-    anchor.href = url;
-    anchor.download = 'audio.wav';
-    anchor.click();
-    window.URL.revokeObjectURL(url);
-    document.body.removeChild(anchor);
+    forceDownload([new DataView(encoded)], 'audio/wav', `${studio.title}.wav`); // for mp3 [new DataView] not needed
   }, [studio]);
 
 

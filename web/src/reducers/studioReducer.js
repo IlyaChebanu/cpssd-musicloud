@@ -23,6 +23,7 @@ export default (
     selectedTrack: 0,
     selectedSample: -1,
     clipboard: {},
+    title: 'Untitled',
   },
   action,
 ) => {
@@ -150,6 +151,11 @@ export default (
       return {
         ...state,
         clipboard: action.sample,
+      };
+    case 'SET_SONG_TITLE':
+      return {
+        ...state,
+        title: action.title,
       };
     default:
       return state;
