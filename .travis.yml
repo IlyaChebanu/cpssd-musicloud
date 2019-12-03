@@ -5,8 +5,10 @@ matrix:
         - "3.6"
       install:
         - pip install -r backend/requirements.txt
+      before_install:
+        - cd backend
       script:
-        - pytest --cov-fail-under=65 --cov=backend/src backend/tests && pylint backend/
+        - pytest --cov-fail-under=65 --cov=src/ tests/ && pylint src/ tests/ run.py
     - language: node_js
       node_js:
         - node
