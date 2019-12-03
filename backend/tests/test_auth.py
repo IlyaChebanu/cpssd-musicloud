@@ -38,7 +38,7 @@ class AuthTests(unittest.TestCase):
                     query_string=test_req_data,
                     follow_redirects=True
                 )
-                with open("src/controllers/auth/success.html", "rb") as file:
+                with open("./src/controllers/auth/success.html", "rb") as file:
                     expexcted_page = file.read()
                     self.assertEqual(200, res.status_code)
                     self.assertEqual(expexcted_page, res.data)
