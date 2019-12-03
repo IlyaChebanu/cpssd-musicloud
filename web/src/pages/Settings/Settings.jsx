@@ -8,6 +8,7 @@ import { emailRe } from '../../helpers/constants';
 import { showNotification } from '../../actions/notificationsActions';
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
+import { patchUserDetails } from "../../helpers/api";
 
 const Settings = memo(props => {
   const { dispatch } = props;
@@ -40,10 +41,33 @@ const Settings = memo(props => {
     return submitted && (newPassword !== repeatPassword || !repeatPassword) ? '#b90539' : 'white';
   }, [repeatPassword, newPassword, submitted]);
 
-  const handleSubmit = useCallback((e) => {
+  const handleSubmit = useCallback(async (e) => {
       e.preventDefault();
+      let reqData = {};
       if (!(password)) {
         dispatch(showNotification({ message: 'Please enter your current password' }));
+      } else if (!(newPassword || email)) {
+        dispatch(showNotification({ message: 'You haven\'t entered any new values' }));
+      } else {
+        reqData.current_password = password;
+        if (newPassword && !repeatPassword) {
+          dispatch(showNotification({message: 'Please repeat your new password'}));
+        } else if (newPassword !== repeatPassword) {
+          dispatch(showNotification({message: 'Passwords do not match'}));
+        } else {
+          reqData.password = newPassword;
+        }
+        if (email && !emailRe.test(email)) {
+          dispatch(showNotification({message: 'Invalid email address'}));
+        } else if (email && emailRe.test(email)) {
+          reqData.email = email;
+        }
+        console.log(reqData);
+        console.log(!emailRe.test(email));
+        const res = await patchUserDetails(reqData);
+        if (res.status === 200) {
+          dispatch(showNotification({ message: 'Account updated', type: 'info' }));
+    }
       }
       setSubmitted(true);
   }, [dispatch, email, password, newPassword, repeatPassword]);
@@ -75,6 +99,4 @@ Settings.propTypes = {
 
 Settings.displayName = 'Settings';
 
-const mapStateToProps = () => {};
-
-export default connect(mapStateToProps)(Settings);
+export default connect()(Settings);
