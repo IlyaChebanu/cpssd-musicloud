@@ -864,3 +864,47 @@ def update_publised_timestamp(sid, timestamp):
         sid,
     )
     query(sql, args)
+
+
+def notify_like_dids(sid):
+    """
+    Get the did's for the user who needs to be notified about a new song like.
+    :param sid:
+    Int - Sid of the user who's owns the liked song.
+    :return:
+    List - A list of dids.
+    """
+    sql = (
+        "SELECT did FROM Notifications WHERE uid IN (SELECT uid FROM Users "
+        "WHERE uid IN (SELECT uid FROM Songs WHERE sid=%s) AND "
+        "silence_post_notifcation=0);"
+    )
+    args = (
+        sid,
+    )
+    res = query(sql, args, True)
+    if not res:
+        raise NoResults
+    return res
+
+
+def notify_song_dids(uid):
+    """
+    Get the did's for every user who needs to be notified about the new song.
+    :param uid:
+    Int - Uid of the user who published the song.
+    :return:
+    List - A list of dids.
+    """
+    sql = (
+        "SELECT did FROM Notifications WHERE uid IN (SELECT uid FROM Users "
+        "WHERE uid IN (SELECT follower FROM Followers WHERE following=%s) "
+        "AND silence_song_notifcation=0);"
+    )
+    args = (
+        uid,
+    )
+    res = query(sql, args, True)
+    if not res:
+        raise NoResults
+    return res
