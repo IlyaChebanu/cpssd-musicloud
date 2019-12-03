@@ -38,7 +38,7 @@ class AuthTests(unittest.TestCase):
                     query_string=test_req_data,
                     follow_redirects=True
                 )
-                with open("backend/src/controllers/auth/success.html", "rb") as file:
+                with open("./src/controllers/auth/success.html", "rb") as file:
                     expexcted_page = file.read()
                     self.assertEqual(200, res.status_code)
                     self.assertEqual(expexcted_page, res.data)
@@ -95,11 +95,7 @@ class AuthTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual((b'{"message":"\'username\' is a required property\\n\\nFailed validating \''
-                          b"required' in schema:\\n    {'properties': {'password': {'minLength': 1, '"
-                          b"type': 'string'},\\n                    'username': {'minLength': 1, 'typ"
-                          b"e': 'string'}},\\n     'required': ['username', 'password'],\\n     'type'"
-                          b': \'object\'}\\n\\nOn instance:\\n    {\'password\': \'1234\'}"}\n'), res.data)
+        self.assertEqual(422, res.status_code)
         test_req_data = {
             "username": "",
             "password": "1234"

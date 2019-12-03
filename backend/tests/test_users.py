@@ -288,7 +288,7 @@ class UserTests(unittest.TestCase):
         """
         Ensure resending of the verification email is working.
         """
-        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake"]]
+        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake", 0, 0, 0, 0]]
         test_req_data = {
             "email": "username@fakemail.noshow",
         }
@@ -360,7 +360,7 @@ class UserTests(unittest.TestCase):
         """
         Ensure following is successful.
         """
-        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake"]]
+        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake", 0, 0, 0, 0]]
         mocked_followers.return_value = []
         test_req_data = {
             "username": "username",
@@ -517,7 +517,7 @@ class UserTests(unittest.TestCase):
         """
         Ensure following fails if a user attempts to follow themselves.
         """
-        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake"]]
+        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake", 0, 0, 0, 0]]
         test_req_data = {
             "username": "username",
         }
@@ -550,7 +550,7 @@ class UserTests(unittest.TestCase):
         """
         Ensure unfollowing is successful.
         """
-        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake"]]
+        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake", 0, 0, 0, 0]]
         mocked_followers.return_value = []
         test_req_data = {
             "username": "username",
@@ -716,7 +716,7 @@ class UserTests(unittest.TestCase):
         songs.return_value = 3
         following.return_value = 2
         follower.return_value = 1
-        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake"]]
+        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake", 0, 0, 0, 0]]
         test_req_data = {
             "username": "username",
         }
@@ -746,6 +746,10 @@ class UserTests(unittest.TestCase):
                 'followers': 1,
                 'following': 2,
                 'likes': 5,
+                'follow_notification_status': 0,
+                'post_notification_status': 0,
+                'song_notification_status': 0,
+                'like_notification_status': 0,
                 'posts': 4,
                 'profile_pic_url': 'http://image.fake',
                 'songs': 3,
@@ -879,7 +883,7 @@ class UserTests(unittest.TestCase):
         """
         Ensure sending password reset email works successfully.
         """
-        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake"]]
+        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake", 0, 0, 0, 0]]
         test_req_data = {
             "email": "fakeemail@idontwork.biz",
         }
@@ -958,7 +962,7 @@ class UserTests(unittest.TestCase):
         """
         Ensure password resets are completed successfully.
         """
-        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake"]]
+        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake", 0, 0, 0, 0]]
         mocked_reset.return_value = [["-1", 10000000, datetime.datetime.utcnow()]]
         test_req_data = {
             "email": "username@fakemail.noshow",
@@ -1187,7 +1191,7 @@ class UserTests(unittest.TestCase):
         """
         Ensure password reset fails if the user never made a password reset request.
         """
-        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake"]]
+        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake", 0, 0, 0, 0]]
         mocked_reset.side_effect = NoResults
         test_req_data = {
             "email": "username@deffoNotAnEmail.fake",
@@ -1207,7 +1211,7 @@ class UserTests(unittest.TestCase):
         """
         Ensure password reset fails if the user sends an expired reset code.
         """
-        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake"]]
+        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake", 0, 0, 0, 0]]
         mocked_reset.return_value = [["-1", 10000000, datetime.datetime(1970, 1, 1, 1, 1, 1)]]
         test_req_data = {
             "email": "username@deffoNotAnEmail.fake",
@@ -1312,7 +1316,7 @@ class UserTests(unittest.TestCase):
         """
         Ensure getting posts is successful without scroll tokens.
         """
-        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake"]]
+        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake", 0, 0, 0, 0]]
         mocked_num_posts.return_value = 2
         mocked_posts.return_value = [
             ["test_message1", "Fri, 01 Nov 2019 19:12:27 GMT"]
@@ -1580,7 +1584,7 @@ class UserTests(unittest.TestCase):
         """
         Ensure getting posts fails if the user tries to access a page that doesn't exist.
         """
-        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake"]]
+        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake", 0, 0, 0, 0]]
         mocked_num_posts.return_value = 2
         test_req_data = {
             "username": "username",
@@ -1657,7 +1661,7 @@ class UserTests(unittest.TestCase):
         """
         Ensure editing a user's email works.
         """
-        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake"]]
+        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake", 0, 0, 0, 0]]
         mocked_verify.return_value = True
         test_req_data = {
             "email": "username@email.com",
@@ -1736,7 +1740,7 @@ class UserTests(unittest.TestCase):
         """
         Ensure editing a user's email & password works.
         """
-        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake"]]
+        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake", 0, 0, 0, 0]]
         mocked_verify.return_value = True
         test_req_data = {
             "email": "username@email.com",
@@ -2260,7 +2264,7 @@ class UserTests(unittest.TestCase):
         """
         Ensure getting followers is successful without scroll tokens.
         """
-        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake"]]
+        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake", 0, 0, 0, 0]]
         mocked_num_followers.return_value = 2
         mocked_followers.return_value = [
             ["username1", "http://fake.com", 0]
@@ -2526,7 +2530,7 @@ class UserTests(unittest.TestCase):
         """
         Ensure getting followers fails if the user tries to access a page that doesn't exist.
         """
-        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake"]]
+        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake", 0, 0, 0, 0]]
         mocked_num_followers.return_value = 2
         test_req_data = {
             "username": "username",
@@ -2604,7 +2608,7 @@ class UserTests(unittest.TestCase):
         """
         Ensure getting followings is successful without scroll tokens.
         """
-        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake"]]
+        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake", 0, 0, 0, 0]]
         mocked_num_followings.return_value = 2
         mocked_followings.return_value = [
             ["username1", "http://fake.com", 0]
@@ -2870,7 +2874,7 @@ class UserTests(unittest.TestCase):
         """
         Ensure getting followings fails if the user tries to access a page that doesn't exist.
         """
-        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake"]]
+        mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake", 0, 0, 0, 0]]
         mocked_num_followings.return_value = 2
         test_req_data = {
             "username": "username",
@@ -3290,6 +3294,778 @@ class UserTests(unittest.TestCase):
             res = self.test_client.get(
                 "/api/v1/users/timeline",
                 query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    def test_patch_notification_status_success(self):
+        """
+        Ensure editing a user's notification preferences works.
+        """
+        test_req_data = {
+            "status": 0
+        }
+        with mock.patch('backend.src.controllers.users.controllers.update_silence_all_notificaitons'):
+            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+                mock_token.return_value = {
+                    'uid': -1,
+                    'email': 'username2@fakemail.noshow',
+                    'username': 'username2',
+                    'verified': 1,
+                    'random_value': (
+                        'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                        'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                        'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                        'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                        'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                        'zeyvzkssMFUTdeEvzbKu'
+                    )
+                }
+                res = self.test_client.patch(
+                    "/api/v1/users/notifications",
+                    json=test_req_data,
+                    headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                    follow_redirects=True
+                )
+                self.assertEqual(200, res.status_code)
+                expected_body = {'message': 'All notifications unmuted'}
+                self.assertEqual(expected_body, json.loads(res.data))
+
+    def test_patch_notification_status_fail_missing_access_token(self):
+        """
+        Ensure patch notifications fails if no access_token is sent.
+        """
+        res = self.test_client.patch(
+            "/api/v1/users/notifications",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_patch_notification_status_fail_access_token_expired(self):
+        """
+        Ensure patch notifications fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
+            res = self.test_client.patch(
+                "/api/v1/users/notifications",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_patch_notification_status_fail_bad_access_token_signature(self):
+        """
+        Ensure patch notifications fails if the access_token signature does not
+        match the one configured on the server.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
+            res = self.test_client.patch(
+                "/api/v1/users/notifications",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_patch_notification_status_fail_unknown_access_token_issue(self):
+        """
+        Ensure patch notifications fails if some unknown error relating to the
+        access_token occurs.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
+            res = self.test_client.patch(
+                "/api/v1/users/notifications",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_patch_notification_status_fail_missing_status(self):
+        """
+        Ensure patch notifications fails if the user doesn't send a status
+        value.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            test_req_data = {}
+            res = self.test_client.patch(
+                "/api/v1/users/notifications",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+            test_req_data = {
+                "status": None
+            }
+            res = self.test_client.patch(
+                "/api/v1/users/notifications",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    def test_patch_notification_status_fail_bad_status(self):
+        """
+        Ensure patch notifications fails if the status sent is not a valid
+        value.
+        """
+        test_req_data = {
+            "status": -1
+        }
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.patch(
+                "/api/v1/users/notifications",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    def test_patch_follow_notification_status_success(self):
+        """
+        Ensure editing a user's follow notification preferences works.
+        """
+        test_req_data = {
+            "status": 0
+        }
+        with mock.patch('backend.src.controllers.users.controllers.update_silence_follow_notificaitons'):
+            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+                mock_token.return_value = {
+                    'uid': -1,
+                    'email': 'username2@fakemail.noshow',
+                    'username': 'username2',
+                    'verified': 1,
+                    'random_value': (
+                        'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                        'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                        'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                        'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                        'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                        'zeyvzkssMFUTdeEvzbKu'
+                    )
+                }
+                res = self.test_client.patch(
+                    "/api/v1/users/notifications/follows",
+                    json=test_req_data,
+                    headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                    follow_redirects=True
+                )
+                self.assertEqual(200, res.status_code)
+                expected_body = {'message': 'Follow notifications unmuted'}
+                self.assertEqual(expected_body, json.loads(res.data))
+
+    def test_patch_follow_notification_status_fail_missing_access_token(self):
+        """
+        Ensure patch follow notifications fails if no access_token is sent.
+        """
+        res = self.test_client.patch(
+            "/api/v1/users/notifications/follows",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_patch_follow_notification_status_fail_access_token_expired(self):
+        """
+        Ensure patch follow notifications fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
+            res = self.test_client.patch(
+                "/api/v1/users/notifications/follows",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_patch_follow_notification_status_fail_bad_access_token_signature(self):
+        """
+        Ensure patch follow notifications fails if the access_token signature
+        does not match the one configured on the server.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
+            res = self.test_client.patch(
+                "/api/v1/users/notifications/follows",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_patch_follow_notification_status_fail_unknown_access_token_issue(self):
+        """
+        Ensure patch follow notifications fails if some unknown error relating
+        to the access_token occurs.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
+            res = self.test_client.patch(
+                "/api/v1/users/notifications/follows",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_patch_follow_notification_status_fail_missing_status(self):
+        """
+        Ensure patch follow notifications fails if the user doesn't send a
+        status value.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            test_req_data = {}
+            res = self.test_client.patch(
+                "/api/v1/users/notifications/follows",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+            test_req_data = {
+                "status": None
+            }
+            res = self.test_client.patch(
+                "/api/v1/users/notifications/follows",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    def test_patch_follow_notification_status_fail_bad_status(self):
+        """
+        Ensure patch follow notifications fails if the status sent is not a
+        valid value.
+        """
+        test_req_data = {
+            "status": -1
+        }
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.patch(
+                "/api/v1/users/notifications/follows",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    def test_patch_post_notification_status_success(self):
+        """
+        Ensure editing a user's post notification preferences works.
+        """
+        test_req_data = {
+            "status": 0
+        }
+        with mock.patch('backend.src.controllers.users.controllers.update_silence_follow_notificaitons'):
+            with mock.patch(
+                    'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+                mock_token.return_value = {
+                    'uid': -1,
+                    'email': 'username2@fakemail.noshow',
+                    'username': 'username2',
+                    'verified': 1,
+                    'random_value': (
+                        'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                        'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                        'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                        'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                        'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                        'zeyvzkssMFUTdeEvzbKu'
+                    )
+                }
+                res = self.test_client.patch(
+                    "/api/v1/users/notifications/posts",
+                    json=test_req_data,
+                    headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                    follow_redirects=True
+                )
+                self.assertEqual(200, res.status_code)
+                expected_body = {'message': 'Post notifications unmuted'}
+                self.assertEqual(expected_body, json.loads(res.data))
+
+    def test_patch_post_notification_status_fail_missing_access_token(self):
+        """
+        Ensure patch post notifications fails if no access_token is sent.
+        """
+        res = self.test_client.patch(
+            "/api/v1/users/notifications/posts",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_patch_post_notification_status_fail_access_token_expired(self):
+        """
+        Ensure patch post notifications fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
+            res = self.test_client.patch(
+                "/api/v1/users/notifications/posts",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_patch_post_notification_status_fail_bad_access_token_signature(self):
+        """
+        Ensure patch post notifications fails if the access_token signature
+        does not match the one configured on the server.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
+            res = self.test_client.patch(
+                "/api/v1/users/notifications/posts",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_patch_post_notification_status_fail_unknown_access_token_issue(self):
+        """
+        Ensure patch post notifications fails if some unknown error relating
+        to the access_token occurs.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
+            res = self.test_client.patch(
+                "/api/v1/users/notifications/posts",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_patch_post_notification_status_fail_missing_status(self):
+        """
+        Ensure patch post notifications fails if the user doesn't send a
+        status value.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            test_req_data = {}
+            res = self.test_client.patch(
+                "/api/v1/users/notifications/posts",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+            test_req_data = {
+                "status": None
+            }
+            res = self.test_client.patch(
+                "/api/v1/users/notifications/posts",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    def test_patch_post_notification_status_fail_bad_status(self):
+        """
+        Ensure patch post notifications fails if the status sent is not a
+        valid value.
+        """
+        test_req_data = {
+            "status": -1
+        }
+        with mock.patch(
+                'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.patch(
+                "/api/v1/users/notifications/posts",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    def test_patch_like_notification_status_success(self):
+        """
+        Ensure editing a user's like notification preferences works.
+        """
+        test_req_data = {
+            "status": 0
+        }
+        with mock.patch('backend.src.controllers.users.controllers.update_silence_follow_notificaitons'):
+            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+                mock_token.return_value = {
+                    'uid': -1,
+                    'email': 'username2@fakemail.noshow',
+                    'username': 'username2',
+                    'verified': 1,
+                    'random_value': (
+                        'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                        'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                        'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                        'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                        'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                        'zeyvzkssMFUTdeEvzbKu'
+                    )
+                }
+                res = self.test_client.patch(
+                    "/api/v1/users/notifications/likes",
+                    json=test_req_data,
+                    headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                    follow_redirects=True
+                )
+                self.assertEqual(200, res.status_code)
+                expected_body = {'message': 'Like notifications unmuted'}
+                self.assertEqual(expected_body, json.loads(res.data))
+
+    def test_patch_like_notification_status_fail_missing_access_token(self):
+        """
+        Ensure patch like notifications fails if no access_token is sent.
+        """
+        res = self.test_client.patch(
+            "/api/v1/users/notifications/likes",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_patch_like_notification_status_fail_access_token_expired(self):
+        """
+        Ensure patch like notifications fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
+            res = self.test_client.patch(
+                "/api/v1/users/notifications/likes",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_patch_like_notification_status_fail_bad_access_token_signature(self):
+        """
+        Ensure patch like notifications fails if the access_token signature
+        does not match the one configured on the server.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
+            res = self.test_client.patch(
+                "/api/v1/users/notifications/likes",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_patch_like_notification_status_fail_unknown_access_token_issue(self):
+        """
+        Ensure patch like notifications fails if some unknown error relating
+        to the access_token occurs.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
+            res = self.test_client.patch(
+                "/api/v1/users/notifications/likes",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_patch_like_notification_status_fail_missing_status(self):
+        """
+        Ensure patch like notifications fails if the user doesn't send a
+        status value.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            test_req_data = {}
+            res = self.test_client.patch(
+                "/api/v1/users/notifications/likes",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+            test_req_data = {
+                "status": None
+            }
+            res = self.test_client.patch(
+                "/api/v1/users/notifications/likes",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    def test_patch_like_notification_status_fail_bad_status(self):
+        """
+        Ensure patch like notifications fails if the status sent is not a
+        valid value.
+        """
+        test_req_data = {
+            "status": -1
+        }
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.patch(
+                "/api/v1/users/notifications/likes",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    def test_patch_song_notification_status_success(self):
+        """
+        Ensure editing a user's song notification preferences works.
+        """
+        test_req_data = {
+            "status": 0
+        }
+        with mock.patch('backend.src.controllers.users.controllers.update_silence_follow_notificaitons'):
+            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+                mock_token.return_value = {
+                    'uid': -1,
+                    'email': 'username2@fakemail.noshow',
+                    'username': 'username2',
+                    'verified': 1,
+                    'random_value': (
+                        'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                        'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                        'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                        'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                        'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                        'zeyvzkssMFUTdeEvzbKu'
+                    )
+                }
+                res = self.test_client.patch(
+                    "/api/v1/users/notifications/songs",
+                    json=test_req_data,
+                    headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                    follow_redirects=True
+                )
+                self.assertEqual(200, res.status_code)
+                expected_body = {'message': 'Song notifications unmuted'}
+                self.assertEqual(expected_body, json.loads(res.data))
+
+    def test_patch_song_notification_status_fail_missing_access_token(self):
+        """
+        Ensure patch song notifications fails if no access_token is sent.
+        """
+        res = self.test_client.patch(
+            "/api/v1/users/notifications/songs",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_patch_song_notification_status_fail_access_token_expired(self):
+        """
+        Ensure patch song notifications fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
+            res = self.test_client.patch(
+                "/api/v1/users/notifications/songs",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_patch_song_notification_status_fail_bad_access_token_signature(self):
+        """
+        Ensure patch song notifications fails if the access_token signature
+        does not match the one configured on the server.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
+            res = self.test_client.patch(
+                "/api/v1/users/notifications/songs",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_patch_song_notification_status_fail_unknown_access_token_issue(self):
+        """
+        Ensure patch song notifications fails if some unknown error relating
+        to the access_token occurs.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
+            res = self.test_client.patch(
+                "/api/v1/users/notifications/songs",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_patch_song_notification_status_fail_missing_status(self):
+        """
+        Ensure patch song notifications fails if the user doesn't send a
+        status value.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            test_req_data = {}
+            res = self.test_client.patch(
+                "/api/v1/users/notifications/songs",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+            test_req_data = {
+                "status": None
+            }
+            res = self.test_client.patch(
+                "/api/v1/users/notifications/songs",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    def test_patch_song_notification_status_fail_bad_status(self):
+        """
+        Ensure patch song notifications fails if the status sent is not a
+        valid value.
+        """
+        test_req_data = {
+            "status": -1
+        }
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = {
+                'uid': -1,
+                'email': 'username2@fakemail.noshow',
+                'username': 'username2',
+                'verified': 1,
+                'random_value': (
+                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+                    'zeyvzkssMFUTdeEvzbKu'
+                )
+            }
+            res = self.test_client.patch(
+                "/api/v1/users/notifications/songs",
+                json=test_req_data,
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )

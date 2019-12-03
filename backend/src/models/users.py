@@ -1,3 +1,4 @@
+# pylint: disable=C0302
 """
 Query models for interfacing with the DB for user related transactions.
 """
@@ -812,3 +813,209 @@ def get_timeline_song_only_length(uid):
     if not res:
         return 0
     return res[0][0]
+
+
+def register_device_for_notifications(did, uid):
+    """
+    Adds a device to the notifications table.
+    :param did:
+    Int - Unique ID of the mobile device.
+    :param uid:
+    Int - Uid of the user who owns the device.
+    :return:
+    None - Adds device to the notifications table and returns None.
+    """
+    sql = (
+        "INSERT INTO Notifications "
+        "(did, uid) "
+        "VALUES (%s, %s);"
+    )
+    args = (
+        did,
+        uid,
+    )
+    query(sql, args)
+
+
+def unregister_device_for_notifications(did, uid):
+    """
+    Removes a device from the notifications table.
+    :param did:
+    Int - Unique ID of the mobile device.
+    :param uid:
+    Int - Uid of the user who owns the device.
+    :return:
+    None - Removes the device from the notifications table and returns None.
+    """
+    sql = (
+        "DELETE FROM Notifications "
+        "WHERE did=%s AND uid=%s"
+    )
+    args = (
+        did,
+        uid,
+    )
+    query(sql, args)
+
+
+def update_silence_all_notificaitons(uid, status):
+    """
+    Update all the notification silencing columns in the Users table.
+    :param uid:
+    Int - Uid of the user you wish to change the silence notification statuses
+    of.
+    :param status:
+    Int - 0 for send notifications, 1 for mute notifications.
+    :return:
+    None - Updates the user's silence_notificaiton statuses and returns None.
+    """
+    sql = (
+        "UPDATE Users "
+        "SET silence_follow_notifcation = %s, silence_post_notifcation = %s, "
+        "silence_like_notifcation = %s, silence_song_notifcation = %s "
+        "WHERE uid = %s"
+    )
+    args = (
+        status,
+        status,
+        status,
+        status,
+        uid,
+    )
+    query(sql, args)
+
+
+def update_silence_follow_notificaitons(uid, status):
+    """
+    Update only the follow notification silencing column in the Users table.
+    :param uid:
+    Int - Uid of the user you wish to change the silence notification status
+    of.
+    :param status:
+    Int - 0 for send notifications, 1 for mute notifications.
+    :return:
+    None - Updates the user's follow notification status and returns None.
+    """
+    sql = (
+        "UPDATE Users "
+        "SET silence_follow_notifcation = %s "
+        "WHERE uid = %s"
+    )
+    args = (
+        status,
+        uid,
+    )
+    query(sql, args)
+
+
+def update_silence_post_notificaitons(uid, status):
+    """
+    Update only the post notification silencing column in the Users table.
+    :param uid:
+    Int - Uid of the user you wish to change the silence notification status
+    of.
+    :param status:
+    Int - 0 for send notifications, 1 for mute notifications.
+    :return:
+    None - Updates the user's post notification status and returns None.
+    """
+    sql = (
+        "UPDATE Users "
+        "SET silence_post_notifcation = %s "
+        "WHERE uid = %s"
+    )
+    args = (
+        status,
+        uid,
+    )
+    query(sql, args)
+
+
+def update_silence_song_notificaitons(uid, status):
+    """
+    Update only the song notification silencing column in the Users table.
+    :param uid:
+    Int - Uid of the user you wish to change the silence notification status
+    of.
+    :param status:
+    Int - 0 for send notifications, 1 for mute notifications.
+    :return:
+    None - Updates the user's song notification status and returns None.
+    """
+    sql = (
+        "UPDATE Users "
+        "SET silence_song_notifcation = %s "
+        "WHERE uid = %s"
+    )
+    args = (
+        status,
+        uid,
+    )
+    query(sql, args)
+
+
+def update_silence_like_notificaitons(uid, status):
+    """
+    Update only the like notification silencing column in the Users table.
+    :param uid:
+    Int - Uid of the user you wish to change the silence notification status
+    of.
+    :param status:
+    Int - 0 for send notifications, 1 for mute notifications.
+    :return:
+    None - Updates the user's like notification status and returns None.
+    """
+    sql = (
+        "UPDATE Users "
+        "SET silence_like_notifcation = %s "
+        "WHERE uid = %s"
+    )
+    args = (
+        status,
+        uid,
+    )
+    query(sql, args)
+
+
+def get_dids_for_a_user(uid):
+    """
+    Get all the dids for a given user.
+    :param uid:
+    Int - Uid of the user who's dids we want.
+    of.
+    :return:
+    List - A list of dids
+    """
+    sql = (
+        "SELECT did FROM Notifications "
+        "WHERE uid = %s"
+    )
+    args = (
+        uid,
+    )
+    res = query(sql, args, True)
+    if not res:
+        raise NoResults
+    return res
+
+
+def notify_post_dids(uid):
+    """
+    Get the did's for every user who needs to be notified about the new post.
+    :param uid:
+    Int - Uid of the user who posted.
+    :return:
+    List - A list of dids.
+    """
+    sql = (
+        "SELECT did FROM Notifications WHERE uid IN (SELECT uid FROM Users "
+        "WHERE uid IN (SELECT follower FROM Followers WHERE following=%s) "
+        "AND silence_post_notifcation=0);"
+    )
+    args = (
+        uid,
+    )
+    res = query(sql, args, True)
+    if not res:
+        raise NoResults
+    return res

@@ -1,3 +1,4 @@
+# pylint: disable=C0302
 """
 /users API controller code.
 """
@@ -15,10 +16,11 @@ from flask import request
 from jsonschema import validate, ValidationError
 
 from ...config import HOST, RESET_TIMEOUT, JWT_SECRET
+from ...models.errors import NoResults
 from ...utils.logger import log
 from ...utils import (
     random_string, send_mail, gen_scroll_tokens, gen_timeline_post_object,
-    gen_timeline_song_object
+    gen_timeline_song_object, notification_sender
 )
 from ...models.users import (
     insert_user, get_user_via_username, get_user_via_email, make_post,
@@ -29,7 +31,10 @@ from ...models.users import (
     reset_email, update_profiler_url, get_following_names, get_follower_names,
     get_timeline, get_timeline_length, get_timeline_posts_only,
     get_timeline_posts_only_length, get_timeline_song_only,
-    get_timeline_song_only_length
+    get_timeline_song_only_length, update_silence_all_notificaitons,
+    get_dids_for_a_user, update_silence_follow_notificaitons,
+    update_silence_post_notificaitons, update_silence_song_notificaitons,
+    update_silence_like_notificaitons, notify_post_dids
 )
 from ...models.verification import insert_verification, get_verification
 from ...middleware.auth_required import auth_required
@@ -72,6 +77,18 @@ def follow(user_data):
 
     if (user_data.get("uid"), other_user[0]) not in other_user_followers:
         post_follow(user_data.get("uid"), other_user[0])
+
+    muted = get_user_via_username(user_data.get("username"))[0][6]
+
+    if not muted:
+        try:
+            dids = []
+            for did in get_dids_for_a_user(user_data.get("uid")):
+                dids += did
+            message = other_user[6] + " has started following you."
+            notification_sender(message, dids, "New Follower")
+        except NoResults:
+            pass
 
     return {
         "message": "You are now following: " + request.json.get("username")
@@ -258,7 +275,11 @@ def user():
         "following": following_data,
         "songs": songs,
         "posts": user_posts,
-        "likes": likes
+        "likes": likes,
+        "follow_notification_status": user_data[0][6],
+        "post_notification_status": user_data[0][7],
+        "song_notification_status": user_data[0][8],
+        "like_notification_status": user_data[0][9]
     }, 200
 
 
@@ -388,6 +409,15 @@ def post(user_data):
 
     time_issued = datetime.datetime.utcnow()
     make_post(user_data.get("uid"), request.json.get("message"), time_issued)
+
+    try:
+        dids = []
+        for did in notify_post_dids(user_data.get("uid")):
+            dids += did
+        message = user_data.get("username") + " just posted."
+        notification_sender(message, dids, "New Post")
+    except NoResults:
+        pass
 
     return {"message": "Message posted."}, 200
 
@@ -983,3 +1013,173 @@ def timeline(user_data):  # pylint:disable=R0912, R0914, R0915
         "back_page": back_page,
         "timeline": res
     }, 200
+
+
+@USERS.route("/notifications", methods=["PATCH"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def patch_notification_status(user_data):
+    """
+    Endpoint to change a user's global notification preferences.
+    """
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "status": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1
+            }
+        },
+        "required": ["status"],
+        "minProperties": 1
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    update_silence_all_notificaitons(
+        user_data.get("uid"), request.json.get("status")
+    )
+
+    if request.json.get("status") == 0:
+        return {"message": "All notifications unmuted"}, 200
+    return {"message": "All notifications muted"}, 200
+
+
+@USERS.route("/notifications/follows", methods=["PATCH"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def patch_follow_notification_status(user_data):
+    """
+    Endpoint to change a user's follow notification preferences.
+    """
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "status": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1
+            }
+        },
+        "required": ["status"],
+        "minProperties": 1
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    update_silence_follow_notificaitons(
+        user_data.get("uid"), request.json.get("status")
+    )
+
+    if request.json.get("status") == 0:
+        return {"message": "Follow notifications unmuted"}, 200
+    return {"message": "Follow notifications muted"}, 200
+
+
+@USERS.route("/notifications/posts", methods=["PATCH"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def patch_post_notification_status(user_data):
+    """
+    Endpoint to change a user's post notification preferences.
+    """
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "status": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1
+            }
+        },
+        "required": ["status"],
+        "minProperties": 1
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    update_silence_post_notificaitons(
+        user_data.get("uid"), request.json.get("status")
+    )
+
+    if request.json.get("status") == 0:
+        return {"message": "Post notifications unmuted"}, 200
+    return {"message": "Post notifications muted"}, 200
+
+
+@USERS.route("/notifications/songs", methods=["PATCH"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def patch_song_notification_status(user_data):
+    """
+    Endpoint to change a user's song notification preferences.
+    """
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "status": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1
+            }
+        },
+        "required": ["status"],
+        "minProperties": 1
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    update_silence_song_notificaitons(
+        user_data.get("uid"), request.json.get("status")
+    )
+
+    if request.json.get("status") == 0:
+        return {"message": "Song notifications unmuted"}, 200
+    return {"message": "Song notifications muted"}, 200
+
+
+@USERS.route("/notifications/likes", methods=["PATCH"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def patch_like_notification_status(user_data):
+    """
+    Endpoint to change a user's like notification preferences.
+    """
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "status": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1
+            }
+        },
+        "required": ["status"],
+        "minProperties": 1
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    update_silence_like_notificaitons(
+        user_data.get("uid"), request.json.get("status")
+    )
+
+    if request.json.get("status") == 0:
+        return {"message": "Like notifications unmuted"}, 200
+    return {"message": "Like notifications muted"}, 200
