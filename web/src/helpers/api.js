@@ -122,3 +122,11 @@ export const getUserDetails = (username) => axios.get(
     headers: getAuth(),
   },
 );
+
+export const patchUserDetails = (reqData) => axios.patch(
+  `${API_URL}/v1/users`,
+  reqData,
+  {
+    headers: getAuth(),
+  },
+);

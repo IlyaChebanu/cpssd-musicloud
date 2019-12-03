@@ -1,0 +1,51 @@
+.wrapper {
+  height: 100vh;
+}
+
+.submit {
+  margin-top: 40px !important;
+}
+
+.sectionTitle {
+  margin: 40px 0px 0px 0px;
+  font-size: 24px;
+  color: white;
+  display: block;
+
+  &:first-child {
+    margin-top: 20px;
+  }
+}
+
+.formWrapper {
+  max-width: 840px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 40px;
+  margin-bottom: 40px;
+  width: 80%;
+  max-width: 550px;
+
+  .settingsError {
+    margin: 0;
+    color: #b90539;
+    height: 22px;
+    font-size: 14px;
+  }
+
+  h1 {
+    font-size: 48px;
+    color: white;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    input {
+
+      margin: 10px 0px 10px 0px;
+    }
+  }
+}
