@@ -2,7 +2,6 @@
 import React, { memo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 import styles from './ProfileBlock.module.scss';
 import SubmitButton from '../SubmitButton';
 import history from '../../history';
@@ -64,4 +63,4 @@ ProfileBlock.defaultProps = {
 
 ProfileBlock.displayName = 'ProfileBlock';
 
-export default connect()(ProfileBlock);
+export default (ProfileBlock);
