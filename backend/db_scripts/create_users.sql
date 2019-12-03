@@ -4,5 +4,9 @@ CREATE TABLE `musicloud_db`.`Users` (
     `username` VARCHAR(100) NOT NULL UNIQUE,
     `password` VARCHAR(100) NOT NULL,
     `verified` TINYINT DEFAULT 0,
-    `profiler` VARCHAR(255)
+    `profiler` VARCHAR(255),
+    `silence_follow_notifcation` TINYINT DEFAULT 0,
+    `silence_post_notifcation` TINYINT DEFAULT 0,
+    `silence_song_notifcation` TINYINT DEFAULT 0,
+    `silence_like_notifcation` TINYINT DEFAULT 0
 );
