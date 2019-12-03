@@ -54,7 +54,7 @@ const Settings = memo(props => {
           dispatch(showNotification({message: 'Please repeat your new password'}));
         } else if (newPassword !== repeatPassword) {
           dispatch(showNotification({message: 'Passwords do not match'}));
-        } else {
+        } else if (newPassword && repeatPassword && (newPassword === repeatPassword)) {
           reqData.password = newPassword;
         }
         if (email && !emailRe.test(email)) {
