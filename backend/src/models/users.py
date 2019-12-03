@@ -1,3 +1,4 @@
+# pylint: disable=C0302
 """
 Query models for interfacing with the DB for user related transactions.
 """
@@ -980,6 +981,28 @@ def get_dids_for_a_user(uid):
     sql = (
         "SELECT did FROM Notifications "
         "WHERE uid = %s"
+    )
+    args = (
+        uid,
+    )
+    res = query(sql, args, True)
+    if not res:
+        raise NoResults
+    return res
+
+
+def notify_post_dids(uid):
+    """
+    Get the did's for every user who needs to be notified about the new post.
+    :param uid:
+    Int - Uid of the user who posted.
+    :return:
+    List - A list of dids.
+    """
+    sql = (
+        "SELECT did FROM Notifications WHERE uid IN (SELECT uid FROM Users "
+        "WHERE uid IN (SELECT follower FROM Followers WHERE following=%s) "
+        "AND silence_post_notifcation=0);"
     )
     args = (
         uid,

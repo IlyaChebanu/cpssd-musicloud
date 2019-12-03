@@ -34,7 +34,7 @@ from ...models.users import (
     get_timeline_song_only_length, update_silence_all_notificaitons,
     get_dids_for_a_user, update_silence_follow_notificaitons,
     update_silence_post_notificaitons, update_silence_song_notificaitons,
-    update_silence_like_notificaitons
+    update_silence_like_notificaitons, notify_post_dids
 )
 from ...models.verification import insert_verification, get_verification
 from ...middleware.auth_required import auth_required
@@ -78,7 +78,9 @@ def follow(user_data):
     if (user_data.get("uid"), other_user[0]) not in other_user_followers:
         post_follow(user_data.get("uid"), other_user[0])
 
-    if other_user[6] == 0:
+    muted = get_user_via_username(user_data.get("username"))[0][6]
+
+    if not muted:
         try:
             dids = []
             for did in get_dids_for_a_user(user_data.get("uid")):
@@ -407,6 +409,15 @@ def post(user_data):
 
     time_issued = datetime.datetime.utcnow()
     make_post(user_data.get("uid"), request.json.get("message"), time_issued)
+
+    try:
+        dids = []
+        for did in notify_post_dids(user_data.get("uid")):
+            dids += did
+        message = user_data.get("username") + " just posted."
+        notification_sender(message, dids)
+    except NoResults:
+        pass
 
     return {"message": "Message posted."}, 200
 

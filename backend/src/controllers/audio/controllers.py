@@ -15,7 +15,8 @@ from ...middleware.auth_required import auth_required
 from ...middleware.sql_err_catcher import sql_err_catcher
 from ...utils.logger import log
 from ...utils import (
-    permitted_to_edit, gen_scroll_tokens, gen_song_object, gen_playlist_object
+    permitted_to_edit, gen_scroll_tokens, gen_song_object, gen_playlist_object,
+    notification_sender
 )
 from ...models.audio import (
     insert_song, insert_song_state, get_song_state, get_all_compiled_songs,
@@ -28,7 +29,8 @@ from ...models.audio import (
     delete_playlist, get_playlists, get_number_of_playlists,
     get_number_of_songs_in_playlist, get_playlist_data, add_to_playlist,
     remove_from_playlist, get_from_playlist, update_playlist_timestamp,
-    update_playlist_name, update_publised_timestamp
+    update_playlist_name, update_publised_timestamp, notify_like_dids,
+    notify_song_dids
 )
 from ...models.users import get_user_via_username
 from ...models.errors import NoResults
@@ -306,6 +308,15 @@ def like_song(user_data):
     if (user_data.get("uid"), request.json.get("sid")) not in like_pair:
         post_like(user_data.get("uid"), request.json.get("sid"))
 
+    try:
+        dids = []
+        for did in notify_like_dids(request.json.get("sid")):
+            dids += did
+        message = user_data.get("username") + " just liked your song!"
+        notification_sender(message, dids)
+    except NoResults:
+        pass
+
     return {"message": "Song liked"}, 200
 
 
@@ -582,6 +593,15 @@ def publish_song(user_data):
         request.json.get("sid"),
         str(datetime.datetime.utcnow())
     )
+
+    try:
+        dids = []
+        for did in notify_song_dids(user_data.get("uid")):
+            dids += did
+        message = user_data.get("username") + " just dropped a new song!"
+        notification_sender(message, dids)
+    except NoResults:
+        pass
 
     return {"message": "Song published."}, 200
 
