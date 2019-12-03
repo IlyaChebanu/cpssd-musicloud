@@ -5,7 +5,7 @@ https://pushy.me/docs/resources/python-backend-sample
 import json
 import requests
 
-from backend.src.config import PUSHY_KEY
+from ..config import PUSHY_KEY
 
 
 def notification_sender(message, dids, title):
