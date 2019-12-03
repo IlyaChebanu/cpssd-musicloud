@@ -30,12 +30,16 @@ const Header = memo((props) => {
     selected, studio, children, dispatch, history,
   } = props;
   const { tempo, tracks, songId } = studio;
+
   const handleSaveState = useCallback(async () => {
+    if (!songId) return true;
     const songState = { tempo, tracks };
     const res = await saveState(songId, songState);
     if (res.status === 200) {
       dispatch(showNotification({ message: 'Song saved', type: 'info' }));
+      return true;
     }
+    return false;
   }, [tempo, tracks, songId, dispatch]);
 
   function buildFileSelector() {
@@ -67,40 +71,25 @@ const Header = memo((props) => {
     };
   }, [dispatch, fileSelector, studio]);
 
-  const handleShowSongPicker = () => {
-    if (studio.tracks.length !== 0) {
-      if (!(window.confirm('Current song state will be lost. Are you sure you want to open the Song Picker?'))) {
-        return;
-      }
+  const handleShowSongPicker = useCallback(async () => {
+    if (await handleSaveState()) {
+      dispatch(setSongName('New Song'));
+      dispatch(setTracks([]));
+      dispatch(setTempo(140));
+      dispatch(showSongPicker());
     }
-    dispatch(setTracks([]));
-    dispatch(setTempo(140));
-    dispatch(showSongPicker());
-  };
+  }, [dispatch, handleSaveState]);
 
-  const handleHideSongPicker = () => {
-    let songName = '';
-    if (studio.tracks.length !== 0) {
-      songName = window.prompt('Current song state will be lost. Enter the new song name if you wish to proceed.');
-    } else {
-      songName = window.prompt('Enter the song name');
+  const handleHideSongPicker = useCallback(async () => {
+    if (await handleSaveState()) {
+      dispatch(setSongName('New Song'));
+      dispatch(setTracks([]));
+      dispatch(setTempo(140));
+      dispatch(hideSongPicker());
     }
-    // handle cancel button press event
-    if (songName === null) {
-      return;
-    }
-    // handle no song name provided
-    if (songName === '') {
-      dispatch(showNotification({ message: 'Song name cannot be empty', type: 'error' }));
-      return;
-    }
-    dispatch(setSongName(songName));
-    dispatch(setTracks([]));
-    dispatch(setTempo(140));
-    dispatch(hideSongPicker());
-  };
+  }, [dispatch, handleSaveState]);
 
-  const fileDropdownItems = [
+  const fileDropdownItems = useMemo(() => [
     { name: 'New', action: handleHideSongPicker, icon: newIcon },
     { name: 'Open', action: handleShowSongPicker, icon: openIcon },
     { name: 'Publish', icon: publishIcon },
@@ -109,8 +98,9 @@ const Header = memo((props) => {
     { name: 'Export', icon: exportIcon },
     { name: 'Generate', icon: generateIcon },
     { name: 'Exit', icon: exitIcon },
-  ];
-  const editDropdownItems = [
+  ], [handleHideSongPicker, handleSampleSelect, handleSaveState, handleShowSongPicker]);
+
+  const editDropdownItems = useMemo(() => [
     { name: 'Edit 1' },
     { name: 'Edit 2' },
     { name: 'Edit 3' },
@@ -119,17 +109,14 @@ const Header = memo((props) => {
     { name: 'Edit 6' },
     { name: 'Edit 7' },
     { name: 'Edit 8' },
-  ];
+  ], []);
 
-  const handleSignout = useCallback(
-    () => {
-      deleteTokenAPI();
-      cookie.remove('token');
-      dispatch(deleteToken);
-      history.push('/login');
-    },
-    [dispatch, history],
-  );
+  const handleSignout = useCallback(() => {
+    cookie.remove('token');
+    deleteTokenAPI();
+    dispatch(deleteToken);
+    history.push('/login');
+  }, [dispatch, history]);
 
   return (
     <div className={styles.header}>

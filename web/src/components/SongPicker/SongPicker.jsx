@@ -31,8 +31,6 @@ const SongPicker = memo((props) => {
           );
         });
         setGotSongs(s);
-      } else {
-        dispatch(showNotification({ message: res.data.message, type: 'error' }));
       }
     };
     getSongs();

@@ -5,7 +5,7 @@ export default (
       start: 1,
       stop: 17,
     },
-    songId: 1001,
+    songId: null,
     songName: 'New Song',
     gridSize: 1,
     gridWidth: 1,
