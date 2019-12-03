@@ -6,7 +6,7 @@ import PlusCircle from '../../assets/icons/plus-circle-light.svg';
 const NewSong = memo((props) => {
   const { className, onClick } = props;
   return (
-    <div onClick={onClick} className={`${styles.wrapper} ${className}`}>
+    <div onClick={onClick} className={`${styles.wrapper} ${className}`} role="button" tabIndex={0}>
       <div className={styles.thumbWrapper}>
         <img alt="song cover art" className={styles.thumbnail} src={PlusCircle} />
         <p>New Song</p>

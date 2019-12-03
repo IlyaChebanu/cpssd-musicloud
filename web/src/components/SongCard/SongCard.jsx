@@ -6,24 +6,23 @@ import CircularImage from '../CircularImage';
 import CloudQuestion from '../../assets/cloud-question.jpg';
 
 const SongCard = memo((props) => {
-  const { className, profiler } = props;
+  const { className } = props;
   return (
 
-  <div className={`${styles.wrapper} ${className}`}>
-    <div className={styles.thumbWrapper}>
-      <img alt="song cover art" className={styles.thumbnail} src={CloudQuestion} />
+    <div className={`${styles.wrapper} ${className}`}>
+      <div className={styles.thumbWrapper}>
+        <img alt="song cover art" className={styles.thumbnail} src={CloudQuestion} />
+      </div>
+      <div className={styles.details}>
+        <p className={styles.title}>A song</p>
+        <span>
+          <CircularImage className={styles.profilePic} src={ProfilePicture} />
+          <p className={styles.username}>Napstalgic</p>
+        </span>
+      </div>
     </div>
-    <div className={styles.details}>
-      <p className={styles.title}>A song</p>
-      <span>
-        <CircularImage className={styles.profilePic} src={ProfilePicture} />
-        <p className={styles.username}>Napstalgic</p>
-      </span>
-    </div>
-  </div>
-  )
-}
-);
+  );
+});
 
 SongCard.propTypes = {
   className: PropTypes.string,

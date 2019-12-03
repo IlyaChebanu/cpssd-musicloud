@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
 import styles from './Studio.module.scss';
 import Header from '../../components/Header';
 import {
-  setTracks, setScroll, setScrollY, setGridWidth,
+  setTracks, setScroll, setScrollY, setGridWidth, setTempo,
 } from '../../actions/studioActions';
 import { showNotification } from '../../actions/notificationsActions';
 import kick from '../../assets/basic_sounds/kick.wav';
@@ -28,35 +28,14 @@ import PlayBackControls from '../../components/PlaybackControls';
 import SongPicker from '../../components/SongPicker';
 import Track from '../../components/Track/Track';
 
-import { saveState } from '../../helpers/api';
+import { saveState, getSongState } from '../../helpers/api';
 import { useUpdateUserDetails } from '../../helpers/hooks';
 import store from '../../store';
 
 const Studio = memo((props) => {
   const { dispatch, tracks, studio } = props;
 
-  useUpdateUserDetails();
-  const tracksRef = useRef();
-
-  useEffect(() => {
-    const latest = tracks.reduce((m, track) => {
-      const sampleMax = track.samples.reduce((sm, sample) => {
-        const endTime = sample.time + (sample.duration * (studio.tempo / 60));
-        return Math.max(endTime, sm);
-      }, 1);
-      return Math.max(sampleMax, m);
-    }, 1);
-    const width = Math.max(
-      latest,
-      tracksRef.current
-        ? tracksRef.current.getBoundingClientRect().width / (40 * studio.gridSize)
-        : 0,
-    );
-    dispatch(setGridWidth(width));
-  }, [dispatch, tracks, studio.gridSize, studio.tempo, tracksRef]);
-
-
-  const exampleSong = {
+  const exampleSong = useMemo(() => ({
     name: 'Example Song 1',
     tempo: 400,
     tracks: [
@@ -256,7 +235,40 @@ const Studio = memo((props) => {
         ],
       },
     ],
-  };
+  }), []);
+
+  useUpdateUserDetails();
+  const tracksRef = useRef();
+
+  useEffect(() => {
+    if (studio.songId) {
+      (async () => {
+        const res = await getSongState(studio.songId);
+        if (res.status === 200) {
+          const songState = JSON.parse(res.data.song_state);
+          dispatch(setTracks(songState.tracks));
+          dispatch(setTempo(songState.tempo));
+        }
+      })();
+    }
+  }, [dispatch, exampleSong.tracks, studio.songId]);
+
+  useEffect(() => {
+    const latest = tracks.reduce((m, track) => {
+      const sampleMax = track.samples.reduce((sm, sample) => {
+        const endTime = sample.time + (sample.duration * (studio.tempo / 60));
+        return Math.max(endTime, sm);
+      }, 1);
+      return Math.max(sampleMax, m);
+    }, 1);
+    const width = Math.max(
+      latest,
+      tracksRef.current
+        ? tracksRef.current.getBoundingClientRect().width / (40 * studio.gridSize)
+        : 0,
+    );
+    dispatch(setGridWidth(width));
+  }, [dispatch, tracks, studio.gridSize, studio.tempo, tracksRef]);
 
   const handleScroll = useCallback((e) => {
     dispatch(setScroll(e.target.scrollLeft));

@@ -142,18 +142,20 @@ export default (store) => {
         });
 
         // Verify that all the tracks have buffers
-        await Promise.all(action.tracks.map(async (track) => {
-          await Promise.all(track.samples.map(async (sample) => {
-            if (!bufferStore[sample.url]) {
-              await store.dispatch(setSampleLoading(true));
-              const res = await axios.get(sample.url, { responseType: 'arraybuffer' });
-              const buffer = await audioContext.decodeAudioData(res.data);
-              bufferStore[sample.url] = buffer;
-              store.dispatch(setSampleLoading(false));
-            }
-            sample.duration = bufferStore[sample.url].duration;
+        if (action.tracks) {
+          await Promise.all(action.tracks.map(async (track) => {
+            await Promise.all(track.samples.map(async (sample) => {
+              if (!bufferStore[sample.url]) {
+                await store.dispatch(setSampleLoading(true));
+                const res = await axios.get(sample.url, { responseType: 'arraybuffer' });
+                const buffer = await audioContext.decodeAudioData(res.data);
+                bufferStore[sample.url] = buffer;
+                store.dispatch(setSampleLoading(false));
+              }
+              sample.duration = bufferStore[sample.url].duration;
+            }));
           }));
-        }));
+        }
         break;
 
       case 'SET_TRACK':
