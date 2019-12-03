@@ -8,6 +8,7 @@ import styles from "./styles";
 import MultiPurposeButton from "../../components/multiPurposeButton/multiPurposeButton";
 import { readStorageData, TOKEN_DATA_KEY, USERNAME_DATA_KEY, SETTINGS_PORTRAIT_DATA_KEY } from "../../utils/localStorage";
 import Orientation from 'react-native-orientation';
+import Pushy from 'pushy-react-native';
 
 class StartScreen extends React.Component {
   constructor(props) {
@@ -16,6 +17,18 @@ class StartScreen extends React.Component {
     this.state = {
       
     };
+  }
+
+  componentDidMount() {
+    // Register the device for push notifications
+    Pushy.register().then(async (deviceToken) => {
+      if (__DEV__) {
+        console.log('pushy deviceToken token: ' + deviceToken)
+      }
+      this.props.setDeviceToken(deviceToken)
+    }).catch((err) => {
+      console.error(err);
+    });
   }
 
   async loadCorrectFlow() {

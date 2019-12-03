@@ -68,9 +68,10 @@ class LoginScreen extends React.Component {
   }
 
   handleLoginClick() {
+    let deviceToken = this.props.deviceToken
     let invalidFields = getInvalidLoginDetails(this.state.username.trim(), this.state.password)
     if (invalidFields.length == 0) {
-      loginUser(this.state.username, this.state.password).then(response => {
+      loginUser(this.state.username, this.state.password, deviceToken).then(response => {
         if (response.data.access_token) {
           this.saveLoginDetails(response.data.access_token)
           this.props.setNewAccount(false)
@@ -171,6 +172,7 @@ class LoginScreen extends React.Component {
 function mapStateToProps(state) {
   return {
     token: state.home.token,
+    deviceToken: state.home.deviceToken,
     newAccount: state.reg.newAccount,
     email: state.reg.email,
   };
