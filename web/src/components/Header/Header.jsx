@@ -42,16 +42,11 @@ const Header = memo((props) => {
     return false;
   }, [tempo, tracks, songId, dispatch]);
 
-  function buildFileSelector() {
-    // eslint-disable-next-line no-undef
+
+  const handleSampleSelect = useCallback(() => {
     const fileSelector = document.createElement('input');
     fileSelector.setAttribute('type', 'file');
     fileSelector.setAttribute('accept', 'audio/*');
-    return fileSelector;
-  }
-
-  const fileSelector = buildFileSelector();
-  const handleSampleSelect = useCallback(() => {
     fileSelector.click();
     fileSelector.onchange = function onChange() {
       const url = uploadFile('audio', fileSelector.files[0], cookie.get('token'));
@@ -69,7 +64,7 @@ const Header = memo((props) => {
         dispatch(setTrackAtIndex(track, state.selectedTrack));
       });
     };
-  }, [dispatch, fileSelector, studio]);
+  }, [dispatch, studio]);
 
   const handleShowSongPicker = useCallback(async () => {
     if (await handleSaveState()) {
