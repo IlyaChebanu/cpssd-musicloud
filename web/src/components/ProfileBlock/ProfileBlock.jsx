@@ -5,14 +5,15 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styles from './ProfileBlock.module.scss';
 import SubmitButton from '../SubmitButton';
+import history from '../../history';
 
 const ProfileBlock = memo((props) => {
-  const { className, history } = props;
+  const { className } = props;
 
   const goToSettings = useCallback((e) => {
     e.preventDefault();
     history.push('/settings');
-  }, [history]);
+  }, []);
 
   return (
 
@@ -55,7 +56,6 @@ const ProfileBlock = memo((props) => {
 
 ProfileBlock.propTypes = {
   className: PropTypes.string,
-  history: PropTypes.object.isRequired,
 };
 
 ProfileBlock.defaultProps = {
