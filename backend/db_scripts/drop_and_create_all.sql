@@ -19,7 +19,10 @@ CREATE TABLE `musicloud_db`.`Users` (
     `password` VARCHAR(100) NOT NULL,
     `verified` TINYINT DEFAULT 0,
     `profiler` VARCHAR(255),
-    `silence_notificaitons` TINYINT DEFAULT 0
+    `silence_follow_notifcation` TINYINT DEFAULT 0,
+    `silence_post_notifcation` TINYINT DEFAULT 0,
+    `silence_song_notifcation` TINYINT DEFAULT 0,
+    `silence_like_notifcation` TINYINT DEFAULT 0
 );
 
 CREATE TABLE `musicloud_db`.`Songs` (
@@ -108,7 +111,7 @@ CREATE TABLE `musicloud_db`.`Playlist_State` (
 );
 
 CREATE TABLE `musicloud_db`.`Notifications` (
-    `did` INT NOT NULL UNIQUE AUTO_INCREMENT PRIMARY KEY,
+    `did` INT NOT NULL UNIQUE PRIMARY KEY,
     `uid` INT NOT NULL,
     FOREIGN KEY (uid) REFERENCES Users(uid)
 );

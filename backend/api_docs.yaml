@@ -559,7 +559,16 @@ paths:
               username:
                 type: "string"
                 example: "TestUser"
-              notification_status:
+              follow_notification_status:
+                type: "integer"
+                example: 0
+              post_notification_status:
+                type: "integer"
+                example: 0
+              song_notification_status:
+                type: "integer"
+                example: 0
+              like_notification_status:
                 type: "integer"
                 example: 0
         401:
@@ -753,8 +762,8 @@ paths:
     patch:
       tags:
       - "users"
-      summary: "Mute/Unmute a user's notifications"
-      description: "Changes the user's notification status between muted(0) & unmuted(1).\n\nThe status sent may only be 1 or 0."
+      summary: "Mute/Unmute all a user's notifications"
+      description: "Changes the user's notification status (for all types of notification) between muted(0) & unmuted(1).\n\nThe status sent may only be 1 or 0."
       consumes:
       - "application/json"
       produces:
@@ -782,7 +791,275 @@ paths:
             properties:
               message:
                 type: "string"
-                example: "Notification preferences updated"
+                example: "All notifications unmuted"
+        401:
+          description: "Bad credentials."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Incorrect password!"
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Error while hashing password."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+                
+  /users/notifications/follows:
+    patch:
+      tags:
+      - "users"
+      summary: "Mute/Unmute all a user's follow notifications"
+      description: "Changes the user's notification status (for 'follow' types of notification) between muted(0) & unmuted(1).\n\nThe status sent may only be 1 or 0."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "Authorization Header"
+        description: "This is where you should set your access_token."
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "Notification status\n\n0 - Unmuted\n\n1 - muted"
+        schema:
+          type: "object"
+          properties:
+            status:
+              type: "integer"
+              example: 0
+      responses:
+        200:
+          description: "Status updated"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Follow notifications unmuted"
+        401:
+          description: "Bad credentials."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Incorrect password!"
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Error while hashing password."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+                
+  /users/notifications/posts:
+    patch:
+      tags:
+      - "users"
+      summary: "Mute/Unmute all a user's post notifications"
+      description: "Changes the user's notification status (for 'post' types of notification) between muted(0) & unmuted(1).\n\nThe status sent may only be 1 or 0."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "Authorization Header"
+        description: "This is where you should set your access_token."
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "Notification status\n\n0 - Unmuted\n\n1 - muted"
+        schema:
+          type: "object"
+          properties:
+            status:
+              type: "integer"
+              example: 0
+      responses:
+        200:
+          description: "Status updated"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Post notifications unmuted"
+        401:
+          description: "Bad credentials."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Incorrect password!"
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Error while hashing password."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+                
+  /users/notifications/songs:
+    patch:
+      tags:
+      - "users"
+      summary: "Mute/Unmute all a user's song notifications"
+      description: "Changes the user's notification status (for 'song' types of notification) between muted(0) & unmuted(1).\n\nThe status sent may only be 1 or 0."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "Authorization Header"
+        description: "This is where you should set your access_token."
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "Notification status\n\n0 - Unmuted\n\n1 - muted"
+        schema:
+          type: "object"
+          properties:
+            status:
+              type: "integer"
+              example: 0
+      responses:
+        200:
+          description: "Status updated"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Song notifications unmuted"
+        401:
+          description: "Bad credentials."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Incorrect password!"
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Error while hashing password."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+                
+  /users/notifications/likes:
+    patch:
+      tags:
+      - "users"
+      summary: "Mute/Unmute all a user's like notifications"
+      description: "Changes the user's notification status (for 'like' types of notification) between muted(0) & unmuted(1).\n\nThe status sent may only be 1 or 0."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "Authorization Header"
+        description: "This is where you should set your access_token."
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "Notification status\n\n0 - Unmuted\n\n1 - muted"
+        schema:
+          type: "object"
+          properties:
+            status:
+              type: "integer"
+              example: 0
+      responses:
+        200:
+          description: "Status updated"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Like notifications unmuted"
         401:
           description: "Bad credentials."
           schema:
