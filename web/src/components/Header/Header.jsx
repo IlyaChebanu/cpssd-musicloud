@@ -118,6 +118,8 @@ const Header = memo((props) => {
     history.push('/login');
   }, [dispatch, history]);
 
+  const songNameStyle = useMemo(() => ({ visibility: selected !== 0 ? 'hidden' : 'visible' }), [selected]);
+
   return (
     <div className={styles.header}>
       <Logo className={styles.logo} />
@@ -127,7 +129,7 @@ const Header = memo((props) => {
         {children}
       </div>
       <div className={styles.songName}>
-        <p style={{ visibility: selected !== 0 ? 'hidden' : 'visible' }}>
+        <p style={songNameStyle}>
           {studio.songName}
         </p>
       </div>
