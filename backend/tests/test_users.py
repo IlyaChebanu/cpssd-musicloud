@@ -2032,7 +2032,7 @@ class UserTests(unittest.TestCase):
                     headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                     follow_redirects=True
                 )
-                self.assertEqual(401, res.status_code)
+                self.assertEqual(403, res.status_code)
 
     def test_patch_user_fail_bad_email(self):
         """

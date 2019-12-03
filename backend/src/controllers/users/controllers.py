@@ -528,7 +528,7 @@ def patch_user(user_data):
     # Check the user's password against the provided one
     user_password = get_user_via_username(user_data.get("username"))[0][3]
     if not argon2.verify(request.json.get("current_password"), user_password):
-        return {"message": "Incorrect password!"}, 401
+        return {"message": "Incorrect password!"}, 403
 
     res_string = ""
     code = ""
