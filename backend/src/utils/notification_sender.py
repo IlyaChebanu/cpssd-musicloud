@@ -2,8 +2,8 @@
 This code was adapted from the the code found here:
 https://pushy.me/docs/resources/python-backend-sample
 """
-import requests
 import json
+import requests
 
 from backend.src.config import PUSHY_KEY
 

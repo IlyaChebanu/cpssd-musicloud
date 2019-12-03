@@ -978,6 +978,14 @@ def update_silence_like_notificaitons(uid, status):
 
 
 def get_dids_for_a_user(uid):
+    """
+    Get all the dids for a given user.
+    :param uid:
+    Int - Uid of the user who's dids we want.
+    of.
+    :return:
+    List - A list of dids
+    """
     sql = (
         "SELECT did FROM Notifications "
         "WHERE uid = %s"
