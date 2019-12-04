@@ -84,9 +84,9 @@ def follow(user_data):
     if not muted:
         try:
             dids = []
-            for did in get_dids_for_a_user(user_data.get("uid")):
+            for did in get_dids_for_a_user(other_user[0]):
                 dids += did
-            message = other_user[6] + " has started following you."
+            message = user_data.get("username") + " has started following you."
             notification_sender(message, dids, "New Follower")
         except NoResults:
             pass
