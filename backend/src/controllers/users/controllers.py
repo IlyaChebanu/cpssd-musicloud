@@ -6,11 +6,11 @@ import re
 import traceback
 import datetime
 import random
-from smtplib import SMTPException
 
 import jwt
 import mysql.connector
-from passlib.hash import argon2
+from argon2 import PasswordHasher
+from argon2.exceptions import VerifyMismatchError
 from flask import Blueprint
 from flask import request
 from jsonschema import validate, ValidationError
@@ -41,6 +41,7 @@ from ...middleware.auth_required import auth_required
 from ...middleware.sql_err_catcher import sql_err_catcher
 
 USERS = Blueprint("users", __name__)
+HASHER = PasswordHasher()
 
 
 @USERS.route("/follow", methods=["POST"])
@@ -164,7 +165,7 @@ def register():
         return {"message": str(exc)}, 422
 
     try:
-        password_hash = argon2.hash(request.json.get("password"))
+        password_hash = HASHER.hash(request.json.get("password"))
     except Exception:  # pylint:disable=W0703
         log("error", "Failed to hash password", traceback.format_exc())
         return {"message": "Error while hashing password."}, 500
@@ -191,7 +192,7 @@ def register():
 
     try:
         send_mail(request.json.get("email"), subject, body)
-    except SMTPException:
+    except Exception:  # pylint:disable=W0703
         log("error", "Failed to send email.", traceback.format_exc())
 
     return {"message": "User created!"}, 200
@@ -244,7 +245,7 @@ def reverify():
 
     try:
         send_mail(request.json.get("email"), subject, body)
-    except SMTPException:
+    except Exception:  # pylint:disable=W0703
         log("error", "Failed to send email.", traceback.format_exc())
 
     return {"message": "Verification email sent."}, 200
@@ -320,7 +321,7 @@ def get_reset():
 
     try:
         send_mail(email, subject, body)
-    except SMTPException:
+    except Exception:  # pylint:disable=W0703
         log("error", "Failed to send email.", traceback.format_exc())
 
     return {"message": "Email sent."}, 200
@@ -362,7 +363,7 @@ def reset():
     code = request.json.get("code")
 
     try:
-        password_hash = argon2.hash(request.json.get("password"))
+        password_hash = HASHER.hash(request.json.get("password"))
     except Exception:  # pylint:disable=W0703
         log("error", "Failed to hash password", traceback.format_exc())
         return {"message": "Error while hashing password."}, 500
@@ -557,7 +558,9 @@ def patch_user(user_data):
 
     # Check the user's password against the provided one
     user_password = get_user_via_username(user_data.get("username"))[0][3]
-    if not argon2.verify(request.json.get("current_password"), user_password):
+    try:
+        HASHER.verify(user_password, request.json.get("current_password"))
+    except VerifyMismatchError:
         return {"message": "Incorrect password!"}, 403
 
     res_string = ""
@@ -582,7 +585,7 @@ def patch_user(user_data):
 
         try:
             send_mail(request.json.get("email"), subject, body)
-        except SMTPException:
+        except Exception:  # pylint:disable=W0703
             log("error", "Failed to send email.", traceback.format_exc())
 
         reset_email(user_data.get("uid"), request.json.get("email"))
@@ -590,7 +593,7 @@ def patch_user(user_data):
 
     if request.json.get("password"):
         try:
-            password_hash = argon2.hash(request.json.get("password"))
+            password_hash = HASHER.hash(request.json.get("password"))
         except Exception:  # pylint:disable=W0703
             log("error", "Failed to hash password", traceback.format_exc())
             return {"message": "Error while hashing password."}, 500

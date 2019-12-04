@@ -7,7 +7,8 @@ import jwt
 from flask import Blueprint
 from flask import request
 from flask import send_file
-from passlib.hash import argon2
+from argon2 import PasswordHasher
+from argon2.exceptions import VerifyMismatchError
 from jsonschema import validate, ValidationError
 
 from ...config import JWT_SECRET
@@ -25,6 +26,7 @@ from ...middleware.auth_required import auth_required
 from ...middleware.sql_err_catcher import sql_err_catcher
 
 AUTH = Blueprint('auth', __name__)
+HASHER = PasswordHasher()
 
 
 @AUTH.route('/verify', methods=["GET"])
@@ -77,7 +79,9 @@ def login():
     user = get_user_via_username(request.json.get("username"))
 
     # Check the user's password against the provided one
-    if not argon2.verify(request.json.get("password"), user[0][3]):
+    try:
+        HASHER.verify(user[0][3], request.json.get("password"))
+    except VerifyMismatchError:
         return {"message": "Bad login credentials."}, 401
 
     # Check the user is verified
