@@ -164,7 +164,6 @@ def register():
         log("warning", "Request validation failed.", str(exc))
         return {"message": str(exc)}, 422
 
-    import pdb; pdb.set_trace()
     try:
         password_hash = HASHER.hash(request.json.get("password"))
     except Exception:  # pylint:disable=W0703
@@ -322,7 +321,7 @@ def get_reset():
 
     try:
         send_mail(email, subject, body)
-    except SMTPException:
+    except Exception:  # pylint:disable=W0703
         log("error", "Failed to send email.", traceback.format_exc())
 
     return {"message": "Email sent."}, 200
@@ -586,7 +585,7 @@ def patch_user(user_data):
 
         try:
             send_mail(request.json.get("email"), subject, body)
-        except SMTPException:
+        except Exception:  # pylint:disable=W0703
             log("error", "Failed to send email.", traceback.format_exc())
 
         reset_email(user_data.get("uid"), request.json.get("email"))
