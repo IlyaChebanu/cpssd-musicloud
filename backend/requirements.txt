@@ -1,5 +1,5 @@
 # run 'pip install -r requirements.txt' to install dependencies
-passlib
+argon2-cffi
 mysql-connector
 argon2_cffi
 PyJWT
