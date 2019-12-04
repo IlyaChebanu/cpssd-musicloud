@@ -9,6 +9,7 @@ import mock
 
 from mysql.connector.errors import IntegrityError
 from jwt.exceptions import InvalidSignatureError
+from argon2.exceptions import VerifyMismatchError
 
 from ..src import APP
 from ..src.models.errors import NoResults
@@ -239,7 +240,7 @@ class UserTests(unittest.TestCase):
             "password": "1234"
         }
         with mock.patch(
-                'backend.src.controllers.users.controllers.argon2.hash'
+                'backend.src.controllers.users.controllers.PasswordHasher.hash'
         ) as file:
             file.side_effect = Exception()
             res = self.test_client.post(
@@ -1142,7 +1143,7 @@ class UserTests(unittest.TestCase):
             "password": "1234",
             "code": 10000000
         }
-        with mock.patch('backend.src.controllers.users.controllers.argon2.hash') as file:
+        with mock.patch('backend.src.controllers.users.controllers.PasswordHasher.hash') as file:
             file.side_effect = Exception()
             res = self.test_client.post(
                 "/api/v1/users/reset",
@@ -1655,7 +1656,7 @@ class UserTests(unittest.TestCase):
             )
             self.assertEqual(422, res.status_code)
 
-    @mock.patch('backend.src.controllers.auth.controllers.argon2.verify')
+    @mock.patch('backend.src.controllers.auth.controllers.PasswordHasher.verify')
     @mock.patch('backend.src.controllers.users.controllers.get_user_via_email')
     def test_patch_user_success_email_only(self, mocked_user, mocked_verify):
         """
@@ -1697,7 +1698,7 @@ class UserTests(unittest.TestCase):
                                 expected_body = {'message': 'Email reset, and verification mail sent. '}
                                 self.assertEqual(expected_body, json.loads(res.data))
 
-    @mock.patch('backend.src.controllers.auth.controllers.argon2.verify')
+    @mock.patch('backend.src.controllers.auth.controllers.PasswordHasher.verify')
     def test_patch_user_success_password_only(self, mocked_verify):
         """
         Ensure editing a user's password works.
@@ -1734,7 +1735,7 @@ class UserTests(unittest.TestCase):
                     expected_body = {'message': 'Password reset.'}
                     self.assertEqual(expected_body, json.loads(res.data))
 
-    @mock.patch('backend.src.controllers.auth.controllers.argon2.verify')
+    @mock.patch('backend.src.controllers.auth.controllers.PasswordHasher.verify')
     @mock.patch('backend.src.controllers.users.controllers.get_user_via_email')
     def test_patch_user_success_email_and_password(self, mocked_user, mocked_verify):
         """
@@ -2004,12 +2005,12 @@ class UserTests(unittest.TestCase):
             )
             self.assertEqual(422, res.status_code)
 
-    @mock.patch('backend.src.controllers.auth.controllers.argon2.verify')
+    @mock.patch('backend.src.controllers.auth.controllers.PasswordHasher.verify')
     def test_patch_user_fail_bad_current_password(self, mocked_verify):
         """
         Ensure patch user fails if the user sends an invalid current_password.
         """
-        mocked_verify.return_value = False
+        mocked_verify.side_effect = VerifyMismatchError
         with mock.patch('backend.src.controllers.users.controllers.get_user_via_username'):
             with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
                 mock_token.return_value = {
@@ -2069,7 +2070,7 @@ class UserTests(unittest.TestCase):
             )
             self.assertEqual(422, res.status_code)
 
-    @mock.patch('backend.src.controllers.auth.controllers.argon2.verify')
+    @mock.patch('backend.src.controllers.auth.controllers.PasswordHasher.verify')
     def test_patch_user_fail_password_hashing(self, mocked_verify):
         """
         Ensure patch user fails if the password hashing fails.
@@ -2081,7 +2082,7 @@ class UserTests(unittest.TestCase):
         }
         with mock.patch('backend.src.controllers.users.controllers.get_user_via_username'):
             with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-                with mock.patch('backend.src.controllers.users.controllers.argon2.hash') as file:
+                with mock.patch('backend.src.controllers.users.controllers.PasswordHasher.hash') as file:
                     file.side_effect = Exception()
                     mock_token.return_value = {
                         'uid': -1,

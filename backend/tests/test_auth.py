@@ -7,6 +7,7 @@ import json
 import mock
 
 from jwt.exceptions import InvalidSignatureError
+from argon2.exceptions import VerifyMismatchError
 
 from ..src import APP
 from ..src.utils.random_string import random_string
@@ -59,7 +60,7 @@ class AuthTests(unittest.TestCase):
         self.assertEqual(400, res.status_code)
 
     @mock.patch('backend.src.controllers.auth.controllers.random_string')
-    @mock.patch('backend.src.controllers.auth.controllers.argon2.verify')
+    @mock.patch('backend.src.controllers.auth.controllers.PasswordHasher.verify')
     @mock.patch('backend.src.controllers.auth.controllers.get_user_via_username')
     def test_login_success(self, mocked_user, mocked_verify, mocked_random_string):
         """
@@ -152,14 +153,14 @@ class AuthTests(unittest.TestCase):
             follow_redirects=True
         )
         self.assertEqual(422, res.status_code)
-    @mock.patch('backend.src.controllers.auth.controllers.argon2.verify')
+    @mock.patch('backend.src.controllers.auth.controllers.PasswordHasher.verify')
     @mock.patch('backend.src.controllers.auth.controllers.get_user_via_username')
     def test_login_fail_bad_credentials(self, mocked_user, mocked_verify):
         """
         Ensure login attempt fails if bad credentials are provided.
         """
         mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 1, "http://image.fake"]]
-        mocked_verify.return_value = False
+        mocked_verify.side_effect = VerifyMismatchError
         test_req_data = {
             "username": "username",
             "password": "1234"
@@ -173,7 +174,7 @@ class AuthTests(unittest.TestCase):
             )
             self.assertEqual(401, res.status_code)
 
-    @mock.patch('backend.src.controllers.auth.controllers.argon2.verify')
+    @mock.patch('backend.src.controllers.auth.controllers.PasswordHasher.verify')
     @mock.patch('backend.src.controllers.auth.controllers.get_user_via_username')
     def test_login_fail_unverified(self, mocked_user, mocked_verify):
         """
