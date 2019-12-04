@@ -1,11 +1,14 @@
 import random
 import datetime
 
-from passlib.hash import argon2
+from argon2 import PasswordHasher
 
 from backend.src.models.users import insert_full_user_data, make_post, post_follow
 from backend.src.models.audio import insert_full_song, post_like, insert_editor
 from backend.src.utils import random_string
+
+
+HASHER = PasswordHasher()
 
 
 def populate_users(number_of_users=1000, offset=0):
@@ -27,7 +30,7 @@ def populate_users(number_of_users=1000, offset=0):
                 insertion_count + offset,
                 username + random.choice(email_extensions),
                 username,
-                argon2.hash(random_string(32)),
+                HASHER.hash("1234"),
                 1,
                 "https://dcumusicloudbucket.s3-eu-west-1.amazonaws.com/profilers/1.jpeg"
             )
