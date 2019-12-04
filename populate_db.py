@@ -1,10 +1,15 @@
 import random
 import datetime
+import json
 
 from argon2 import PasswordHasher
 
-from backend.src.models.users import insert_full_user_data, make_post, post_follow
-from backend.src.models.audio import insert_full_song, post_like, insert_editor
+from backend.src.models.users import (
+    insert_full_user_data, make_post, post_follow
+)
+from backend.src.models.audio import (
+    insert_full_song, post_like, insert_editor, insert_song_state
+)
 from backend.src.utils import random_string
 
 
@@ -113,8 +118,58 @@ def populate_songs(start_uid, end_uid, number_of_songs=1000, offset=0):
                 cover,
                 random.choice(genres)
             )
+            state = json.dumps({
+                "tempo": 400,
+                "tracks": [
+                    {
+                        '0': {
+                            "volume": 0.1,
+                            "mute": False,
+                            "solo": False,
+                            "pan": 0,
+                            "name": 'Kick',
+                            "samples": [
+                                {
+                                    "id": 1,
+                                    "time": 1,
+                                    "url": '/static/media/kick.0bfa7d2f.wav',
+                                    "duration": 0.5,
+                                    "volume": 0.1,
+                                    "track": 0,
+                                    "buffer": {},
+                                    "endTime": 5.341360544217687
+                                },
+                                {
+                                    "id": 'MC40OTQ2MzU1',
+                                    "time": 5,
+                                    "url": '/static/media/kick.0bfa7d2f.wav',
+                                    "duration": 0.5,
+                                    "track": 0,
+                                    "volume": 0.1,
+                                    "buffer": {},
+                                    "endTime": 5.9413605442176864
+                                },
+                                {
+                                    "id": 'MC44NDMzNjU5',
+                                    "time": 13,
+                                    "url": '/static/media/kick.0bfa7d2f.wav',
+                                    "duration": 0.5,
+                                    "track": 0,
+                                    "volume": 0.1,
+                                    "buffer": {},
+                                    "endTime": 7.141360544217687
+                                }
+                            ]
+                        }
+                    }
+                ]
+            })
+            insert_song_state(insertion_count + offset, state, time_created)
             insertion_count += 1
-            print(str(insertion_count) + " out of " + str(number_of_songs) + " songs added.")
+            print(
+                str(insertion_count) + " out of " + str(number_of_songs)
+                + " songs added."
+            )
         except:
             continue
 
