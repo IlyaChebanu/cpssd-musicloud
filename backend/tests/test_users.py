@@ -13,7 +13,7 @@ from argon2.exceptions import VerifyMismatchError
 
 from ..src import APP
 from ..src.models.errors import NoResults
-from .constants import TEST_TOKEN
+from .constants import TEST_TOKEN, MOCKED_TOKEN, ALT_MOCKED_TOKEN
 
 
 class UserTests(unittest.TestCase):
@@ -368,20 +368,7 @@ class UserTests(unittest.TestCase):
         }
         with mock.patch("backend.src.controllers.users.controllers.post_follow"):
             with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-                mock_token.return_value = {
-                    'uid': -2,
-                    'email': 'username2@fakemail.noshow',
-                    'username': 'username2',
-                    'verified': 1,
-                    'random_value': (
-                        'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                        'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                        'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                        'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                        'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                        'zeyvzkssMFUTdeEvzbKu'
-                    )
-                }
+                mock_token.return_value = MOCKED_TOKEN
                 res = self.test_client.post(
                     "/api/v1/users/follow",
                     json=test_req_data,
@@ -449,20 +436,7 @@ class UserTests(unittest.TestCase):
         """
         test_req_data = {}
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -2,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = MOCKED_TOKEN
             res = self.test_client.post(
                 "/api/v1/users/follow",
                 json=test_req_data,
@@ -491,20 +465,7 @@ class UserTests(unittest.TestCase):
             "username": "iDon'tExist'",
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -2,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = MOCKED_TOKEN
             res = self.test_client.post(
                 "/api/v1/users/follow",
                 json=test_req_data,
@@ -523,20 +484,7 @@ class UserTests(unittest.TestCase):
             "username": "username",
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.post(
                 "/api/v1/users/follow",
                 json=test_req_data,
@@ -557,20 +505,7 @@ class UserTests(unittest.TestCase):
             "username": "username",
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -2,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = MOCKED_TOKEN
             res = self.test_client.post(
                 "/api/v1/users/unfollow",
                 json=test_req_data,
@@ -637,20 +572,7 @@ class UserTests(unittest.TestCase):
         Ensure unfollowing fails if no username is sent.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -2,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = MOCKED_TOKEN
             test_req_data = {}
             res = self.test_client.post(
                 "/api/v1/users/unfollow",
@@ -680,20 +602,7 @@ class UserTests(unittest.TestCase):
             "username": "iDon'tExist'",
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -2,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = MOCKED_TOKEN
             res = self.test_client.post(
                 "/api/v1/users/unfollow",
                 json=test_req_data,
@@ -722,20 +631,7 @@ class UserTests(unittest.TestCase):
             "username": "username",
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -2,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/users",
                 query_string=test_req_data,
@@ -814,20 +710,7 @@ class UserTests(unittest.TestCase):
         Ensure getting a user's info fails if no username is provided.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -2,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = MOCKED_TOKEN
             test_req_data = {}
             res = self.test_client.get(
                 "/api/v1/users",
@@ -857,20 +740,7 @@ class UserTests(unittest.TestCase):
             "username": "iDon'tExist'",
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -2,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/users",
                 query_string=test_req_data,
@@ -1235,20 +1105,7 @@ class UserTests(unittest.TestCase):
         }
         with mock.patch('backend.src.controllers.users.controllers.make_post'):
             with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-                mock_token.return_value = {
-                    'uid': -1,
-                    'email': 'username2@fakemail.noshow',
-                    'username': 'username2',
-                    'verified': 1,
-                    'random_value': (
-                        'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                        'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                        'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                        'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                        'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                        'zeyvzkssMFUTdeEvzbKu'
-                    )
-                }
+                mock_token.return_value = ALT_MOCKED_TOKEN
                 res = self.test_client.post(
                     "/api/v1/users/post",
                     json=test_req_data,
@@ -1327,20 +1184,7 @@ class UserTests(unittest.TestCase):
             "posts_per_page": 1
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/users/posts",
                 query_string=test_req_data,
@@ -1375,20 +1219,7 @@ class UserTests(unittest.TestCase):
             )
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/users/posts",
                 query_string=test_req_data,
@@ -1423,20 +1254,7 @@ class UserTests(unittest.TestCase):
             )
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/users/posts",
                 query_string=test_req_data,
@@ -1510,20 +1328,7 @@ class UserTests(unittest.TestCase):
         Ensure getting posts fails if no username or scroll tokens were provided.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {
                 "posts_per_page": 1
             }
@@ -1553,20 +1358,7 @@ class UserTests(unittest.TestCase):
         """
         mocked_user.side_effect = NoResults
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {
                 "username": "username",
                 "posts_per_page": 1
@@ -1593,20 +1385,7 @@ class UserTests(unittest.TestCase):
             "posts_per_page": 1
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/users/posts",
                 query_string=test_req_data,
@@ -1634,20 +1413,7 @@ class UserTests(unittest.TestCase):
             )
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/users/posts",
                 query_string=test_req_data,
@@ -1674,20 +1440,7 @@ class UserTests(unittest.TestCase):
                     with mock.patch('backend.src.controllers.users.controllers.send_mail'):
                         with mock.patch('backend.src.controllers.users.controllers.reset_email'):
                             with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-                                mock_token.return_value = {
-                                    'uid': -1,
-                                    'email': 'username2@fakemail.noshow',
-                                    'username': 'username2',
-                                    'verified': 1,
-                                    'random_value': (
-                                        'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                                        'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                                        'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                                        'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                                        'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                                        'zeyvzkssMFUTdeEvzbKu'
-                                    )
-                                }
+                                mock_token.return_value = ALT_MOCKED_TOKEN
                                 res = self.test_client.patch(
                                     "/api/v1/users",
                                     json=test_req_data,
@@ -1711,20 +1464,7 @@ class UserTests(unittest.TestCase):
         with mock.patch('backend.src.controllers.users.controllers.get_user_via_username'):
             with mock.patch('backend.src.controllers.users.controllers.reset_password'):
                 with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-                    mock_token.return_value = {
-                        'uid': -1,
-                        'email': 'username2@fakemail.noshow',
-                        'username': 'username2',
-                        'verified': 1,
-                        'random_value': (
-                            'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                            'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                            'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                            'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                            'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                            'zeyvzkssMFUTdeEvzbKu'
-                        )
-                    }
+                    mock_token.return_value = ALT_MOCKED_TOKEN
                     res = self.test_client.patch(
                         "/api/v1/users",
                         json=test_req_data,
@@ -1755,20 +1495,7 @@ class UserTests(unittest.TestCase):
                         with mock.patch('backend.src.controllers.users.controllers.reset_email'):
                             with mock.patch('backend.src.controllers.users.controllers.reset_password'):
                                 with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-                                    mock_token.return_value = {
-                                        'uid': -1,
-                                        'email': 'username2@fakemail.noshow',
-                                        'username': 'username2',
-                                        'verified': 1,
-                                        'random_value': (
-                                            'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                                            'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                                            'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                                            'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                                            'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                                            'zeyvzkssMFUTdeEvzbKu'
-                                        )
-                                    }
+                                    mock_token.return_value = ALT_MOCKED_TOKEN
                                     res = self.test_client.patch(
                                         "/api/v1/users",
                                         json=test_req_data,
@@ -1839,20 +1566,7 @@ class UserTests(unittest.TestCase):
             "current_password": "1234"
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.patch(
                 "/api/v1/users",
                 json=test_req_data,
@@ -1870,20 +1584,7 @@ class UserTests(unittest.TestCase):
             "current_password": "1234"
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.patch(
                 "/api/v1/users",
                 json=test_req_data,
@@ -1900,20 +1601,7 @@ class UserTests(unittest.TestCase):
             "current_password": "1234"
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.patch(
                 "/api/v1/users",
                 json=test_req_data,
@@ -1927,20 +1615,7 @@ class UserTests(unittest.TestCase):
         Ensure patch user fails if the user doesn't send there current password.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {
                 "email": "username@email.com",
                 "password": "1234"
@@ -1970,20 +1645,7 @@ class UserTests(unittest.TestCase):
         Ensure patch user fails if the user doesn't send any valid values.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {}
             res = self.test_client.patch(
                 "/api/v1/users",
@@ -2013,20 +1675,7 @@ class UserTests(unittest.TestCase):
         mocked_verify.side_effect = VerifyMismatchError
         with mock.patch('backend.src.controllers.users.controllers.get_user_via_username'):
             with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-                mock_token.return_value = {
-                    'uid': -1,
-                    'email': 'username2@fakemail.noshow',
-                    'username': 'username2',
-                    'verified': 1,
-                    'random_value': (
-                        'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                        'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                        'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                        'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                        'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                        'zeyvzkssMFUTdeEvzbKu'
-                    )
-                }
+                mock_token.return_value = ALT_MOCKED_TOKEN
                 test_req_data = {
                     "email": "username@email.com",
                     "current_password": "1234"
@@ -2048,20 +1697,7 @@ class UserTests(unittest.TestCase):
             "current_password": "1234"
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.patch(
                 "/api/v1/users",
                 json=test_req_data,
@@ -2084,20 +1720,7 @@ class UserTests(unittest.TestCase):
             with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
                 with mock.patch('backend.src.controllers.users.controllers.PasswordHasher.hash') as file:
                     file.side_effect = Exception()
-                    mock_token.return_value = {
-                        'uid': -1,
-                        'email': 'username2@fakemail.noshow',
-                        'username': 'username2',
-                        'verified': 1,
-                        'random_value': (
-                            'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                            'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                            'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                            'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                            'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                            'zeyvzkssMFUTdeEvzbKu'
-                        )
-                    }
+                    mock_token.return_value = ALT_MOCKED_TOKEN
                     res = self.test_client.patch(
                         "/api/v1/users",
                         json=test_req_data,
@@ -2115,20 +1738,7 @@ class UserTests(unittest.TestCase):
         }
         with mock.patch('backend.src.controllers.users.controllers.update_profiler_url'):
             with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-                mock_token.return_value = {
-                    'uid': -1,
-                    'email': 'username2@fakemail.noshow',
-                    'username': 'username2',
-                    'verified': 1,
-                    'random_value': (
-                        'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                        'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                        'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                        'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                        'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                        'zeyvzkssMFUTdeEvzbKu'
-                    )
-                }
+                mock_token.return_value = ALT_MOCKED_TOKEN
                 res = self.test_client.patch(
                     "/api/v1/users/profiler",
                     json=test_req_data,
@@ -2195,20 +1805,7 @@ class UserTests(unittest.TestCase):
         Ensure patching a user's profile pic URL fails if the user doesn't send a URL.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {}
             res = self.test_client.patch(
                 "/api/v1/users/profiler",
@@ -2233,20 +1830,7 @@ class UserTests(unittest.TestCase):
         Ensure patching a user's profile pic URL fails if the user doesn't send a valid URL.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {
                 "url": "not a url string"
             }
@@ -2275,20 +1859,7 @@ class UserTests(unittest.TestCase):
             "users_per_page": 1
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/users/followers",
                 query_string=test_req_data,
@@ -2322,20 +1893,7 @@ class UserTests(unittest.TestCase):
             )
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/users/followers",
                 query_string=test_req_data,
@@ -2369,20 +1927,7 @@ class UserTests(unittest.TestCase):
             )
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/users/followers",
                 query_string=test_req_data,
@@ -2456,20 +2001,7 @@ class UserTests(unittest.TestCase):
         Ensure getting followers fails if no username or scroll tokens were provided.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {
                 "users_per_page": 1
             }
@@ -2499,20 +2031,7 @@ class UserTests(unittest.TestCase):
         """
         mocked_user.side_effect = NoResults
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {
                 "username": "username",
                 "users_per_page": 1
@@ -2539,20 +2058,7 @@ class UserTests(unittest.TestCase):
             "users_per_page": 1
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/users/followers",
                 query_string=test_req_data,
@@ -2580,20 +2086,7 @@ class UserTests(unittest.TestCase):
             )
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/users/followers",
                 query_string=test_req_data,
@@ -2619,20 +2112,7 @@ class UserTests(unittest.TestCase):
             "users_per_page": 1
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/users/following",
                 query_string=test_req_data,
@@ -2666,20 +2146,7 @@ class UserTests(unittest.TestCase):
             )
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/users/following",
                 query_string=test_req_data,
@@ -2713,20 +2180,7 @@ class UserTests(unittest.TestCase):
             )
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/users/following",
                 query_string=test_req_data,
@@ -2800,20 +2254,7 @@ class UserTests(unittest.TestCase):
         Ensure getting followings fails if no username or scroll tokens were provided.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {
                 "users_per_page": 1
             }
@@ -2843,20 +2284,7 @@ class UserTests(unittest.TestCase):
         """
         mocked_user.side_effect = NoResults
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {
                 "username": "username",
                 "users_per_page": 1
@@ -2883,20 +2311,7 @@ class UserTests(unittest.TestCase):
             "users_per_page": 1
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/users/following",
                 query_string=test_req_data,
@@ -2924,20 +2339,7 @@ class UserTests(unittest.TestCase):
             )
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/users/following",
                 query_string=test_req_data,
@@ -2984,20 +2386,7 @@ class UserTests(unittest.TestCase):
             ]
         ]
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/users/timeline",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -3062,20 +2451,7 @@ class UserTests(unittest.TestCase):
             )
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/users/timeline",
                 query_string=test_req_data,
@@ -3129,20 +2505,7 @@ class UserTests(unittest.TestCase):
             )
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/users/timeline",
                 query_string=test_req_data,
@@ -3236,20 +2599,7 @@ class UserTests(unittest.TestCase):
             "items_per_page": 1
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/users/timeline",
                 query_string=test_req_data,
@@ -3278,20 +2628,7 @@ class UserTests(unittest.TestCase):
             )
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/users/timeline",
                 query_string=test_req_data,
@@ -3309,20 +2646,7 @@ class UserTests(unittest.TestCase):
         }
         with mock.patch('backend.src.controllers.users.controllers.update_silence_all_notificaitons'):
             with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-                mock_token.return_value = {
-                    'uid': -1,
-                    'email': 'username2@fakemail.noshow',
-                    'username': 'username2',
-                    'verified': 1,
-                    'random_value': (
-                        'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                        'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                        'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                        'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                        'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                        'zeyvzkssMFUTdeEvzbKu'
-                    )
-                }
+                mock_token.return_value = ALT_MOCKED_TOKEN
                 res = self.test_client.patch(
                     "/api/v1/users/notifications",
                     json=test_req_data,
@@ -3390,20 +2714,7 @@ class UserTests(unittest.TestCase):
         value.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {}
             res = self.test_client.patch(
                 "/api/v1/users/notifications",
@@ -3432,20 +2743,7 @@ class UserTests(unittest.TestCase):
             "status": -1
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.patch(
                 "/api/v1/users/notifications",
                 json=test_req_data,
@@ -3463,20 +2761,7 @@ class UserTests(unittest.TestCase):
         }
         with mock.patch('backend.src.controllers.users.controllers.update_silence_follow_notificaitons'):
             with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-                mock_token.return_value = {
-                    'uid': -1,
-                    'email': 'username2@fakemail.noshow',
-                    'username': 'username2',
-                    'verified': 1,
-                    'random_value': (
-                        'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                        'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                        'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                        'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                        'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                        'zeyvzkssMFUTdeEvzbKu'
-                    )
-                }
+                mock_token.return_value = ALT_MOCKED_TOKEN
                 res = self.test_client.patch(
                     "/api/v1/users/notifications/follows",
                     json=test_req_data,
@@ -3544,20 +2829,7 @@ class UserTests(unittest.TestCase):
         status value.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {}
             res = self.test_client.patch(
                 "/api/v1/users/notifications/follows",
@@ -3586,20 +2858,7 @@ class UserTests(unittest.TestCase):
             "status": -1
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.patch(
                 "/api/v1/users/notifications/follows",
                 json=test_req_data,
@@ -3618,20 +2877,7 @@ class UserTests(unittest.TestCase):
         with mock.patch('backend.src.controllers.users.controllers.update_silence_follow_notificaitons'):
             with mock.patch(
                     'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-                mock_token.return_value = {
-                    'uid': -1,
-                    'email': 'username2@fakemail.noshow',
-                    'username': 'username2',
-                    'verified': 1,
-                    'random_value': (
-                        'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                        'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                        'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                        'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                        'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                        'zeyvzkssMFUTdeEvzbKu'
-                    )
-                }
+                mock_token.return_value = ALT_MOCKED_TOKEN
                 res = self.test_client.patch(
                     "/api/v1/users/notifications/posts",
                     json=test_req_data,
@@ -3699,20 +2945,7 @@ class UserTests(unittest.TestCase):
         status value.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {}
             res = self.test_client.patch(
                 "/api/v1/users/notifications/posts",
@@ -3742,20 +2975,7 @@ class UserTests(unittest.TestCase):
         }
         with mock.patch(
                 'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.patch(
                 "/api/v1/users/notifications/posts",
                 json=test_req_data,
@@ -3773,20 +2993,7 @@ class UserTests(unittest.TestCase):
         }
         with mock.patch('backend.src.controllers.users.controllers.update_silence_follow_notificaitons'):
             with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-                mock_token.return_value = {
-                    'uid': -1,
-                    'email': 'username2@fakemail.noshow',
-                    'username': 'username2',
-                    'verified': 1,
-                    'random_value': (
-                        'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                        'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                        'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                        'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                        'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                        'zeyvzkssMFUTdeEvzbKu'
-                    )
-                }
+                mock_token.return_value = ALT_MOCKED_TOKEN
                 res = self.test_client.patch(
                     "/api/v1/users/notifications/likes",
                     json=test_req_data,
@@ -3854,20 +3061,7 @@ class UserTests(unittest.TestCase):
         status value.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {}
             res = self.test_client.patch(
                 "/api/v1/users/notifications/likes",
@@ -3896,20 +3090,7 @@ class UserTests(unittest.TestCase):
             "status": -1
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.patch(
                 "/api/v1/users/notifications/likes",
                 json=test_req_data,
@@ -3927,20 +3108,7 @@ class UserTests(unittest.TestCase):
         }
         with mock.patch('backend.src.controllers.users.controllers.update_silence_follow_notificaitons'):
             with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-                mock_token.return_value = {
-                    'uid': -1,
-                    'email': 'username2@fakemail.noshow',
-                    'username': 'username2',
-                    'verified': 1,
-                    'random_value': (
-                        'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                        'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                        'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                        'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                        'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                        'zeyvzkssMFUTdeEvzbKu'
-                    )
-                }
+                mock_token.return_value = ALT_MOCKED_TOKEN
                 res = self.test_client.patch(
                     "/api/v1/users/notifications/songs",
                     json=test_req_data,
@@ -4008,20 +3176,7 @@ class UserTests(unittest.TestCase):
         status value.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {}
             res = self.test_client.patch(
                 "/api/v1/users/notifications/songs",
@@ -4050,20 +3205,7 @@ class UserTests(unittest.TestCase):
             "status": -1
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.patch(
                 "/api/v1/users/notifications/songs",
                 json=test_req_data,

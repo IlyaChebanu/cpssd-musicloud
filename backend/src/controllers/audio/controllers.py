@@ -30,7 +30,7 @@ from ...models.audio import (
     get_number_of_songs_in_playlist, get_playlist_data, add_to_playlist,
     remove_from_playlist, get_from_playlist, update_playlist_timestamp,
     update_playlist_name, update_publised_timestamp, notify_like_dids,
-    notify_song_dids
+    notify_song_dids, update_song_name
 )
 from ...models.users import get_user_via_username
 from ...models.errors import NoResults
@@ -78,6 +78,41 @@ def create_song(user_data):
     return {
         "message": "Your song project has been created", "sid": row_id
     }, 200
+
+
+@AUDIO.route("/rename", methods=["PATCH"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def rename_song(user_data):
+    """
+    Endpoint for renaming new song.
+    """
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "sid": {
+                "type": "integer",
+                "minimum": 1
+            },
+            "title": {
+                "type": "string",
+                "minLength": 1
+            }
+        },
+        "required": ["sid", "title"]
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    if not permitted_to_edit(request.json.get("sid"), user_data.get("uid")):
+        return {"message": "You can't rename that song!"}, 401
+
+    update_song_name(request.json.get("title"), request.json.get("sid"))
+
+    return {"message": "Song renamed"}, 200
 
 
 @AUDIO.route("/state", methods=["POST"])

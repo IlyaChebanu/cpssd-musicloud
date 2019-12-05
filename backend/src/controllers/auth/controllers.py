@@ -10,6 +10,7 @@ from flask import send_file
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 from jsonschema import validate, ValidationError
+from mysql.connector.errors import IntegrityError
 
 from ...config import JWT_SECRET
 from ...utils.logger import log
@@ -102,8 +103,13 @@ def login():
 
     insert_login(user[0][0], access_token.decode('utf-8'), time_issued)
 
-    if request.json.get("did"):
-        register_device_for_notifications(request.json.get("did"), user[0][0])
+    try:
+        if request.json.get("did"):
+            register_device_for_notifications(
+                request.json.get("did"), user[0][0]
+            )
+    except IntegrityError:
+        pass
 
     return {"access_token": access_token.decode('utf-8')}, 200
 
