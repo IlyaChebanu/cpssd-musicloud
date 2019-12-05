@@ -52,7 +52,7 @@ export default class PasswordInput extends Component {
     }
 
     render() {
-        let visibleImg = this.state.maskPassword ? require("../../assets/images/visibility.png") : require("../../assets/images/visibility_off.png")
+        let visibleImg = this.state.maskPassword ? require("../../assets/images/visibility_off.png") : require("../../assets/images/visibility.png")
         return (
             <View style={[this.props.style, styles.container, !this.state.editable && styles.disabledContainer]} >
                 <TouchableOpacity activeOpacity={1} onPress={() => this.handleInputClick()}>

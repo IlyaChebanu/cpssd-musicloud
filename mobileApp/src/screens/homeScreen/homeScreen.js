@@ -33,16 +33,16 @@ class HomeScreen extends React.Component {
 
   handleSongClick(item, index) {
     this.props.setSongData(item)
-    this.props.setSongId(item[0])
-    this.props.setSongUrl(item[6])
-    this.getOtherUserDetails(item[1])
+    this.props.setSongId(item.sid)
+    this.props.setSongUrl(item.url)
+    this.getOtherUserDetails(item.username)
     this.props.navigateToMusicPlayerScreen()
   }
 
   getSongs() {
-    getCompiledSongs(this.props.token, '', 10).then(response => {
+    getCompiledSongs(this.props.token, '').then(response => {
       if (response.status === 200) {
-        this.setState({ songsData: response.data.compiled_songs})
+        this.setState({ songsData: response.data.songs})
       } else {
         
       }
@@ -59,10 +59,9 @@ class HomeScreen extends React.Component {
   }
 
   renderSong({ item, index }) {
-    let songName = item[2]
-    let authorName = item[1]
-    let songImage = item[7]
-    let genre = item[8]
+    let songName = item.title
+    let authorName = item.username
+    let songImage = item.cover
     let playImage = require('../../assets/images/play.png')
     return (
       <TouchableOpacity style={styles.songContainer} onPress={() => this.handleSongClick(item, index)}>
@@ -86,7 +85,7 @@ class HomeScreen extends React.Component {
             style={styles.discoverFlatList}
             data={this.state.songsData}
             renderItem={this.renderSong.bind(this)}
-            keyExtractor={item => String(item)}
+            keyExtractor={item => String(item.sid)}
             extraData={this.state.songsData}
           />
         </View>

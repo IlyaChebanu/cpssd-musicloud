@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from 'react-redux';
 import { ActionCreators } from '../../actions/index';
 import { bindActionCreators } from 'redux';
-import { StyleSheet, Text, View, Image, Alert } from "react-native";
+import { StyleSheet, Text, View, Image, Alert, TouchableOpacity } from "react-native";
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import { getUserInfo, patchUserPictureUrl } from "../../api/usersAPI";
@@ -35,7 +35,7 @@ class ProfileComponent extends React.Component {
 
   getUserDetails() {
     getUserInfo(this.props.username, this.props.accessToken).then(response => {
-      if (response.status===200) {
+      if (response.status === 200) {
         this.setState({
           userDetails: response.data
         })
@@ -63,7 +63,7 @@ class ProfileComponent extends React.Component {
             if (response === 200) {
               this.props.setPicUrl(picUrl)
               patchUserPictureUrl(this.props.accessToken, picUrl).then(response => {
-                if (response.status===200) {
+                if (response.status === 200) {
                   this.showAlert('Sucess', 'Photo uploaded sucessfully')
                 } else {
                   this.showAlert('Error', response.data.message ? response.data.message : 'patchUserPicture failed')
@@ -76,6 +76,14 @@ class ProfileComponent extends React.Component {
         }
       }
     })
+  }
+
+  handleFollowerClick() {
+    this.props.handleFollowerClick()
+  }
+
+  handleFollowingClick() {
+    this.props.handleFollowingClick()
   }
 
   render() {
@@ -106,9 +114,13 @@ class ProfileComponent extends React.Component {
         </PhotoUpload>
 
         <View style={styles.statsContainer}>
+            <TouchableOpacity style={styles.link} onPress={() => this.handleFollowerClick()}>
+              <Text style={styles.profileText}><Text style={styles.profileNum}>{userData.followers}</Text>{' followers'}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => this.handleFollowingClick()}>
+              <Text style={styles.profileText}><Text style={styles.profileNum}>{userData.following}</Text>{' following'}</Text>
+            </TouchableOpacity>
           <Text style={styles.profileText}>
-            <Text style={styles.profileNum}>{userData.followers}</Text>{' followers'}{'\n'}
-            <Text style={styles.profileNum}>{userData.following}</Text>{' following'}{'\n'}
             <Text style={styles.profileNum}>{userData.songs}</Text>{' songs'}{'\n'}
             <Text style={styles.profileNum}>{userData.posts}</Text>{' posts'}{'\n'}
             <Text style={styles.profileNum}>{userData.likes}</Text>{' likes'}

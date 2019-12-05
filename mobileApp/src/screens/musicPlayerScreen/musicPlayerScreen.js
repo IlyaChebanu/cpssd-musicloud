@@ -28,8 +28,6 @@ class MusicPlayerScreen extends React.Component {
 
     handleAuthorClick() {
         this.props.navigateToUserProfileScreen()
-        // this.props.navigation.navigate('Profile')
-        // this.props.navigateBack()
     }
 
     render() {

@@ -22,9 +22,11 @@ class StartScreen extends React.Component {
     let token = await readStorageData(TOKEN_DATA_KEY)
     let username = await readStorageData(USERNAME_DATA_KEY)
     let portraitMode = await readStorageData(SETTINGS_PORTRAIT_DATA_KEY)
-    this.props.setIsPortrait(portraitMode)
-    if (!portraitMode) {
+    if (portraitMode === false) {
+      this.props.setIsPortrait(portraitMode)
       Orientation.unlockAllOrientations();
+    } else if(portraitMode === true) {
+      this.props.setIsPortrait(portraitMode)
     }
     if (token != null) {
       this.props.setAuthToken(token)
