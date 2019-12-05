@@ -406,29 +406,9 @@ const Studio = memo((props) => {
               </div>
             </div>
             <div className={styles.tracks} onScroll={handleScroll} ref={tracksRef}>
-              {/* <div  className={styles.sidebar}>
-          <TimelineControls/>
-          <div style={trackControlsStyle}>
-            {tracks.map((track, i) => <TrackControls key={i} track={track} index={i} />)}
-            <div
-              className={`${styles.newTrack} ${tracks.length % 2 !== 1 ? styles.even : ''}`}
-              onClick={handleAddNewTrack}
-              role="button"
-              tabIndex={0}
-            >
-              Add new track
-            </div>
-          </div>
-        </div>
-        <div className={styles.scrollableMain} onScroll={handleScroll}>
-          <div className={styles.mainContent}>
-            <Timeline />
-            <div className={styles.songPicker}>
-        <SongPicker exampleSong={exampleSong} songs={[]}/>
-      </div>
-
-            <div className={styles.tracks}> */}
-              {renderableTracks}
+              <div className={styles.tracks}>
+                {renderableTracks}
+              </div>
             </div>
           </div>
         </div>
