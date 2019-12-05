@@ -9,23 +9,7 @@ import mock
 from jwt.exceptions import InvalidSignatureError
 
 from ..src import APP
-from .constants import TEST_TOKEN
-
-
-MOCKED_TOKEN = {
-    'uid': -2,
-    'email': 'username2@fakemail.noshow',
-    'username': 'username2',
-    'verified': 1,
-    'random_value': (
-        'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-        'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-        'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-        'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-        'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-        'zeyvzkssMFUTdeEvzbKu'
-    )
-}
+from .constants import TEST_TOKEN, MOCKED_TOKEN
 
 
 class MockBoto3Client:   # pylint: disable=R0903
