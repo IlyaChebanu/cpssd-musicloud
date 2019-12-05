@@ -15,7 +15,7 @@ S3 = Blueprint('s3', __name__)
 @S3.route("/signed-form-post", methods=["POST"])
 @sql_err_catcher()
 @auth_required(return_user=True)
-def signed_form_post(user):
+def signed_form_post(user_data):
     """
     Endpoint to access the S3 bucket.
     """
@@ -56,7 +56,7 @@ def signed_form_post(user):
 
     url = s3_client.generate_presigned_post(
         Bucket=AWS_CREDS['Bucket'],
-        Key=directory + "/" + str(user.get('uid')) + "_" + file_name,
+        Key=directory + "/" + str(user_data.get('uid')) + "_" + file_name,
         Fields={
             'Content-Type': file_type,
         },

@@ -10,6 +10,14 @@ from ..src import APP
 from .constants import TEST_TOKEN
 
 
+class MockBoto3Client(object):
+    """
+    A fake boto3 client for mocking in tests.
+    """
+    def generate_presigned_post(self, **kwargs):
+        return "http://fake.url"
+
+
 class S3Tests(unittest.TestCase):
     """
     Unit tests for /s3 API endpoints.
@@ -22,7 +30,7 @@ class S3Tests(unittest.TestCase):
         """
         Ensure uploads to the S3 bucket behave correctly.
         """
-        mock_url.return_value = "http://bucket.fake"
+        mock_url.return_value = MockBoto3Client()
         test_req_data = {
             "dir": "audio",
             "fileName": "test",
@@ -52,7 +60,7 @@ class S3Tests(unittest.TestCase):
             self.assertEqual(200, res.status_code)
             expected_body = {
                 "message": "Signed url for file uploading has been provided",
-                "signed_url": "http://bucket.fake"
+                "signed_url": 'http://fake.url'
             }
             self.assertEqual(expected_body, json.loads(res.data))
 
