@@ -908,3 +908,25 @@ def notify_song_dids(uid):
     if not res:
         raise NoResults
     return res
+
+
+def update_song_name(title, sid):
+    """
+    Change the title of a song.
+    :param title:
+    Str - New song name.
+    :param sid:
+    Int - ID of the song who's name we are changing.
+    :return:
+    None - Updates song name in DB and returns None.
+    """
+    sql = (
+        "UPDATE Songs "
+        "SET title=%s "
+        "WHERE sid = %s"
+    )
+    args = (
+        title,
+        sid,
+    )
+    query(sql, args)

@@ -717,7 +717,7 @@ paths:
               message:
                 type: "string"
                 example: "Email reset, and verification mail sent. Password reset."
-        401:
+        403:
           description: "Bad credentials."
           schema:
             type: "object"
@@ -2283,6 +2283,77 @@ paths:
               message:
                 type: "string"
                 example: "Song published."
+        401:
+          description: "Access_token expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+                
+  /audio/rename:
+    patch:
+      tags:
+      - "audio"
+      summary: "Rename a song"
+      description: "By passing an access_token to this endpoint in the request header, along with the sid of the song you wish to rename, and the new title you wish to rename the song to, in the request body, you will update that songs title, if you have permission to edit the song."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "sid of the song you wish to rename, and the new title."
+          required: true
+          schema:
+            type: "object"
+            properties:
+              sid:
+                type: "integer"
+                example: 1
+              title:
+                type: "string"
+                example: "NewSongName"
+      responses:
+        200:
+          description: "successful query"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Song renamed"
         401:
           description: "Access_token expired"
           schema:

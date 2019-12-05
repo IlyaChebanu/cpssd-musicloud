@@ -8,6 +8,7 @@ import jwt
 from flask import request
 
 from ..utils import verify_and_refresh, log
+from ..models.errors import NoResults
 
 
 def auth_required(
@@ -46,6 +47,8 @@ def auth_required(
             except jwt.exceptions.InvalidSignatureError:
                 return {"message": "Server failed to decode token."}, 500
             except jwt.exceptions.DecodeError:
+                return {"message": "Bad access_token."}, 401
+            except NoResults:
                 return {"message": "Bad access_token."}, 401
             # Intended to be a general catch all exception.
             except Exception:  # pylint:disable=W0703
