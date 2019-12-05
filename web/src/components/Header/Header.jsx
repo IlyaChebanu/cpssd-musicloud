@@ -72,15 +72,15 @@ const Header = memo((props) => {
     };
   }, [dispatch, fileSelector, studio]);
 
-  const handleShowSongPicker = useCallback(() => {
+  const handleShowSongPicker = () => {
     dispatch(setTracks([]));
     dispatch(showSongPicker());
-  }, [dispatch]);
+  };
 
-  const handleHideSongPicker = useCallback(() => {
+  const handleHideSongPicker = () => {
     dispatch(setTracks([]));
     dispatch(hideSongPicker());
-  }, [dispatch]);
+  };
 
   const fileDropdownItems = [
     { name: 'New', action: handleHideSongPicker, icon: newIcon },

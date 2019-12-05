@@ -54,7 +54,6 @@ const SongPicker = memo((props) => {
         {cards}
       </div>
     </div>
-
   );
 });
 
