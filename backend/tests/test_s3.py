@@ -12,6 +12,22 @@ from ..src import APP
 from .constants import TEST_TOKEN
 
 
+MOCKED_TOKEN = {
+    'uid': -2,
+    'email': 'username2@fakemail.noshow',
+    'username': 'username2',
+    'verified': 1,
+    'random_value': (
+        'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+        'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+        'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+        'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+        'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+        'zeyvzkssMFUTdeEvzbKu'
+    )
+}
+
+
 class MockBoto3Client:   # pylint: disable=R0903
     """
     A fake boto3 client for mocking in tests.
@@ -42,20 +58,7 @@ class S3Tests(unittest.TestCase):
             "fileType": "wav"
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -2,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = MOCKED_TOKEN
             res = self.test_client.post(
                 "/api/v1/s3/signed-form-post",
                 json=test_req_data,
@@ -74,20 +77,7 @@ class S3Tests(unittest.TestCase):
         Ensure reading from the S3 bucket fails if a dir value is not sent.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -2,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = MOCKED_TOKEN
             test_req_data = {
                 "fileName": "test",
                 "fileType": "wav"
@@ -117,20 +107,7 @@ class S3Tests(unittest.TestCase):
         Ensure reading from the S3 bucket fails if a fileName value is not sent.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -2,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = MOCKED_TOKEN
             test_req_data = {
                 "dir": "audio",
                 "fileType": "wav"
@@ -160,20 +137,7 @@ class S3Tests(unittest.TestCase):
         Ensure reading from the S3 bucket fails if a fileType value is not sent.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -2,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = MOCKED_TOKEN
             test_req_data = {
                 "dir": "audio",
                 "fileName": "test",
@@ -203,20 +167,7 @@ class S3Tests(unittest.TestCase):
         Ensure reading from the S3 bucket fails if the fileType and fileName values are not sent.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -2,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = MOCKED_TOKEN
             test_req_data = {
                 "dir": "audio",
             }
@@ -245,20 +196,7 @@ class S3Tests(unittest.TestCase):
         Ensure reading from the S3 bucket fails if the dir and fileName values are not sent.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -2,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = MOCKED_TOKEN
             test_req_data = {
                 "fileType": "wav"
             }
@@ -287,20 +225,7 @@ class S3Tests(unittest.TestCase):
         Ensure reading from the S3 bucket fails if the dir and fileType values are not sent.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -2,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = MOCKED_TOKEN
             test_req_data = {
                 "fileName": "test",
             }
@@ -329,20 +254,7 @@ class S3Tests(unittest.TestCase):
         Ensure reading from the S3 bucket fails if no values are sent.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -2,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = MOCKED_TOKEN
             res = self.test_client.post(
                 "/api/v1/s3/signed-form-post",
                 json={},
@@ -373,20 +285,7 @@ class S3Tests(unittest.TestCase):
             "fileType": "wav"
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -2,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = MOCKED_TOKEN
             res = self.test_client.post(
                 "/api/v1/s3/signed-form-post",
                 json=test_req_data,
