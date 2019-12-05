@@ -3,13 +3,25 @@
     width: 150px;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
     border-radius: 25px;
+    cursor:pointer;
+    justify-content: center;
+    align-items: center;
+    display: flex;
     background-color: #54565A;
+    transition: margin 0.5s, box-shadow 0.5s;
     
     p {
         padding: 0px;
         margin: 0 auto;
         font-size: 16px;
         color: white;
+    }
+
+    &:hover {
+      background: linear-gradient(90deg, #FF0265 0%, #E78D35 100%); 
+      margin: -10px 0px 0px 0px;
+      box-shadow: 0px 5px 5px 0px black;
+      transition: margin 0.5s, box-shadow 0.5s;
     }
   }
   

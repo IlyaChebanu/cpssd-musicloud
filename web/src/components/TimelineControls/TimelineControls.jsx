@@ -88,7 +88,7 @@ const TimelineControls = memo((props) => {
   return (
     <div className={styles.wrapper}>
       <span>
-        <input type="text" value={tempoInput} onChange={handleChange} onBlur={handleSetTempo} onKeyDown={handleKeyDown} />
+        <input type="text" value={tempo} onChange={handleChange} onBlur={handleSetTempo} onKeyDown={handleKeyDown} />
         <p>BPM</p>
       </span>
       {gridSnapEnabled

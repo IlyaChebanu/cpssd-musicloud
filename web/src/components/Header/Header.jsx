@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React, { useCallback, memo } from 'react';
+import React, { useCallback, useMemo, memo } from 'react';
 import cookie from 'js-cookie';
 import { connect } from 'react-redux';
 import { withRouter, Link } from 'react-router-dom';
@@ -21,7 +21,9 @@ import importIcon from '../../assets/icons/file_dropdown/import.svg';
 import exportIcon from '../../assets/icons/file_dropdown/export.svg';
 import generateIcon from '../../assets/icons/file_dropdown/generate.svg';
 import exitIcon from '../../assets/icons/file_dropdown/exit.svg';
-import { setTrackAtIndex } from '../../actions/studioActions';
+import {
+  setTrackAtIndex, setTracks, hideSongPicker, showSongPicker,
+} from '../../actions/studioActions';
 
 const Header = memo((props) => {
   const {
@@ -58,8 +60,6 @@ const Header = memo((props) => {
       const cast = Promise.resolve(url);
       cast.then(() => {
         const state = studio;
-
-
         const track = { ...state.tracks[state.selectedTrack] };
         track.samples.push({
           url: fileSelector.files[0],
@@ -72,10 +72,19 @@ const Header = memo((props) => {
     };
   }, [dispatch, fileSelector, studio]);
 
+  const handleShowSongPicker = useCallback(() => {
+    dispatch(setTracks([]));
+    dispatch(showSongPicker());
+  }, [dispatch]);
+
+  const handleHideSongPicker = useCallback(() => {
+    dispatch(setTracks([]));
+    dispatch(hideSongPicker());
+  }, [dispatch]);
 
   const fileDropdownItems = [
-    { name: 'New', action: null, icon: newIcon },
-    { name: 'Open', icon: openIcon },
+    { name: 'New', action: handleHideSongPicker, icon: newIcon },
+    { name: 'Open', action: handleShowSongPicker, icon: openIcon },
     { name: 'Publish', icon: publishIcon },
     { name: 'Save', icon: saveIcon, action: handleSaveState },
     { name: 'Import', icon: importIcon, action: handleSampleSelect },
@@ -112,8 +121,8 @@ const Header = memo((props) => {
         <Dropdown items={editDropdownItems} title="Edit" />
         {children}
       </div>
+      <p className={styles.songName}>Song name</p>
       <span>
-
         <nav>
           <Link to="/studio" className={selected === 0 ? styles.selected : ''}>Studio</Link>
           <Link to="/discover" className={selected === 1 ? styles.selected : ''}>Discover</Link>

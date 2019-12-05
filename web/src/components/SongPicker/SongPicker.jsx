@@ -1,68 +1,77 @@
-import React, { memo, useEffect, useCallback, useMemo } from 'react';
+import React, {
+  memo, useMemo, useCallback,
+} from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import styles from './SongPicker.module.scss';
-import OwnSongCard from '../../components/OwnSongCard'
+import OwnSongCard from '../OwnSongCard';
 import NewSong from '../NewSong/NewSong';
 import {
-  setTracks,
+  setTracks, hideSongPicker, setTempo, showSongPicker,
 } from '../../actions/studioActions';
-import { connect } from 'react-redux';
+import { showNotification } from '../../actions/notificationsActions';
+import store from '../../store';
 
-const songCards = [];
-const pushSongs = (songs) => {
-  for (let i = 1; i < 20; i += 1) {
-    songCards.push(<OwnSongCard key={i} songName={"Song " + i} className={styles.songCard} />);
-  }
+const cards = [];
+
+
+for (let i = 0; i < 20; i++) {
+  cards.push(<OwnSongCard key={i} songName={`Song ${i}`} className={styles.songCard} />);
 }
 
-// const handleAddNewTrack = useCallback(() => {
-//   dispatch(setTracks([
-//     ...tracks,
-//     {
-//       volume: 1,
-//       pan: 0,
-//       mute: false,
-//       solo: false,
-//       name: 'New track',
-//       samples: [],
-//     },
-//   ]));
-// }, [dispatch, tracks]);
-
 const SongPicker = memo((props) => {
-
-  
-  const { dispatch, exampleSong, tracks } = props;
-  
-  const click = () => {
-    dispatch(setTracks(exampleSong))};
-  
-  songCards.push(<OwnSongCard key={0} songName={"exampleSong"} className={styles.songCard} onClick={useEffect(click, [dispatch, tracks])}/>)
-  pushSongs()
+  const { songs, dispatch } = props;
+  const songCards = useMemo(() => songs.map((song, i) => (
+    <OwnSongCard
+      key={i}
+      songName={`${song.name}`}
+      className={styles.songCard}
+      onClick={() => {
+        if (window.confirm(`Are you sure you want to load "${song.name}" song?`)) {
+          dispatch(setTempo(song.tempo));
+          dispatch(setTracks(song.tracks));
+          dispatch(hideSongPicker());
+        }
+      }}
+    />
+  )), [dispatch, songs]);
   return (
-    <div className={styles.wrapper}>
+    <div style={{ display: store.getState().studio.songPickerHidden ? 'none' : 'true' }} className={styles.wrapper}>
       <div className={styles.songs}>
-        <NewSong className={styles.songCard} />
+        <NewSong
+          onClick={() => {
+            if (window.prompt('Enter the song name') !== '') {
+              dispatch(setTracks([]));
+              dispatch(setTempo(140));
+              dispatch(showSongPicker());
+            } else {
+              dispatch(showNotification({ message: 'Song name cannot be empty', type: 'error' }));
+            }
+          }}
+          className={styles.songCard}
+        />
         {songCards}
+        {cards}
       </div>
     </div>
-    
+
   );
 });
 
 SongPicker.propTypes = {
   dispatch: PropTypes.func.isRequired,
-  exampleSong: PropTypes.array,
+  songs: PropTypes.array,
 };
 
 SongPicker.defaultProps = {
-  exampleSong: [],
+  songs: [],
 };
 
 SongPicker.displayName = 'SongPicker';
 
-const mapStateToProps = ({ studio }) => ({ studio, tracks: studio.tracks })
-
+const mapStateToProps = ({ studio }) => ({
+  studio,
+  tracks: studio.tracks,
+});
 
 export default connect(mapStateToProps)(SongPicker);
-

@@ -12,7 +12,7 @@ export default (
     loopEnabled: true,
     scroll: 0,
     scrollY: 0,
-    tempo: 400.0,
+    tempo: 140.0,
     playingStartBeat: 1,
     playingStartTime: 0,
     playing: false,
@@ -23,6 +23,7 @@ export default (
     selectedTrack: 0,
     selectedSample: -1,
     clipboard: {},
+    songPickerHidden: false,
   },
   action,
 ) => {
@@ -150,6 +151,16 @@ export default (
       return {
         ...state,
         clipboard: action.sample,
+      };
+    case 'SONG_PICKER_HIDE':
+      return {
+        ...state,
+        songPickerHidden: true,
+      };
+    case 'SONG_PICKER_SHOW':
+      return {
+        ...state,
+        songPickerHidden: false,
       };
     default:
       return state;

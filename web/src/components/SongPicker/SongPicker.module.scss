@@ -2,13 +2,14 @@
     min-width: 150px;
     max-width: 720px;
     width: fit-content;
-    height: fit-content;
+    height: 500px;
     position: relative;
     display: inline;
     background-color: #303237;
     z-index: 11;
     border-radius: 25px;
     padding: 40px;
+    overflow-y: scroll;
     
     
 
