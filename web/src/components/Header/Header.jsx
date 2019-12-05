@@ -22,7 +22,7 @@ import exportIcon from '../../assets/icons/file_dropdown/export.svg';
 import generateIcon from '../../assets/icons/file_dropdown/generate.svg';
 import exitIcon from '../../assets/icons/file_dropdown/exit.svg';
 import {
-  setTrackAtIndex, setTracks, hideSongPicker, showSongPicker,
+  setTrackAtIndex, setTracks, hideSongPicker, showSongPicker, setTempo, setSongName,
 } from '../../actions/studioActions';
 
 const Header = memo((props) => {
@@ -30,13 +30,8 @@ const Header = memo((props) => {
     selected, studio, children, dispatch, history,
   } = props;
   const { tempo, tracks, songId } = studio;
-
   const handleSaveState = useCallback(async () => {
     const songState = { tempo, tracks };
-    /* At the moment, this just uses the hardcoded song ID in the state (1001). */
-    /* The user who has edit permission for the song by default it Kamil. */
-    /* You can add your uid and the sid 1001 to the Song_Editors table to */
-    /* save from your account. */
     const res = await saveState(songId, songState);
     if (res.status === 200) {
       dispatch(showNotification({ message: 'Song saved', type: 'info' }));
@@ -73,12 +68,35 @@ const Header = memo((props) => {
   }, [dispatch, fileSelector, studio]);
 
   const handleShowSongPicker = () => {
+    if (studio.tracks.length !== 0) {
+      if (!(window.confirm('Current song state will be lost. Are you sure you want to open the Song Picker?'))) {
+        return;
+      }
+    }
     dispatch(setTracks([]));
+    dispatch(setTempo(140));
     dispatch(showSongPicker());
   };
 
   const handleHideSongPicker = () => {
+    let songName = '';
+    if (studio.tracks.length !== 0) {
+      songName = window.prompt('Current song state will be lost. Enter the new song name if you wish to proceed.');
+    } else {
+      songName = window.prompt('Enter the song name');
+    }
+    // handle cancel button press event
+    if (songName === null) {
+      return;
+    }
+    // handle no song name provided
+    if (songName === '') {
+      dispatch(showNotification({ message: 'Song name cannot be empty', type: 'error' }));
+      return;
+    }
+    dispatch(setSongName(songName));
     dispatch(setTracks([]));
+    dispatch(setTempo(140));
     dispatch(hideSongPicker());
   };
 
@@ -121,7 +139,11 @@ const Header = memo((props) => {
         <Dropdown items={editDropdownItems} title="Edit" />
         {children}
       </div>
-      <p className={styles.songName}>Song name</p>
+      <div className={styles.songName}>
+        <p style={{ visibility: selected !== 0 ? 'hidden' : 'visible' }}>
+          {studio.songName}
+        </p>
+      </div>
       <span>
         <nav>
           <Link to="/studio" className={selected === 0 ? styles.selected : ''}>Studio</Link>

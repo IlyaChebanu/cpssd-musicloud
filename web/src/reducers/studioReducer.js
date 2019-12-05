@@ -6,6 +6,7 @@ export default (
       stop: 17,
     },
     songId: 1001,
+    songName: 'New Song',
     gridSize: 1,
     gridWidth: 1,
     gridSnapEnabled: true,
@@ -161,6 +162,16 @@ export default (
       return {
         ...state,
         songPickerHidden: false,
+      };
+    case 'SET_SONG_NAME':
+      return {
+        ...state,
+        songName: action.songName,
+      };
+    case 'SET_SONG_ID':
+      return {
+        ...state,
+        songId: action.songId,
       };
     default:
       return state;

@@ -162,3 +162,17 @@ export const showSongPicker = () => (dispatch) => {
     type: 'SONG_PICKER_SHOW',
   });
 };
+
+export const setSongName = (songName) => (dispatch) => {
+  dispatch({
+    type: 'SET_SONG_NAME',
+    songName,
+  });
+};
+
+export const setSongId = (songId) => (dispatch) => {
+  dispatch({
+    type: 'SET_SONG_ID',
+    songId,
+  });
+};

@@ -1,10 +1,13 @@
 .wrapper {
-    min-width: 150px;
-    max-width: 720px;
     width: fit-content;
-    height: 500px;
-    position: relative;
-    display: inline;
+    height: 50vh;
+    position: absolute;
+    top:0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+  	
+	margin: auto;
     background-color: #303237;
     z-index: 11;
     border-radius: 25px;
@@ -14,7 +17,7 @@
     
 
     .songs {
-        width: 720px;
+        width: 90vh;
         display: grid;
         grid-gap: 40px;
         grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));

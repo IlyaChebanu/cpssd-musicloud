@@ -337,9 +337,7 @@ const Studio = memo((props) => {
         </div>
       </div>
       <PlayBackControls style={{ 'pointer-events': 'none' }} />
-      <div className={styles.songPicker}>
-        <SongPicker style={{ display: store.getState().songPickerHidden ? 'none' : 'true' }} songs={[exampleSong]} />
-      </div>
+      <SongPicker songs={[exampleSong]} />
     </div>
 
   );

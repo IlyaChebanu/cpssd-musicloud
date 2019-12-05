@@ -33,19 +33,6 @@
   position: relative;
 }
 
-.songPicker {
-  width: fit-content;
-  height: fit-content;
-  justify-content: center;
-  align-content: center;
-  display: flex;
-  position: absolute;
-  top: 200px;
-  bottom: 0;
-  left: 600px;
-  right: 0;
-}
-
 .scrollableMain {
   width: calc(100% - 220px);
   height: 100%;
