@@ -7,6 +7,7 @@ import mock
 import json
 
 from ..src import APP
+from .constants import TEST_TOKEN
 
 
 class S3Tests(unittest.TestCase):
@@ -16,7 +17,7 @@ class S3Tests(unittest.TestCase):
     def setUp(self):
         self.test_client = APP.test_client(self)
 
-    @mock.patch("backend.src.controllers.s3.controllers.boto3.client.generate_presigned_post")
+    @mock.patch("backend.src.controllers.s3.controllers.boto3.client")
     def test_signed_form_post_success(self, mock_url):
         """
         Ensure uploads to the S3 bucket behave correctly.
@@ -45,10 +46,14 @@ class S3Tests(unittest.TestCase):
             res = self.test_client.post(
                 "/api/v1/s3/signed-form-post",
                 json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
             self.assertEqual(200, res.status_code)
-            expected_body = {"message": "User created!"}
+            expected_body = {
+                "message": "Signed url for file uploading has been provided",
+                "signed_url": "http://bucket.fake"
+            }
             self.assertEqual(expected_body, json.loads(res.data))
 
     def test_registration_fail_missing_username(self):
