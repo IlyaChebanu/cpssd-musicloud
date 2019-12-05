@@ -35,7 +35,6 @@ class UserProfileSongs extends React.Component {
     this.props.setSongId(item.sid)
     this.props.setSongUrl(item.url)
     this.props.navigateToMusicPlayerScreen()
-    // this.props.navigation.navigate('Player')
   }
 
   renderheader() {
