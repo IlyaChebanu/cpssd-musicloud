@@ -10,7 +10,6 @@ import {
   setTracks, hideSongPicker, setTempo, showSongPicker,
 } from '../../actions/studioActions';
 import { showNotification } from '../../actions/notificationsActions';
-import store from '../../store';
 
 const cards = [];
 
@@ -20,7 +19,7 @@ for (let i = 0; i < 20; i++) {
 }
 
 const SongPicker = memo((props) => {
-  const { songs, dispatch } = props;
+  const { songs, dispatch, studio } = props;
   const songCards = useMemo(() => songs.map((song, i) => (
     <OwnSongCard
       key={i}
@@ -36,7 +35,7 @@ const SongPicker = memo((props) => {
     />
   )), [dispatch, songs]);
   return (
-    <div style={{ display: store.getState().studio.songPickerHidden ? 'none' : 'true' }} className={styles.wrapper}>
+    <div style={{ display: studio.songPickerHidden ? 'none' : 'true' }} className={styles.wrapper}>
       <div className={styles.songs}>
         <NewSong
           onClick={() => {
