@@ -10,7 +10,7 @@ export default class FollowingComponent extends React.Component {
 
         this.state = {
             followerData: [],
-            following: true,
+            followingPairs: {},
         }
     }
 
@@ -20,24 +20,37 @@ export default class FollowingComponent extends React.Component {
 
     getFollowing() {
         getFollowers(this.props.username, this.props.accessToken).then(response => {
-            this.setState({ followerData: response.data.followers })
+            let followersData = response.data.followers
+            let obj = {}
+            for (var i = 0; i < followersData.length; i++) {
+                obj[followersData[i].username] = followersData[i].follow_back
+            }
+            this.setState({ followerData: followersData, followingPairs: obj })
         })
     }
 
-    handleFollowClick() {
-        console.warn('click')
-        followUser(this.props.token, this.props.otherUserData.username).then(response => {
+    handleFollowClick(item) {
+        followUser(this.props.accessToken, item.username).then(response => {
             if (response.status === 200) {
-                this.setState({ following: true })
+                this.setState(prevState => ({
+                    followingPairs: {                   // object that we want to update
+                        ...prevState.followingPairs,    // keep all other key-value pairs
+                        [item.username]: 1              // update the value of specific key
+                    }
+                }))
             }
         })
     }
 
-    handleUnFollowClick() {
-        console.warn('click')
-        unfollowUser(this.props.token, this.props.otherUserData.username).then(response => {
+    handleUnFollowClick(item) {
+        unfollowUser(this.props.accessToken, item.username).then(response => {
             if (response.status === 200) {
-                this.setState({ following: false })
+                this.setState(prevState => ({
+                    followingPairs: {
+                        ...prevState.followingPairs,
+                        [item.username]: 0
+                    }
+                }))
             }
         })
     }
@@ -46,19 +59,19 @@ export default class FollowingComponent extends React.Component {
         let profilePic = item.profiler
         let profilePicPlaceholder = require('../../assets/images/profilePlaceholder.png')
         let username = item.username
-        let isFollowing = this.state.following//item.follow_back
+        let isFollowing = this.state.followingPairs ? this.state.followingPairs[item.username] : item.follow_back
         return (
             <View style={styles.followingContainer}>
                 {profilePic ? <Image style={styles.profileImg} source={{ uri: profilePic }} /> :
                     <Image style={styles.profileImg} source={profilePicPlaceholder} />}
                 <Text style={styles.nameText}>{username}</Text>
                 {!isFollowing ?
-                    <TouchableOpacity style={styles.followingButton} onPress={() => this.handleFollowClick}>
+                    <TouchableOpacity style={styles.followingButton} onPress={() => this.handleFollowClick(item)}>
                         <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} colors={['#FF0265', '#E78D35']} style={styles.button}>
                             <Text style={styles.followText}>{'Follow'}</Text>
                         </LinearGradient>
                     </TouchableOpacity> :
-                    <TouchableOpacity style={styles.followingButton} onPress={() => this.handleUnFollowClick}>
+                    <TouchableOpacity style={styles.followingButton} onPress={() => this.handleUnFollowClick(item)}>
                         <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} colors={['#FF0265', '#E78D35']} style={styles.button}>
                             <Text style={styles.followText}>{'Following ✓'}</Text>
                         </LinearGradient>
