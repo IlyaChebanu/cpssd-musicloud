@@ -10,6 +10,8 @@ import { SafeAreaView } from "react-navigation";
 import ProfileComponent from "../../components/profileComponent/profileComponent";
 import ProfileSongs from "../../components/profileSongs/profileSongs";
 import ProfilePosts from "../../components/profilePosts/profilePosts";
+import FollowingComponent from "../../components/followingComponent/followingComponent";
+import FollowerComponent from "../../components/followerComponent/followerComponent";
 
 class ProfileScreen extends React.Component {
   constructor(props) {
@@ -91,8 +93,8 @@ class ProfileScreen extends React.Component {
           </View>
         </View>
         {this.state.activeFollowTab === 1 ?
-          null // following
-          : null // followers
+          <FollowerComponent accessToken={this.props.token} username={this.props.username} />
+          : <FollowingComponent accessToken={this.props.token} username={this.props.username} />
         }
       </View>
     )
