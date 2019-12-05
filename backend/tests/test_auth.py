@@ -11,7 +11,7 @@ from argon2.exceptions import VerifyMismatchError
 
 from ..src import APP
 from ..src.utils.random_string import random_string
-from .constants import TEST_TOKEN
+from .constants import TEST_TOKEN, MOCKED_TOKEN
 
 
 class AuthTests(unittest.TestCase):
@@ -201,20 +201,7 @@ class AuthTests(unittest.TestCase):
         """
         with mock.patch('backend.src.controllers.auth.controllers.delete_login'):
             with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-                mock_token.return_value = {
-                    'uid': -1,
-                    'email': 'username2@fakemail.noshow',
-                    'username': 'username2',
-                    'verified': 1,
-                    'random_value': (
-                        'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                        'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                        'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                        'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                        'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                        'zeyvzkssMFUTdeEvzbKu'
-                    )
-                }
+                mock_token.return_value = MOCKED_TOKEN
                 res = self.test_client.post(
                     "/api/v1/auth/logout",
                     headers={'Authorization': 'Bearer ' + TEST_TOKEN},

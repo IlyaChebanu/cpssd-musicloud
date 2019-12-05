@@ -10,7 +10,7 @@ from jwt.exceptions import InvalidSignatureError
 
 from ..src import APP
 from ..src.models.errors import NoResults
-from .constants import TEST_TOKEN
+from .constants import TEST_TOKEN, MOCKED_TOKEN, ALT_MOCKED_TOKEN
 
 
 class AudioTests(unittest.TestCase):
@@ -28,20 +28,7 @@ class AudioTests(unittest.TestCase):
         mocked_sid.return_value = 1
         with mock.patch('backend.src.controllers.audio.controllers.insert_song_state'):
             with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-                mock_token.return_value = {
-                    'uid': -1,
-                    'email': 'username2@fakemail.noshow',
-                    'username': 'username2',
-                    'verified': 1,
-                    'random_value': (
-                        'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                        'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                        'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                        'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                        'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                        'zeyvzkssMFUTdeEvzbKu'
-                    )
-                }
+                mock_token.return_value = ALT_MOCKED_TOKEN
                 test_req_data = {
                     "title": "test song"
                 }
@@ -111,20 +98,7 @@ class AudioTests(unittest.TestCase):
         Ensure creating a song fails if a title is not sent.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {}
             res = self.test_client.post(
                 "/api/v1/audio",
@@ -152,20 +126,7 @@ class AudioTests(unittest.TestCase):
         mocked_edit.return_value = 1
         with mock.patch('backend.src.controllers.audio.controllers.insert_song_state'):
             with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-                mock_token.return_value = {
-                    'uid': -1,
-                    'email': 'username2@fakemail.noshow',
-                    'username': 'username2',
-                    'verified': 1,
-                    'random_value': (
-                        'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                        'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                        'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                        'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                        'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                        'zeyvzkssMFUTdeEvzbKu'
-                    )
-                }
+                mock_token.return_value = ALT_MOCKED_TOKEN
                 test_req_data = {
                     "sid": 1,
                     "song_state": {
@@ -240,20 +201,7 @@ class AudioTests(unittest.TestCase):
         Ensure saving a song fails if a sid is not sent.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {
                 "song_state": {
                     "tracks": [
@@ -289,20 +237,7 @@ class AudioTests(unittest.TestCase):
         Ensure saving a song fails if a song_state is not sent.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {
                 "sid": 1
             }
@@ -319,20 +254,7 @@ class AudioTests(unittest.TestCase):
         Ensure saving a song fails if a song_state and sid is not sent.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {}
             res = self.test_client.post(
                 "/api/v1/audio/state",
@@ -350,20 +272,7 @@ class AudioTests(unittest.TestCase):
         mocked_edit.return_value = 0
         with mock.patch('backend.src.controllers.audio.controllers.insert_song_state'):
             with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-                mock_token.return_value = {
-                    'uid': -1,
-                    'email': 'username2@fakemail.noshow',
-                    'username': 'username2',
-                    'verified': 1,
-                    'random_value': (
-                        'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                        'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                        'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                        'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                        'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                        'zeyvzkssMFUTdeEvzbKu'
-                    )
-                }
+                mock_token.return_value = ALT_MOCKED_TOKEN
                 test_req_data = {
                     "sid": 1,
                     "song_state": {
@@ -389,20 +298,7 @@ class AudioTests(unittest.TestCase):
         mocked_edit.return_value = 1
         mocked_state.return_value = {}
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {
                 "sid": 1
             }
@@ -472,20 +368,7 @@ class AudioTests(unittest.TestCase):
         Ensure loading a song fails if a sid is not sent.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {}
             res = self.test_client.get(
                 "/api/v1/audio/state",
@@ -514,20 +397,7 @@ class AudioTests(unittest.TestCase):
         mocked_edit.return_value = 0
         mocked_state.return_value = {}
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {
                 "sid": 1
             }
@@ -551,20 +421,7 @@ class AudioTests(unittest.TestCase):
         mocked_num_songs.return_value = 2
         mocked_songs.return_value = test_songs
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username@fakemail.noshow',
-                'username': 'username',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/audio/compiled_songs",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -611,20 +468,7 @@ class AudioTests(unittest.TestCase):
             )
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/audio/compiled_songs",
                 query_string=test_req_data,
@@ -674,20 +518,7 @@ class AudioTests(unittest.TestCase):
             )
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/audio/compiled_songs",
                 query_string=test_req_data,
@@ -733,20 +564,7 @@ class AudioTests(unittest.TestCase):
         mocked_songs.return_value = test_songs
         mocked_user.return_value = [[1]]
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username@fakemail.noshow',
-                'username': 'username',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {
                 "username": "username"
             }
@@ -809,20 +627,7 @@ class AudioTests(unittest.TestCase):
             "username": "username"
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/audio/compiled_songs",
                 query_string=test_req_data,
@@ -871,20 +676,7 @@ class AudioTests(unittest.TestCase):
             "username": "username2"
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/audio/compiled_songs",
                 query_string=test_req_data,
@@ -977,20 +769,7 @@ class AudioTests(unittest.TestCase):
             "posts_per_page": 1
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/audio/compiled_songs",
                 query_string=test_req_data,
@@ -1018,20 +797,7 @@ class AudioTests(unittest.TestCase):
             )
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/audio/compiled_songs",
                 query_string=test_req_data,
@@ -1048,20 +814,7 @@ class AudioTests(unittest.TestCase):
         test_song = [[1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, None, 8]]
         mocked_song.return_value = test_song
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {
                 "sid": 1
             }
@@ -1080,20 +833,7 @@ class AudioTests(unittest.TestCase):
         Ensure user's can't get a song's info if they don't provide an sid.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {}
             res = self.test_client.get(
                 "/api/v1/audio/song",
@@ -1120,20 +860,7 @@ class AudioTests(unittest.TestCase):
         """
         mocked_song.side_effect = NoResults
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {
                 "sid": "-1"
             }
@@ -1209,20 +936,7 @@ class AudioTests(unittest.TestCase):
         mocked_num_songs.return_value = 2
         mocked_songs.return_value = test_songs
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username@fakemail.noshow',
-                'username': 'username',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/audio/editable_songs",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -1280,20 +994,7 @@ class AudioTests(unittest.TestCase):
             )
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/audio/editable_songs",
                 query_string=test_req_data,
@@ -1341,20 +1042,7 @@ class AudioTests(unittest.TestCase):
             )
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/audio/editable_songs",
                 query_string=test_req_data,
@@ -1447,20 +1135,7 @@ class AudioTests(unittest.TestCase):
             "posts_per_page": 1
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/audio/editable_songs",
                 query_string=test_req_data,
@@ -1488,20 +1163,7 @@ class AudioTests(unittest.TestCase):
             )
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/audio/editable_songs",
                 query_string=test_req_data,
@@ -1526,20 +1188,7 @@ class AudioTests(unittest.TestCase):
         mocked_songs.return_value = test_songs
         mocked_user.return_value = [[1]]
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username@fakemail.noshow',
-                'username': 'username',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {
                 "username": "username"
             }
@@ -1604,20 +1253,7 @@ class AudioTests(unittest.TestCase):
             "username": "username"
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/audio/liked_songs",
                 query_string=test_req_data,
@@ -1668,20 +1304,7 @@ class AudioTests(unittest.TestCase):
             "username": "username2"
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/audio/liked_songs",
                 query_string=test_req_data,
@@ -1774,20 +1397,7 @@ class AudioTests(unittest.TestCase):
             "posts_per_page": 1
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/audio/liked_songs",
                 query_string=test_req_data,
@@ -1815,20 +1425,7 @@ class AudioTests(unittest.TestCase):
             )
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/audio/liked_songs",
                 query_string=test_req_data,
@@ -1849,20 +1446,7 @@ class AudioTests(unittest.TestCase):
         with mock.patch("backend.src.controllers.audio.controllers.get_song_data"):
             with mock.patch("backend.src.controllers.audio.controllers.post_like"):
                 with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-                    mock_token.return_value = {
-                        'uid': -2,
-                        'email': 'username2@fakemail.noshow',
-                        'username': 'username2',
-                        'verified': 1,
-                        'random_value': (
-                            'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                            'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                            'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                            'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                            'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                            'zeyvzkssMFUTdeEvzbKu'
-                        )
-                    }
+                    mock_token.return_value = MOCKED_TOKEN
                     res = self.test_client.post(
                         "/api/v1/audio/like",
                         json=test_req_data,
@@ -1930,20 +1514,7 @@ class AudioTests(unittest.TestCase):
         """
         test_req_data = {}
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -2,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = MOCKED_TOKEN
             res = self.test_client.post(
                 "/api/v1/audio/like",
                 json=test_req_data,
@@ -1971,20 +1542,7 @@ class AudioTests(unittest.TestCase):
         }
         with mock.patch("backend.src.controllers.audio.controllers.post_unlike"):
             with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-                mock_token.return_value = {
-                    'uid': -2,
-                    'email': 'username2@fakemail.noshow',
-                    'username': 'username2',
-                    'verified': 1,
-                    'random_value': (
-                        'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                        'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                        'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                        'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                        'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                        'zeyvzkssMFUTdeEvzbKu'
-                    )
-                }
+                mock_token.return_value = MOCKED_TOKEN
                 res = self.test_client.post(
                     "/api/v1/audio/unlike",
                     json=test_req_data,
@@ -2052,20 +1610,7 @@ class AudioTests(unittest.TestCase):
         """
         test_req_data = {}
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -2,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = MOCKED_TOKEN
             res = self.test_client.post(
                 "/api/v1/audio/unlike",
                 json=test_req_data,
@@ -2094,20 +1639,7 @@ class AudioTests(unittest.TestCase):
         with mock.patch("backend.src.controllers.audio.controllers.permitted_to_edit"):
             with mock.patch("backend.src.controllers.audio.controllers.update_published_status"):
                 with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-                    mock_token.return_value = {
-                        'uid': -2,
-                        'email': 'username2@fakemail.noshow',
-                        'username': 'username2',
-                        'verified': 1,
-                        'random_value': (
-                            'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                            'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                            'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                            'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                            'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                            'zeyvzkssMFUTdeEvzbKu'
-                        )
-                    }
+                    mock_token.return_value = MOCKED_TOKEN
                     res = self.test_client.post(
                         "/api/v1/audio/publish",
                         json=test_req_data,
@@ -2175,20 +1707,7 @@ class AudioTests(unittest.TestCase):
         """
         test_req_data = {}
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -2,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = MOCKED_TOKEN
             res = self.test_client.post(
                 "/api/v1/audio/publish",
                 json=test_req_data,
@@ -2217,20 +1736,7 @@ class AudioTests(unittest.TestCase):
         }
         mocked_editor_check.return_value = False
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -2,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = MOCKED_TOKEN
             res = self.test_client.post(
                 "/api/v1/audio/publish",
                 json=test_req_data,
@@ -2251,20 +1757,7 @@ class AudioTests(unittest.TestCase):
         with mock.patch("backend.src.controllers.audio.controllers.permitted_to_edit"):
             with mock.patch("backend.src.controllers.audio.controllers.update_published_status"):
                 with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-                    mock_token.return_value = {
-                        'uid': -2,
-                        'email': 'username2@fakemail.noshow',
-                        'username': 'username2',
-                        'verified': 1,
-                        'random_value': (
-                            'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                            'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                            'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                            'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                            'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                            'zeyvzkssMFUTdeEvzbKu'
-                        )
-                    }
+                    mock_token.return_value = MOCKED_TOKEN
                     res = self.test_client.post(
                         "/api/v1/audio/unpublish",
                         json=test_req_data,
@@ -2332,20 +1825,7 @@ class AudioTests(unittest.TestCase):
         """
         test_req_data = {}
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -2,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = MOCKED_TOKEN
             res = self.test_client.post(
                 "/api/v1/audio/unpublish",
                 json=test_req_data,
@@ -2374,20 +1854,7 @@ class AudioTests(unittest.TestCase):
         }
         mocked_editor_check.return_value = False
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -2,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = MOCKED_TOKEN
             res = self.test_client.post(
                 "/api/v1/audio/unpublish",
                 json=test_req_data,
@@ -2411,20 +1878,7 @@ class AudioTests(unittest.TestCase):
         mocked_editor_check.return_value = True
         with mock.patch('backend.src.controllers.audio.controllers.update_compiled_url'):
             with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-                mock_token.return_value = {
-                    'uid': -1,
-                    'email': 'username2@fakemail.noshow',
-                    'username': 'username2',
-                    'verified': 1,
-                    'random_value': (
-                        'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                        'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                        'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                        'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                        'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                        'zeyvzkssMFUTdeEvzbKu'
-                    )
-                }
+                mock_token.return_value = ALT_MOCKED_TOKEN
                 res = self.test_client.patch(
                     "/api/v1/audio/compiled_url",
                     json=test_req_data,
@@ -2491,20 +1945,7 @@ class AudioTests(unittest.TestCase):
         Ensure patching the URL for a compiled song fails if the user doesn't send a URL.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {
                 "sid": 1,
                 "duration": 1
@@ -2534,20 +1975,7 @@ class AudioTests(unittest.TestCase):
         Ensure patching the URL for a compiled song fails if the user doesn't send a valid URL.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {
                 "sid": 1,
                 "duration": 1,
@@ -2566,20 +1994,7 @@ class AudioTests(unittest.TestCase):
         Ensure patching the URL for a compiled song fails if the user doesn't send a sid.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {
                 "url": "http://fake.com",
                 "duration": 1
@@ -2609,20 +2024,7 @@ class AudioTests(unittest.TestCase):
         Ensure patching the URL for a compiled song fails if the user doesn't send a valid sid.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {
                 "sid": -1,
                 "duration": 1,
@@ -2641,20 +2043,7 @@ class AudioTests(unittest.TestCase):
         Ensure patching the URL for a compiled song fails if the user doesn't send a duration.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {
                 "url": "http://fake.com",
                 "sid": 1
@@ -2684,20 +2073,7 @@ class AudioTests(unittest.TestCase):
         Ensure patching the URL for a compiled song fails if the user doesn't send a valid duration.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {
                 "duration": -1,
                 "sid": 1,
@@ -2723,20 +2099,7 @@ class AudioTests(unittest.TestCase):
         }
         mocked_editor_check.return_value = False
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -2,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = MOCKED_TOKEN
             res = self.test_client.patch(
                 "/api/v1/audio/compiled_url",
                 json=test_req_data,
@@ -2759,20 +2122,7 @@ class AudioTests(unittest.TestCase):
         mocked_editor_check.return_value = True
         with mock.patch('backend.src.controllers.audio.controllers.update_cover_url'):
             with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-                mock_token.return_value = {
-                    'uid': -1,
-                    'email': 'username2@fakemail.noshow',
-                    'username': 'username2',
-                    'verified': 1,
-                    'random_value': (
-                        'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                        'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                        'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                        'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                        'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                        'zeyvzkssMFUTdeEvzbKu'
-                    )
-                }
+                mock_token.return_value = ALT_MOCKED_TOKEN
                 res = self.test_client.patch(
                     "/api/v1/audio/cover_art",
                     json=test_req_data,
@@ -2839,20 +2189,7 @@ class AudioTests(unittest.TestCase):
         Ensure patching the URL for a song's cover art fails if the user doesn't send a URL.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {
                 "sid": 1,
             }
@@ -2880,20 +2217,7 @@ class AudioTests(unittest.TestCase):
         Ensure patching the URL for a song's cover art fails if the user doesn't send a valid URL.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {
                 "sid": 1,
                 "url": "not a url string"
@@ -2911,20 +2235,7 @@ class AudioTests(unittest.TestCase):
         Ensure patching the URL for a song's cover art fails if the user doesn't send a sid.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {
                 "url": "http://fake.com"
             }
@@ -2952,20 +2263,7 @@ class AudioTests(unittest.TestCase):
         Ensure patching the URL for a song's cover art fails if the user doesn't send a valid sid.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {
                 "sid": -1,
                 "url": "http://fake.com"
@@ -2989,20 +2287,7 @@ class AudioTests(unittest.TestCase):
         }
         mocked_editor_check.return_value = False
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -2,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = MOCKED_TOKEN
             res = self.test_client.patch(
                 "/api/v1/audio/cover_art",
                 json=test_req_data,
@@ -3023,20 +2308,7 @@ class AudioTests(unittest.TestCase):
         }
         mocked_pid.return_value = 1
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.post(
                 "/api/v1/audio/playlist",
                 json=test_req_data,
@@ -3103,20 +2375,7 @@ class AudioTests(unittest.TestCase):
         Ensure creating a playlist fails if a title is not sent.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.post(
                 "/api/v1/audio/playlist",
                 json={},
@@ -3147,20 +2406,7 @@ class AudioTests(unittest.TestCase):
         with mock.patch('backend.src.controllers.audio.controllers.delete_playlist_data'):
             with mock.patch('backend.src.controllers.audio.controllers.delete_playlist'):
                 with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-                    mock_token.return_value = {
-                        'uid': -1,
-                        'email': 'username2@fakemail.noshow',
-                        'username': 'username2',
-                        'verified': 1,
-                        'random_value': (
-                            'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                            'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                            'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                            'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                            'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                            'zeyvzkssMFUTdeEvzbKu'
-                        )
-                    }
+                    mock_token.return_value = ALT_MOCKED_TOKEN
                     res = self.test_client.delete(
                         "/api/v1/audio/playlist",
                         json=test_req_data,
@@ -3227,20 +2473,7 @@ class AudioTests(unittest.TestCase):
         Ensure deleting a playlist fails if a pid is not sent.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.delete(
                 "/api/v1/audio/playlist",
                 json={},
@@ -3269,20 +2502,7 @@ class AudioTests(unittest.TestCase):
         }
         mock_raise.side_effect = IndexError
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.delete(
                 "/api/v1/audio/playlist",
                 json=test_req_data,
@@ -3302,20 +2522,7 @@ class AudioTests(unittest.TestCase):
         }
         mock_uid.return_value = [[None, 1]]
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.delete(
                 "/api/v1/audio/playlist",
                 json=test_req_data,
@@ -3350,20 +2557,7 @@ class AudioTests(unittest.TestCase):
         mocked_num_playlists.return_value = 2
         mocked_playlists.return_value = test_playlists
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username@fakemail.noshow',
-                'username': 'username',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/audio/playlist",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -3419,20 +2613,7 @@ class AudioTests(unittest.TestCase):
             )
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/audio/playlist",
                 query_string=test_req_data,
@@ -3482,20 +2663,7 @@ class AudioTests(unittest.TestCase):
             )
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/audio/playlist",
                 query_string=test_req_data,
@@ -3581,20 +2749,7 @@ class AudioTests(unittest.TestCase):
         """
         mocked_num_playlists.return_value = 2
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {
                 "current_page": 12,
                 "songs_per_page": 1
@@ -3627,20 +2782,7 @@ class AudioTests(unittest.TestCase):
             )
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/audio/playlist",
                 query_string=test_req_data,
@@ -3662,20 +2804,7 @@ class AudioTests(unittest.TestCase):
         with mock.patch('backend.src.controllers.audio.controllers.update_playlist_name'):
             with mock.patch('backend.src.controllers.audio.controllers.update_playlist_timestamp'):
                 with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-                    mock_token.return_value = {
-                        'uid': -1,
-                        'email': 'username2@fakemail.noshow',
-                        'username': 'username2',
-                        'verified': 1,
-                        'random_value': (
-                            'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                            'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                            'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                            'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                            'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                            'zeyvzkssMFUTdeEvzbKu'
-                        )
-                    }
+                    mock_token.return_value = ALT_MOCKED_TOKEN
                     res = self.test_client.patch(
                         "/api/v1/audio/playlist",
                         json=test_req_data,
@@ -3742,20 +2871,7 @@ class AudioTests(unittest.TestCase):
         Ensure renaming a playlist fails if a pid is not sent.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {
                 "pid": None,
                 "title": "different title"
@@ -3784,20 +2900,7 @@ class AudioTests(unittest.TestCase):
         Ensure renaming a playlist fails if a title is not sent.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {
                 "pid": 1
             }
@@ -3825,20 +2928,7 @@ class AudioTests(unittest.TestCase):
         Ensure renaming a playlist fails if a title and pid are not sent.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.patch(
                 "/api/v1/audio/playlist",
                 json={},
@@ -3869,20 +2959,7 @@ class AudioTests(unittest.TestCase):
         }
         mock_raise.side_effect = IndexError
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.patch(
                 "/api/v1/audio/playlist",
                 json=test_req_data,
@@ -3904,20 +2981,7 @@ class AudioTests(unittest.TestCase):
         mock_uid.return_value = [[None, 1]]
         with mock.patch(
                 'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.patch(
                 "/api/v1/audio/playlist",
                 json=test_req_data,
@@ -3942,20 +3006,7 @@ class AudioTests(unittest.TestCase):
         mocked_songs.return_value = test_songs
         mock_uid.return_value = [[None, -1]]
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username@fakemail.noshow',
-                'username': 'username',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {
                 "pid": 1
             }
@@ -4017,20 +3068,7 @@ class AudioTests(unittest.TestCase):
             )
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/audio/playlist_songs",
                 query_string=test_req_data,
@@ -4078,20 +3116,7 @@ class AudioTests(unittest.TestCase):
             )
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/audio/playlist_songs",
                 query_string=test_req_data,
@@ -4183,20 +3208,7 @@ class AudioTests(unittest.TestCase):
         mocked_num_songs.return_value = 2
         mock_uid.return_value = [[None, -1]]
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {
                 "pid": 1,
                 "current_page": 12,
@@ -4230,20 +3242,7 @@ class AudioTests(unittest.TestCase):
             )
         }
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/audio/playlist_songs",
                 query_string=test_req_data,
@@ -4263,20 +3262,7 @@ class AudioTests(unittest.TestCase):
         }
         mock_raise.side_effect = IndexError
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/audio/playlist_songs",
                 json=test_req_data,
@@ -4298,20 +3284,7 @@ class AudioTests(unittest.TestCase):
         mock_uid.return_value = [[None, 1]]
         mocked_num_songs.return_value = 2
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/audio/playlist_songs",
                 query_string=test_req_data,
@@ -4326,20 +3299,7 @@ class AudioTests(unittest.TestCase):
         tokens are not sent.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.get(
                 "/api/v1/audio/playlist_songs",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -4376,20 +3336,7 @@ class AudioTests(unittest.TestCase):
         with mock.patch('backend.src.controllers.audio.controllers.add_to_playlist'):
             with mock.patch('backend.src.controllers.audio.controllers.update_playlist_timestamp'):
                 with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-                    mock_token.return_value = {
-                        'uid': -1,
-                        'email': 'username2@fakemail.noshow',
-                        'username': 'username2',
-                        'verified': 1,
-                        'random_value': (
-                            'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                            'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                            'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                            'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                            'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                            'zeyvzkssMFUTdeEvzbKu'
-                        )
-                    }
+                    mock_token.return_value = ALT_MOCKED_TOKEN
                     res = self.test_client.post(
                         "/api/v1/audio/playlist_songs",
                         json=test_req_data,
@@ -4456,20 +3403,7 @@ class AudioTests(unittest.TestCase):
         Ensure adding songs to a playlist fails if a pid is not sent.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {
                 "sid": 1
             }
@@ -4497,20 +3431,7 @@ class AudioTests(unittest.TestCase):
         Ensure adding songs to a playlist fails if a title is not sent.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {
                 "pid": 1
             }
@@ -4539,20 +3460,7 @@ class AudioTests(unittest.TestCase):
         sent.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.post(
                 "/api/v1/audio/playlist_songs",
                 json={},
@@ -4583,20 +3491,7 @@ class AudioTests(unittest.TestCase):
         }
         mock_raise.side_effect = IndexError
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.post(
                 "/api/v1/audio/playlist_songs",
                 json=test_req_data,
@@ -4617,20 +3512,7 @@ class AudioTests(unittest.TestCase):
         }
         mock_uid.return_value = [[None, 1]]
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.post(
                 "/api/v1/audio/playlist_songs",
                 json=test_req_data,
@@ -4652,20 +3534,7 @@ class AudioTests(unittest.TestCase):
         mocked_uid.return_value = [[None, -1]]
         mocke_raise.side_effect = NoResults
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.post(
                 "/api/v1/audio/playlist_songs",
                 json=test_req_data,
@@ -4694,20 +3563,7 @@ class AudioTests(unittest.TestCase):
             [1, 1]
         ]
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.post(
                 "/api/v1/audio/playlist_songs",
                 json=test_req_data,
@@ -4729,20 +3585,7 @@ class AudioTests(unittest.TestCase):
         with mock.patch('backend.src.controllers.audio.controllers.remove_from_playlist'):
             with mock.patch('backend.src.controllers.audio.controllers.update_playlist_timestamp'):
                 with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-                    mock_token.return_value = {
-                        'uid': -1,
-                        'email': 'username2@fakemail.noshow',
-                        'username': 'username2',
-                        'verified': 1,
-                        'random_value': (
-                            'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                            'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                            'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                            'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                            'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                            'zeyvzkssMFUTdeEvzbKu'
-                        )
-                    }
+                    mock_token.return_value = ALT_MOCKED_TOKEN
                     res = self.test_client.delete(
                         "/api/v1/audio/playlist_songs",
                         json=test_req_data,
@@ -4810,20 +3653,7 @@ class AudioTests(unittest.TestCase):
         Ensure removing songs from a playlist fails if a pid is not sent.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {
                 "sid": 1
             }
@@ -4851,20 +3681,7 @@ class AudioTests(unittest.TestCase):
         Ensure removing songs from a playlist fails if a title is not sent.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {
                 "pid": 1
             }
@@ -4893,20 +3710,7 @@ class AudioTests(unittest.TestCase):
         sent.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.delete(
                 "/api/v1/audio/playlist_songs",
                 json={},
@@ -4937,20 +3741,7 @@ class AudioTests(unittest.TestCase):
         }
         mock_raise.side_effect = IndexError
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.delete(
                 "/api/v1/audio/playlist_songs",
                 json=test_req_data,
@@ -4971,20 +3762,7 @@ class AudioTests(unittest.TestCase):
         }
         mock_uid.return_value = [[None, 1]]
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = {
-                'uid': -1,
-                'email': 'username2@fakemail.noshow',
-                'username': 'username2',
-                'verified': 1,
-                'random_value': (
-                    'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                    'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                    'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                    'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                    'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                    'zeyvzkssMFUTdeEvzbKu'
-                )
-            }
+            mock_token.return_value = ALT_MOCKED_TOKEN
             res = self.test_client.delete(
                 "/api/v1/audio/playlist_songs",
                 json=test_req_data,
