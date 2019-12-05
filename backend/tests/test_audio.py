@@ -3770,3 +3770,177 @@ class AudioTests(unittest.TestCase):
                 follow_redirects=True
             )
             self.assertEqual(401, res.status_code)
+
+    def test_rename_song_success(self):
+        """
+        Ensure renaming a song is successful.
+        """
+        test_req_data = {
+            "sid": 1,
+            "title": "new title"
+        }
+        with mock.patch("backend.src.controllers.audio.controllers.permitted_to_edit"):
+            with mock.patch("backend.src.controllers.audio.controllers.update_song_name"):
+                with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+                    mock_token.return_value = MOCKED_TOKEN
+                    res = self.test_client.patch(
+                        "/api/v1/audio/rename",
+                        json=test_req_data,
+                        headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                        follow_redirects=True
+                    )
+                    self.assertEqual(200, res.status_code)
+                    expected_body = {"message": "Song renamed"}
+                    self.assertEqual(expected_body, json.loads(res.data))
+
+    def test_rename_song_fail_missing_access_token(self):
+        """
+        Ensure renaming a song fails if no access_token is sent.
+        """
+        res = self.test_client.patch(
+            "/api/v1/audio/rename",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_rename_song_fail_access_token_expired(self):
+        """
+        Ensure renaming a song fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
+            res = self.test_client.patch(
+                "/api/v1/audio/rename",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_rename_song_fail_bad_access_token_signature(self):
+        """
+        Ensure renaming a song fails if the access_token signature does not match
+        the one configured on the server.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
+            res = self.test_client.patch(
+                "/api/v1/audio/rename",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_rename_song_fail_unknown_access_token_issue(self):
+        """
+        Ensure renaming a song fails if some unknown error relating to the access_token
+        occurs.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
+            res = self.test_client.patch(
+                "/api/v1/audio/rename",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_rename_song_fail_missing_sid(self):
+        """
+        Ensure renaming a song fails if no sid is sent.
+        """
+        test_req_data = {
+            "title": "a title"
+        }
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = MOCKED_TOKEN
+            res = self.test_client.patch(
+                "/api/v1/audio/rename",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+            test_req_data = {
+                "sid": None,
+                "title": "a title"
+            }
+            res = self.test_client.patch(
+                "/api/v1/audio/rename",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    def test_rename_song_fail_missing_title(self):
+        """
+        Ensure renaming a song fails if no title is sent.
+        """
+        test_req_data = {
+            "sid": 1
+        }
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = MOCKED_TOKEN
+            res = self.test_client.patch(
+                "/api/v1/audio/rename",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+            test_req_data = {
+                "sid": 1,
+                "title": ""
+            }
+            res = self.test_client.patch(
+                "/api/v1/audio/rename",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    def test_rename_song_fail_missing_sid_and_title(self):
+        """
+        Ensure renaming a song fails if no sid or title is sent.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = MOCKED_TOKEN
+            res = self.test_client.patch(
+                "/api/v1/audio/rename",
+                json={},
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+            test_req_data = {
+                "sid": None,
+                "title": ""
+            }
+            res = self.test_client.patch(
+                "/api/v1/audio/rename",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    @mock.patch("backend.src.controllers.audio.controllers.permitted_to_edit")
+    def test_rename_song_fail_not_permitted_to_edit(self, mocked_editor_check):
+        """
+        Ensure renaming a song fails if I don't have permission to edit the song.
+        """
+        test_req_data = {
+            "sid": 1,
+            "title": "a new title"
+        }
+        mocked_editor_check.return_value = False
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = MOCKED_TOKEN
+            res = self.test_client.patch(
+                "/api/v1/audio/rename",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
