@@ -6,7 +6,7 @@ import { withRouter, Link } from 'react-router-dom';
 import styles from './Header.module.scss';
 import { deleteToken } from '../../actions/userActions';
 import {
- deleteToken as deleteTokenAPI, saveState, uploadFile, createNewSong 
+  deleteToken as deleteTokenAPI, saveState, uploadFile, createNewSong,
 } from '../../helpers/api';
 import { showNotification } from '../../actions/notificationsActions';
 import { ReactComponent as Logo } from '../../assets/logo.svg';
