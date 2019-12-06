@@ -40,7 +40,7 @@ const PlaybackControls = memo((props) => {
   }, [currentBeat, dispatch]);
 
 
-  const curSecond = ((currentBeat - 1) / tempo) * 60;
+  const curSecond = ((currentBeat - 1) / (tempo)) * 60;
   const date = new Date(null);
   date.setSeconds(curSecond);
   date.setMilliseconds((curSecond * 1000) % 1000);

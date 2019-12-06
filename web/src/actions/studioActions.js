@@ -157,3 +157,29 @@ export const setSongTitle = (title) => (dispatch) => {
     title,
   });
 };
+
+export const hideSongPicker = () => (dispatch) => {
+  dispatch({
+    type: 'SONG_PICKER_HIDE',
+  });
+};
+
+export const showSongPicker = () => (dispatch) => {
+  dispatch({
+    type: 'SONG_PICKER_SHOW',
+  });
+};
+
+export const setSongName = (songName) => (dispatch) => {
+  dispatch({
+    type: 'SET_SONG_NAME',
+    songName,
+  });
+};
+
+export const setSongId = (songId) => (dispatch) => {
+  dispatch({
+    type: 'SET_SONG_ID',
+    songId,
+  });
+};

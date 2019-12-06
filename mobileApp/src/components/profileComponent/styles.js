@@ -57,5 +57,8 @@ export default StyleSheet.create({
   },
   followText: {
     color: '#FFF'
-  }
+  },
+  link: {
+    margin: 0,
+  },
 })

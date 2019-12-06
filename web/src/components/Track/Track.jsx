@@ -48,7 +48,9 @@ const Track = memo((props) => {
     />
   ), [gridSize, index]);
 
-  const samples = useMemo(() => track.samples.map(getSample), [getSample, track.samples]);
+  const samples = useMemo(() => (
+    track.samples && track.samples.map(getSample)
+  ), [getSample, track.samples]);
 
   const handleSetSelected = useCallback(() => {
     dispatch(setSelectedTrack(index));

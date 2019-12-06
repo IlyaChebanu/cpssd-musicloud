@@ -13,6 +13,7 @@ import { clamp, lerp } from '../../helpers/utils';
 import store from '../../store';
 import { colours } from '../../helpers/constants';
 
+
 const TrackControls = memo((props) => {
   const {
     track, tracks, dispatch, index, selectedTrack,

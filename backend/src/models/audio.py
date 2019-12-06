@@ -151,7 +151,7 @@ def get_song_state(sid):
     Dict - The most recently saved JSON song_state object.
     """
     sql = (
-        "SELECT * FROM Song_State "
+        "SELECT state FROM Song_State "
         "WHERE sid = %s "
         "ORDER BY time_updated DESC "
     )
@@ -161,7 +161,7 @@ def get_song_state(sid):
     state = query(sql, args, True)
     if not state:
         return {}
-    return state[0][1]
+    return state[0][0]
 
 
 def get_all_compiled_songs(start_index, songs_per_page):
@@ -861,6 +861,72 @@ def update_publised_timestamp(sid, timestamp):
     )
     args = (
         timestamp,
+        sid,
+    )
+    query(sql, args)
+
+
+def notify_like_dids(sid):
+    """
+    Get the did's for the user who needs to be notified about a new song like.
+    :param sid:
+    Int - Sid of the user who's owns the liked song.
+    :return:
+    List - A list of dids.
+    """
+    sql = (
+        "SELECT did FROM Notifications WHERE uid IN (SELECT uid FROM Users "
+        "WHERE uid IN (SELECT uid FROM Songs WHERE sid=%s) AND "
+        "silence_post_notifcation=0);"
+    )
+    args = (
+        sid,
+    )
+    res = query(sql, args, True)
+    if not res:
+        raise NoResults
+    return res
+
+
+def notify_song_dids(uid):
+    """
+    Get the did's for every user who needs to be notified about the new song.
+    :param uid:
+    Int - Uid of the user who published the song.
+    :return:
+    List - A list of dids.
+    """
+    sql = (
+        "SELECT did FROM Notifications WHERE uid IN (SELECT uid FROM Users "
+        "WHERE uid IN (SELECT follower FROM Followers WHERE following=%s) "
+        "AND silence_song_notifcation=0);"
+    )
+    args = (
+        uid,
+    )
+    res = query(sql, args, True)
+    if not res:
+        raise NoResults
+    return res
+
+
+def update_song_name(title, sid):
+    """
+    Change the title of a song.
+    :param title:
+    Str - New song name.
+    :param sid:
+    Int - ID of the song who's name we are changing.
+    :return:
+    None - Updates song name in DB and returns None.
+    """
+    sql = (
+        "UPDATE Songs "
+        "SET title=%s "
+        "WHERE sid = %s"
+    )
+    args = (
+        title,
         sid,
     )
     query(sql, args)
