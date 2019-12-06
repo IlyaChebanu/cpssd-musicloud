@@ -76,7 +76,7 @@ const Header = memo((props) => {
     const renderedBuffer = await renderTracks(studio);
     const encoded = toWav(renderedBuffer);
 
-    forceDownload([new DataView(encoded)], 'audio/wav', `${studio.title}.wav`); // for mp3 [new DataView] not needed
+    forceDownload([new DataView(encoded)], 'audio/wav', `${studio.songName}.wav`); // for mp3 [new DataView] not needed
   }, [studio]);
 
   const handleShowSongPicker = useCallback(async () => {
