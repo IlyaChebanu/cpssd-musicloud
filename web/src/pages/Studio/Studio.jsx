@@ -246,12 +246,12 @@ const Studio = memo((props) => {
         const res = await getSongState(studio.songId);
         if (res.status === 200) {
           const songState = JSON.parse(res.data.song_state);
-          dispatch(setTracks(songState.tracks));
-          dispatch(setTempo(songState.tempo));
+          if (songState.tracks) dispatch(setTracks(songState.tracks));
+          if (songState.tempo) dispatch(setTempo(songState.tempo));
         }
       })();
     }
-  }, [dispatch, exampleSong.tracks, studio.songId]);
+  }, [dispatch, studio.songId]);
 
   useEffect(() => {
     const latest = tracks.reduce((m, track) => {
