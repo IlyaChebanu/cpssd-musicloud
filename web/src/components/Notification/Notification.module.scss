@@ -1,0 +1,68 @@
+.wrapper {
+  background-color: rgb(240, 240, 240);
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.2);
+  height: 80px;
+  transition: opacity 400ms, transform 400ms;
+  animation: notificationFadeIn 400ms;
+  border-radius: 20px;
+  position: absolute;
+  top: 10px;
+  width: calc(100% - 10px);
+  border: 4px solid #e06363;
+  color: #333;
+
+  &.fadeOut {
+    opacity: 0;
+  }
+
+  &.info {
+    border-color: #51829f;
+
+    p {
+      color: #51829f;
+    }
+
+    svg {
+      color: #51829f;
+    }
+  }
+}
+
+.top {
+  display: flex;
+  width: calc(100% - 20px);
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px;
+
+  p {
+    color: #e06363;
+    font-weight: 600;
+    font-size: 14px;
+    margin: 0;
+  }
+
+  svg {
+    color: #e06363;
+    width: 20px;
+    height: 20px;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}
+
+.errorText {
+  width: calc(100% - 20px);
+  margin: 0px 10px;
+}
+
+@keyframes notificationFadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}

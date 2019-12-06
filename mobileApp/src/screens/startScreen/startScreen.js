@@ -25,6 +25,8 @@ class StartScreen extends React.Component {
     if (portraitMode === false) {
       this.props.setIsPortrait(portraitMode)
       Orientation.unlockAllOrientations();
+    } else if(portraitMode === true) {
+      this.props.setIsPortrait(portraitMode)
     }
     if (token != null) {
       this.props.setAuthToken(token)

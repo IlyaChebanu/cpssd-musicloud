@@ -1,9 +1,19 @@
-.wrapper {
+.outerWrap {
   width: 220px;
+  display: flex;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.wrapper {
+  width: 210px;
   height: 100px;
   background-color: #36393D;
   display: flex;
   flex-direction: column;
+  position: relative;
 
   &.even {
     background-color: #303237;
@@ -13,7 +23,7 @@
     flex: 1;
     color: white;
     font-size: 18px;
-    margin: 15px 20px 10px 20px;
+    margin: 10px 20px 10px 10px;
     display: flex;
     align-items: center;
 
@@ -35,7 +45,7 @@
     flex: 1;
     display: flex;
     justify-content: space-between;
-    margin: 0px 20px 15px 20px;
+    margin: 0px 20px 15px 10px;
     color: white;
 
     svg {
@@ -59,4 +69,10 @@
       }
     }
   }
+}
+
+.selectBar {
+  position: relative;
+  width: 10px;
+  min-height: 100px;
 }

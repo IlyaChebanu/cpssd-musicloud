@@ -1,20 +1,88 @@
-.contentWrapper {
-  height: calc(100vh - 80px);
+.wrapper {
   overflow: hidden;
+}
+
+.contentWrapper {
+  height: calc(100vh - 140px);
+  overflow: hidden;
+}
+
+.trackControls {
+  width: 220px;
+  background-color: #26292E;
+}
+
+.content {
+  width: 100%;
+  overflow-y: hidden;
+  display: flex;
+  min-height: 100%;
+}
+
+.scrollable {
+  height: calc(100vh - 200px);
+  overflow-y: scroll;
 }
 
 .sidebar {
   width: 220px;
   height: 100%;
   float: left;
+  background-color: #26292E;
+  box-shadow: 4px 0px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+  position: relative;
 }
 
 .scrollableMain {
   width: calc(100% - 220px);
   height: 100%;
   overflow-x: scroll;
+  overflow-y: hidden;
 }
 
 .mainContent {
   width: 150%;
+  height: 100%;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 100px;
+  overflow-y: scroll;
+
+}
+
+.newTrack {
+  width: 220px;
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 18px;
+  background-color: #303237;
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  &.even {
+    background-color: #36393D;
+  }
+}
+
+.saveButton {
+  height: 25px !important;
+  width: 65px;
+  margin-left: 15px;
+}
+
+.tracks {
+  width: calc(100vw - 220px);
+  overflow-x: scroll;
+  overflow-y: hidden;
+  // height: fit-content;
+  // overflow-y: scroll;
+}
+
+.track:last-child {
+  margin-bottom: 100px;
 }

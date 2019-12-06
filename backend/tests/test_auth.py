@@ -1,12 +1,17 @@
+# pylint: disable=C0302, C0301, R0904
+"""
+Test suite for /auth endpoints.
+"""
 import unittest
-import mock
 import json
+import mock
 
 from jwt.exceptions import InvalidSignatureError
+from argon2.exceptions import VerifyMismatchError
 
-from ..src import app
+from ..src import APP
 from ..src.utils.random_string import random_string
-from .constants import TEST_TOKEN
+from .constants import TEST_TOKEN, MOCKED_TOKEN
 
 
 class AuthTests(unittest.TestCase):
@@ -14,7 +19,7 @@ class AuthTests(unittest.TestCase):
     Unit tests for /auth API endpoints.
     """
     def setUp(self):
-        self.test_client = app.test_client(self)
+        self.test_client = APP.test_client(self)
 
     @mock.patch('backend.src.controllers.auth.controllers.get_verification_by_code')
     def test_verify_success(self, mock_user):
@@ -34,8 +39,8 @@ class AuthTests(unittest.TestCase):
                     query_string=test_req_data,
                     follow_redirects=True
                 )
-                with open("backend/src/controllers/auth/success.html", "rb") as f:
-                    expexcted_page = f.read()
+                with open("./src/controllers/auth/success.html", "rb") as file:
+                    expexcted_page = file.read()
                     self.assertEqual(200, res.status_code)
                     self.assertEqual(expexcted_page, res.data)
 
@@ -55,7 +60,7 @@ class AuthTests(unittest.TestCase):
         self.assertEqual(400, res.status_code)
 
     @mock.patch('backend.src.controllers.auth.controllers.random_string')
-    @mock.patch('backend.src.controllers.auth.controllers.argon2.verify')
+    @mock.patch('backend.src.controllers.auth.controllers.PasswordHasher.verify')
     @mock.patch('backend.src.controllers.auth.controllers.get_user_via_username')
     def test_login_success(self, mocked_user, mocked_verify, mocked_random_string):
         """
@@ -91,11 +96,7 @@ class AuthTests(unittest.TestCase):
             json=test_req_data,
             follow_redirects=True
         )
-        self.assertEqual((b'{"message":"\'username\' is a required property\\n\\nFailed validating \''
-                          b"required' in schema:\\n    {'properties': {'password': {'minLength': 1, '"
-                          b"type': 'string'},\\n                    'username': {'minLength': 1, 'typ"
-                          b"e': 'string'}},\\n     'required': ['username', 'password'],\\n     'type'"
-                          b': \'object\'}\\n\\nOn instance:\\n    {\'password\': \'1234\'}"}\n'), res.data)
+        self.assertEqual(422, res.status_code)
         test_req_data = {
             "username": "",
             "password": "1234"
@@ -152,14 +153,14 @@ class AuthTests(unittest.TestCase):
             follow_redirects=True
         )
         self.assertEqual(422, res.status_code)
-    @mock.patch('backend.src.controllers.auth.controllers.argon2.verify')
+    @mock.patch('backend.src.controllers.auth.controllers.PasswordHasher.verify')
     @mock.patch('backend.src.controllers.auth.controllers.get_user_via_username')
     def test_login_fail_bad_credentials(self, mocked_user, mocked_verify):
         """
         Ensure login attempt fails if bad credentials are provided.
         """
         mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 1, "http://image.fake"]]
-        mocked_verify.return_value = False
+        mocked_verify.side_effect = VerifyMismatchError
         test_req_data = {
             "username": "username",
             "password": "1234"
@@ -173,7 +174,7 @@ class AuthTests(unittest.TestCase):
             )
             self.assertEqual(401, res.status_code)
 
-    @mock.patch('backend.src.controllers.auth.controllers.argon2.verify')
+    @mock.patch('backend.src.controllers.auth.controllers.PasswordHasher.verify')
     @mock.patch('backend.src.controllers.auth.controllers.get_user_via_username')
     def test_login_fail_unverified(self, mocked_user, mocked_verify):
         """
@@ -199,21 +200,8 @@ class AuthTests(unittest.TestCase):
         Ensure user's can logout correctly.
         """
         with mock.patch('backend.src.controllers.auth.controllers.delete_login'):
-            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-                vr.return_value = {
-                    'uid': -1,
-                    'email': 'username2@fakemail.noshow',
-                    'username': 'username2',
-                    'verified': 1,
-                    'random_value': (
-                        'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
-                        'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
-                        'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
-                        'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
-                        'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
-                        'zeyvzkssMFUTdeEvzbKu'
-                    )
-                }
+            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+                mock_token.return_value = MOCKED_TOKEN
                 res = self.test_client.post(
                     "/api/v1/auth/logout",
                     headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -237,8 +225,8 @@ class AuthTests(unittest.TestCase):
         """
         Ensure getting a logout request fails if the access_token is expired.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = ValueError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
             res = self.test_client.post(
                 "/api/v1/auth/logout",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -251,8 +239,8 @@ class AuthTests(unittest.TestCase):
         Ensure getting a logout request fails if the access_token signature does not match
         the one configured on the server.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = InvalidSignatureError
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
             res = self.test_client.post(
                 "/api/v1/auth/logout",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
@@ -265,11 +253,11 @@ class AuthTests(unittest.TestCase):
         Ensure getting a logout request fails if some unknown error relating to the access_token
         occurs.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as vr:
-            vr.side_effect = Exception
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
             res = self.test_client.post(
                 "/api/v1/auth/logout",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(503, res.status_code)
+            self.assertEqual(500, res.status_code)

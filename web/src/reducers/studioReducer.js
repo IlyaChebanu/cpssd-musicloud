@@ -1,108 +1,179 @@
+/* eslint-disable no-param-reassign */
 export default (
   state = {
     loop: {
       start: 1,
-      stop: 5
+      stop: 17,
     },
+    songId: null,
+    songName: 'New Song',
     gridSize: 1,
+    gridWidth: 1,
     gridSnapEnabled: true,
     loopEnabled: true,
     scroll: 0,
-    tempo: 90.0,
+    scrollY: 0,
+    tempo: 140.0,
     playingStartBeat: 1,
     playingStartTime: 0,
     playing: false,
     currentBeat: 1,
     volume: 1,
     sampleLoading: false,
-    tracks: []
+    tracks: [],
+    selectedTrack: 0,
+    selectedSample: -1,
+    clipboard: {},
+    songPickerHidden: false,
   },
-  action
+  action,
 ) => {
+  let tracks;
   switch (action.type) {
     case 'STUDIO_PLAY':
       return {
         ...state,
-        playing: true
-      }
+        playing: true,
+      };
     case 'STUDIO_PAUSE':
       return {
         ...state,
-        playing: false
-      }
+        playing: false,
+      };
     case 'STUDIO_STOP':
       return {
         ...state,
-        playing: false
-      }
+        playing: false,
+      };
     case 'PLAYING_START_TIME':
       return {
         ...state,
-        playingStartTime: action.time
-      }
+        playingStartTime: action.time,
+      };
     case 'PLAYING_START_BEAT':
       return {
         ...state,
-        playingStartBeat: action.beat
-      }
+        playingStartBeat: action.beat,
+      };
     case 'SET_CURRENT_BEAT':
       return {
         ...state,
-        currentBeat: action.beat
-      }
+        currentBeat: action.beat,
+      };
     case 'SET_TEMPO':
       return {
         ...state,
-        tempo: action.tempo
-      }
+        tempo: action.tempo,
+      };
     case 'SET_TRACKS':
       return {
         ...state,
-        tracks: action.tracks
-      }
+        tracks: action.tracks,
+      };
     case 'SET_TRACK':
-      const tracks = [...state.tracks];
+      tracks = [...state.tracks];
       tracks[action.index] = action.track;
       return {
         ...state,
-        tracks
-      }
+        tracks,
+      };
+    case 'SET_SAMPLE_TIME':
+      return {
+        ...state,
+        tracks: state.tracks.map((track) => {
+          track.samples = track.samples.map((sample) => {
+            if (sample.id === action.id) {
+              return {
+                ...sample,
+                time: action.time,
+              };
+            }
+            return sample;
+          });
+          return track;
+        }),
+      };
     case 'SET_SAMPLE_LOADING':
       return {
         ...state,
-        sampleLoading: action.bool
-      }
+        sampleLoading: action.bool,
+      };
     case 'SET_VOLUME':
       return {
         ...state,
-        volume: action.volume
-      }
+        volume: action.volume,
+      };
     case 'SET_SCROLL':
       return {
         ...state,
-        scroll: action.scroll
-      }
+        scroll: action.scroll,
+      };
+    case 'SET_SCROLL_Y':
+      return {
+        ...state,
+        scrollY: action.scroll,
+      };
     case 'SET_LOOP':
       return {
         ...state,
-        loop: action.obj
-      }
+        loop: action.obj,
+      };
     case 'SET_LOOP_ENABLED':
       return {
         ...state,
-        loopEnabled: action.bool
-      }
+        loopEnabled: action.bool,
+      };
     case 'SET_GRID_SIZE':
       return {
         ...state,
-        gridSize: action.gridSize
-      }
+        gridSize: action.gridSize,
+      };
+    case 'SET_GRID_WIDTH':
+      return {
+        ...state,
+        gridWidth: action.width,
+      };
     case 'SET_GRID_SNAP_ENABLED':
       return {
         ...state,
-        gridSnapEnabled: action.bool
-      }
+        gridSnapEnabled: action.bool,
+      };
+    case 'SET_SELECTED_TRACK':
+      return {
+        ...state,
+        selectedTrack: action.track,
+      };
+    case 'SET_SELECTED_SAMPLE':
+      return {
+        ...state,
+        selectedSample: action.id,
+      };
+    case 'SET_CLIPBOARD':
+      return {
+        ...state,
+        clipboard: action.sample,
+      };
+    case 'SONG_PICKER_HIDE':
+      return {
+        ...state,
+        songPickerHidden: true,
+      };
+    case 'SONG_PICKER_SHOW':
+      return {
+        ...state,
+        songPickerHidden: false,
+      };
+    case 'SET_SONG_NAME':
+      return {
+        ...state,
+        songName: action.songName,
+      };
+    case 'SET_SONG_ID':
+      return {
+        ...state,
+        songId: action.songId,
+      };
     default:
-      return state
+      return state;
   }
-}
+};

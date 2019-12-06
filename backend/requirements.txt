@@ -1,5 +1,5 @@
 # run 'pip install -r requirements.txt' to install dependencies
-passlib
+argon2-cffi
 mysql-connector
 argon2_cffi
 PyJWT
@@ -7,6 +7,7 @@ flask
 mock
 jsonschema
 flask-cors
-
-# accessing s3 bucket
+pytest-cov
 boto3
+pylint
+requests

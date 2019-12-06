@@ -1,6 +1,8 @@
-import React, { useState, useMemo, useCallback, memo } from 'react';
-import styles from './Reverify.module.scss';
+import React, {
+  useState, useMemo, useCallback, memo,
+} from 'react';
 import { Link as link } from 'react-router-dom';
+import styles from './Reverify.module.scss';
 import { reverify } from '../../helpers/api';
 import { ReactComponent as logo } from '../../assets/logo.svg';
 import InputField from '../../components/InputField';
@@ -15,11 +17,12 @@ const Reverify = memo(() => {
   const [submitted, setSubmitted] = useState(false);
   const [errorText, setErrorText] = useState('');
 
-  const emailBorder = useMemo(() => {
-    return submitted && !emailRe.test(email) ? '#b90539' : 'white';
-  }, [email, submitted]);
+  const emailBorder = useMemo(
+    () => (submitted && !emailRe.test(email) ? '#b90539' : 'white'),
+    [email, submitted],
+  );
 
-  const handleSubmit = useCallback(async e => {
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
 
     if (emailRe.test(email)) {
@@ -29,11 +32,11 @@ const Reverify = memo(() => {
           setErrorText('Unknown error has occurred');
           console.error(res);
         } else {
-          setErrorText(<span style={{ color: 'white' }}>Verification email sent!</span>)
+          setErrorText(<span style={{ color: 'white' }}>Verification email sent!</span>);
         }
-      } catch (e) {
+      } catch (err) {
         setErrorText('Fatal error');
-        console.error(e);
+        console.error(err);
       }
     }
 
@@ -43,16 +46,20 @@ const Reverify = memo(() => {
   return (
     <div className={styles.wrapper}>
       <div className={styles.lCol}>
-        <Logo className={styles.logo} alt='MusiCloud logo' />
+        <Logo className={styles.logo} alt="MusiCloud logo" />
       </div>
       <div className={styles.rCol}>
         <div className={styles.formWrapper}>
           <h1>Verify email</h1>
           <p className={styles.verifyError}>{errorText}</p>
           <form onSubmit={handleSubmit}>
-            <InputField onChange={setEmail} name='email' placeholder='Email' borderColor={emailBorder} />
-            <SubmitButton text='Send email' />
-            <p>Already verified? <Link to='/login'>Sign in!</Link></p>
+            <InputField onChange={setEmail} name="email" placeholder="Email" borderColor={emailBorder} />
+            <SubmitButton text="Send email" />
+            <p>
+              Already verified?
+              {' '}
+              <Link to="/login">Sign in!</Link>
+            </p>
           </form>
         </div>
       </div>
@@ -60,5 +67,6 @@ const Reverify = memo(() => {
   );
 });
 
+Reverify.displayName = 'Reverify';
 
 export default Reverify;

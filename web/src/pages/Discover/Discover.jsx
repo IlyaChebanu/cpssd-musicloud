@@ -1,21 +1,23 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import styles from './Discover.module.scss';
 import Header from '../../components/Header';
 import MusicSearch from '../../components/MusicSearch';
 import SongCard from '../../components/SongCard';
+import { useUpdateUserDetails } from '../../helpers/hooks';
 
 const songCards = [];
-for (let i = 0; i < 10; i++) {
-  songCards.push(<SongCard className={styles.songCard}/>);
+for (let i = 0; i < 10; i += 1) {
+  songCards.push(<SongCard key={i} className={styles.songCard} />);
 }
 
-const Discover = props => {
+const Discover = () => {
+  useUpdateUserDetails();
+
   return (
     <div className={styles.wrapper}>
-      <Header selected={1}/>
+      <Header selected={1} />
       <div className={styles.contentWrapper}>
-        <MusicSearch className={styles.musicSearch}/>
+        <MusicSearch className={styles.musicSearch} />
         <div className={styles.songs}>
           {songCards}
         </div>
@@ -24,9 +26,6 @@ const Discover = props => {
   );
 };
 
-Discover.propTypes = {
-
-};
+Discover.displayName = 'Discover';
 
 export default Discover;
-

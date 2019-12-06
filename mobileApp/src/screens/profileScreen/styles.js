@@ -12,6 +12,17 @@ export default StyleSheet.create({
     paddingRight: 20,
     paddingTop: 20,
   },
+  followContainer: {
+    flex: 1,
+  },
+  followTabs: {
+    flexDirection: 'row',
+    height: 50,
+    backgroundColor: 'rgba(61,64,68,0.75)',
+  },
+  profileContainer: {
+    flex: 1,
+  },
   profileTabs: {
     flexDirection: 'row',
     height: 50,

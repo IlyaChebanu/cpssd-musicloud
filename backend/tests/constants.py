@@ -1,3 +1,6 @@
+"""
+Test constants.
+"""
 TEST_TOKEN = (
     'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0yLCJlbWFpbCI6InVz'
     'ZXJuYW1lMkBmYWtlbWFpbC5ub3Nob3ciLCJ1c2VybmFtZSI6InVzZXJuYW1lMiIsI'
@@ -9,3 +12,33 @@ TEST_TOKEN = (
     'hsQ1hUS29obm5lUk5FemNyTHpSemV5dnprc3NNRlVUZGVFdnpiS3UifQ.CQ0Rc-be'
     'iTcw9vdLhHZBLNGoljbqO5OstvoyHxWiYIs'
 )
+
+MOCKED_TOKEN = {
+    'uid': -2,
+    'email': 'username2@fakemail.noshow',
+    'username': 'username2',
+    'verified': 1,
+    'random_value': (
+        'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+        'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+        'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+        'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+        'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+        'zeyvzkssMFUTdeEvzbKu'
+    )
+}
+
+ALT_MOCKED_TOKEN = {
+    'uid': -1,
+    'email': 'username2@fakemail.noshow',
+    'username': 'username2',
+    'verified': 1,
+    'random_value': (
+        'nCSihTTgfbQAtxfKXRMkicFxvXbeBulFJthWwUEMtJWXTfN'
+        'swNzJIKtbzFoKujvLmHdcJhCROMbneQplAuCdjBNNfLAJQg'
+        'UWpXafGXCmTZoAQEnXIPuGJslmvMvfigfNjgeHysWDAoBtw'
+        'HJahayNPunFvEfgGoMWIBdnHuESqEZNAEHvxXvCnAcgdzpL'
+        'ELmnSZOPJpFalZibEPkHTGaGchmhlCXTKohnneRNEzcrLzR'
+        'zeyvzkssMFUTdeEvzbKu'
+    )
+}

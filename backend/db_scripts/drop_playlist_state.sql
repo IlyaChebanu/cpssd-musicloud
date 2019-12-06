@@ -1,0 +1,1 @@
+DROP TABLE `musicloud_db`.`Playlist_State`;
