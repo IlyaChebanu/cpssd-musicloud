@@ -1,5 +1,5 @@
 import React, {
-  memo, useState, useCallback, useMemo,
+  memo, useState, useCallback, useMemo, useEffect,
 } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -21,6 +21,13 @@ const TimelineControls = memo((props) => {
     tempo, dispatch, gridSnapEnabled, loopEnabled,
   } = props;
   const [tempoInput, setTempoInput] = useState(tempo);
+
+  useEffect(() => {
+    if (tempoInput !== tempo) {
+      setTempoInput(tempo);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tempo]);
 
   const handleChange = useCallback((e) => {
     setTempoInput(e.target.value);

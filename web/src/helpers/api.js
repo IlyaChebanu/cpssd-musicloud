@@ -130,3 +130,25 @@ export const patchUserDetails = (reqData) => axios.patch(
     headers: getAuth(),
   },
 );
+
+export const getEditableSongs = () => axios.get(
+  `${API_URL}/v1/audio/editable_songs?songs_per_page=100`,
+  {
+    headers: getAuth(),
+  },
+);
+
+export const getSongState = (sid) => axios.get(
+  `${API_URL}/v1/audio/state?sid=${sid}`,
+  {
+    headers: getAuth(),
+  },
+);
+
+export const createNewSong = (title) => axios.post(
+  `${API_URL}/v1/audio`,
+  { title },
+  {
+    headers: getAuth(),
+  },
+);

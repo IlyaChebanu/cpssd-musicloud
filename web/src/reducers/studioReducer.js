@@ -5,14 +5,15 @@ export default (
       start: 1,
       stop: 17,
     },
-    songId: 1001,
+    songId: null,
+    songName: 'New Song',
     gridSize: 1,
     gridWidth: 1,
     gridSnapEnabled: true,
     loopEnabled: true,
     scroll: 0,
     scrollY: 0,
-    tempo: 400.0,
+    tempo: 140.0,
     playingStartBeat: 1,
     playingStartTime: 0,
     playing: false,
@@ -23,6 +24,7 @@ export default (
     selectedTrack: 0,
     selectedSample: -1,
     clipboard: {},
+    songPickerHidden: false,
   },
   action,
 ) => {
@@ -150,6 +152,26 @@ export default (
       return {
         ...state,
         clipboard: action.sample,
+      };
+    case 'SONG_PICKER_HIDE':
+      return {
+        ...state,
+        songPickerHidden: true,
+      };
+    case 'SONG_PICKER_SHOW':
+      return {
+        ...state,
+        songPickerHidden: false,
+      };
+    case 'SET_SONG_NAME':
+      return {
+        ...state,
+        songName: action.songName,
+      };
+    case 'SET_SONG_ID':
+      return {
+        ...state,
+        songId: action.songId,
       };
     default:
       return state;
