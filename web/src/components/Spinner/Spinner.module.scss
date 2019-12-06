@@ -1,0 +1,34 @@
+@keyframes spin {
+  0% { transform: rotate(0deg) }
+  50% { transform: rotate(180deg) }
+  100% { transform: rotate(360deg) }
+}
+.inner div {
+  position: absolute;
+  animation: spin 1s linear infinite;
+  width: 100px;
+  height: 100px;
+  top: 0px;
+  left: 0px;
+  border-radius: 50%;
+  box-shadow: 0 4px 0 0 #fff;
+  transform-origin: 50px 50px;
+}
+.spinner {
+  width: 200px;
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  background: none;
+}
+.inner {
+  width: 100px;
+  height: 100px;
+  position: relative;
+  transform: translateZ(0) scale(1);
+  backface-visibility: hidden;
+  transform-origin: 0 0;
+}
+.inner div { box-sizing: content-box; }
