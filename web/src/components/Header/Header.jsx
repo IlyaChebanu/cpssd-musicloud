@@ -81,6 +81,7 @@ const Header = memo((props) => {
 
   const handleShowSongPicker = useCallback(async () => {
     if (await handleSaveState()) {
+      dispatch(setSongId(null));
       dispatch(setSongName('New Song'));
       dispatch(setTracks([]));
       dispatch(setTempo(140));
