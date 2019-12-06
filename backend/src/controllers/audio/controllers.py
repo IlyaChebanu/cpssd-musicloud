@@ -166,7 +166,7 @@ def load_song(user_data):
     if not sid:
         return {"message": "sid param can't be empty!"}, 422
     if permitted_to_edit(sid, user_data.get("uid")):
-        return {"song_state": get_song_state(sid)}, 200
+        return {"song_state": json.loads(get_song_state(sid))}, 200
     return {"message": "You are not permitted to edit song: " + sid}, 403
 
 

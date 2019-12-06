@@ -296,7 +296,7 @@ class AudioTests(unittest.TestCase):
         Ensure user's can load a song correctly.
         """
         mocked_edit.return_value = 1
-        mocked_state.return_value = {}
+        mocked_state.return_value = "{\"tempo\": 140, \"tracks\": []}"
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
             mock_token.return_value = ALT_MOCKED_TOKEN
             test_req_data = {
@@ -309,7 +309,7 @@ class AudioTests(unittest.TestCase):
                 follow_redirects=True
             )
             self.assertEqual(200, res.status_code)
-            expected_body = {'song_state': {}}
+            expected_body = {'song_state': {'tempo': 140, 'tracks': []}}
             self.assertEqual(expected_body, json.loads(res.data))
 
     def test_load_song_fail_missing_access_token(self):
