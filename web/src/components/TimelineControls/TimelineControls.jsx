@@ -26,7 +26,8 @@ const TimelineControls = memo((props) => {
     if (tempoInput !== tempo) {
       setTempoInput(tempo);
     }
-  }, [tempo, tempoInput]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tempo]);
 
   const handleChange = useCallback((e) => {
     setTempoInput(e.target.value);

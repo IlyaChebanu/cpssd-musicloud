@@ -5,7 +5,9 @@ import { connect } from 'react-redux';
 import { withRouter, Link } from 'react-router-dom';
 import styles from './Header.module.scss';
 import { deleteToken } from '../../actions/userActions';
-import { deleteToken as deleteTokenAPI, saveState, uploadFile } from '../../helpers/api';
+import {
+ deleteToken as deleteTokenAPI, saveState, uploadFile, createNewSong 
+} from '../../helpers/api';
 import { showNotification } from '../../actions/notificationsActions';
 import { ReactComponent as Logo } from '../../assets/logo.svg';
 import { ReactComponent as SignOutIcon } from '../../assets/icons/sign-out-alt-light.svg';
@@ -22,7 +24,7 @@ import exportIcon from '../../assets/icons/file_dropdown/export.svg';
 import generateIcon from '../../assets/icons/file_dropdown/generate.svg';
 import exitIcon from '../../assets/icons/file_dropdown/exit.svg';
 import {
-  setTrackAtIndex, setTracks, hideSongPicker, showSongPicker, setTempo, setSongName,
+  setTrackAtIndex, setTracks, hideSongPicker, showSongPicker, setTempo, setSongName, setSongId,
 } from '../../actions/studioActions';
 
 const Header = memo((props) => {
@@ -77,10 +79,14 @@ const Header = memo((props) => {
 
   const handleHideSongPicker = useCallback(async () => {
     if (await handleSaveState()) {
-      dispatch(setSongName('New Song'));
-      dispatch(setTracks([]));
-      dispatch(setTempo(140));
-      dispatch(hideSongPicker());
+      const res = await createNewSong('New Song');
+      if (res.status === 200) {
+        dispatch(setSongId(res.data.sid));
+        dispatch(setTracks([]));
+        dispatch(setTempo(140));
+        dispatch(setSongName('New Song'));
+        dispatch(hideSongPicker());
+      }
     }
   }, [dispatch, handleSaveState]);
 
