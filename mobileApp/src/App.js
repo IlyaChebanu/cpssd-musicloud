@@ -42,6 +42,7 @@ export default class App extends Component<Props> {
   componentDidMount() {
     // Start the Pushy service
     Pushy.listen();
+    Pushy.setNotificationIcon('ic_notification');
 
     
   }
