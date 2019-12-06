@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/no-array-index-key */
 import React, {
-  memo, useCallback, useEffect, useMemo, useRef,
+  memo, useCallback, useEffect, useMemo, useRef, useState,
 } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -31,9 +31,12 @@ import Track from '../../components/Track/Track';
 import { saveState, getSongState } from '../../helpers/api';
 import { useUpdateUserDetails } from '../../helpers/hooks';
 import store from '../../store';
+import Spinner from '../../components/Spinner/Spinner';
 
 const Studio = memo((props) => {
   const { dispatch, tracks, studio } = props;
+
+  const [tracksLoading, setTracksLoading] = useState(false);
 
   const exampleSong = useMemo(() => ({
     name: 'Example Song 1',
@@ -243,9 +246,11 @@ const Studio = memo((props) => {
   useEffect(() => {
     if (studio.songId) {
       (async () => {
+        setTracksLoading(true);
         const res = await getSongState(studio.songId);
+        setTracksLoading(false);
         if (res.status === 200) {
-          const songState = JSON.parse(res.data.song_state);
+          const songState = res.data.song_state;
           if (songState.tracks) dispatch(setTracks(songState.tracks));
           if (songState.tempo) dispatch(setTempo(songState.tempo));
         }
@@ -343,7 +348,7 @@ const Studio = memo((props) => {
               </div>
             </div>
             <div className={styles.tracks} onScroll={handleScroll} ref={tracksRef}>
-              {renderableTracks}
+              {tracksLoading ? <Spinner /> : renderableTracks}
             </div>
           </div>
         </div>
