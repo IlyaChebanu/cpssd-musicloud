@@ -1,27 +1,29 @@
 .wrapper {
-    width: fit-content;
+    width: 50%;
+    max-width: 740px;
     height: 50vh;
     position: absolute;
     top:0;
 	bottom: 0;
 	left: 0;
 	right: 0;
-  	
+
 	margin: auto;
     background-color: #303237;
     z-index: 11;
     border-radius: 25px;
     padding: 40px;
     overflow-y: scroll;
-    
-    
+
+
 
     .songs {
-        width: 90vh;
+        width: 100%;
         display: grid;
         grid-gap: 40px;
         grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
         align-content: space-around;
         grid-auto-columns: minmax(min-content, max-content);
+        justify-items: center;
       }
   }
