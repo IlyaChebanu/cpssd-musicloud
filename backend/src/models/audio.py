@@ -151,7 +151,7 @@ def get_song_state(sid):
     Dict - The most recently saved JSON song_state object.
     """
     sql = (
-        "SELECT * FROM Song_State "
+        "SELECT state FROM Song_State "
         "WHERE sid = %s "
         "ORDER BY time_updated DESC "
     )
@@ -161,7 +161,7 @@ def get_song_state(sid):
     state = query(sql, args, True)
     if not state:
         return {}
-    return state[0][1]
+    return state[0][0]
 
 
 def get_all_compiled_songs(start_index, songs_per_page):
