@@ -4,7 +4,6 @@ import React, { useCallback, useMemo, memo } from 'react';
 import cookie from 'js-cookie';
 import { connect } from 'react-redux';
 import { withRouter, Link } from 'react-router-dom';
-import _ from 'lodash';
 import toWav from 'audiobuffer-to-wav';
 import styles from './Header.module.scss';
 import { deleteToken } from '../../actions/userActions';
@@ -27,7 +26,7 @@ import exportIcon from '../../assets/icons/file_dropdown/export.svg';
 import generateIcon from '../../assets/icons/file_dropdown/generate.svg';
 import exitIcon from '../../assets/icons/file_dropdown/exit.svg';
 import { renderTracks } from '../../middleware/audioRedux';
-import { encodeMp3, forceDownload } from '../../helpers/utils';
+import { forceDownload } from '../../helpers/utils';
 import {
   setTrackAtIndex, setTracks, hideSongPicker, showSongPicker, setTempo, setSongName, setSongId,
 } from '../../actions/studioActions';
