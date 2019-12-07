@@ -156,7 +156,6 @@ const Header = memo((props) => {
     setNameInput(nameInput);
     const res = patchSongName(studio.songId, nameInput);
     return res.status === 200;
-
   }, [dispatch, nameInput, studio.songId]);
 
   const handleKeyDown = useCallback((e) => {
