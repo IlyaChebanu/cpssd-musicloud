@@ -1,12 +1,14 @@
 import PropTypes from 'prop-types';
-import React, {useCallback, useMemo, memo, useState, useEffect} from 'react';
+import React, {
+  useCallback, useMemo, memo, useState, useEffect,
+} from 'react';
 import cookie from 'js-cookie';
 import { connect } from 'react-redux';
 import { withRouter, Link } from 'react-router-dom';
 import styles from './Header.module.scss';
 import { deleteToken } from '../../actions/userActions';
 import {
-  deleteToken as deleteTokenAPI, saveState, uploadFile, createNewSong, patchSongName
+  deleteToken as deleteTokenAPI, saveState, uploadFile, createNewSong, patchSongName,
 } from '../../helpers/api';
 import { showNotification } from '../../actions/notificationsActions';
 import { ReactComponent as Logo } from '../../assets/logo.svg';
@@ -26,11 +28,6 @@ import exitIcon from '../../assets/icons/file_dropdown/exit.svg';
 import {
   setTrackAtIndex, setTracks, hideSongPicker, showSongPicker, setTempo, setSongName, setSongId,
 } from '../../actions/studioActions';
-import {ReactComponent as SnapActive} from "../../assets/icons/magnet-regular.svg";
-import {ReactComponent as Snap} from "../../assets/icons/magnet-light.svg";
-import {ReactComponent as Grid} from "../../assets/icons/th-large-light.svg";
-import {ReactComponent as LoopActive} from "../../assets/icons/repeat-alt-regular.svg";
-import {ReactComponent as Loop} from "../../assets/icons/repeat-alt-light.svg";
 
 const Header = memo((props) => {
   const {
@@ -145,7 +142,7 @@ const Header = memo((props) => {
       return true;
     }
     return false;
-  }, [dispatch, nameInput]);
+  }, [dispatch, nameInput, studio.songId]);
 
   const handleKeyDown = useCallback((e) => {
     if (e.key === 'Enter') {
@@ -156,14 +153,16 @@ const Header = memo((props) => {
   return (
     <div className={styles.header}>
       <Logo className={styles.logo} />
-      <div className={(!studio.songPickerHidden || selected !== 0) ? styles.hide : styles.dropdownBlock}>
+      <div className={(!studio.songPickerHidden || selected !== 0)
+        ? styles.hide : styles.dropdownBlock}
+      >
         <Dropdown items={fileDropdownItems} title="File" />
         <Dropdown items={editDropdownItems} title="Edit" />
         {children}
       </div>
       <div className={styles.songName}>
         <span>
-          <input type={ ( !studio.songPickerHidden || selected !== 0) ? 'hidden' : 'text' } value={nameInput} onChange={handleChange} onBlur={handleSetName} onKeyDown={handleKeyDown} />
+          <input type={(!studio.songPickerHidden || selected !== 0) ? 'hidden' : 'text'} value={nameInput} onChange={handleChange} onBlur={handleSetName} onKeyDown={handleKeyDown} />
         </span>
       </div>
       <span>
