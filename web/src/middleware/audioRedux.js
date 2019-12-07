@@ -4,7 +4,6 @@ import _ from 'lodash';
 import {
   playingStartTime, setCurrentBeat, playingStartBeat, setSampleLoading,
 } from '../actions/studioActions';
-// import getSampleTimes from '../helpers/getSampleTimes';
 import {
   audioContext, bufferStore,
 } from '../helpers/constants';
