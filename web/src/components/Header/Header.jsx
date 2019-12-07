@@ -26,6 +26,11 @@ import exitIcon from '../../assets/icons/file_dropdown/exit.svg';
 import {
   setTrackAtIndex, setTracks, hideSongPicker, showSongPicker, setTempo, setSongName, setSongId,
 } from '../../actions/studioActions';
+import {ReactComponent as SnapActive} from "../../assets/icons/magnet-regular.svg";
+import {ReactComponent as Snap} from "../../assets/icons/magnet-light.svg";
+import {ReactComponent as Grid} from "../../assets/icons/th-large-light.svg";
+import {ReactComponent as LoopActive} from "../../assets/icons/repeat-alt-regular.svg";
+import {ReactComponent as Loop} from "../../assets/icons/repeat-alt-light.svg";
 
 const Header = memo((props) => {
   const {
@@ -120,8 +125,6 @@ const Header = memo((props) => {
     history.push('/login');
   }, [dispatch, history]);
 
-  const songNameStyle = useMemo(() => ({ visibility: selected !== 0 ? 'hidden' : 'visible' }), [selected]);
-
   useEffect(() => {
     if (nameInput !== studio.songName) {
       setNameInput(studio.songName);
@@ -153,14 +156,14 @@ const Header = memo((props) => {
   return (
     <div className={styles.header}>
       <Logo className={styles.logo} />
-      <div className={selected !== 0 ? styles.hide : styles.dropdownBlock}>
+      <div className={(!studio.songPickerHidden || selected !== 0) ? styles.hide : styles.dropdownBlock}>
         <Dropdown items={fileDropdownItems} title="File" />
         <Dropdown items={editDropdownItems} title="Edit" />
         {children}
       </div>
-      <div className={styles.songName}>
-        <span style={songNameStyle}>
-          <input type="text" value={nameInput} onChange={handleChange} onBlur={handleSetName} onKeyDown={handleKeyDown} />
+      <div className={styles.wrapper}>
+        <span>
+          <input type={ ( !studio.songPickerHidden || selected !== 0) ? 'hidden' : 'text' } value={nameInput} onChange={handleChange} onBlur={handleSetName} onKeyDown={handleKeyDown} />
         </span>
       </div>
       <span>
