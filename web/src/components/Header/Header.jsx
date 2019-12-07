@@ -48,26 +48,35 @@ const Header = memo((props) => {
 
 
   const handleSampleImport = useCallback(() => {
+    if (studio.tracks.length === 0) {
+      dispatch(showNotification({ message: 'Please add a track first', type: 'info' }));
+      return;
+    }
     const fileSelector = document.createElement('input');
     fileSelector.setAttribute('type', 'file');
     fileSelector.setAttribute('accept', 'audio/*');
     fileSelector.click();
+    let sampleState = {};
+    const track = { ...studio.tracks[studio.selectedTrack] };
     fileSelector.onchange = function onChange() {
-      const response = uploadFile('audio', fileSelector.files[0], cookie.get('token'));
+      const sampleFile = fileSelector.files[0];
+      const response = uploadFile('audio', sampleFile, cookie.get('token'));
       const cast = Promise.resolve(response);
       cast.then((url) => {
-        const state = studio;
-        const track = { ...state.tracks[state.selectedTrack] };
-        const sample = {
+        sampleState = {
           url,
-          id: 1156,
-          time: 10,
-          track: state.selectedTrack,
+          id: sampleFile.name + track.samples.length.toString(),
+          time: studio.currentBeat,
+          track: studio.selectedTrack,
         };
-        track.samples.push(sample);
-        dispatch(setTrackAtIndex(track, state.selectedTrack));
+        track.samples.push(sampleState);
+        dispatch(setTrackAtIndex(track, studio.selectedTrack));
       });
     };
+    dispatch(setSelectedSample(sampleState.id));
+    dispatch(setSampleTime(sampleState.time, sampleState.id));
+    dispatch(setSampleLoading(true));
+    dispatch(setTracks(studio.tracks));
   }, [dispatch, studio]);
 
   const handleShowSongPicker = useCallback(async () => {
