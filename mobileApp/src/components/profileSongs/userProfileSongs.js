@@ -53,6 +53,8 @@ class UserProfileSongs extends React.Component {
     let authorName = item.username
     let songImage = item.cover
     let playImage = require('../../assets/images/play.png')
+    let songLikes = item.likes
+    let likeImg = require('../../assets/images/like.png')
     return (
       <TouchableOpacity style={styles.songContainer} onPress={() => this.handleSongClick(item, index)}>
         <Image style={styles.songImage} source={{uri: songImage}} />
@@ -60,6 +62,9 @@ class UserProfileSongs extends React.Component {
         <View style={styles.songDetailsContainer}>
           <Text style={styles.songNameText}>{songName}</Text>
           <Text style={styles.authorNameText}>{authorName}</Text>
+          <View style={styles.likeContainer}>
+            <Text style={styles.likes}>{songLikes}</Text><Image style={styles.likeImg} source={likeImg} />
+          </View>
         </View>
       </TouchableOpacity>
     );

@@ -25,7 +25,7 @@ class HomeScreen extends React.Component {
 
   getOtherUserDetails(username) {
     getUserInfo(username, this.props.token).then(response => {
-      if (response.status===200) {
+      if (response.status === 200) {
         this.props.setOtherUserData(response.data)
       }
     })
@@ -42,9 +42,9 @@ class HomeScreen extends React.Component {
   getSongs() {
     getCompiledSongs(this.props.token, '').then(response => {
       if (response.status === 200) {
-        this.setState({ songsData: response.data.songs})
+        this.setState({ songsData: response.data.songs })
       } else {
-        
+
       }
     })
   }
@@ -63,13 +63,18 @@ class HomeScreen extends React.Component {
     let authorName = item.username
     let songImage = item.cover
     let playImage = require('../../assets/images/play.png')
+    let songLikes = item.likes
+    let likeImg = require('../../assets/images/like.png')
     return (
       <TouchableOpacity style={styles.songContainer} onPress={() => this.handleSongClick(item, index)}>
-        <Image style={styles.songImage} source={{uri: songImage}} />
+        <Image style={styles.songImage} source={{ uri: songImage }} />
         <Image style={styles.playImage} source={playImage} />
         <View style={styles.songDetailsContainer}>
           <Text style={styles.songNameText}>{songName}</Text>
           <Text style={styles.authorNameText}>{authorName}</Text>
+          <View style={styles.likeContainer}>
+            <Text style={styles.likes}>{songLikes}</Text><Image style={styles.likeImg} source={likeImg} />
+          </View>
         </View>
       </TouchableOpacity>
     );
