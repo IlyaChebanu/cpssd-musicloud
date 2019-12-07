@@ -21,16 +21,22 @@
   }
 
   .songName {
-    
     left:0;
     right: 0;
     margin: auto;
-    p {
+    input {
       color: white;
       padding-bottom: 5px;
+      border-right: none;
+      border-left: none;
+      border-top: none;
       border-bottom: white 1px solid;
+      background: none;
+      font-size: 18px;
+      text-align: center;
+      margin-right: 5px;
     }
-    
+
   }
 
   span {

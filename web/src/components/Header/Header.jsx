@@ -161,7 +161,7 @@ const Header = memo((props) => {
         <Dropdown items={editDropdownItems} title="Edit" />
         {children}
       </div>
-      <div className={styles.wrapper}>
+      <div className={styles.songName}>
         <span>
           <input type={ ( !studio.songPickerHidden || selected !== 0) ? 'hidden' : 'text' } value={nameInput} onChange={handleChange} onBlur={handleSetName} onKeyDown={handleKeyDown} />
         </span>
