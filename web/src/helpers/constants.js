@@ -2,8 +2,8 @@ export const emailRe = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+
 
 export const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
-export const globalSongGain = audioContext.createGain();
-globalSongGain.connect(audioContext.destination);
+audioContext.globalGain = audioContext.createGain();
+audioContext.globalGain.connect(audioContext.destination);
 
 export const bufferStore = {};
 

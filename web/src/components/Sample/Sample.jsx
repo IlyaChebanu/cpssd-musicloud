@@ -55,6 +55,7 @@ const Sample = memo((props) => {
     return {
       width: buffer ? buffer.duration * beatsPerSecond * (40 * gridSize) : 20,
       backgroundColor: selected ? colours[colourIdx] : dColours[colourIdx],
+      zIndex: selected ? 2 : 1,
     };
   }, [tempo, sample.track, sample.id, selectedSample, buffer, gridSize]);
 
