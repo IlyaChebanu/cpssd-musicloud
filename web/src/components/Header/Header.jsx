@@ -137,11 +137,8 @@ const Header = memo((props) => {
     dispatch(setSongName(nameInput));
     setNameInput(nameInput);
     const res = patchSongName(studio.songId, nameInput);
-    if (res.status === 200) {
-      dispatch(showNotification({ message: 'Song renamed', type: 'info' }));
-      return true;
-    }
-    return false;
+    return res.status === 200;
+
   }, [dispatch, nameInput, studio.songId]);
 
   const handleKeyDown = useCallback((e) => {
