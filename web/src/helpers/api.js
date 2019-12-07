@@ -93,12 +93,9 @@ export const uploadFile = async (dir, f) => {
       },
     };
     if (res.status === 200) {
-      const data = new FormData();
-      data.append('file', f.file);
       const putAudio = async () => {
         url = makeSignedUrl(res.data.signed_url);
-
-        await putMedia(url, data, options);
+        await putMedia(url, f, options);
       };
       putAudio();
     }

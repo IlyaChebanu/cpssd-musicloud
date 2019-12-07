@@ -40,6 +40,7 @@ import {
   stop,
 } from '../../actions/studioActions';
 
+
 const Header = memo((props) => {
   const {
     selected, studio, children, dispatch, history,
@@ -59,24 +60,24 @@ const Header = memo((props) => {
   }, [tempo, tracks, songId, dispatch]);
 
 
-  const handleSampleSelect = useCallback(() => {
+  const handleSampleImport = useCallback(() => {
     const fileSelector = document.createElement('input');
     fileSelector.setAttribute('type', 'file');
     fileSelector.setAttribute('accept', 'audio/*');
     fileSelector.click();
     fileSelector.onchange = function onChange() {
-      const url = uploadFile('audio', fileSelector.files[0], cookie.get('token'));
-
-      const cast = Promise.resolve(url);
-      cast.then(() => {
+      const response = uploadFile('audio', fileSelector.files[0], cookie.get('token'));
+      const cast = Promise.resolve(response);
+      cast.then((url) => {
         const state = studio;
         const track = { ...state.tracks[state.selectedTrack] };
-        track.samples.push({
-          url: fileSelector.files[0],
+        const sample = {
+          url,
           id: 1156,
           time: 10,
-        });
-
+          track: state.selectedTrack,
+        };
+        track.samples.push(sample);
         dispatch(setTrackAtIndex(track, state.selectedTrack));
       });
     };
@@ -119,17 +120,11 @@ const Header = memo((props) => {
     { name: 'Open', action: handleShowSongPicker, icon: openIcon },
     { name: 'Publish', icon: publishIcon },
     { name: 'Save', icon: saveIcon, action: handleSaveState },
-    { name: 'Import', icon: importIcon, action: handleSampleSelect },
+    { name: 'Import', icon: importIcon, action: handleSampleImport },
     { name: 'Export', icon: exportIcon, action: exportAction },
     { name: 'Generate', icon: generateIcon },
     { name: 'Exit', icon: exitIcon },
-  ], [
-    exportAction,
-    handleHideSongPicker,
-    handleSampleSelect,
-    handleSaveState,
-    handleShowSongPicker,
-  ]);
+  ], [exportAction, handleHideSongPicker, handleSampleImport, handleSaveState, handleShowSongPicker]);
 
   const editDropdownItems = useMemo(() => [
     { name: 'Edit 1' },
