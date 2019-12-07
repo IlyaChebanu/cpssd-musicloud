@@ -634,16 +634,18 @@ def get_timeline(uid, start_index, items_per_page):
         "as likes, 'song' AS type FROM "
         "Songs WHERE uid IN "
         "(SELECT Followers.following FROM Followers WHERE follower=%s)"
-        " AND public=1) UNION (SELECT NULL AS sid, "
+        " OR uid=%s AND public=1) UNION (SELECT NULL AS sid, "
         "(SELECT username FROM Users WHERE Posts.uid=Users.uid) as usernanme"
         ", NULL AS title,"
         "NULL AS duration, NULL AS created, NULL AS public, time, NULL AS url,"
         "NULL AS cover, message, NULL AS likes, 'post' AS type FROM Posts "
         "WHERE uid IN "
-        "(SELECT Followers.following FROM Followers WHERE follower=%s)"
-        ")) AS Sp ORDER BY `time` DESC LIMIT %s, %s;"
+        "(SELECT Followers.following FROM Followers WHERE follower=%s) "
+        "OR uid=%s)) AS Sp ORDER BY `time` DESC LIMIT %s, %s;"
     )
     args = (
+        uid,
+        uid,
         uid,
         uid,
         start_index,
@@ -672,16 +674,18 @@ def get_timeline_length(uid):
         "as likes, 'song' AS type FROM "
         "Songs WHERE uid IN "
         "(SELECT Followers.following FROM Followers WHERE follower=%s)"
-        " AND public=1) UNION (SELECT NULL AS sid, "
+        " OR uid=%s AND public=1) UNION (SELECT NULL AS sid, "
         "(SELECT username FROM Users WHERE Posts.uid=Users.uid) as usernanme"
         ", NULL AS title,"
         "NULL AS duration, NULL AS created, NULL AS public, time, NULL AS url,"
         "NULL AS cover, message, NULL AS likes, 'post' AS type FROM Posts "
         "WHERE uid IN "
         "(SELECT Followers.following FROM Followers WHERE follower=%s)"
-        ")) AS Sp ORDER BY `time` DESC;"
+        " OR uid=%s)) AS Sp ORDER BY `time` DESC;"
     )
     args = (
+        uid,
+        uid,
         uid,
         uid,
     )
@@ -712,9 +716,10 @@ def get_timeline_posts_only(uid, start_index, items_per_page):
         "NULL AS cover, message, NULL AS likes, 'post' AS type FROM Posts "
         "WHERE uid IN "
         "(SELECT Followers.following FROM Followers WHERE follower=%s)"
-        ")) AS Sp ORDER BY `time` DESC LIMIT %s, %s;"
+        " OR uid=%s )) AS Sp ORDER BY `time` DESC LIMIT %s, %s;"
     )
     args = (
+        uid,
         uid,
         start_index,
         items_per_page,
@@ -741,9 +746,10 @@ def get_timeline_posts_only_length(uid):
         "NULL AS cover, message, NULL AS likes, 'post' AS type FROM Posts "
         "WHERE uid IN "
         "(SELECT Followers.following FROM Followers WHERE follower=%s)"
-        ")) AS Sp ORDER BY `time` DESC;"
+        " OR uid=%s)) AS Sp ORDER BY `time` DESC;"
     )
     args = (
+        uid,
         uid,
     )
     res = query(sql, args, True)
@@ -774,9 +780,10 @@ def get_timeline_song_only(uid, start_index, items_per_page):
         "as likes, 'song' AS type FROM "
         "Songs WHERE uid IN "
         "(SELECT Followers.following FROM Followers WHERE follower=%s)"
-        " AND public=1)) AS Sp ORDER BY `time` DESC LIMIT %s, %s;"
+        " OR uid=%s AND public=1)) AS Sp ORDER BY `time` DESC LIMIT %s, %s;"
     )
     args = (
+        uid,
         uid,
         start_index,
         items_per_page,
@@ -804,9 +811,10 @@ def get_timeline_song_only_length(uid):
         "as likes, 'song' AS type FROM "
         "Songs WHERE uid IN "
         "(SELECT Followers.following FROM Followers WHERE follower=%s)"
-        " AND public=1)) AS Sp ORDER BY `time` DESC;"
+        " OR uid=%s AND public=1)) AS Sp ORDER BY `time` DESC;"
     )
     args = (
+        uid,
         uid,
     )
     res = query(sql, args, True)
