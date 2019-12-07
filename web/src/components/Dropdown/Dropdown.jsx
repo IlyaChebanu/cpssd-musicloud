@@ -21,7 +21,7 @@ const Dropdown = memo((props) => {
     <li
       key={item.name}
       onMouseDown={() => {
-        item.action();
+        if (item.action) item.action();
         setDisplayMenu(false);
       }}
     >

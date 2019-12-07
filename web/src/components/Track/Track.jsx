@@ -48,7 +48,9 @@ const Track = memo((props) => {
     />
   ), [gridSize, index]);
 
-  const samples = useMemo(() => track.samples.map(getSample), [getSample, track.samples]);
+  const samples = useMemo(() => (
+    track.samples && track.samples.map(getSample)
+  ), [getSample, track.samples]);
 
   const handleSetSelected = useCallback(() => {
     dispatch(setSelectedTrack(index));
@@ -59,10 +61,9 @@ const Track = memo((props) => {
     if (_.isEmpty(sample)) {
       return;
     }
-    const lastSample = track.samples[track.samples.length - 1];
     sample.id = genId();
-    sample.time = lastSample ? lastSample.time + (lastSample.duration * 60) / tempo : 1;
-    track.samples.push(sample);
+    sample.time += sample.duration * (tempo / 60);
+    track.samples = [...track.samples, sample];
     dispatch(setTrackAtIndex(track, index));
   }, [clipboard, dispatch, index, tempo, track]);
 

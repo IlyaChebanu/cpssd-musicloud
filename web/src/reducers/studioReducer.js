@@ -24,6 +24,7 @@ export default (
     selectedTrack: 0,
     selectedSample: -1,
     clipboard: {},
+    title: 'Untitled',
     songPickerHidden: false,
   },
   action,
@@ -152,6 +153,11 @@ export default (
       return {
         ...state,
         clipboard: action.sample,
+      };
+    case 'SET_SONG_TITLE':
+      return {
+        ...state,
+        title: action.title,
       };
     case 'SONG_PICKER_HIDE':
       return {

@@ -151,6 +151,13 @@ export const setClipboard = (sample) => (dispatch) => {
   });
 };
 
+export const setSongTitle = (title) => (dispatch) => {
+  dispatch({
+    type: 'SET_SONG_TITLE',
+    title,
+  });
+};
+
 export const hideSongPicker = () => (dispatch) => {
   dispatch({
     type: 'SONG_PICKER_HIDE',

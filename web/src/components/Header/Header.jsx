@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import PropTypes from 'prop-types';
 import React, {
   useCallback, useMemo, memo, useState, useEffect,
@@ -5,6 +6,7 @@ import React, {
 import cookie from 'js-cookie';
 import { connect } from 'react-redux';
 import { withRouter, Link } from 'react-router-dom';
+import toWav from 'audiobuffer-to-wav';
 import styles from './Header.module.scss';
 import { deleteToken } from '../../actions/userActions';
 import {
@@ -25,6 +27,8 @@ import importIcon from '../../assets/icons/file_dropdown/import.svg';
 import exportIcon from '../../assets/icons/file_dropdown/export.svg';
 import generateIcon from '../../assets/icons/file_dropdown/generate.svg';
 import exitIcon from '../../assets/icons/file_dropdown/exit.svg';
+import { renderTracks } from '../../middleware/audioRedux';
+import { forceDownload } from '../../helpers/utils';
 import {
   setTrackAtIndex, setTracks, hideSongPicker, showSongPicker, setTempo, setSongName, setSongId,
 } from '../../actions/studioActions';
@@ -71,8 +75,16 @@ const Header = memo((props) => {
     };
   }, [dispatch, studio]);
 
+  const exportAction = useCallback(async () => {
+    const renderedBuffer = await renderTracks(studio);
+    const encoded = toWav(renderedBuffer);
+
+    forceDownload([new DataView(encoded)], 'audio/wav', `${studio.songName}.wav`); // for mp3 [new DataView] not needed
+  }, [studio]);
+
   const handleShowSongPicker = useCallback(async () => {
     if (await handleSaveState()) {
+      dispatch(setSongId(null));
       dispatch(setSongName('New Song'));
       dispatch(setTracks([]));
       dispatch(setTempo(140));
@@ -99,10 +111,16 @@ const Header = memo((props) => {
     { name: 'Publish', icon: publishIcon },
     { name: 'Save', icon: saveIcon, action: handleSaveState },
     { name: 'Import', icon: importIcon, action: handleSampleSelect },
-    { name: 'Export', icon: exportIcon },
+    { name: 'Export', icon: exportIcon, action: exportAction },
     { name: 'Generate', icon: generateIcon },
     { name: 'Exit', icon: exitIcon },
-  ], [handleHideSongPicker, handleSampleSelect, handleSaveState, handleShowSongPicker]);
+  ], [
+    exportAction,
+    handleHideSongPicker,
+    handleSampleSelect,
+    handleSaveState,
+    handleShowSongPicker,
+  ]);
 
   const editDropdownItems = useMemo(() => [
     { name: 'Edit 1' },

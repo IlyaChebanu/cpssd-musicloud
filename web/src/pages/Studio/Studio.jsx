@@ -260,10 +260,10 @@ const Studio = memo((props) => {
 
   useEffect(() => {
     const latest = tracks.reduce((m, track) => {
-      const sampleMax = track.samples.reduce((sm, sample) => {
+      const sampleMax = track.samples ? track.samples.reduce((sm, sample) => {
         const endTime = sample.time + (sample.duration * (studio.tempo / 60));
         return Math.max(endTime, sm);
-      }, 1);
+      }, 1) : 1;
       return Math.max(sampleMax, m);
     }, 1);
     const width = Math.max(
