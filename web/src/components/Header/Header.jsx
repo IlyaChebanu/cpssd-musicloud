@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types';
-import React, { useCallback, useMemo, memo } from 'react';
+import React, {useCallback, useMemo, memo, useState, useEffect} from 'react';
 import cookie from 'js-cookie';
 import { connect } from 'react-redux';
 import { withRouter, Link } from 'react-router-dom';
 import styles from './Header.module.scss';
 import { deleteToken } from '../../actions/userActions';
 import {
-  deleteToken as deleteTokenAPI, saveState, uploadFile, createNewSong,
+  deleteToken as deleteTokenAPI, saveState, uploadFile, createNewSong, patchSongName
 } from '../../helpers/api';
 import { showNotification } from '../../actions/notificationsActions';
 import { ReactComponent as Logo } from '../../assets/logo.svg';
@@ -32,6 +32,7 @@ const Header = memo((props) => {
     selected, studio, children, dispatch, history,
   } = props;
   const { tempo, tracks, songId } = studio;
+  const [nameInput, setNameInput] = useState(studio.songName);
 
   const handleSaveState = useCallback(async () => {
     if (!songId) return true;
@@ -121,6 +122,34 @@ const Header = memo((props) => {
 
   const songNameStyle = useMemo(() => ({ visibility: selected !== 0 ? 'hidden' : 'visible' }), [selected]);
 
+  useEffect(() => {
+    if (nameInput !== studio.songName) {
+      setNameInput(studio.songName);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [studio.songName]);
+
+  const handleChange = useCallback((e) => {
+    setNameInput(e.target.value);
+  }, []);
+
+  const handleSetName = useCallback(async () => {
+    dispatch(setSongName(nameInput));
+    setNameInput(nameInput);
+    const res = patchSongName(studio.songId, nameInput);
+    if (res.status === 200) {
+      dispatch(showNotification({ message: 'Song renamed', type: 'info' }));
+      return true;
+    }
+    return false;
+  }, [dispatch, nameInput]);
+
+  const handleKeyDown = useCallback((e) => {
+    if (e.key === 'Enter') {
+      handleSetName();
+    }
+  }, [handleSetName]);
+
   return (
     <div className={styles.header}>
       <Logo className={styles.logo} />
@@ -130,9 +159,9 @@ const Header = memo((props) => {
         {children}
       </div>
       <div className={styles.songName}>
-        <p style={songNameStyle}>
-          {studio.songName}
-        </p>
+        <span style={songNameStyle}>
+          <input type="text" value={nameInput} onChange={handleChange} onBlur={handleSetName} onKeyDown={handleKeyDown} />
+        </span>
       </div>
       <span>
         <nav>
