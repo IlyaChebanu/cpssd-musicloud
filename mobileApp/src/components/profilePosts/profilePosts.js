@@ -46,11 +46,20 @@ export default class ProfilePosts extends React.Component {
     this.props.handleFollowingsClick()
   }
 
+  handleLikedSongClick() {
+    this.props.handleLikedSongsClick()
+  }
+
   renderheader() {
     return (
       <View style={styles.container}>
         <Text style={styles.profileTitleText}>{"PROFILE"}</Text>
-        <ProfileComponent handleFollowerClick={this.handleFollowerClick.bind(this)} handleFollowingClick={this.handleFollowingClick.bind(this)} accessToken={this.props.accessToken} username={this.props.username} />
+        <ProfileComponent 
+        handleFollowerClick={this.handleFollowerClick.bind(this)} 
+        handleFollowingClick={this.handleFollowingClick.bind(this)} 
+        handleLikedSongClick={this.handleLikedSongClick.bind(this)} 
+        accessToken={this.props.accessToken} 
+        username={this.props.username} />
         <Text style={styles.titleText}>{"Posts"}</Text>
         <CreatePostComponent createdPost={this.createdPost.bind(this)} accessToken={this.props.accessToken}/>
       </View>

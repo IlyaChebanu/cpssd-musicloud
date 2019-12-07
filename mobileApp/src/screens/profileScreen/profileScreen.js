@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from 'react-redux';
 import { ActionCreators } from '../../actions/index';
 import { bindActionCreators } from 'redux';
-import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList } from "react-native";
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import HeaderComponent from "../../components/headerComponent/headerComponent";
@@ -12,6 +12,7 @@ import ProfileSongs from "../../components/profileSongs/profileSongs";
 import ProfilePosts from "../../components/profilePosts/profilePosts";
 import FollowingComponent from "../../components/followingComponent/followingComponent";
 import FollowerComponent from "../../components/followerComponent/followerComponent";
+import { getLikedSongs } from "../../api/audioAPI";
 
 class ProfileScreen extends React.Component {
   constructor(props) {
@@ -21,6 +22,7 @@ class ProfileScreen extends React.Component {
       activeTab: 1,
       activeFollowTab: 1,
       profileScreen: 1,
+      likedSongsData: [],
     }
   }
 
@@ -38,6 +40,10 @@ class ProfileScreen extends React.Component {
 
   handleFollowingClick() {
     this.setState({ activeFollowTab: 2 })
+  }
+
+  componentDidMount() {
+    this.getLikedSongs()
   }
 
   renderProfile() {
@@ -58,9 +64,77 @@ class ProfileScreen extends React.Component {
           </View>
         </View>
         {this.state.activeTab === 1 ?
-          <ProfileSongs handleFollowersClick={this.handleFollowersTextClick.bind(this)} handleFollowingsClick={this.handleFollowingTextClick.bind(this)} accessToken={this.props.token} username={this.props.username} navigation={this.props.navigation} />
-          : <ProfilePosts handleFollowersClick={this.handleFollowersTextClick.bind(this)} handleFollowingsClick={this.handleFollowingTextClick.bind(this)} accessToken={this.props.token} username={this.props.username} />
+          <ProfileSongs 
+            handleFollowersClick={this.handleFollowersTextClick.bind(this)} 
+            handleFollowingsClick={this.handleFollowingTextClick.bind(this)} 
+            handleLikedSongsClick={this.handleLikedSongTextClick.bind(this)} 
+            accessToken={this.props.token} 
+            username={this.props.username} 
+            navigation={this.props.navigation} />
+          : <ProfilePosts 
+            handleFollowersClick={this.handleFollowersTextClick.bind(this)} 
+            handleFollowingsClick={this.handleFollowingTextClick.bind(this)} 
+            handleLikedSongsClick={this.handleLikedSongTextClick.bind(this)} 
+            accessToken={this.props.token} 
+            username={this.props.username} />
         }
+      </View>
+    )
+  }
+
+  handleLikedSongClick() {
+
+  }
+
+  getLikedSongs() {
+    getLikedSongs(this.props.token, this.props.username).then(response => {
+      if (response.status === 200) {
+        this.setState({ likedSongsData: response.data.songs })
+      }
+    })
+  }
+
+  renderLikedSong({ item, index }) {
+    let songName = item.title
+    let authorName = item.username
+    let songImage = item.cover
+    let playImage = require('../../assets/images/play.png')
+    let songLikes = item.likes
+    let likeImg = require('../../assets/images/like.png')
+    return(
+      <TouchableOpacity style={styles.songContainer} onPress={() => this.handleLikedSongClick(item, index)}>
+        <Image style={styles.songImage} source={{uri: songImage}} />
+        <Image style={styles.playImage} source={playImage} />
+        <View style={styles.songDetailsContainer}>
+          <Text style={styles.songNameText}>{songName}</Text>
+          <Text style={styles.authorNameText}>{authorName}</Text>
+          <View style={styles.likeContainer}>
+            <Text style={styles.likes}>{songLikes}</Text><Image style={styles.likeImg} source={likeImg} />
+          </View>
+        </View>
+      </TouchableOpacity>
+    )
+  }
+
+  renderLikedSongHeader() {
+    return(
+      <View style={styles.headerContainer}>
+        <Text style={styles.likedSongTitleText}>{'Liked Songs'}</Text>
+      </View>
+    )
+  }
+
+  renderLikedSongs() {
+    return(
+      <View style={styles.likedSongsContainer}>
+        <FlatList
+          ListHeaderComponent={this.renderLikedSongHeader()}
+          style={styles.songFlatList}
+          data={this.state.likedSongsData}
+          renderItem={this.renderLikedSong.bind(this)}
+          keyExtractor={item => String(item.sid)}
+          extraData={this.state.likedSongsData}
+        />
       </View>
     )
   }
@@ -71,6 +145,10 @@ class ProfileScreen extends React.Component {
 
   handleFollowingTextClick() {
     this.setState({ profileScreen: 2, activeFollowTab: 2 })
+  }
+
+  handleLikedSongTextClick() {
+    this.setState({ profileScreen: 3 })
   }
 
   renderFollow() {
@@ -105,12 +183,14 @@ class ProfileScreen extends React.Component {
   }
 
   render() {
-    let followScreen = this.state.profileScreen === 2
+    let withArrow = (this.state.profileScreen === 2 || this.state.profileScreen === 3)
     return (
       <SafeAreaView forceInset={{ bottom: 'never' }} style={{ 'backgroundColor': '#3D4044', 'flex': 1 }}>
         <View style={{ 'backgroundColor': '#1B1E23', 'flex': 1 }}>
-          <HeaderComponent navigation={this.props.navigation} withArrow={followScreen ? true : false} onArrowClick={this.onArrowClick.bind(this)} />
-          {this.state.profileScreen === 1 ? this.renderProfile() : this.renderFollow()}
+          <HeaderComponent navigation={this.props.navigation} withArrow={withArrow ? true : false} onArrowClick={this.onArrowClick.bind(this)} />
+          {this.state.profileScreen === 1 && this.renderProfile()}
+          {this.state.profileScreen === 2 && this.renderFollow()}
+          {this.state.profileScreen === 3 && this.renderLikedSongs()}
         </View>
       </SafeAreaView>
     )
