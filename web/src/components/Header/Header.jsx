@@ -28,7 +28,7 @@ import exportIcon from '../../assets/icons/file_dropdown/export.svg';
 import generateIcon from '../../assets/icons/file_dropdown/generate.svg';
 import exitIcon from '../../assets/icons/file_dropdown/exit.svg';
 import { renderTracks } from '../../middleware/audioRedux';
-import { forceDownload } from '../../helpers/utils';
+import { forceDownload, genId } from '../../helpers/utils';
 import {
   setTrackAtIndex,
   setTracks,
@@ -81,7 +81,7 @@ const Header = memo((props) => {
       cast.then((url) => {
         sampleState = {
           url,
-          id: sampleFile.name + track.samples.length.toString(),
+          id: genId(),
           time: studio.currentBeat,
           track: studio.selectedTrack,
         };
