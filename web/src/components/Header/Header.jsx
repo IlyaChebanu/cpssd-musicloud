@@ -1,6 +1,8 @@
 /* eslint-disable no-param-reassign */
 import PropTypes from 'prop-types';
-import React, { useCallback, useMemo, memo } from 'react';
+import React, {
+  useCallback, useMemo, memo, useState, useEffect,
+} from 'react';
 import cookie from 'js-cookie';
 import { connect } from 'react-redux';
 import { withRouter, Link } from 'react-router-dom';
@@ -8,7 +10,7 @@ import toWav from 'audiobuffer-to-wav';
 import styles from './Header.module.scss';
 import { deleteToken } from '../../actions/userActions';
 import {
-  deleteToken as deleteTokenAPI, saveState, uploadFile, createNewSong,
+  deleteToken as deleteTokenAPI, saveState, uploadFile, createNewSong, patchSongName,
 } from '../../helpers/api';
 import { showNotification } from '../../actions/notificationsActions';
 import { ReactComponent as Logo } from '../../assets/logo.svg';
@@ -28,7 +30,14 @@ import exitIcon from '../../assets/icons/file_dropdown/exit.svg';
 import { renderTracks } from '../../middleware/audioRedux';
 import { forceDownload } from '../../helpers/utils';
 import {
-  setTrackAtIndex, setTracks, hideSongPicker, showSongPicker, setTempo, setSongName, setSongId,
+  setTrackAtIndex,
+  setTracks,
+  hideSongPicker,
+  showSongPicker,
+  setTempo,
+  setSongName,
+  setSongId,
+  stop,
 } from '../../actions/studioActions';
 
 const Header = memo((props) => {
@@ -36,6 +45,7 @@ const Header = memo((props) => {
     selected, studio, children, dispatch, history,
   } = props;
   const { tempo, tracks, songId } = studio;
+  const [nameInput, setNameInput] = useState(studio.songName);
 
   const handleSaveState = useCallback(async () => {
     if (!songId) return true;
@@ -81,9 +91,10 @@ const Header = memo((props) => {
 
   const handleShowSongPicker = useCallback(async () => {
     if (await handleSaveState()) {
+      dispatch(stop);
+      dispatch(setTracks([]));
       dispatch(setSongId(null));
       dispatch(setSongName('New Song'));
-      dispatch(setTracks([]));
       dispatch(setTempo(140));
       dispatch(showSongPicker());
     }
@@ -93,8 +104,9 @@ const Header = memo((props) => {
     if (await handleSaveState()) {
       const res = await createNewSong('New Song');
       if (res.status === 200) {
-        dispatch(setSongId(res.data.sid));
+        dispatch(stop);
         dispatch(setTracks([]));
+        dispatch(setSongId(res.data.sid));
         dispatch(setTempo(140));
         dispatch(setSongName('New Song'));
         dispatch(hideSongPicker());
@@ -137,22 +149,46 @@ const Header = memo((props) => {
     history.push('/login');
   }, [dispatch, history]);
 
-  const songNameStyle = useMemo(() => ({ visibility: selected !== 0 ? 'hidden' : 'visible' }), [selected]);
+  useEffect(() => {
+    if (nameInput !== studio.songName) {
+      setNameInput(studio.songName);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [studio.songName]);
+
+  const handleChange = useCallback((e) => {
+    setNameInput(e.target.value);
+  }, []);
+
+  const handleSetName = useCallback(async () => {
+    dispatch(setSongName(nameInput));
+    setNameInput(nameInput);
+    const res = patchSongName(studio.songId, nameInput);
+    return res.status === 200;
+  }, [dispatch, nameInput, studio.songId]);
+
+  const handleKeyDown = useCallback((e) => {
+    if (e.key === 'Enter') {
+      handleSetName();
+    }
+  }, [handleSetName]);
 
   return (
     <div className={styles.header}>
-      <Logo className={styles.logo} />
-      <div className={selected !== 0 ? styles.hide : styles.dropdownBlock}>
-        <Dropdown items={fileDropdownItems} title="File" />
-        <Dropdown items={editDropdownItems} title="Edit" />
-        {children}
-      </div>
-      <div className={styles.songName}>
-        <p style={songNameStyle}>
-          {studio.songName}
-        </p>
-      </div>
-      <span>
+      <span className={styles.left}>
+        <Logo className={styles.logo} />
+        <div className={(!studio.songPickerHidden || selected !== 0)
+          ? styles.hide : styles.dropdownBlock}
+        >
+          <Dropdown items={fileDropdownItems} title="File" />
+          <Dropdown items={editDropdownItems} title="Edit" />
+          {children}
+        </div>
+      </span>
+      <span className={styles.songName}>
+        <input type={(!studio.songPickerHidden || selected !== 0) ? 'hidden' : 'text'} value={nameInput} onChange={handleChange} onBlur={handleSetName} onKeyDown={handleKeyDown} />
+      </span>
+      <span className={styles.nav}>
         <nav>
           <Link to="/studio" className={selected === 0 ? styles.selected : ''}>Studio</Link>
           <Link to="/discover" className={selected === 1 ? styles.selected : ''}>Discover</Link>

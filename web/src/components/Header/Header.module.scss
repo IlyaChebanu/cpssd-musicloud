@@ -5,9 +5,14 @@
   z-index: 13;
   display: flex;
   align-items: center;
-  
+  justify-content: space-between;
+
   padding: 0px 20px 0px 20px;
   position: relative;
+
+  .left {
+    display: flex;
+  }
 
   .dropdownBlock {
     display: flex;
@@ -21,19 +26,22 @@
   }
 
   .songName {
-    
-    left:0;
-    right: 0;
-    margin: auto;
-    p {
+    input {
       color: white;
       padding-bottom: 5px;
+      border-right: none;
+      border-left: none;
+      border-top: none;
       border-bottom: white 1px solid;
+      background: none;
+      font-size: 18px;
+      text-align: center;
+      width: 200px;
     }
-    
+
   }
 
-  span {
+  .nav {
     display: flex;
     flex-direction: row;
     position: relative;

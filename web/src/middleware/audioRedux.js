@@ -2,7 +2,7 @@
 import axios from 'axios';
 import _ from 'lodash';
 import {
-  playingStartTime, setCurrentBeat, playingStartBeat, setSampleLoading,
+  playingStartTime, setCurrentBeat, playingStartBeat, setSampleLoading, stop,
 } from '../actions/studioActions';
 import {
   audioContext, bufferStore,
@@ -100,7 +100,10 @@ export default (store) => {
   // Update currentBeat in redux to animate seek bar
   const beatUpdate = () => {
     const state = store.getState().studio;
-    if (state.playing) {
+    if (state.playing && window.location.pathname !== '/studio') {
+      store.dispatch(stop);
+    }
+    if (state.playing && window.location.pathname === '/studio') {
       requestAnimationFrame(beatUpdate);
       const secondsPerBeat = 60 / state.tempo;
       let currentBeat = (

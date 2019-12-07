@@ -10,19 +10,25 @@ import {
   setTracks, hideSongPicker, setTempo, setSongName, setSongId,
 } from '../../actions/studioActions';
 import { getEditableSongs, createNewSong } from '../../helpers/api';
+import Spinner from '../Spinner/Spinner';
 
 const SongPicker = memo((props) => {
   const { dispatch, songPickerHidden } = props;
   const [gotSongs, setGotSongs] = useState([]);
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     const getSongs = async () => {
+      setLoading(true);
       const res = await getEditableSongs();
+      setLoading(false);
       if (res.status === 200) {
         setGotSongs(res.data.songs);
       }
     };
-    getSongs();
-  }, [dispatch]);
+    if (!songPickerHidden) {
+      getSongs();
+    }
+  }, [dispatch, songPickerHidden]);
 
   const handleCreateNewSong = useCallback(async () => {
     const res = await createNewSong('New Song');
@@ -57,7 +63,7 @@ const SongPicker = memo((props) => {
           onClick={handleCreateNewSong}
           className={styles.songCard}
         />
-        {ownSongCards}
+        {loading ? <Spinner /> : ownSongCards}
       </div>
     </div>
   );

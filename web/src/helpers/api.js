@@ -152,3 +152,11 @@ export const createNewSong = (title) => axios.post(
     headers: getAuth(),
   },
 );
+
+export const patchSongName = (sid, title) => axios.patch(
+  `${API_URL}/v1/audio/rename`,
+  { sid, title },
+  {
+    headers: getAuth(),
+  },
+);
