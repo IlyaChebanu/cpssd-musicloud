@@ -45,11 +45,20 @@ class ProfileSongs extends React.Component {
     this.props.handleFollowingsClick()
   }
 
+  handleLikedSongClick() {
+    this.props.handleLikedSongsClick()
+  }
+
   renderheader() {
     return (
       <View style={styles.container}>
         <Text style={styles.profileTitleText}>{"PROFILE"}</Text>
-        <ProfileComponent handleFollowerClick={this.handleFollowerClick.bind(this)} handleFollowingClick={this.handleFollowingClick.bind(this)} accessToken={this.props.accessToken} username={this.props.username} />
+        <ProfileComponent 
+          handleFollowerClick={this.handleFollowerClick.bind(this)} 
+          handleFollowingClick={this.handleFollowingClick.bind(this)} 
+          handleLikedSongClick={this.handleLikedSongClick.bind(this)} 
+          accessToken={this.props.accessToken} 
+          username={this.props.username} />
         <Text style={styles.titleText}>{"Songs"}</Text>
         {this.state.songsData.length === 0 ? <Text style={styles.noSongsText}>{'User has no songs yet'}</Text> : null}
       </View>
@@ -61,6 +70,8 @@ class ProfileSongs extends React.Component {
     let authorName = item.username
     let songImage = item.cover
     let playImage = require('../../assets/images/play.png')
+    let songLikes = item.likes
+    let likeImg = require('../../assets/images/like.png')
     return (
       <TouchableOpacity style={styles.songContainer} onPress={() => this.handleSongClick(item, index)}>
         <Image style={styles.songImage} source={{uri: songImage}} />
@@ -68,6 +79,9 @@ class ProfileSongs extends React.Component {
         <View style={styles.songDetailsContainer}>
           <Text style={styles.songNameText}>{songName}</Text>
           <Text style={styles.authorNameText}>{authorName}</Text>
+          <View style={styles.likeContainer}>
+            <Text style={styles.likes}>{songLikes}</Text><Image style={styles.likeImg} source={likeImg} />
+          </View>
         </View>
       </TouchableOpacity>
     );

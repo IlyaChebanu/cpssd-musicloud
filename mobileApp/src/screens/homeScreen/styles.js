@@ -61,4 +61,28 @@ export default StyleSheet.create({
     textShadowRadius: 1,
     textShadowColor: '#666',
   },
+  likes: {
+    fontSize: 18,
+    color: '#FFF',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 1,
+    textShadowColor: '#666',
+  },
+  likeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    position: 'absolute',
+    bottom: 0,
+    right: 0
+  },
+  likeImg: {
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
+    elevation: 3,
+  },
 })

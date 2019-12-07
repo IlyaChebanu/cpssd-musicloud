@@ -86,6 +86,10 @@ class ProfileComponent extends React.Component {
     this.props.handleFollowingClick()
   }
 
+  handleLikedSongClick() {
+    this.props.handleLikedSongClick()
+  }
+
   render() {
     let profilePic = require('../../assets/images/profilePlaceholder.png')
     let profilePicUrl = this.props.picUrl
@@ -120,10 +124,12 @@ class ProfileComponent extends React.Component {
             <TouchableOpacity onPress={() => this.handleFollowingClick()}>
               <Text style={styles.profileText}><Text style={styles.profileNum}>{userData.following}</Text>{' following'}</Text>
             </TouchableOpacity>
+            <TouchableOpacity onPress={() => this.handleLikedSongClick()}>
+              <Text style={styles.profileText}><Text style={styles.profileNum}>{userData.likes}</Text>{' liked songs'}</Text>
+            </TouchableOpacity>
           <Text style={styles.profileText}>
             <Text style={styles.profileNum}>{userData.songs}</Text>{' songs'}{'\n'}
             <Text style={styles.profileNum}>{userData.posts}</Text>{' posts'}{'\n'}
-            <Text style={styles.profileNum}>{userData.likes}</Text>{' likes'}
           </Text>
         </View>
       </View>
