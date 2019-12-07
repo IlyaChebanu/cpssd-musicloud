@@ -30,7 +30,14 @@ import exitIcon from '../../assets/icons/file_dropdown/exit.svg';
 import { renderTracks } from '../../middleware/audioRedux';
 import { forceDownload } from '../../helpers/utils';
 import {
-  setTrackAtIndex, setTracks, hideSongPicker, showSongPicker, setTempo, setSongName, setSongId,
+  setTrackAtIndex,
+  setTracks,
+  hideSongPicker,
+  showSongPicker,
+  setTempo,
+  setSongName,
+  setSongId,
+  stop,
 } from '../../actions/studioActions';
 
 const Header = memo((props) => {
@@ -84,9 +91,10 @@ const Header = memo((props) => {
 
   const handleShowSongPicker = useCallback(async () => {
     if (await handleSaveState()) {
+      dispatch(stop);
+      dispatch(setTracks([]));
       dispatch(setSongId(null));
       dispatch(setSongName('New Song'));
-      dispatch(setTracks([]));
       dispatch(setTempo(140));
       dispatch(showSongPicker());
     }
@@ -96,8 +104,9 @@ const Header = memo((props) => {
     if (await handleSaveState()) {
       const res = await createNewSong('New Song');
       if (res.status === 200) {
-        dispatch(setSongId(res.data.sid));
+        dispatch(stop);
         dispatch(setTracks([]));
+        dispatch(setSongId(res.data.sid));
         dispatch(setTempo(140));
         dispatch(setSongName('New Song'));
         dispatch(hideSongPicker());
@@ -166,20 +175,20 @@ const Header = memo((props) => {
 
   return (
     <div className={styles.header}>
-      <Logo className={styles.logo} />
-      <div className={(!studio.songPickerHidden || selected !== 0)
-        ? styles.hide : styles.dropdownBlock}
-      >
-        <Dropdown items={fileDropdownItems} title="File" />
-        <Dropdown items={editDropdownItems} title="Edit" />
-        {children}
-      </div>
-      <div className={styles.songName}>
-        <span>
-          <input type={(!studio.songPickerHidden || selected !== 0) ? 'hidden' : 'text'} value={nameInput} onChange={handleChange} onBlur={handleSetName} onKeyDown={handleKeyDown} />
-        </span>
-      </div>
-      <span>
+      <span className={styles.left}>
+        <Logo className={styles.logo} />
+        <div className={(!studio.songPickerHidden || selected !== 0)
+          ? styles.hide : styles.dropdownBlock}
+        >
+          <Dropdown items={fileDropdownItems} title="File" />
+          <Dropdown items={editDropdownItems} title="Edit" />
+          {children}
+        </div>
+      </span>
+      <span className={styles.songName}>
+        <input type={(!studio.songPickerHidden || selected !== 0) ? 'hidden' : 'text'} value={nameInput} onChange={handleChange} onBlur={handleSetName} onKeyDown={handleKeyDown} />
+      </span>
+      <span className={styles.nav}>
         <nav>
           <Link to="/studio" className={selected === 0 ? styles.selected : ''}>Studio</Link>
           <Link to="/discover" className={selected === 1 ? styles.selected : ''}>Discover</Link>
