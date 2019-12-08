@@ -203,9 +203,9 @@ const Header = memo((props) => {
       </span>
       <span className={styles.nav}>
         <nav>
-          <Link to={"/studio?username=" + user.username} className={selected === 0 ? styles.selected : ''}>Studio</Link>
-          <Link to={"/discover?username=" + user.username} className={selected === 1 ? styles.selected : ''}>Discover</Link>
-          <Link to={"/profile?username=" + user.username } className={selected === 2 ? styles.selected : ''}>Profile</Link>
+          <Link to="/studio" className={selected === 0 ? styles.selected : ''}>Studio</Link>
+          <Link to="/discover" className={selected === 1 ? styles.selected : ''}>Discover</Link>
+          <Link to={"/profile?username=" + user.username} className={selected === 2 ? styles.selected : ''}>Profile</Link>
         </nav>
         <div className={styles.pictureWrapper}>
           <CircularImage src={ProfilePicture} />
