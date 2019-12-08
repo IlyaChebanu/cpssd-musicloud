@@ -9,12 +9,16 @@ import { bufferStore, dColours, colours } from '../../helpers/constants';
 import { lerp } from '../../helpers/utils';
 import {
   setSampleTime, setTrackAtIndex, setSelectedSample, setClipboard,
+  hideSampleEffects, showSampleEffects,
 } from '../../actions/studioActions';
+
+import editIcon from '../../assets/icons/edit-sample.svg';
 
 
 const Sample = memo((props) => {
   const {
     sample, tempo, selectedSample, dispatch, gridSnapEnabled, gridSize, tracks,
+    sampleEffectsHidden,
   } = props;
 
   const buffer = useMemo(() => bufferStore[sample.url], [sample.url]);
@@ -104,6 +108,15 @@ const Sample = memo((props) => {
     COPY_SAMPLE: copySample,
   };
 
+  const handleShowHideSampleEffects = useCallback(() => {
+    if (sampleEffectsHidden) {
+      dispatch(showSampleEffects());
+    } else {
+      dispatch(hideSampleEffects());
+    }
+  }, [dispatch, sampleEffectsHidden]);
+
+
   return (
     <HotKeys
       allowChanges
@@ -113,6 +126,16 @@ const Sample = memo((props) => {
       style={{ ...wrapperStyle, ...props.style }}
       onMouseDown={handleDragSample}
     >
+      <p>{sample.id === selectedSample ? props.sample.name : ''}</p>
+      {sample.id === selectedSample
+        ? (
+          <img
+            onClick={handleShowHideSampleEffects}
+            className={sampleEffectsHidden ? styles.edit : `${styles.editing} ${styles.edit}`}
+            src={editIcon}
+            alt="edit sample icon"
+          />
+        ) : ''}
       {waveform}
     </HotKeys>
   );
@@ -127,6 +150,7 @@ Sample.propTypes = {
   gridSnapEnabled: PropTypes.bool.isRequired,
   gridSize: PropTypes.number.isRequired,
   tracks: PropTypes.arrayOf(PropTypes.object).isRequired,
+  sampleEffectsHidden: PropTypes.bool.isRequired,
 };
 
 Sample.defaultProps = {
@@ -142,6 +166,7 @@ const mapStateToProps = ({ studio }) => ({
   gridSize: studio.gridSize,
   selectedSample: studio.selectedSample,
   tracks: studio.tracks,
+  sampleEffectsHidden: studio.sampleEffectsHidden,
 });
 
 export default connect(mapStateToProps)(Sample);

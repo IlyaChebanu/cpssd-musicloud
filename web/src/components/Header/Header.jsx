@@ -81,6 +81,7 @@ const Header = memo((props) => {
       cast.then((url) => {
         sampleState = {
           url,
+          name: sampleFile.name,
           id: genId(),
           time: studio.currentBeat,
           track: studio.selectedTrack,
@@ -89,7 +90,6 @@ const Header = memo((props) => {
         dispatch(setTrackAtIndex(track, studio.selectedTrack));
       });
     };
-    dispatch(setSelectedSample(sampleState.id));
     dispatch(setSampleTime(sampleState.time, sampleState.id));
     dispatch(setSampleLoading(true));
     dispatch(setTracks(studio.tracks));
