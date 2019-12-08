@@ -71,17 +71,6 @@
 .textBlock span {
   display: flex;
   align-items: center;
-
-  svg {
-    height: 20px;
-    width: auto;
-    fill: white;
-    margin: 0 5px 0 10px;
-
-    &:hover {
-      cursor: pointer;
-    }
-  }
 }
 
 .playPause {
@@ -102,7 +91,7 @@
 }
 
 .title {
-  margin: 0;
+  margin: 0 10px 0 0;
   font-size: 18px;
 }
 
@@ -126,4 +115,48 @@
 .profiler {
   width: 30px;
   height: 30px;
+}
+
+.coverWrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+
+  img {
+    transition: filter 200ms;
+  }
+}
+
+.like {
+  position: absolute;
+  height: 50%;
+  width: auto;
+  fill: white;
+  margin: auto;
+  left: 0;
+  right: 0;
+  opacity: 0;
+  transition: opacity 200ms, fill 200ms;
+
+  &.hovered {
+    opacity: 1;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}
+
+.likeGradient {
+  fill: url(#gradient);
+  opacity: 0;
+  pointer-events: none;
+
+  &.liked {
+    opacity: 1;
+  }
+
+  &.hide {
+    opacity: 0;
+  }
 }

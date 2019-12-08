@@ -15,15 +15,19 @@ import { ReactComponent as LikeIcon } from '../../assets/icons/favorite-24px.svg
 import { ReactComponent as PlayIcon } from '../../assets/icons/play-circle-light.svg';
 import { ReactComponent as PauseIcon } from '../../assets/icons/pause-circle-light.svg';
 import { lerp } from '../../helpers/utils';
+import { likeSong, unlikeSong } from '../../helpers/api';
 
 const SongFeedCard = memo(({
-  className, username, time, title, url, likes, coverImage,
+  className, username, time, title, url, likes, coverImage, isLiked, id,
 }) => {
   const [playerShowing, setPlayerShowing] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [loading, setLoading] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [songDuration, setSongDuration] = useState(1);
+
+  const [coverHover, setCoverHover] = useState(false);
+  const [songLiked, setSongLiked] = useState(false);
 
   const playerRef = useRef();
 
@@ -95,6 +99,33 @@ const SongFeedCard = memo(({
     window.addEventListener('mouseup', handleDragStop);
   }, []);
 
+  const coverStyle = useMemo(() => ({
+    filter: coverHover ? 'blur(1px) brightness(90%)' : 'none',
+  }), [coverHover]);
+
+  const coverEnter = useCallback(() => {
+    setCoverHover(true);
+  }, []);
+
+  const coverLeave = useCallback(() => {
+    setCoverHover(false);
+  }, []);
+
+  const handleLikeSong = useCallback(() => {
+    (async () => {
+      if (songLiked) {
+        const res = await unlikeSong(id);
+        if (res.status === 200) {
+          setSongLiked(false);
+        }
+      } else {
+        const res = await likeSong(id);
+        if (res.status === 200) {
+          setSongLiked(true);
+        }
+      }
+    })();
+  }, [id, songLiked]);
 
   return (
     <div className={`${styles.wrapper} ${className}`}>
@@ -105,12 +136,15 @@ const SongFeedCard = memo(({
           <p className={styles.timestamp}>{`published ${moment(time).fromNow()}`}</p>
         </span>
         <div className={styles.content}>
-          <Img src={[coverImage, CloudQuestion]} alt="song cover art" loader={<Spinner />} />
+          <div className={styles.coverWrapper} onMouseEnter={coverEnter} onMouseLeave={coverLeave}>
+            <Img src={[coverImage, CloudQuestion]} alt="song cover art" loader={<Spinner />} style={coverStyle} />
+            <LikeIcon className={`${styles.like} ${coverHover ? styles.hovered : ''}`} onClick={handleLikeSong} />
+            <LikeIcon className={`${styles.like} ${styles.likeGradient} ${!coverHover ? styles.hide : ''} ${songLiked ? styles.liked : ''}`} onClick={handleLikeSong} />
+          </div>
           <div className={styles.songInfo}>
             <div className={styles.textBlock}>
               <span>
                 <p className={styles.title}>{title}</p>
-                <LikeIcon />
                 <p className={styles.timestamp}>{`${likes} likes`}</p>
               </span>
               <p className={styles.description}>Song description</p>
@@ -142,10 +176,12 @@ SongFeedCard.propTypes = {
   url: PropTypes.string.isRequired,
   likes: PropTypes.number.isRequired,
   coverImage: PropTypes.string.isRequired,
+  isLiked: PropTypes.bool,
 };
 
 SongFeedCard.defaultProps = {
   className: '',
+  isLiked: false,
 };
 
 SongFeedCard.displayName = 'SongFeedCard';

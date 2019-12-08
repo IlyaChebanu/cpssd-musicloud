@@ -158,3 +158,19 @@ export const getTimeline = () => axios.get(
     headers: getAuth(),
   },
 );
+
+export const likeSong = (sid) => axios.post(
+  `${API_URL}/v1/audio/like`,
+  { sid },
+  {
+    headers: getAuth(),
+  },
+);
+
+export const unlikeSong = (sid) => axios.post(
+  `${API_URL}/v1/audio/unlike`,
+  { sid },
+  {
+    headers: getAuth(),
+  },
+);

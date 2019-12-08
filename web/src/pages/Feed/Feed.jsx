@@ -38,7 +38,6 @@ function Feed(props) {
       );
     }
     if (feedItem.type === 'song') {
-      console.log(feedItem);
       return (
         <SongFeedCard
           time={feedItem.created}
@@ -48,6 +47,8 @@ function Feed(props) {
           duration={feedItem.duration}
           likes={feedItem.likes}
           coverImage={feedItem.cover}
+          isLiked={Boolean(feedItem.like_status)}
+          id={feedItem.sid}
         />
       );
     }
