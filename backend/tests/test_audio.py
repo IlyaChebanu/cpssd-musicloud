@@ -416,7 +416,7 @@ class AudioTests(unittest.TestCase):
         Ensure getting all compiled songs is successful without scroll tokens.
         """
         test_songs = [
-            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, None, 8]
+            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0]
         ]
         mocked_num_songs.return_value = 2
         mocked_songs.return_value = test_songs
@@ -438,7 +438,8 @@ class AudioTests(unittest.TestCase):
                     "public": 1,
                     "url": None,
                     "cover": None,
-                    "likes": None
+                    "likes": 8,
+                    "like_status": 0
                 }
             ]
             expected_body = {
@@ -457,7 +458,7 @@ class AudioTests(unittest.TestCase):
         Ensure getting songs is successful with a next page scroll token and no username encoded.
         """
         test_song = [
-            [2, "username2", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, None, 8]
+            [2, "username2", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0]
         ]
         mocked_songs.return_value = test_song
         test_req_data = {
@@ -486,7 +487,8 @@ class AudioTests(unittest.TestCase):
                     "public": 1,
                     "url": None,
                     "cover": None,
-                    "likes": None
+                    "likes": 8,
+                    "like_status": 0
                 }
             ]
             expected_body = {
@@ -506,7 +508,7 @@ class AudioTests(unittest.TestCase):
         Ensure getting songs is successful with a back page scroll token and no username encoded.
         """
         test_song = [
-            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, None, 8]
+            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0]
         ]
         mocked_songs.return_value = test_song
         test_req_data = {
@@ -536,7 +538,8 @@ class AudioTests(unittest.TestCase):
                     "public": 1,
                     "url": None,
                     "cover": None,
-                    "likes": None
+                    "likes": 8,
+                    "like_status": 0
                 }
             ]
             expected_body = {
@@ -557,8 +560,8 @@ class AudioTests(unittest.TestCase):
         Ensure getting all compiled songs for a specified username is successful without scroll tokens.
         """
         test_songs = [
-            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, None, 8],
-            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, None, 8]
+            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0],
+            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0]
         ]
         mocked_num_songs.return_value = 2
         mocked_songs.return_value = test_songs
@@ -585,7 +588,8 @@ class AudioTests(unittest.TestCase):
                     "public": 1,
                     "url": None,
                     "cover": None,
-                    "likes": None
+                    "likes": 8,
+                    "like_status": 0
                 },
                 {
                     "sid": 2,
@@ -596,7 +600,8 @@ class AudioTests(unittest.TestCase):
                     "public": 1,
                     "url": None,
                     "cover": None,
-                    "likes": None
+                    "likes": 8,
+                    "like_status": 0
                 }
             ]
             expected_body = {
@@ -615,7 +620,7 @@ class AudioTests(unittest.TestCase):
         Ensure getting songs using a next page scroll token works with username also being defined.
         """
         test_song = [
-            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, None, 8]
+            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0]
         ]
         mocked_songs.return_value = test_song
         test_req_data = {
@@ -645,7 +650,8 @@ class AudioTests(unittest.TestCase):
                     "public": 1,
                     "url": None,
                     "cover": None,
-                    "likes": None
+                    "likes": 8,
+                    "like_status": 0
                 }
             ]
             expected_body = {
@@ -664,7 +670,7 @@ class AudioTests(unittest.TestCase):
         Ensure getting songs using a back page scroll token works with username also being defined.
         """
         test_song = [
-            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, None, 8]
+            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0]
         ]
         mocked_songs.return_value = test_song
         test_req_data = {
@@ -694,7 +700,8 @@ class AudioTests(unittest.TestCase):
                     "public": 1,
                     "url": None,
                     "cover": None,
-                    "likes": None
+                    "likes": 8,
+                    "like_status": 0
                 }
             ]
             expected_body = {
@@ -811,7 +818,7 @@ class AudioTests(unittest.TestCase):
         """
         Ensure user's can get a song's info successfully.
         """
-        test_song = [[1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, None, 8]]
+        test_song = [[1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0]]
         mocked_song.return_value = test_song
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
             mock_token.return_value = ALT_MOCKED_TOKEN
@@ -825,7 +832,7 @@ class AudioTests(unittest.TestCase):
                 follow_redirects=True
             )
             self.assertEqual(200, res.status_code)
-            expected_body = {'song': {'sid': 1, 'username': 'username', 'title': 'A test song', 'duration': 0, 'created': 'Wed, 13 Nov 2019 17:07:39 GMT', 'public': 1, 'url': None, 'cover': None, 'likes': None}}
+            expected_body = {'song': {'sid': 1, 'username': 'username', 'like_status': 0, 'title': 'A test song', 'duration': 0, 'created': 'Wed, 13 Nov 2019 17:07:39 GMT', 'public': 1, 'url': None, 'cover': None, 'likes': 8}}
             self.assertEqual(expected_body, json.loads(res.data))
 
     def test_get_song_data_fail_missing_sid(self):
@@ -930,8 +937,8 @@ class AudioTests(unittest.TestCase):
         Ensure getting all editable songs for the current user is successful without scroll tokens.
         """
         test_songs = [
-            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, None, 8],
-            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, None, 8]
+            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0],
+            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0]
         ]
         mocked_num_songs.return_value = 2
         mocked_songs.return_value = test_songs
@@ -953,7 +960,8 @@ class AudioTests(unittest.TestCase):
                     "public": 1,
                     "url": None,
                     "cover": None,
-                    "likes": None
+                    "likes": 8,
+                    "like_status": 0
                 },
                 {
                     "sid": 2,
@@ -964,7 +972,8 @@ class AudioTests(unittest.TestCase):
                     "public": 1,
                     "url": None,
                     "cover": None,
-                    "likes": None
+                    "likes": 8,
+                    "like_status": 0
                 }
             ]
             expected_body = {
@@ -983,7 +992,7 @@ class AudioTests(unittest.TestCase):
         Ensure getting editable songs for the current user is successful with a next page scroll token.
         """
         test_song = [
-            [2, "username2", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, None, 8]
+            [2, "username2", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0]
         ]
         mocked_songs.return_value = test_song
         test_req_data = {
@@ -1012,7 +1021,8 @@ class AudioTests(unittest.TestCase):
                     "public": 1,
                     "url": None,
                     "cover": None,
-                    "likes": None
+                    "likes": 8,
+                    "like_status": 0
                 }
             ]
             expected_body = {
@@ -1031,7 +1041,7 @@ class AudioTests(unittest.TestCase):
         Ensure getting editable songs for the current user is successful with a back page scroll token.
         """
         test_song = [
-            [1, "username2", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, None, 8]
+            [1, "username2", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0]
         ]
         mocked_songs.return_value = test_song
         test_req_data = {
@@ -1060,7 +1070,8 @@ class AudioTests(unittest.TestCase):
                     "public": 1,
                     "url": None,
                     "cover": None,
-                    "likes": None
+                    "likes": 8,
+                    "like_status": 0
                 }
             ]
             expected_body = {
@@ -1181,8 +1192,8 @@ class AudioTests(unittest.TestCase):
         Ensure getting all liked songs for a specified username is successful without scroll tokens.
         """
         test_songs = [
-            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, None, 8],
-            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, None, 8]
+            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0],
+            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0]
         ]
         mocked_num_songs.return_value = 2
         mocked_songs.return_value = test_songs
@@ -1209,7 +1220,8 @@ class AudioTests(unittest.TestCase):
                     "public": 1,
                     "url": None,
                     "cover": None,
-                    "likes": None
+                    "likes": 8,
+                    "like_status": 0
                 },
                 {
                     "sid": 2,
@@ -1220,7 +1232,8 @@ class AudioTests(unittest.TestCase):
                     "public": 1,
                     "url": None,
                     "cover": None,
-                    "likes": None
+                    "likes": 8,
+                    "like_status": 0
                 }
             ]
             expected_body = {
@@ -1240,7 +1253,7 @@ class AudioTests(unittest.TestCase):
         Ensure getting liked songs using a next page scroll token works with username also being defined.
         """
         test_song = [
-            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, None, 8]
+            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0]
         ]
         mocked_songs.return_value = test_song
         mocked_user.return_value = [[1]]
@@ -1271,7 +1284,8 @@ class AudioTests(unittest.TestCase):
                     "public": 1,
                     "url": None,
                     "cover": None,
-                    "likes": None
+                    "likes": 8,
+                    "like_status": 0
                 }
             ]
             expected_body = {
@@ -1291,7 +1305,7 @@ class AudioTests(unittest.TestCase):
         Ensure getting liked songs using a back page scroll token works with username also being defined.
         """
         test_song = [
-            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, None, 8]
+            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0]
         ]
         mocked_user.return_value = [[1]]
         mocked_songs.return_value = test_song
@@ -1322,7 +1336,8 @@ class AudioTests(unittest.TestCase):
                     "public": 1,
                     "url": None,
                     "cover": None,
-                    "likes": None
+                    "likes": 8,
+                    "like_status": 0
                 }
             ]
             expected_body = {
@@ -2999,8 +3014,8 @@ class AudioTests(unittest.TestCase):
         tokens.
         """
         test_songs = [
-            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, None, 8],
-            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, None, 8]
+            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0],
+            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0]
         ]
         mocked_num_songs.return_value = 2
         mocked_songs.return_value = test_songs
@@ -3027,7 +3042,8 @@ class AudioTests(unittest.TestCase):
                     "public": 1,
                     "url": None,
                     "cover": None,
-                    "likes": None
+                    "likes": 8,
+                    "like_status": 0
                 },
                 {
                     "sid": 2,
@@ -3038,7 +3054,8 @@ class AudioTests(unittest.TestCase):
                     "public": 1,
                     "url": None,
                     "cover": None,
-                    "likes": None
+                    "likes": 8,
+                    "like_status": 0
                 }
             ]
             expected_body = {
@@ -3057,7 +3074,7 @@ class AudioTests(unittest.TestCase):
         Ensure getting all the songs in a playlist is successful with a next page scroll token.
         """
         test_songs = [
-            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, None, 8]
+            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0]
         ]
         mocked_songs.return_value = test_songs
         test_req_data = {
@@ -3086,7 +3103,8 @@ class AudioTests(unittest.TestCase):
                     "public": 1,
                     "url": None,
                     "cover": None,
-                    "likes": None
+                    "likes": 8,
+                    "like_status": 0
                 }
             ]
             expected_body = {
@@ -3105,7 +3123,7 @@ class AudioTests(unittest.TestCase):
         Ensure getting all the songs in a playlist is successful with a back page scroll token.
         """
         test_songs = [
-            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, None, 8]
+            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0]
         ]
         mocked_songs.return_value = test_songs
         test_req_data = {
@@ -3134,7 +3152,8 @@ class AudioTests(unittest.TestCase):
                     "public": 1,
                     "url": None,
                     "cover": None,
-                    "likes": None
+                    "likes": 8,
+                    "like_status": 0
                 }
             ]
             expected_body = {

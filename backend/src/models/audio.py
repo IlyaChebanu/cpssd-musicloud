@@ -64,7 +64,7 @@ def insert_song_state(sid, state, time_updated):
     query(sql, args)
 
 
-def get_song_data(sid):
+def get_song_data(sid, uid):
     """
     Get all the info for a specific song.
     :param sid:
@@ -77,10 +77,14 @@ def get_song_data(sid):
         "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as usernanme,"
         "title, duration, created, public, url, cover, ("
         "SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=%s"
-        ") as likes FROM Songs WHERE sid=%s"
+        ") as likes, ("
+        "SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=%s AND "
+        "Song_Likes.uid=%s) as like_status FROM Songs WHERE sid=%s"
     )
     args = (
         sid,
+        sid,
+        uid,
         sid,
     )
     song = query(sql, args, True)
@@ -164,7 +168,7 @@ def get_song_state(sid):
     return state[0][0]
 
 
-def get_all_compiled_songs(start_index, songs_per_page):
+def get_all_compiled_songs(start_index, songs_per_page, uid):
     """
     Get any publicly available song.
     :param start_index:
@@ -179,16 +183,19 @@ def get_all_compiled_songs(start_index, songs_per_page):
         "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as usernanme,"
         "title, duration, created, public, url, cover, ("
         "SELECT COUNT(*) FROM Song_Likes WHERE Songs.sid = Song_Likes.sid"
-        ") as likes FROM Songs WHERE public=1 LIMIT %s, %s;"
+        ") as likes, (SELECT COUNT(*) FROM Song_Likes WHERE "
+        "Song_Likes.sid=Songs.sid "
+        "AND Song_Likes.uid=%s) FROM Songs WHERE public=1 LIMIT %s, %s;"
     )
     args = (
+        uid,
         start_index,
         songs_per_page
     )
     return query(sql, args, True)
 
 
-def get_all_compiled_songs_by_uid(uid, start_index, songs_per_page):
+def get_all_compiled_songs_by_uid(uid, start_index, songs_per_page, my_uid):
     """
     Get any publicly available song for a specific user.
     :param uid:
@@ -205,9 +212,13 @@ def get_all_compiled_songs_by_uid(uid, start_index, songs_per_page):
         "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as usernanme,"
         "title, duration, created, public, url, cover, ("
         "SELECT COUNT(*) FROM Song_Likes WHERE Songs.sid = Song_Likes.sid"
-        ") as likes FROM Songs WHERE public=1 AND uid=%s LIMIT %s, %s;"
+        ") as likes, (SELECT COUNT(*) FROM Song_Likes WHERE "
+        "Song_Likes.sid=Songs.sid "
+        "AND Song_Likes.uid=%s) FROM Songs WHERE public=1 AND uid=%s "
+        "LIMIT %s, %s;"
     )
     args = (
+        my_uid,
         uid,
         start_index,
         songs_per_page
@@ -233,17 +244,23 @@ def get_all_editable_songs_by_uid(uid, start_index, songs_per_page):
         "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as usernanme,"
         "title, duration, created, public, url, cover,"
         "(SELECT COUNT(*) FROM Song_Likes WHERE "
-        "Songs.sid = Song_Likes.sid ) as likes FROM Songs "
+        "Songs.sid = Song_Likes.sid ) as likes, "
+        "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid "
+        "AND Song_Likes.uid=%s) AS like_status FROM Songs "
         "WHERE uid = %s UNION SELECT "
         "Songs.sid, (SELECT username FROM Users "
         "WHERE Songs.uid=Users.uid) as usernanme,"
         "title, duration, created, public, url, cover,"
         "(SELECT COUNT(*) FROM Song_Likes WHERE "
-        "Songs.sid = Song_Likes.sid) as likes FROM Songs INNER JOIN "
+        "Songs.sid = Song_Likes.sid) as likes, "
+        "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid "
+        "AND Song_Likes.uid=%s) AS like_status FROM Songs INNER JOIN "
         "Song_Editors ON Song_Editors.sid = Songs.sid WHERE "
-        "Song_Editors.uid = %s LIMIT %s, %s;"
+        "Song_Editors.uid = %s ORDER BY created DESC LIMIT %s, %s;"
     )
     args = (
+        uid,
+        uid,
         uid,
         uid,
         start_index,
@@ -453,7 +470,7 @@ def get_number_of_liked_songs_by_uid(uid):
     return query(sql, args, True)[0][0]
 
 
-def get_all_liked_songs_by_uid(uid, start_index, songs_per_page):
+def get_all_liked_songs_by_uid(uid, start_index, songs_per_page, my_uid):
     """
     Get all the songs a specific user liked.
     :param uid:
@@ -470,11 +487,14 @@ def get_all_liked_songs_by_uid(uid, start_index, songs_per_page):
         "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as usernanme,"
         "title, duration, created, public, url, cover, "
         "(SELECT COUNT(*) FROM Song_Likes WHERE "
-        "Songs.sid = Song_Likes.sid) as likes FROM Songs "
+        "Songs.sid = Song_Likes.sid) as likes, "
+        "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid "
+        "AND Song_Likes.uid=%s) as like_status FROM Songs "
         "INNER JOIN Song_Likes ON "
         "Song_Likes.sid = Songs.sid WHERE Song_Likes.uid = %s LIMIT %s, %s;"
     )
     args = (
+        my_uid,
         uid,
         start_index,
         songs_per_page,
@@ -677,7 +697,7 @@ def get_playlists(uid, start_index, playlists_per_page):
     return query(sql, args, True)
 
 
-def get_playlist_data(pid, start_index, songs_per_page):
+def get_playlist_data(pid, start_index, songs_per_page, uid):
     """
     Return all of the songs in a playlist using pagination.
     :param pid:
@@ -694,12 +714,15 @@ def get_playlist_data(pid, start_index, songs_per_page):
         "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as usernanme,"
         "title, duration, created, public, url, cover, "
         "(SELECT COUNT(*) FROM Song_Likes WHERE "
-        "Songs.sid = Song_Likes.sid) as likes FROM Songs "
+        "Songs.sid = Song_Likes.sid) as likes, "
+        "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid "
+        "AND Song_Likes.uid=%s) FROM Songs "
         "INNER JOIN Playlist_State ON "
         "Playlist_State.sid = Songs.sid WHERE Playlist_State.pid = %s "
         "AND Songs.public = 1 LIMIT %s, %s;"
     )
     args = (
+        uid,
         pid,
         start_index,
         songs_per_page,
