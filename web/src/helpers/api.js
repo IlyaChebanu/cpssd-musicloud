@@ -74,38 +74,23 @@ const generatePresignedPost = (dir, filename, filetype) => axios.post(
 
 const putMedia = (signedUrl, file, options) => axios.put(
   signedUrl, file, options,
-).catch((e) => e.response);
+);
 
 // TODO: use extra params to make use of signed url without public access to the bucket
-const makeSignedUrl = (object) => {
-  const url = new URL(object.url + object.fields.key);
-  return url.href;
-};
+const makeSignedUrl = (object) => (new URL(object.url + object.fields.key)).href;
 
 export const uploadFile = async (dir, f) => {
   let url = '';
-  try {
-    const res = await generatePresignedPost(dir, f.name, f.type);
-
-    const options = {
+  const res = await generatePresignedPost(dir, f.name, f.type);
+  if (res.status === 200) {
+    url = makeSignedUrl(res.data.signed_url);
+    await putMedia(url, f, {
       headers: {
         'Content-Type': f.type,
       },
-    };
-    if (res.status === 200) {
-      const data = new FormData();
-      data.append('file', f.file);
-      const putAudio = async () => {
-        url = makeSignedUrl(res.data.signed_url);
-
-        await putMedia(url, data, options);
-      };
-      putAudio();
-    }
-  } catch (err) {
-    return err.response;
+    });
   }
-  return url.toString();
+  return url;
 };
 
 export const saveState = (songId, songState) => axios.post(

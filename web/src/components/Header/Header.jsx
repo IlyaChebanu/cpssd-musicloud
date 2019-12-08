@@ -28,7 +28,7 @@ import exportIcon from '../../assets/icons/file_dropdown/export.svg';
 import generateIcon from '../../assets/icons/file_dropdown/generate.svg';
 import exitIcon from '../../assets/icons/file_dropdown/exit.svg';
 import { renderTracks } from '../../middleware/audioRedux';
-import { forceDownload } from '../../helpers/utils';
+import { forceDownload, genId } from '../../helpers/utils';
 import {
   setTrackAtIndex,
   setTracks,
@@ -38,7 +38,11 @@ import {
   setSongName,
   setSongId,
   stop,
+  setSampleTime,
+  setSelectedSample,
+  setSampleLoading,
 } from '../../actions/studioActions';
+
 
 const Header = memo((props) => {
   const {
@@ -59,27 +63,36 @@ const Header = memo((props) => {
   }, [tempo, tracks, songId, dispatch]);
 
 
-  const handleSampleSelect = useCallback(() => {
+  const handleSampleImport = useCallback(() => {
+    if (studio.tracks.length === 0) {
+      dispatch(showNotification({ message: 'Please add a track first', type: 'info' }));
+      return;
+    }
     const fileSelector = document.createElement('input');
     fileSelector.setAttribute('type', 'file');
     fileSelector.setAttribute('accept', 'audio/*');
     fileSelector.click();
+    let sampleState = {};
+    const track = { ...studio.tracks[studio.selectedTrack] };
     fileSelector.onchange = function onChange() {
-      const url = uploadFile('audio', fileSelector.files[0], cookie.get('token'));
-
-      const cast = Promise.resolve(url);
-      cast.then(() => {
-        const state = studio;
-        const track = { ...state.tracks[state.selectedTrack] };
-        track.samples.push({
-          url: fileSelector.files[0],
-          id: 1156,
-          time: 10,
-        });
-
-        dispatch(setTrackAtIndex(track, state.selectedTrack));
+      const sampleFile = fileSelector.files[0];
+      const response = uploadFile('audio', sampleFile, cookie.get('token'));
+      const cast = Promise.resolve(response);
+      cast.then((url) => {
+        sampleState = {
+          url,
+          id: genId(),
+          time: studio.currentBeat,
+          track: studio.selectedTrack,
+        };
+        track.samples.push(sampleState);
+        dispatch(setTrackAtIndex(track, studio.selectedTrack));
       });
     };
+    dispatch(setSelectedSample(sampleState.id));
+    dispatch(setSampleTime(sampleState.time, sampleState.id));
+    dispatch(setSampleLoading(true));
+    dispatch(setTracks(studio.tracks));
   }, [dispatch, studio]);
 
   const exportAction = useCallback(async () => {
@@ -119,14 +132,14 @@ const Header = memo((props) => {
     { name: 'Open', action: handleShowSongPicker, icon: openIcon },
     { name: 'Publish', icon: publishIcon },
     { name: 'Save', icon: saveIcon, action: handleSaveState },
-    { name: 'Import', icon: importIcon, action: handleSampleSelect },
+    { name: 'Import', icon: importIcon, action: handleSampleImport },
     { name: 'Export', icon: exportIcon, action: exportAction },
     { name: 'Generate', icon: generateIcon },
     { name: 'Exit', icon: exitIcon },
   ], [
     exportAction,
     handleHideSongPicker,
-    handleSampleSelect,
+    handleSampleImport,
     handleSaveState,
     handleShowSongPicker,
   ]);
