@@ -23,7 +23,7 @@ const Profile = () => {
 
   return (
     <div className={styles.wrapper}>
-      <Header selected={2} />
+      <Header selected={3} />
       {/* Songs section */}
       <div className={styles.contentWrapper}>
         <ProfileBlock />
