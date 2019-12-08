@@ -1,44 +1,48 @@
 .wrapper {
-    background-color: #36393D;
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
-    border-radius: 20px;
-    display: flex;
-    flex-direction: column;
-    transition: height 1s;
-  }
-  
-  .postCard {
-    flex: 1;
-    display: block;
-    margin: 20px;
-  
-    p {
-      margin: 0px;
-    }
+  background-color: #36393D;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  transition: height 1s;
+  margin-bottom: 30px;
 
-    .text {
-        display: block;
-        margin: 0px 0px 10px 0px;
-        color: white;
-        font-size: 18px;
-        }
-    .timestamp {
-        display: flex;
-        color: #C3C3C3;
-        font-size: 18;
-    }
-    .likes {
-        float: right;
-        color: white;
-        font-weight: bold;
-        font-size: 20px;
-        margin-top: -20px;
-    }
-    .likeIcon {
-      margin-top: -20px;
-      float: right;
-      fill: white;
-      height: 21px;
+  &:last-child {
+    margin-bottom: 0;
   }
-  }
-  
+}
+
+.postCard {
+  flex: 1;
+  display: block;
+  margin: 10px;
+}
+
+.postHeader {
+  display: flex;
+  align-items: center;
+}
+
+.text {
+  display: block;
+  margin: 5px 0px 5px 0px;
+  color: white;
+  font-size: 14px;
+}
+
+.username {
+  color: white;
+  font-size: 16px;
+  margin: 0 10px;
+}
+
+.timestamp {
+  display: flex;
+  color: #C3C3C3;
+  font-size: 12px;
+}
+
+.profiler {
+  width: 30px;
+  height: 30px;
+}

@@ -7,6 +7,7 @@ import history from '../history';
 
 axios.interceptors.response.use((res) => res, (err) => {
   const state = store.getState();
+  console.log(err);
   const res = err.response || { status: null };
   if ([500, 422].includes(res.status)) {
     store.dispatch(showNotification({
@@ -25,6 +26,11 @@ axios.interceptors.response.use((res) => res, (err) => {
     if (res.status === 403) {
       store.dispatch(showNotification({
         message: 'Permission to perform action denied.',
+      }));
+    }
+    if (res.status === 404) {
+      store.dispatch(showNotification({
+        message: 'Object not found.',
       }));
     }
   }
@@ -141,6 +147,13 @@ export const createNewSong = (title) => axios.post(
 export const patchSongName = (sid, title) => axios.patch(
   `${API_URL}/v1/audio/rename`,
   { sid, title },
+  {
+    headers: getAuth(),
+  },
+);
+
+export const getTimeline = () => axios.get(
+  `${API_URL}/v1/users/timeline`,
   {
     headers: getAuth(),
   },
