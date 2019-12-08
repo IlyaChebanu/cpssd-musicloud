@@ -145,3 +145,17 @@ export const patchSongName = (sid, title) => axios.patch(
     headers: getAuth(),
   },
 );
+
+export const getCompiledSongs = (username) => axios.get(
+  `${API_URL}/v1/audio/compiled_songs?songs_per_page=4&username=${username}`,
+  {
+    headers: getAuth(),
+  },
+);
+
+export const getNextCompiledSongs = (next_token) => axios.get(
+  `${API_URL}/v1/audio/compiled_songs?next_page=${next_token}`,
+  {
+    headers: getAuth(),
+  },
+);

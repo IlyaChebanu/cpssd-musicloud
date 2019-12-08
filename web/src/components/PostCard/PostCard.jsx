@@ -13,8 +13,6 @@ const PostCard = memo(({ className }) => (
           Download now: https://musicloud.bounceme.net/samples/release/15171
       </p>
       <p className={styles.timestamp}>16 minutes ago</p>
-      <LikeIcon className={styles.likeIcon} />
-      <p className={styles.likes}>16</p>
     </span>
   </div>
 ));

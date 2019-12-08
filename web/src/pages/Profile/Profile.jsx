@@ -7,6 +7,7 @@ import PostCard from '../../components/PostCard/PostCard';
 import ProfileBlock from '../../components/ProfileBlock';
 import AddPost from '../../components/AddPost';
 import { useUpdateUserDetails } from '../../helpers/hooks';
+import { getCompiledSongs } from '../../helpers/api';
 
 const blogCards = [];
 for (let i = 0; i < 3; i += 1) {

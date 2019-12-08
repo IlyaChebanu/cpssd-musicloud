@@ -46,8 +46,8 @@ const ProfileBlock = memo((props) => {
             <p className={styles.class}>likes</p>
           </div>
         </div>
-        <form className={styles.followButton} onSubmit={goToSettings}>
-          <SubmitButton className={styles.followButton} text="Settings" />
+        <form className={username === user.username ? styles.followButton : styles.hide} onSubmit={goToSettings}>
+          <SubmitButton className={username === user.username ? styles.followButton : styles.hide} text="Settings" />
         </form>
       </div>
       <div>
