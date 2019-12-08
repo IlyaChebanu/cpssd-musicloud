@@ -21,5 +21,6 @@ def gen_timeline_song_object(song_list):
         "url": song_list[7],
         "cover": song_list[8],
         "likes": song_list[10],
-        "type": song_list[11]
+        "profiler": song_list[11],
+        "type": song_list[12]
     }
