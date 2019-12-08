@@ -42,8 +42,8 @@ const SampleControls = memo((props) => {
 
   const handleChange = useCallback((e) => {
     setNameInput(e.target.value);
-  }, []);
-
+    dispatch(setSampleName(e.target.value, studio.selectedSample));
+  }, [dispatch, studio.selectedSample]);
 
   return (
     <div
