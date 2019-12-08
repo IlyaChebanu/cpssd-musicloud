@@ -39,7 +39,6 @@ import {
   setSongId,
   stop,
   setSampleTime,
-  setSelectedSample,
   setSampleLoading,
 } from '../../actions/studioActions';
 

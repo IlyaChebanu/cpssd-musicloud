@@ -39,10 +39,11 @@ const SampleControls = memo((props) => {
     }
   }, [studio.sampleName, studio.selectedSample, studio.selectedTrack, studio.tracks, tracks]);
 
+
   const handleChange = useCallback((e) => {
     setNameInput(e.target.value);
-    dispatch(setSampleName(e.target.value, studio.selectedSample));
-  }, [dispatch, studio.selectedSample]);
+  }, []);
+
 
   return (
     <div
