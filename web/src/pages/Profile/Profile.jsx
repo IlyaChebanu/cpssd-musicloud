@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './Profile.module.scss';
 import Header from '../../components/Header';
@@ -7,7 +7,8 @@ import PostCard from '../../components/PostCard/PostCard';
 import ProfileBlock from '../../components/ProfileBlock';
 import AddPost from '../../components/AddPost';
 import { useUpdateUserDetails } from '../../helpers/hooks';
-import { getCompiledSongs } from '../../helpers/api';
+import store from '../../store';
+
 
 const blogCards = [];
 for (let i = 0; i < 3; i += 1) {
@@ -19,8 +20,11 @@ for (let i = 0; i < 4; i += 1) {
   songCards.push(<SongCard className={styles.songCard} />);
 }
 
-const Profile = () => {
+const Profile = memo((props) => {
   useUpdateUserDetails();
+  const state = store.getState();
+  let url = new URL(window.location.href);
+  let username = url.searchParams.get("username");
 
   return (
     <div className={styles.wrapper}>
@@ -41,7 +45,7 @@ const Profile = () => {
 
       <div className={styles.contentWrapper}>
         <title className={styles.sectionTitle}>Posts</title>
-        <AddPost />
+          {username === state.user.username ? <AddPost /> : <div/>}
         <div className={styles.blogs}>
           {blogCards}
           <Link to="." className={styles.link}>See more</Link>
@@ -49,7 +53,7 @@ const Profile = () => {
       </div>
     </div>
   );
-};
+});
 
 Profile.displayName = 'Profile';
 

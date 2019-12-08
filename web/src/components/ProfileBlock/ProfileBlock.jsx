@@ -18,6 +18,11 @@ const ProfileBlock = memo((props) => {
     history.push('/settings');
   }, []);
 
+  const goToFollow = useCallback((e) => {
+    e.preventDefault();
+    history.push('/profile?username=' + username);
+  }, []);
+
   return (
     <div className={`${styles.wrapper} ${className}`}>
       <div className={styles.topWrapper}>
@@ -48,6 +53,9 @@ const ProfileBlock = memo((props) => {
         </div>
         <form className={username === user.username ? styles.followButton : styles.hide} onSubmit={goToSettings}>
           <SubmitButton className={username === user.username ? styles.followButton : styles.hide} text="Settings" />
+        </form>
+        <form className={username !== user.username ? styles.followButton : styles.hide} onSubmit={goToFollow}>
+          <SubmitButton className={username !== user.username ? styles.followButton : styles.hide} text="Follow" />
         </form>
       </div>
       <div>
