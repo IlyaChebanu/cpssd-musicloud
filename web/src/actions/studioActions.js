@@ -130,6 +130,14 @@ export const setSampleTime = (time, id) => (dispatch) => {
   });
 };
 
+export const setSampleName = (name, id) => (dispatch) => {
+  dispatch({
+    type: 'SET_SAMPLE_NAME',
+    name,
+    id,
+  });
+};
+
 export const setSelectedTrack = (track) => (dispatch) => {
   dispatch({
     type: 'SET_SELECTED_TRACK',
@@ -169,6 +177,19 @@ export const showSongPicker = () => (dispatch) => {
     type: 'SONG_PICKER_SHOW',
   });
 };
+
+export const hideSampleEffects = () => (dispatch) => {
+  dispatch({
+    type: 'SAMPLE_EFFECTS_HIDE',
+  });
+};
+
+export const showSampleEffects = () => (dispatch) => {
+  dispatch({
+    type: 'SAMPLE_EFFECTS_SHOW',
+  });
+};
+
 
 export const setSongName = (songName) => (dispatch) => {
   dispatch({

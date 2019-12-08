@@ -26,6 +26,7 @@ export default (
     clipboard: {},
     title: 'Untitled',
     songPickerHidden: false,
+    sampleEffectsHidden: true,
   },
   action,
 ) => {
@@ -87,6 +88,22 @@ export default (
               return {
                 ...sample,
                 time: action.time,
+              };
+            }
+            return sample;
+          });
+          return track;
+        }),
+      };
+    case 'SET_SAMPLE_NAME':
+      return {
+        ...state,
+        tracks: state.tracks.map((track) => {
+          track.samples = track.samples.map((sample) => {
+            if (sample.id === action.id) {
+              return {
+                ...sample,
+                name: action.name,
               };
             }
             return sample;
@@ -168,6 +185,16 @@ export default (
       return {
         ...state,
         songPickerHidden: false,
+      };
+    case 'SAMPLE_EFFECTS_HIDE':
+      return {
+        ...state,
+        sampleEffectsHidden: true,
+      };
+    case 'SAMPLE_EFFECTS_SHOW':
+      return {
+        ...state,
+        sampleEffectsHidden: false,
       };
     case 'SET_SONG_NAME':
       return {
