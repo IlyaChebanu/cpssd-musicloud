@@ -7,7 +7,6 @@ import history from '../history';
 
 axios.interceptors.response.use((res) => res, (err) => {
   const state = store.getState();
-  console.log(err);
   const res = err.response || { status: null };
   if ([500, 422].includes(res.status)) {
     store.dispatch(showNotification({
@@ -170,6 +169,14 @@ export const likeSong = (sid) => axios.post(
 export const unlikeSong = (sid) => axios.post(
   `${API_URL}/v1/audio/unlike`,
   { sid },
+  {
+    headers: getAuth(),
+  },
+);
+
+export const createPost = (message) => axios.post(
+  `${API_URL}/v1/users/post`,
+  { message },
   {
     headers: getAuth(),
   },

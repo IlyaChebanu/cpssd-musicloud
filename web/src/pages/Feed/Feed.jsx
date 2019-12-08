@@ -1,5 +1,5 @@
 import React, {
-  memo, useState, useEffect, useMemo,
+  memo, useState, useEffect, useMemo, useCallback,
 } from 'react';
 import { connect } from 'react-redux';
 import styles from './Feed.module.scss';
@@ -9,23 +9,26 @@ import { getTimeline } from '../../helpers/api';
 import Spinner from '../../components/Spinner';
 import PostCard from '../../components/PostCard';
 import SongFeedCard from '../../components/SongFeedCard';
+import AddPost from '../../components/AddPost/AddPost';
 
-function Feed(props) {
+function Feed() {
   useUpdateUserDetails();
 
   const [feedItems, setFeedItems] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    (async () => {
-      setLoading(true);
-      const res = await getTimeline();
-      setLoading(false);
-      if (res.status === 200) {
-        setFeedItems(res.data.timeline);
-      }
-    })();
+  const refreshFeed = useCallback(async () => {
+    setLoading(true);
+    const res = await getTimeline();
+    setLoading(false);
+    if (res.status === 200) {
+      setFeedItems(res.data.timeline);
+    }
   }, []);
+
+  useEffect(() => {
+    refreshFeed();
+  }, [refreshFeed]);
 
   const renderableItems = useMemo(() => feedItems.map((feedItem) => {
     if (feedItem.type === 'post') {
@@ -59,7 +62,8 @@ function Feed(props) {
     <div className={styles.wrapper}>
       <Header selected={1} />
       <div className={styles.contentWrapper}>
-        {loading ? <Spinner /> : renderableItems}
+        <AddPost onSubmit={refreshFeed} placeholder="Write something" />
+        {loading ? <Spinner className={styles.spinner} /> : renderableItems}
       </div>
     </div>
   );

@@ -27,7 +27,7 @@ const SongFeedCard = memo(({
   const [songDuration, setSongDuration] = useState(1);
 
   const [coverHover, setCoverHover] = useState(false);
-  const [songLiked, setSongLiked] = useState(false);
+  const [songLiked, setSongLiked] = useState(isLiked);
 
   const playerRef = useRef();
 
@@ -177,6 +177,7 @@ SongFeedCard.propTypes = {
   likes: PropTypes.number.isRequired,
   coverImage: PropTypes.string.isRequired,
   isLiked: PropTypes.bool,
+  id: PropTypes.number.isRequired,
 };
 
 SongFeedCard.defaultProps = {
