@@ -20,5 +20,6 @@ def gen_song_object(song_list):
         "public": song_list[5],
         "url": song_list[6],
         "cover": song_list[7],
-        "likes": song_list[8]
+        "likes": song_list[8],
+        "like_status": song_list[9]
     }
