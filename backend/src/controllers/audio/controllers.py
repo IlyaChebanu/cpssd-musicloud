@@ -172,8 +172,8 @@ def load_song(user_data):
 
 @AUDIO.route("/compiled_songs", methods=["GET"])
 @sql_err_catcher()
-@auth_required()
-def get_compiled_songs():  # pylint: disable=R0912,R0915
+@auth_required(return_user=True)
+def get_compiled_songs(user_data):  # pylint: disable=R0912,R0915
     """
     Endpoint for getting all publicly available songs.
     """
@@ -213,11 +213,11 @@ def get_compiled_songs():  # pylint: disable=R0912,R0915
 
         if uid:
             compiled_songs = get_all_compiled_songs_by_uid(
-                uid, start_index, songs_per_page
+                uid, start_index, songs_per_page, user_data.get("uid")
             )
         else:
             compiled_songs = get_all_compiled_songs(
-                start_index, songs_per_page
+                start_index, songs_per_page, user_data.get("uid")
             )
 
         res = []
@@ -263,11 +263,11 @@ def get_compiled_songs():  # pylint: disable=R0912,R0915
     if username:
         uid = get_user_via_username(username)[0][0]
         compiled_songs = get_all_compiled_songs_by_uid(
-            uid, start_index, songs_per_page
+            uid, start_index, songs_per_page, user_data.get("uid")
         )
     else:
         compiled_songs = get_all_compiled_songs(
-            start_index, songs_per_page
+            start_index, songs_per_page, user_data.get("uid")
         )
 
     res = []
@@ -296,8 +296,8 @@ def get_compiled_songs():  # pylint: disable=R0912,R0915
 
 @AUDIO.route("/song", methods=["GET"])
 @sql_err_catcher()
-@auth_required()
-def get_song():
+@auth_required(return_user=True)
+def get_song(user_data):
     """
     Endpoint for getting info for a single song.
     """
@@ -305,7 +305,7 @@ def get_song():
     if not sid:
         return {"message": "sid param can't be empty!"}, 422
 
-    song = get_song_data(sid)[0]
+    song = get_song_data(sid, user_data.get("uid"))[0]
     res = gen_song_object(song)
     return {"song": res}, 200
 
@@ -334,7 +334,7 @@ def like_song(user_data):
         return {"message": str(exc)}, 422
 
     try:
-        get_song_data(request.json.get("sid"))
+        get_song_data(request.json.get("sid"), user_data.get("uid"))
     except NoResults:
         return {"message": "Song does not exist!"}, 400
 
@@ -486,8 +486,8 @@ def get_editable_songs(user_data):
 
 @AUDIO.route("/liked_songs", methods=["GET"])
 @sql_err_catcher()
-@auth_required()
-def get_liked_songs():
+@auth_required(return_user=True)
+def get_liked_songs(user_data):
     """
     Endpoint for getting all the songs a user has liked.
     """
@@ -525,7 +525,7 @@ def get_liked_songs():
         start_index = (current_page * songs_per_page) - songs_per_page
 
         liked_songs = get_all_liked_songs_by_uid(
-            uid, start_index, songs_per_page
+            uid, start_index, songs_per_page, user_data.get("uid")
         )
 
         res = []
@@ -570,7 +570,7 @@ def get_liked_songs():
 
     uid = get_user_via_username(username)[0][0]
     liked_songs = get_all_liked_songs_by_uid(
-        uid, start_index, songs_per_page
+        uid, start_index, songs_per_page, user_data.get("uid")
     )
 
     res = []
@@ -1014,7 +1014,9 @@ def get_my_playlist_songs(user_data):  # pylint: disable=R0911
 
         start_index = (current_page * songs_per_page) - songs_per_page
 
-        songs = get_playlist_data(pid, start_index, songs_per_page)
+        songs = get_playlist_data(
+            pid, start_index, songs_per_page, user_data.get("uid")
+        )
 
         res = []
         for song in songs:
@@ -1056,7 +1058,9 @@ def get_my_playlist_songs(user_data):  # pylint: disable=R0911
     total_pages = token.get("total_pages")
     start_index = (current_page * songs_per_page) - songs_per_page
 
-    songs = get_playlist_data(pid, start_index, songs_per_page)
+    songs = get_playlist_data(
+        pid, start_index, songs_per_page, user_data.get("uid")
+    )
 
     res = []
     for song in songs:
@@ -1117,7 +1121,9 @@ def add_song_to_playlist(user_data):  # pylint: disable=R0911
         return {"message": "Not permitted to add to that playlist"}, 401
 
     try:
-        song_data = get_song_data(request.json.get('sid'))[0]
+        song_data = get_song_data(
+            request.json.get('sid'), user_data.get("uid")
+        )[0]
         if not song_data[5] or not song_data[6]:
             return {"message": "That song is private"}, 401
     except NoResults:

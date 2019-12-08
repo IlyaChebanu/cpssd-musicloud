@@ -2369,6 +2369,7 @@ class UserTests(unittest.TestCase):
                 None,
                 8,
                 "http://profiler.fake",
+                0,
                 "song"
             ],
             [
@@ -2384,6 +2385,7 @@ class UserTests(unittest.TestCase):
                 "a message",
                 None,
                 "http://profiler.fake",
+                None,
                 "post"
             ]
         ]
@@ -2411,7 +2413,8 @@ class UserTests(unittest.TestCase):
                         'title': 'a song',
                         'type': 'song',
                         'url': 'http://fake.com',
-                        'username': 'username'
+                        'username': 'username',
+                        'like_status': 0
                     },
                     {
                         "created": "2019-12-01 15:36:48",
@@ -2445,6 +2448,7 @@ class UserTests(unittest.TestCase):
                 "a message",
                 None,
                 "http://profiler.fake",
+                None,
                 "post"
             ]
         ]
@@ -2501,6 +2505,7 @@ class UserTests(unittest.TestCase):
                 None,
                 8,
                 "http://profiler.fake",
+                0,
                 "song"
             ]
         ]
@@ -2536,7 +2541,8 @@ class UserTests(unittest.TestCase):
                         'type': 'song',
                         'url': 'http://fake.com',
                         'username': 'username',
-                        "profiler": "http://profiler.fake"
+                        "profiler": "http://profiler.fake",
+                        "like_status": 0
                     }
                 ],
                 'items_per_page': 1,

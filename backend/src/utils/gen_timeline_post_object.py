@@ -11,11 +11,10 @@ def gen_timeline_post_object(post_list):
     :return:
     Dict - The input data structured in a standard dict.
     """
-    print(post_list)
     return {
         "username": post_list[1],
         "created": post_list[6],
         "message": post_list[9],
         "profiler": post_list[11],
-        "type": post_list[12]
+        "type": post_list[13]
     }
