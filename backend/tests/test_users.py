@@ -2368,6 +2368,7 @@ class UserTests(unittest.TestCase):
                 "http://cover.com",
                 None,
                 8,
+                "http://profiler.fake",
                 "song"
             ],
             [
@@ -2382,6 +2383,7 @@ class UserTests(unittest.TestCase):
                 None,
                 "a message",
                 None,
+                "http://profiler.fake",
                 "post"
             ]
         ]
@@ -2403,6 +2405,7 @@ class UserTests(unittest.TestCase):
                         'created': '1986-08-09 11:22:40',
                         'duration': 155000,
                         'likes': 8,
+                        'profiler': "http://profiler.fake",
                         'public': 1,
                         'sid': 1,
                         'title': 'a song',
@@ -2414,7 +2417,8 @@ class UserTests(unittest.TestCase):
                         "created": "2019-12-01 15:36:48",
                         "message": "a message",
                         "type": "post",
-                        "username": "username"
+                        "username": "username",
+                        'profiler': "http://profiler.fake"
                     }
                 ],
                 'items_per_page': 50,
@@ -2440,6 +2444,7 @@ class UserTests(unittest.TestCase):
                 None,
                 "a message",
                 None,
+                "http://profiler.fake",
                 "post"
             ]
         ]
@@ -2468,7 +2473,8 @@ class UserTests(unittest.TestCase):
                         "created": "2019-12-01 15:36:48",
                         "message": "a message",
                         "type": "post",
-                        "username": "username"
+                        "username": "username",
+                        "profiler": "http://profiler.fake"
                     }
                 ],
                 'items_per_page': 1,
@@ -2494,6 +2500,7 @@ class UserTests(unittest.TestCase):
                 "http://cover.com",
                 None,
                 8,
+                "http://profiler.fake",
                 "song"
             ]
         ]
@@ -2528,7 +2535,8 @@ class UserTests(unittest.TestCase):
                         'title': 'a song',
                         'type': 'song',
                         'url': 'http://fake.com',
-                        'username': 'username'
+                        'username': 'username',
+                        "profiler": "http://profiler.fake"
                     }
                 ],
                 'items_per_page': 1,
