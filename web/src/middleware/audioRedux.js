@@ -67,8 +67,8 @@ const scheduleSample = (state, sample, context = audioContext, offline = false) 
 
 export const renderTracks = (studio) => {
   const samples = [];
-  studio.tracks.forEach((track) => {
-    track.samples.forEach((sample, i) => {
+  studio.tracks.forEach((track, i) => {
+    track.samples.forEach((sample) => {
       sample.volume = track.volume;
       sample.track = i;
       sample.buffer = bufferStore[sample.url];
