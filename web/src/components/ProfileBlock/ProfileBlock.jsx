@@ -31,23 +31,33 @@ const ProfileBlock = memo((props) => {
         />
         <div className={styles.stats}>
           <div className={styles.stat}>
-            <Link to={"/profile?username=" + username} className={styles.num}>{user.followers}</Link>
+            <Link to={"/profile?username=" + username} className={styles.num}>
+              {typeof user.followers === "number" ? user.followers : "?"}
+            </Link>
             <p className={styles.class}>followers</p>
           </div>
           <div className={styles.stat}>
-            <Link to={"/profile?username=" + username} className={styles.num}>{user.following}</Link>
+            <Link to={"/profile?username=" + username} className={styles.num}>
+              {typeof user.following === "number" ? user.following : "?"}
+            </Link>
             <p className={styles.class}>following</p>
           </div>
           <div className={styles.stat}>
-            <Link to={"/profile?username=" + username} className={styles.num}>{user.songs}</Link>
+            <Link to={"/profile?username=" + username} className={styles.num}>
+              {typeof user.songs === "number" ? user.songs : "?"}
+            </Link>
             <p className={styles.class}>songs</p>
           </div>
           <div className={styles.stat}>
-            <Link to={"/profile?username=" + username} className={styles.num}>{user.posts}</Link>
+            <Link to={"/profile?username=" + username} className={styles.num}>
+              {typeof user.posts === "number" ? user.posts : "?"}
+            </Link>
             <p className={styles.class}>posts</p>
           </div>
           <div className={styles.stat}>
-            <Link to={"/profile?username=" + username} className={styles.num}>{user.likes}</Link>
+            <Link to={"/profile?username=" + username} className={styles.num}>
+              {typeof user.likes === "number" ? user.likes : "?"}
+            </Link>
             <p className={styles.class}>likes</p>
           </div>
         </div>

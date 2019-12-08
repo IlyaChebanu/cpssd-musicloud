@@ -20,7 +20,7 @@ for (let i = 0; i < 4; i += 1) {
   songCards.push(<SongCard className={styles.songCard} />);
 }
 
-const Profile = memo((props) => {
+const Profile = ()=> {
   useUpdateUserDetails();
   const state = store.getState();
   let url = new URL(window.location.href);
@@ -53,7 +53,7 @@ const Profile = memo((props) => {
       </div>
     </div>
   );
-});
+};
 
 Profile.displayName = 'Profile';
 
