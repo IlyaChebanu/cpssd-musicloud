@@ -145,7 +145,7 @@ const SongFeedCard = memo(({
             <div className={styles.textBlock}>
               <span>
                 <p className={styles.title}>{title}</p>
-                <p className={styles.timestamp}>{`${likes} likes`}</p>
+                <p className={styles.timestamp}>{`${songLiked ? likes + 1 : likes} likes`}</p>
               </span>
               <p className={styles.description}>Song description</p>
             </div>
