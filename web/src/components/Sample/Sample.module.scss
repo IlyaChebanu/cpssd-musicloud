@@ -15,7 +15,6 @@
   }
 
   p {
-    padding: 0 auto;
     margin-left: 3px;
     margin-top: 3px;
     position: absolute;
@@ -23,10 +22,9 @@
     height: 80px;
     width: 70%;
     font-weight: 700;
-    color: white; 
+    color: white;
     overflow: hidden;
     text-overflow: ellipsis;
-    word-break: break-all;
   }
 .edit {
     padding: 0 auto;
