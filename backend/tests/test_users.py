@@ -2407,7 +2407,7 @@ class UserTests(unittest.TestCase):
                 'timeline': [
                     {
                         'cover': 'http://cover.com',
-                        'created': '1986-08-09 11:22:40',
+                        'created': '2019-12-01 15:38:12',
                         'duration': 155000,
                         'likes': 8,
                         'profiler': "http://profiler.fake",
@@ -2535,7 +2535,7 @@ class UserTests(unittest.TestCase):
                 'timeline': [
                     {
                         'cover': 'http://cover.com',
-                        'created': '1986-08-09 11:22:40',
+                        'created': '2019-12-01 15:38:12',
                         'duration': 155000,
                         'likes': 8,
                         'public': 1,
