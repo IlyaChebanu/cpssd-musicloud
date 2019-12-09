@@ -106,7 +106,6 @@ const Profile = memo((props) => {
 
 Profile.propTypes = {
   dispatch: PropTypes.func.isRequired,
-  history: PropTypes.object.isRequired,
   user: PropTypes.object.isRequired,
 };
 

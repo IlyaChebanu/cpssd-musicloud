@@ -1,4 +1,5 @@
 /* eslint-disable no-nested-ternary */
+/* eslint-disable no-unused-vars */
 import React, {
   memo, useState, useCallback, useMemo, useRef,
 } from 'react';
@@ -137,8 +138,6 @@ const SongCard = memo((props) => {
                 ? <PauseIcon className={styles.playPause} onClick={pauseAudio} />
                 : <PlayIcon className={styles.playPause} onClick={playAudio} />}
           </div>
-          {/* <LikeIcon className={`${styles.like} ${coverHover ? styles.hovered : ''}`} onClick={handleLikeSong} />
-            <LikeIcon className={`${styles.like} ${styles.likeGradient} ${!coverHover ? styles.hide : ''} ${songLiked ? styles.liked : ''}`} /> */}
         </div>
       </div>
       <div className={styles.details}>
@@ -164,11 +163,24 @@ SongCard.propTypes = {
   className: PropTypes.string,
   id: PropTypes.number.isRequired,
   isLiked: PropTypes.bool,
+  coverImage: PropTypes.string,
+  url: PropTypes.string,
+  likes: PropTypes.number,
+  title: PropTypes.string,
+  username: PropTypes.string,
+  profileImg: PropTypes.string,
 };
 
 SongCard.defaultProps = {
   className: '',
   isLiked: false,
+  coverImage: null,
+  url: '',
+  likes: null,
+  title: '',
+  username: '',
+  profileImg: null,
+
 };
 
 SongCard.displayName = 'SongCard';
