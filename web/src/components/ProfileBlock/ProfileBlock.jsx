@@ -30,7 +30,7 @@ const ProfileBlock = memo((props) => {
           alt="Profiler"
           className={styles.profilePicture}
           src={
-          (user.profilePicUrl !== null && user.profilePicUrl !== '') ? user.profilePicUrl : CloudQuestion
+          (user.profiler && user.profiler !== '') ? user.profiler : CloudQuestion
 }
         />
         <div className={styles.stats}>

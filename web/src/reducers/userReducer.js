@@ -79,6 +79,11 @@ export default (state = {
         ...state,
         follow_status: action.status,
       };
+    case 'SET_PROFILER':
+      return {
+        ...state,
+        profiler: action.profilerURL
+      };
     default:
       return state;
   }

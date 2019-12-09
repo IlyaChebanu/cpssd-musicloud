@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import store from '../store';
 import { getUserDetails } from './api';
 import {
-  setProfilePicUrl, setFollowers, setFollowing, setLikes, setPosts, setSongs, setFollowStatus,
+  setProfilePicUrl, setFollowers, setFollowing, setLikes, setPosts, setSongs, setFollowStatus, setProfiler,
 } from '../actions/userActions';
 import { showNotification } from '../actions/notificationsActions';
 
@@ -14,7 +14,7 @@ export const useUpdateUserDetails = () => {
   const username = url.searchParams.get('username');
 
   const dispatchProfileData = (res) => {
-    store.dispatch(setProfilePicUrl(res.data.profile_pic_url));
+    store.dispatch(setProfiler(res.data.profile_pic_url));
     store.dispatch(setFollowers(res.data.followers));
     store.dispatch(setFollowing(res.data.following));
     store.dispatch(setLikes(res.data.likes));
@@ -37,6 +37,13 @@ export const useUpdateUserDetails = () => {
         getUserDetails(username).then((res) => {
           if (res.status === 200) {
             dispatchProfileData(res);
+          } else {
+            store.dispatch(showNotification({ message: 'An unknown error has occurred.' }));
+          }
+        });
+        getUserDetails(user.username).then((res) => {
+          if (res.status === 200) {
+            store.dispatch(setProfilePicUrl(res.data.profile_pic_url));
           } else {
             store.dispatch(showNotification({ message: 'An unknown error has occurred.' }));
           }

@@ -10,9 +10,8 @@ import ProfileBlock from '../../components/ProfileBlock';
 import AddPost from '../../components/AddPost';
 import { useUpdateUserDetails } from '../../helpers/hooks';
 import { getCompiledSongs, getUserPosts } from '../../helpers/api';
-import OwnSongCard from '../../components/OwnSongCard';
 import Spinner from '../../components/Spinner';
-import { hideSongPicker, setSongId, setSongName } from '../../actions/studioActions';
+import SongCard from "../../components/SongCard";
 
 
 const Profile = memo((props) => {
@@ -52,21 +51,15 @@ const Profile = memo((props) => {
   }, [refreshPosts]);
 
   const ownSongCards = useMemo(() => gotSongs.map((song) => (
-    <OwnSongCard
-      key={song.sid}
-      songName={`${song.title}`}
-      className={styles.songCard}
-      onClick={() => {
-        if (username === user.username) {
-          dispatch(setSongName(song.title));
-          dispatch(setSongId(song.sid));
-          dispatch(hideSongPicker());
-          history.push('/studio');
-          return true;
-        }
-        return false;
-      }}
-      imageSrc={song.cover}
+    <SongCard
+      id={song.sid}
+      username={song.username}
+      title={song.title}
+      duration={song.duration}
+      url={song.url}
+      cover={song.cover}
+      likes={song.likes}
+      profileImg={user.profiler}
     />
   )), [dispatch, gotSongs, history, user.username, username]);
 
@@ -76,6 +69,7 @@ const Profile = memo((props) => {
       message={post[0]}
       time={post[1]}
       username={username}
+      profileImg={user.profiler}
     />
   )), [gotPosts, username]);
 

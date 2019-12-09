@@ -78,3 +78,10 @@ export const setFollowStatus = (status) => (dispatch) => {
     status,
   });
 };
+
+export const setProfiler = (profilerURL) => (dispatch) => {
+  dispatch({
+    type:'SET_PROFILER',
+    profilerURL,
+  });
+};
