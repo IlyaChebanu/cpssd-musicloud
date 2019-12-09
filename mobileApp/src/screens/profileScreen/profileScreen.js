@@ -101,9 +101,10 @@ class ProfileScreen extends React.Component {
     let playImage = require('../../assets/images/play.png')
     let songLikes = item.likes
     let likeImg = require('../../assets/images/like.png')
+    let placeholderImg = require('../../assets/images/cloud.png')
     return(
       <TouchableOpacity style={styles.songContainer} onPress={() => this.handleLikedSongClick(item, index)}>
-        <Image style={styles.songImage} source={{uri: songImage}} />
+        {songImage ? <Image style={styles.songImage} source={{uri: songImage}} /> : <Image style={styles.songImage} source={placeholderImg} />}
         <Image style={styles.playImage} source={playImage} />
         <View style={styles.songDetailsContainer}>
           <Text style={styles.songNameText}>{songName}</Text>
