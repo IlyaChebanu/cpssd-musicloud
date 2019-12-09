@@ -9,15 +9,7 @@ import history from '../../history';
 import CloudQuestion from '../../assets/cloud-question.jpg';
 import { getUserDetails, postFollow, postUnfollow } from '../../helpers/api';
 import store from '../../store';
-import {
-  setFollowers,
-  setFollowing,
-  setFollowStatus,
-  setLikes,
-  setPosts,
-  setProfiler,
-  setSongs,
-} from '../../actions/userActions';
+import { setFollowers, setFollowStatus } from '../../actions/userActions';
 import { showNotification } from '../../actions/notificationsActions';
 
 const ProfileBlock = memo((props) => {
@@ -33,12 +25,7 @@ const ProfileBlock = memo((props) => {
   const refreshProfile = useCallback(() => {
     getUserDetails(username).then((res) => {
       if (res.status === 200) {
-        store.dispatch(setProfiler(res.data.profile_pic_url));
         store.dispatch(setFollowers(res.data.followers));
-        store.dispatch(setFollowing(res.data.following));
-        store.dispatch(setLikes(res.data.likes));
-        store.dispatch(setPosts(res.data.posts));
-        store.dispatch(setSongs(res.data.songs));
         store.dispatch(setFollowStatus(res.data.follow_status));
       } else {
         store.dispatch(showNotification({ message: 'An unknown error has occurred.' }));
@@ -50,7 +37,6 @@ const ProfileBlock = memo((props) => {
     e.preventDefault();
     const res = await postFollow(username);
     if (res.status === 200) {
-      store.dispatch(setFollowStatus(1));
       refreshProfile();
       return true;
     }
@@ -61,7 +47,6 @@ const ProfileBlock = memo((props) => {
     e.preventDefault();
     const res = await postUnfollow(username);
     if (res.status === 200) {
-      store.dispatch(setFollowStatus(0));
       refreshProfile();
       return true;
     }
