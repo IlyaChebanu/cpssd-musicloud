@@ -805,6 +805,7 @@ def get_timeline_song_only(uid, start_index, items_per_page):
     args = (
         uid,
         uid,
+        uid,
         start_index,
         items_per_page,
     )
@@ -837,6 +838,7 @@ def get_timeline_song_only_length(uid):
         " OR uid=%s AND public=1)) AS Sp ORDER BY `time` DESC;"
     )
     args = (
+        uid,
         uid,
         uid,
     )
