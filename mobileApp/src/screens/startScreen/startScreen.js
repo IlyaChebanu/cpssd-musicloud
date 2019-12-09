@@ -277,9 +277,10 @@ class StartScreen extends React.Component {
   }
 
   handleLoginClick() {
+    let deviceToken = this.props.deviceToken
     let invalidFields = getInvalidLoginDetails(this.state.usernameLogin.trim(), this.state.passwordLogin)
     if (invalidFields.length == 0) {
-      loginUser(this.state.usernameLogin, this.state.passwordLogin).then(response => {
+      loginUser(this.state.usernameLogin, this.state.passwordLogin, deviceToken).then(response => {
         if (response.data.access_token) {
           this.saveLoginDetails(response.data.access_token)
           this.props.setNewAccount(false)
@@ -631,6 +632,7 @@ function mapStateToProps(state) {
     token: state.home.token,
     newAccount: state.reg.newAccount,
     email: state.reg.email,
+    deviceToken: state.home.deviceToken,
   };
 }
 
