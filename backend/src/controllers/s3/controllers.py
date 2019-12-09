@@ -25,7 +25,7 @@ def signed_form_post(user_data):
         "properties": {
             "dir": {
                 "type": "string",
-                "pattern": "^(audio|profiler|compiled_audio)$",
+                "pattern": "^(audio|profiler|compiled_audio|cover)$",
                 "minLength": 1,
             },
             "fileName": {
