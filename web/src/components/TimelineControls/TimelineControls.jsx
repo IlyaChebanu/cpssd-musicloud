@@ -1,8 +1,12 @@
-import React, { memo, useState, useCallback } from 'react';
+import React, {
+  memo, useState, useCallback, useMemo, useEffect,
+} from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import styles from './TimelineControls.module.scss';
-import { setTempo, setGridSnapEnabled, setLoopEnabled } from '../../actions/studioActions';
+import {
+  setTempo, setGridSnapEnabled, setLoopEnabled, setGridSize,
+} from '../../actions/studioActions';
 
 import { ReactComponent as Snap } from '../../assets/icons/magnet-light.svg';
 import { ReactComponent as SnapActive } from '../../assets/icons/magnet-regular.svg';
@@ -10,11 +14,20 @@ import { ReactComponent as Loop } from '../../assets/icons/repeat-alt-light.svg'
 import { ReactComponent as LoopActive } from '../../assets/icons/repeat-alt-regular.svg';
 import { ReactComponent as Grid } from '../../assets/icons/th-large-light.svg';
 
+import Dropdown from '../Dropdown';
+
 const TimelineControls = memo((props) => {
   const {
     tempo, dispatch, gridSnapEnabled, loopEnabled,
   } = props;
   const [tempoInput, setTempoInput] = useState(tempo);
+
+  useEffect(() => {
+    if (tempoInput !== tempo) {
+      setTempoInput(tempo);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tempo]);
 
   const handleChange = useCallback((e) => {
     setTempoInput(e.target.value);
@@ -40,6 +53,45 @@ const TimelineControls = memo((props) => {
     dispatch(setLoopEnabled(!loopEnabled));
   }, [dispatch, loopEnabled]);
 
+  const gridDropdownItems = useMemo(() => [
+    {
+      name: '1/1',
+      action() {
+        dispatch(setGridSize(1));
+      },
+    },
+    {
+      name: '1/2',
+      action() {
+        dispatch(setGridSize(2));
+      },
+    },
+    {
+      name: '1/4',
+      action() {
+        dispatch(setGridSize(4));
+      },
+    },
+    {
+      name: '1/8',
+      action() {
+        dispatch(setGridSize(8));
+      },
+    },
+    {
+      name: '1/16',
+      action() {
+        dispatch(setGridSize(16));
+      },
+    },
+    {
+      name: '1/32',
+      action() {
+        dispatch(setGridSize(32));
+      },
+    },
+  ], [dispatch]);
+
   return (
     <div className={styles.wrapper}>
       <span>
@@ -49,7 +101,7 @@ const TimelineControls = memo((props) => {
       {gridSnapEnabled
         ? <SnapActive onClick={handleGridSnapClick} />
         : <Snap onClick={handleGridSnapClick} />}
-      <Grid />
+      <Dropdown items={gridDropdownItems} title={<Grid />} />
       {loopEnabled
         ? <LoopActive onClick={handleLoopClick} />
         : <Loop onClick={handleLoopClick} />}

@@ -1,3 +1,4 @@
+# pylint: disable=C0302
 """
 Query models for interfacing with the DB for user related transactions.
 """
@@ -218,13 +219,13 @@ def get_followers(uid):
     return query(sql, args, True)
 
 
-def get_following_pair(username_a, username_b):
+def get_following_pair(uid_a, uid_b):
     """
     Get a specific follow relation from the DB.
-    :param username_a:
-    Str - Username of the user who is the follower.
-    :param username_b:
-    Str - Username of the user who is being followed.
+    :param uid_a:
+    Int - Uid of the user who is the follower.
+    :param uid_b:
+    Int - Uid of the user who is being followed.
     :return:
     List - Empty if follow relation doesn't exists, else contains 1 list with,
     user a's uid & user b's uid.
@@ -234,8 +235,8 @@ def get_following_pair(username_a, username_b):
         "WHERE follower = %s AND following = %s"
     )
     args = (
-        username_a,
-        username_b,
+        uid_a,
+        uid_b,
     )
     return query(sql, args, True)
 
@@ -630,19 +631,28 @@ def get_timeline(uid, start_index, items_per_page):
         ", title, duration, created, public,"
         "published AS time, url, cover, NULL AS message, "
         "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid ) "
-        "as likes, 'song' AS type FROM "
-        "Songs WHERE uid IN "
+        "as likes, "
+        "(SELECT profiler FROM Users WHERE Songs.uid=Users.uid) as profiler, "
+        "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid "
+        "AND Song_Likes.uid=%s) AS like_status, "
+        "'song' AS type FROM "
+        "Songs WHERE (uid IN "
         "(SELECT Followers.following FROM Followers WHERE follower=%s)"
-        " AND public=1) UNION (SELECT NULL AS sid, "
+        " OR uid=%s) AND public=1) UNION (SELECT NULL AS sid, "
         "(SELECT username FROM Users WHERE Posts.uid=Users.uid) as usernanme"
         ", NULL AS title,"
         "NULL AS duration, NULL AS created, NULL AS public, time, NULL AS url,"
-        "NULL AS cover, message, NULL AS likes, 'post' AS type FROM Posts "
+        "NULL AS cover, message, NULL AS likes,"
+        "(SELECT profiler FROM Users WHERE Posts.uid=Users.uid) as profiler,"
+        "NULL AS like_status, 'post' AS type FROM Posts "
         "WHERE uid IN "
-        "(SELECT Followers.following FROM Followers WHERE follower=%s)"
-        ")) AS Sp ORDER BY `time` DESC LIMIT %s, %s;"
+        "(SELECT Followers.following FROM Followers WHERE follower=%s) "
+        "OR uid=%s)) AS Sp ORDER BY `time` DESC LIMIT %s, %s;"
     )
     args = (
+        uid,
+        uid,
+        uid,
         uid,
         uid,
         start_index,
@@ -668,19 +678,27 @@ def get_timeline_length(uid):
         ", title, duration, created, public,"
         "published AS time, url, cover, NULL AS message, "
         "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid ) "
-        "as likes, 'song' AS type FROM "
-        "Songs WHERE uid IN "
+        "as likes, "
+        "(SELECT profiler FROM Users WHERE Songs.uid=Users.uid) as profiler,"
+        "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid "
+        "AND Song_Likes.uid=%s) AS like_status, "
+        "'song' AS type FROM "
+        "Songs WHERE (uid IN "
         "(SELECT Followers.following FROM Followers WHERE follower=%s)"
-        " AND public=1) UNION (SELECT NULL AS sid, "
+        " OR uid=%s) AND public=1) UNION (SELECT NULL AS sid, "
         "(SELECT username FROM Users WHERE Posts.uid=Users.uid) as usernanme"
         ", NULL AS title,"
         "NULL AS duration, NULL AS created, NULL AS public, time, NULL AS url,"
-        "NULL AS cover, message, NULL AS likes, 'post' AS type FROM Posts "
+        "NULL AS cover, message, NULL AS likes, "
+        "(SELECT profiler FROM Users WHERE Posts.uid=Users.uid) as profiler,"
+        "NULL AS like_status, 'post' AS type FROM Posts "
         "WHERE uid IN "
         "(SELECT Followers.following FROM Followers WHERE follower=%s)"
-        ")) AS Sp ORDER BY `time` DESC;"
+        " OR uid=%s)) AS Sp ORDER BY `time` DESC;"
     )
     args = (
+        uid,
+        uid,
         uid,
         uid,
     )
@@ -708,12 +726,15 @@ def get_timeline_posts_only(uid, start_index, items_per_page):
         "(SELECT username FROM Users WHERE Posts.uid=Users.uid) as usernanme"
         ", NULL AS title,"
         "NULL AS duration, NULL AS created, NULL AS public, time, NULL AS url,"
-        "NULL AS cover, message, NULL AS likes, 'post' AS type FROM Posts "
+        "NULL AS cover, message, NULL AS likes,"
+        "(SELECT profiler FROM Users WHERE Posts.uid=Users.uid) as profiler, "
+        "NULL AS like_status, 'post' AS type FROM Posts "
         "WHERE uid IN "
         "(SELECT Followers.following FROM Followers WHERE follower=%s)"
-        ")) AS Sp ORDER BY `time` DESC LIMIT %s, %s;"
+        " OR uid=%s )) AS Sp ORDER BY `time` DESC LIMIT %s, %s;"
     )
     args = (
+        uid,
         uid,
         start_index,
         items_per_page,
@@ -737,12 +758,15 @@ def get_timeline_posts_only_length(uid):
         "(SELECT username FROM Users WHERE Posts.uid=Users.uid) as usernanme"
         ", NULL AS title,"
         "NULL AS duration, NULL AS created, NULL AS public, time, NULL AS url,"
-        "NULL AS cover, message, NULL AS likes, 'post' AS type FROM Posts "
+        "NULL AS cover, message, NULL AS likes,"
+        "(SELECT profiler FROM Users WHERE Posts.uid=Users.uid) as profiler, "
+        "NULL AS like_status, 'post' AS type FROM Posts "
         "WHERE uid IN "
         "(SELECT Followers.following FROM Followers WHERE follower=%s)"
-        ")) AS Sp ORDER BY `time` DESC;"
+        " OR uid=%s)) AS Sp ORDER BY `time` DESC;"
     )
     args = (
+        uid,
         uid,
     )
     res = query(sql, args, True)
@@ -770,12 +794,17 @@ def get_timeline_song_only(uid, start_index, items_per_page):
         ", title, duration, created, public,"
         "published AS time, url, cover, NULL AS message, "
         "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid ) "
-        "as likes, 'song' AS type FROM "
-        "Songs WHERE uid IN "
+        "as likes, "
+        "(SELECT profiler FROM Users WHERE Songs.uid=Users.uid) as profiler,"
+        "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid "
+        "AND Song_Likes.uid=%s) AS like_status, 'song' AS type FROM "
+        "Songs WHERE (uid IN "
         "(SELECT Followers.following FROM Followers WHERE follower=%s)"
-        " AND public=1)) AS Sp ORDER BY `time` DESC LIMIT %s, %s;"
+        " OR uid=%s) AND public=1)) AS Sp ORDER BY `time` DESC LIMIT %s, %s;"
     )
     args = (
+        uid,
+        uid,
         uid,
         start_index,
         items_per_page,
@@ -800,15 +829,226 @@ def get_timeline_song_only_length(uid):
         ", title, duration, created, public,"
         "published AS time, url, cover, NULL AS message, "
         "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid ) "
-        "as likes, 'song' AS type FROM "
-        "Songs WHERE uid IN "
+        "as likes, "
+        "(SELECT profiler FROM Users WHERE Songs.uid=Users.uid) as profiler, "
+        "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid "
+        "AND Song_Likes.uid=%s) AS like_status, 'song' AS type FROM "
+        "Songs WHERE (uid IN "
         "(SELECT Followers.following FROM Followers WHERE follower=%s)"
-        " AND public=1)) AS Sp ORDER BY `time` DESC;"
+        " OR uid=%s) AND public=1)) AS Sp ORDER BY `time` DESC;"
     )
     args = (
+        uid,
+        uid,
         uid,
     )
     res = query(sql, args, True)
     if not res:
         return 0
     return res[0][0]
+
+
+def register_device_for_notifications(did, uid):
+    """
+    Adds a device to the notifications table.
+    :param did:
+    Int - Unique ID of the mobile device.
+    :param uid:
+    Int - Uid of the user who owns the device.
+    :return:
+    None - Adds device to the notifications table and returns None.
+    """
+    sql = (
+        "INSERT INTO Notifications "
+        "(did, uid) "
+        "VALUES (%s, %s);"
+    )
+    args = (
+        did,
+        uid,
+    )
+    query(sql, args)
+
+
+def unregister_device_for_notifications(did, uid):
+    """
+    Removes a device from the notifications table.
+    :param did:
+    Int - Unique ID of the mobile device.
+    :param uid:
+    Int - Uid of the user who owns the device.
+    :return:
+    None - Removes the device from the notifications table and returns None.
+    """
+    sql = (
+        "DELETE FROM Notifications "
+        "WHERE did=%s AND uid=%s"
+    )
+    args = (
+        did,
+        uid,
+    )
+    query(sql, args)
+
+
+def update_silence_all_notificaitons(uid, status):
+    """
+    Update all the notification silencing columns in the Users table.
+    :param uid:
+    Int - Uid of the user you wish to change the silence notification statuses
+    of.
+    :param status:
+    Int - 0 for send notifications, 1 for mute notifications.
+    :return:
+    None - Updates the user's silence_notificaiton statuses and returns None.
+    """
+    sql = (
+        "UPDATE Users "
+        "SET silence_follow_notifcation = %s, silence_post_notifcation = %s, "
+        "silence_like_notifcation = %s, silence_song_notifcation = %s "
+        "WHERE uid = %s"
+    )
+    args = (
+        status,
+        status,
+        status,
+        status,
+        uid,
+    )
+    query(sql, args)
+
+
+def update_silence_follow_notificaitons(uid, status):
+    """
+    Update only the follow notification silencing column in the Users table.
+    :param uid:
+    Int - Uid of the user you wish to change the silence notification status
+    of.
+    :param status:
+    Int - 0 for send notifications, 1 for mute notifications.
+    :return:
+    None - Updates the user's follow notification status and returns None.
+    """
+    sql = (
+        "UPDATE Users "
+        "SET silence_follow_notifcation = %s "
+        "WHERE uid = %s"
+    )
+    args = (
+        status,
+        uid,
+    )
+    query(sql, args)
+
+
+def update_silence_post_notificaitons(uid, status):
+    """
+    Update only the post notification silencing column in the Users table.
+    :param uid:
+    Int - Uid of the user you wish to change the silence notification status
+    of.
+    :param status:
+    Int - 0 for send notifications, 1 for mute notifications.
+    :return:
+    None - Updates the user's post notification status and returns None.
+    """
+    sql = (
+        "UPDATE Users "
+        "SET silence_post_notifcation = %s "
+        "WHERE uid = %s"
+    )
+    args = (
+        status,
+        uid,
+    )
+    query(sql, args)
+
+
+def update_silence_song_notificaitons(uid, status):
+    """
+    Update only the song notification silencing column in the Users table.
+    :param uid:
+    Int - Uid of the user you wish to change the silence notification status
+    of.
+    :param status:
+    Int - 0 for send notifications, 1 for mute notifications.
+    :return:
+    None - Updates the user's song notification status and returns None.
+    """
+    sql = (
+        "UPDATE Users "
+        "SET silence_song_notifcation = %s "
+        "WHERE uid = %s"
+    )
+    args = (
+        status,
+        uid,
+    )
+    query(sql, args)
+
+
+def update_silence_like_notificaitons(uid, status):
+    """
+    Update only the like notification silencing column in the Users table.
+    :param uid:
+    Int - Uid of the user you wish to change the silence notification status
+    of.
+    :param status:
+    Int - 0 for send notifications, 1 for mute notifications.
+    :return:
+    None - Updates the user's like notification status and returns None.
+    """
+    sql = (
+        "UPDATE Users "
+        "SET silence_like_notifcation = %s "
+        "WHERE uid = %s"
+    )
+    args = (
+        status,
+        uid,
+    )
+    query(sql, args)
+
+
+def get_dids_for_a_user(uid):
+    """
+    Get all the dids for a given user.
+    :param uid:
+    Int - Uid of the user who's dids we want.
+    of.
+    :return:
+    List - A list of dids
+    """
+    sql = (
+        "SELECT did FROM Notifications "
+        "WHERE uid = %s"
+    )
+    args = (
+        uid,
+    )
+    res = query(sql, args, True)
+    if not res:
+        raise NoResults
+    return res
+
+
+def notify_post_dids(uid):
+    """
+    Get the did's for every user who needs to be notified about the new post.
+    :param uid:
+    Int - Uid of the user who posted.
+    :return:
+    List - A list of dids.
+    """
+    sql = (
+        "SELECT did FROM Notifications WHERE uid IN (SELECT uid FROM Users "
+        "WHERE uid IN (SELECT follower FROM Followers WHERE following=%s) "
+        "AND silence_post_notifcation=0);"
+    )
+    args = (
+        uid,
+    )
+    res = query(sql, args, True)
+    if not res:
+        raise NoResults
+    return res

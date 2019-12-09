@@ -1,11 +1,17 @@
+/* eslint-disable no-param-reassign */
 import PropTypes from 'prop-types';
-import React, { useCallback, memo } from 'react';
+import React, {
+  useCallback, useMemo, memo, useState, useEffect,
+} from 'react';
 import cookie from 'js-cookie';
 import { connect } from 'react-redux';
 import { withRouter, Link } from 'react-router-dom';
+import toWav from 'audiobuffer-to-wav';
 import styles from './Header.module.scss';
 import { deleteToken } from '../../actions/userActions';
-import { deleteToken as deleteTokenAPI, saveState, uploadFile } from '../../helpers/api';
+import {
+  deleteToken as deleteTokenAPI, saveState, uploadFile, createNewSong, patchSongName,
+} from '../../helpers/api';
 import { showNotification } from '../../actions/notificationsActions';
 import { ReactComponent as Logo } from '../../assets/logo.svg';
 import { ReactComponent as SignOutIcon } from '../../assets/icons/sign-out-alt-light.svg';
@@ -21,69 +27,124 @@ import importIcon from '../../assets/icons/file_dropdown/import.svg';
 import exportIcon from '../../assets/icons/file_dropdown/export.svg';
 import generateIcon from '../../assets/icons/file_dropdown/generate.svg';
 import exitIcon from '../../assets/icons/file_dropdown/exit.svg';
-import { setTrackAtIndex } from '../../actions/studioActions';
+import { renderTracks } from '../../middleware/audioRedux';
+import { forceDownload, genId } from '../../helpers/utils';
+import {
+  setTrackAtIndex,
+  setTracks,
+  hideSongPicker,
+  showSongPicker,
+  setTempo,
+  setSongName,
+  setSongId,
+  stop,
+  setSampleTime,
+  setSelectedSample,
+  setSampleLoading,
+} from '../../actions/studioActions';
+
 
 const Header = memo((props) => {
   const {
     selected, studio, children, dispatch, history,
   } = props;
   const { tempo, tracks, songId } = studio;
+  const [nameInput, setNameInput] = useState(studio.songName);
 
   const handleSaveState = useCallback(async () => {
+    if (!songId) return true;
     const songState = { tempo, tracks };
-    /* At the moment, this just uses the hardcoded song ID in the state (1001). */
-    /* The user who has edit permission for the song by default it Kamil. */
-    /* You can add your uid and the sid 1001 to the Song_Editors table to */
-    /* save from your account. */
     const res = await saveState(songId, songState);
     if (res.status === 200) {
       dispatch(showNotification({ message: 'Song saved', type: 'info' }));
+      return true;
     }
+    return false;
   }, [tempo, tracks, songId, dispatch]);
 
-  function buildFileSelector() {
-    // eslint-disable-next-line no-undef
+
+  const handleSampleImport = useCallback(() => {
+    if (studio.tracks.length === 0) {
+      dispatch(showNotification({ message: 'Please add a track first', type: 'info' }));
+      return;
+    }
     const fileSelector = document.createElement('input');
     fileSelector.setAttribute('type', 'file');
     fileSelector.setAttribute('accept', 'audio/*');
-    return fileSelector;
-  }
-
-  const fileSelector = buildFileSelector();
-  const handleSampleSelect = useCallback(() => {
     fileSelector.click();
+    let sampleState = {};
+    const track = { ...studio.tracks[studio.selectedTrack] };
     fileSelector.onchange = function onChange() {
-      const url = uploadFile('audio', fileSelector.files[0], cookie.get('token'));
-
-      const cast = Promise.resolve(url);
-      cast.then(() => {
-        const state = studio;
-
-
-        const track = { ...state.tracks[state.selectedTrack] };
-        track.samples.push({
-          url: fileSelector.files[0],
-          id: 1156,
-          time: 10,
-        });
-
-        dispatch(setTrackAtIndex(track, state.selectedTrack));
+      const sampleFile = fileSelector.files[0];
+      const response = uploadFile('audio', sampleFile, cookie.get('token'));
+      const cast = Promise.resolve(response);
+      cast.then((url) => {
+        sampleState = {
+          url,
+          id: genId(),
+          time: studio.currentBeat,
+          track: studio.selectedTrack,
+        };
+        track.samples.push(sampleState);
+        dispatch(setTrackAtIndex(track, studio.selectedTrack));
       });
     };
-  }, [dispatch, fileSelector, studio]);
+    dispatch(setSelectedSample(sampleState.id));
+    dispatch(setSampleTime(sampleState.time, sampleState.id));
+    dispatch(setSampleLoading(true));
+    dispatch(setTracks(studio.tracks));
+  }, [dispatch, studio]);
 
+  const exportAction = useCallback(async () => {
+    const renderedBuffer = await renderTracks(studio);
+    const encoded = toWav(renderedBuffer);
 
-  const fileDropdownItems = [
-    { name: 'New', action: null, icon: newIcon },
-    { name: 'Open', icon: openIcon },
+    forceDownload([new DataView(encoded)], 'audio/wav', `${studio.songName}.wav`); // for mp3 [new DataView] not needed
+  }, [studio]);
+
+  const handleShowSongPicker = useCallback(async () => {
+    if (await handleSaveState()) {
+      dispatch(stop);
+      dispatch(setTracks([]));
+      dispatch(setSongId(null));
+      dispatch(setSongName('New Song'));
+      dispatch(setTempo(140));
+      dispatch(showSongPicker());
+    }
+  }, [dispatch, handleSaveState]);
+
+  const handleHideSongPicker = useCallback(async () => {
+    if (await handleSaveState()) {
+      const res = await createNewSong('New Song');
+      if (res.status === 200) {
+        dispatch(stop);
+        dispatch(setTracks([]));
+        dispatch(setSongId(res.data.sid));
+        dispatch(setTempo(140));
+        dispatch(setSongName('New Song'));
+        dispatch(hideSongPicker());
+      }
+    }
+  }, [dispatch, handleSaveState]);
+
+  const fileDropdownItems = useMemo(() => [
+    { name: 'New', action: handleHideSongPicker, icon: newIcon },
+    { name: 'Open', action: handleShowSongPicker, icon: openIcon },
     { name: 'Publish', icon: publishIcon },
     { name: 'Save', icon: saveIcon, action: handleSaveState },
-    { name: 'Import', icon: importIcon, action: handleSampleSelect },
-    { name: 'Export', icon: exportIcon },
+    { name: 'Import', icon: importIcon, action: handleSampleImport },
+    { name: 'Export', icon: exportIcon, action: exportAction },
     { name: 'Generate', icon: generateIcon },
     { name: 'Exit', icon: exitIcon },
-  ];
-  const editDropdownItems = [
+  ], [
+    exportAction,
+    handleHideSongPicker,
+    handleSampleImport,
+    handleSaveState,
+    handleShowSongPicker,
+  ]);
+
+  const editDropdownItems = useMemo(() => [
     { name: 'Edit 1' },
     { name: 'Edit 2' },
     { name: 'Edit 3' },
@@ -92,32 +153,60 @@ const Header = memo((props) => {
     { name: 'Edit 6' },
     { name: 'Edit 7' },
     { name: 'Edit 8' },
-  ];
+  ], []);
 
-  const handleSignout = useCallback(
-    () => {
-      deleteTokenAPI();
-      cookie.remove('token');
-      dispatch(deleteToken);
-      history.push('/login');
-    },
-    [dispatch, history],
-  );
+  const handleSignout = useCallback(() => {
+    cookie.remove('token');
+    deleteTokenAPI();
+    dispatch(deleteToken);
+    history.push('/login');
+  }, [dispatch, history]);
+
+  useEffect(() => {
+    if (nameInput !== studio.songName) {
+      setNameInput(studio.songName);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [studio.songName]);
+
+  const handleChange = useCallback((e) => {
+    setNameInput(e.target.value);
+  }, []);
+
+  const handleSetName = useCallback(async () => {
+    dispatch(setSongName(nameInput));
+    setNameInput(nameInput);
+    const res = patchSongName(studio.songId, nameInput);
+    return res.status === 200;
+  }, [dispatch, nameInput, studio.songId]);
+
+  const handleKeyDown = useCallback((e) => {
+    if (e.key === 'Enter') {
+      handleSetName();
+    }
+  }, [handleSetName]);
 
   return (
     <div className={styles.header}>
-      <Logo className={styles.logo} />
-      <div className={selected !== 0 ? styles.hide : styles.dropdownBlock}>
-        <Dropdown items={fileDropdownItems} title="File" />
-        <Dropdown items={editDropdownItems} title="Edit" />
-        {children}
-      </div>
-      <span>
-
+      <span className={styles.left}>
+        <Logo className={styles.logo} />
+        <div className={(!studio.songPickerHidden || selected !== 0)
+          ? styles.hide : styles.dropdownBlock}
+        >
+          <Dropdown items={fileDropdownItems} title="File" />
+          <Dropdown items={editDropdownItems} title="Edit" />
+          {children}
+        </div>
+      </span>
+      <span className={styles.songName}>
+        <input type={(!studio.songPickerHidden || selected !== 0) ? 'hidden' : 'text'} value={nameInput} onChange={handleChange} onBlur={handleSetName} onKeyDown={handleKeyDown} />
+      </span>
+      <span className={styles.nav}>
         <nav>
           <Link to="/studio" className={selected === 0 ? styles.selected : ''}>Studio</Link>
-          <Link to="/discover" className={selected === 1 ? styles.selected : ''}>Discover</Link>
-          <Link to="/profile" className={selected === 2 ? styles.selected : ''}>Profile</Link>
+          <Link to="/feed" className={selected === 1 ? styles.selected : ''}>Feed</Link>
+          <Link to="/discover" className={selected === 2 ? styles.selected : ''}>Discover</Link>
+          <Link to="/profile" className={selected === 3 ? styles.selected : ''}>Profile</Link>
         </nav>
         <div className={styles.pictureWrapper}>
           <CircularImage src={ProfilePicture} />

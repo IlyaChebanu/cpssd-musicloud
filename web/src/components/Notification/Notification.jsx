@@ -9,7 +9,7 @@ import { ReactComponent as CloseIcon } from '../../assets/icons/times-light.svg'
 
 const Notification = memo((props) => {
   const {
-    duration, id, index, dispatch, text,
+    duration, id, index, dispatch, text, type,
   } = props;
 
   const [fadeOut, setFadeOut] = useState(false);
@@ -48,7 +48,7 @@ const Notification = memo((props) => {
 
   return (
     <div
-      className={`${styles.wrapper} ${fadeOut ? styles.fadeOut : ''}`}
+      className={`${styles.wrapper} ${fadeOut ? styles.fadeOut : ''} ${styles[type]}`}
       onMouseEnter={clearTimers}
       onMouseLeave={setTimers}
       onClick={handleClick}
@@ -56,7 +56,7 @@ const Notification = memo((props) => {
       role="alert"
     >
       <div className={styles.top}>
-        <p>ERROR!</p>
+        <p>{`${type.toUpperCase()}!`}</p>
         <CloseIcon />
       </div>
       <div className={styles.errorText}>
@@ -72,6 +72,11 @@ Notification.propTypes = {
   id: PropTypes.string.isRequired,
   index: PropTypes.number.isRequired,
   dispatch: PropTypes.func.isRequired,
+  type: PropTypes.string,
+};
+
+Notification.defaultProps = {
+  type: 'error',
 };
 
 Notification.displayName = 'Notification';

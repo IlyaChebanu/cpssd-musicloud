@@ -5,15 +5,17 @@
  * @format
  * @flow
  */
-import React, { Component } from "react";
+import React, { Fragment, useEffect } from "react";
 import { Provider } from "react-redux";
 import store from "./Store";
 import Navigator, { middleware } from "./navigation/navigator";
-import { Platform, StyleSheet, Text, View } from "react-native";
+import { StatusBar } from "react-native";
 import Orientation from 'react-native-orientation';
+import SplashScreen from 'react-native-splash-screen';
 import Pushy from 'pushy-react-native';
 import { PermissionsAndroid } from 'react-native';
 
+console.disableYellowBox = true;
 
 Pushy.setNotificationListener(async (data) => {
   // Print notification payload data
@@ -31,28 +33,22 @@ Pushy.setNotificationListener(async (data) => {
   Pushy.notify(notificationTitle, notificationText, data);
 });
 
-// console.disableYellowBox = true;
-type Props = {};
-export default class App extends Component<Props> {
-
-  componentWillMount() {
-    Orientation.lockToPortrait();
-  }
-
-  componentDidMount() {
-    // Start the Pushy service
+const App = () => {
+  useEffect(() => {
+    SplashScreen.hide();
     Pushy.listen();
     Pushy.setNotificationIcon('ic_notification');
+    Orientation.lockToPortrait();
+  }, []);
 
-    
-  }
-
-  render() {
-    return (
+  return (
+    <Fragment>
+      <StatusBar barStyle="light-content" />
       <Provider store={store}>
         <Navigator />
       </Provider>
-    );
-  }
+    </Fragment>
+  )
 }
 
+export default App;

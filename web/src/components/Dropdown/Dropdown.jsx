@@ -18,12 +18,14 @@ const Dropdown = memo((props) => {
   }, [setDisplayMenu]);
 
   const menuItems = useMemo(() => items.map((item) => (
-    <li onClick={() => {
-      item.action();
-      setDisplayMenu(false);
-    }}
+    <li
+      key={item.name}
+      onMouseDown={() => {
+        if (item.action) item.action();
+        setDisplayMenu(false);
+      }}
     >
-      <img className={styles.icon} src={item.icon} alt="dropdown item icon" />
+      {item.icon && <img className={styles.icon} src={item.icon} alt="dropdown item icon" />}
       <p>{item.name}</p>
     </li>
   )), [items]);

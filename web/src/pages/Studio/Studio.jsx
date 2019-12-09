@@ -1,14 +1,14 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/no-array-index-key */
 import React, {
-  memo, useCallback, useEffect, useMemo,
+  memo, useCallback, useEffect, useMemo, useRef, useState,
 } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styles from './Studio.module.scss';
 import Header from '../../components/Header';
 import {
-  setTracks, setScroll, setScrollY,
+  setTracks, setScroll, setScrollY, setGridWidth, setTempo,
 } from '../../actions/studioActions';
 import { showNotification } from '../../actions/notificationsActions';
 import kick from '../../assets/basic_sounds/kick.wav';
@@ -21,24 +21,27 @@ import snare from '../../assets/basic_sounds/snare.wav';
 import triangle from '../../assets/basic_sounds/triangle.wav';
 import bass from '../../assets/samples/bass.wav';
 import Timeline from '../../components/Timeline';
-import TimelineControls from '../../components/TimelineControls';
 import SeekBar from '../../components/SeekBar';
 import TrackControls from '../../components/TrackControls';
 import Button from '../../components/Button';
 import PlayBackControls from '../../components/PlaybackControls';
-
+import SongPicker from '../../components/SongPicker';
 import Track from '../../components/Track/Track';
 
-import { saveState } from '../../helpers/api';
+import { saveState, getSongState } from '../../helpers/api';
 import { useUpdateUserDetails } from '../../helpers/hooks';
+import store from '../../store';
+import Spinner from '../../components/Spinner/Spinner';
 
 const Studio = memo((props) => {
   const { dispatch, tracks, studio } = props;
 
-  useUpdateUserDetails();
+  const [tracksLoading, setTracksLoading] = useState(false);
 
-  useEffect(() => {
-    dispatch(setTracks([
+  const exampleSong = useMemo(() => ({
+    name: 'Example Song 1',
+    tempo: 400,
+    tracks: [
       {
         volume: 0.1,
         mute: false,
@@ -49,32 +52,20 @@ const Studio = memo((props) => {
           {
             id: 1,
             time: 1,
-            url: '/static/media/kick.0bfa7d2f.wav',
-            duration: 0.5,
-            volume: 0.06000000000000005,
+            url: kick,
             track: 0,
-            buffer: {},
-            endTime: 297.74,
           },
           {
             id: 'MC40OTQ2MzU1',
             time: 5,
-            url: '/static/media/kick.0bfa7d2f.wav',
-            duration: 0.5,
+            url: kick,
             track: 0,
-            volume: 0.06000000000000005,
-            buffer: {},
-            endTime: 298.34000000000003,
           },
           {
             id: 'MC44NDMzNjU5',
             time: 13,
-            url: '/static/media/kick.0bfa7d2f.wav',
-            duration: 0.5,
+            url: kick,
             track: 0,
-            volume: 0.06000000000000005,
-            buffer: {},
-            endTime: 299.54,
           },
         ],
       },
@@ -88,22 +79,14 @@ const Studio = memo((props) => {
           {
             id: 2,
             time: 5,
-            url: '/static/media/clap.e0ff8267.wav',
-            duration: 0.75,
-            volume: 0.06999999999999995,
+            url: clap,
             track: 1,
-            buffer: {},
-            endTime: 298.59000000000003,
           },
           {
             id: 'MC43MjcxOTk5',
             time: 12,
-            url: '/static/media/clap.e0ff8267.wav',
-            duration: 0.75,
-            volume: 0.06999999999999995,
+            url: clap,
             track: 1,
-            buffer: {},
-            endTime: 299.64,
           },
         ],
       },
@@ -117,12 +100,8 @@ const Studio = memo((props) => {
           {
             id: 3,
             time: 15,
-            url: '/static/media/crash.cad7e819.wav',
-            duration: 1.7142708333333334,
-            volume: 0.050000000000000044,
+            url: crash,
             track: 2,
-            buffer: {},
-            endTime: 298.80427083333336,
           },
         ],
       },
@@ -136,42 +115,26 @@ const Studio = memo((props) => {
           {
             id: 4,
             time: 7,
-            url: '/static/media/hat.b1186440.wav',
-            duration: 0.25,
-            volume: 0.020000000000000018,
+            url: hat,
             track: 3,
-            buffer: {},
-            endTime: 298.39,
           },
           {
             id: 'MC40ODAyNjgz',
             time: 9,
-            url: '/static/media/hat.b1186440.wav',
-            duration: 0.25,
-            volume: 0.020000000000000018,
+            url: hat,
             track: 3,
-            buffer: {},
-            endTime: 298.69,
           },
           {
             id: 'MC40NDQ2NTY3',
             time: 11,
-            url: '/static/media/hat.b1186440.wav',
-            duration: 0.25,
-            volume: 0.020000000000000018,
+            url: hat,
             track: 3,
-            buffer: {},
-            endTime: 298.99,
           },
           {
             id: 'MC4yNzYwNDUw',
             time: 13,
-            url: '/static/media/hat.b1186440.wav',
-            duration: 0.25,
-            volume: 0.020000000000000018,
+            url: hat,
             track: 3,
-            buffer: {},
-            endTime: 299.29,
           },
         ],
       },
@@ -185,22 +148,14 @@ const Studio = memo((props) => {
           {
             id: 'MC4yMTUyOTQ1',
             time: 15,
-            url: '/static/media/openhat.8431cd41.wav',
-            duration: 0.25,
-            volume: 0.10999999999999999,
+            url: openhat,
             track: 4,
-            buffer: {},
-            endTime: 299.59000000000003,
           },
           {
             id: 'MC43OTQwNDQ4',
             time: 3,
-            url: '/static/media/openhat.8431cd41.wav',
-            duration: 0.25,
-            volume: 0.10999999999999999,
+            url: openhat,
             track: 4,
-            buffer: {},
-            endTime: 297.79,
           },
         ],
       },
@@ -214,22 +169,14 @@ const Studio = memo((props) => {
           {
             id: 'MC4zMjY5Mjk0',
             time: 14,
-            url: '/static/media/snare.a6b07320.wav',
-            duration: 0.5,
+            url: snare,
             track: 5,
-            volume: 0.12,
-            buffer: {},
-            endTime: 299.69,
           },
           {
             id: 'MC40ODcwMjUy',
             time: 7,
-            url: '/static/media/snare.a6b07320.wav',
-            duration: 0.5,
+            url: snare,
             track: 5,
-            volume: 0.12,
-            buffer: {},
-            endTime: 298.64,
           },
         ],
       },
@@ -243,12 +190,8 @@ const Studio = memo((props) => {
           {
             id: 7,
             time: 1,
-            url: '/static/media/triangle.620921d6.wav',
-            duration: 0.857125,
-            volume: 0.12,
+            url: triangle,
             track: 6,
-            buffer: {},
-            endTime: 298.097125,
           },
         ],
       },
@@ -262,32 +205,20 @@ const Studio = memo((props) => {
           {
             id: 8,
             time: 4,
-            url: '/static/media/percussion.61cb7109.wav',
-            duration: 0.21875,
-            volume: 0.12,
+            url: percussion,
             track: 7,
-            buffer: {},
-            endTime: 297.90875,
           },
           {
             id: 'MC40MTM2OTMy',
             time: 11,
-            url: '/static/media/percussion.61cb7109.wav',
-            duration: 0.21875,
-            volume: 0.12,
+            url: percussion,
             track: 7,
-            buffer: {},
-            endTime: 298.95875,
           },
           {
             id: 'MC4yNzU4NDM0',
             time: 14,
-            url: '/static/media/percussion.61cb7109.wav',
-            duration: 0.21875,
-            volume: 0.12,
+            url: percussion,
             track: 7,
-            buffer: {},
-            endTime: 299.40875,
           },
         ],
       },
@@ -301,26 +232,52 @@ const Studio = memo((props) => {
           {
             id: 'MC4yNzU4N53450',
             time: 1,
-            url: '/static/media/bass.a24f6a59.wav',
-            duration: 2.3339791666666665,
-            volume: 1,
+            url: bass,
             track: 8,
-            buffer: {},
-            endTime: 299.5739791666667,
           },
         ],
       },
-    ]));
-  }, [dispatch]);
+    ],
+  }), []);
+
+  useUpdateUserDetails();
+  const tracksRef = useRef();
+
+  useEffect(() => {
+    if (studio.songId) {
+      (async () => {
+        setTracksLoading(true);
+        const res = await getSongState(studio.songId);
+        setTracksLoading(false);
+        if (res.status === 200) {
+          const songState = res.data.song_state;
+          if (songState.tracks) dispatch(setTracks(songState.tracks));
+          if (songState.tempo) dispatch(setTempo(songState.tempo));
+        }
+      })();
+    }
+  }, [dispatch, studio.songId]);
+
+  useEffect(() => {
+    const latest = tracks.reduce((m, track) => {
+      const sampleMax = track.samples ? track.samples.reduce((sm, sample) => {
+        const endTime = sample.time + (sample.duration * (studio.tempo / 60));
+        return Math.max(endTime, sm);
+      }, 1) : 1;
+      return Math.max(sampleMax, m);
+    }, 1);
+    const width = Math.max(
+      latest,
+      tracksRef.current
+        ? tracksRef.current.getBoundingClientRect().width / (40 * studio.gridSize)
+        : 0,
+    );
+    dispatch(setGridWidth(width));
+  }, [dispatch, tracks, studio.gridSize, studio.tempo, tracksRef]);
 
   const handleScroll = useCallback((e) => {
     dispatch(setScroll(e.target.scrollLeft));
-    dispatch(setScrollY(e.target.scrollTop));
   }, [dispatch]);
-
-  const renderableTracks = useMemo(() => tracks.map((t, i) => (
-    <Track index={i} track={t} key={i} className={styles.track} />
-  )), [tracks]);
 
   const handleAddNewTrack = useCallback(() => {
     dispatch(setTracks([
@@ -352,6 +309,14 @@ const Studio = memo((props) => {
     }
   }, [studio.tempo, studio.songId, tracks, dispatch]);
 
+  const renderableTracks = useMemo(() => tracks.map((t, i) => (
+    <Track index={i} track={t} key={i} className={styles.track} />
+  )), [tracks]);
+
+  const trackControls = useMemo(() => tracks.map((track, i) => (
+    <TrackControls key={i} track={track} index={i} />
+  )), [tracks]);
+
   const trackControlsStyle = useMemo(() => ({
     transform: `translateY(${-studio.scrollY}px)`,
   }), [studio.scrollY]);
@@ -368,31 +333,30 @@ const Studio = memo((props) => {
       </Header>
       <div className={styles.contentWrapper}>
         <SeekBar />
-        <div className={styles.sidebar}>
-          <TimelineControls />
-          <div style={trackControlsStyle}>
-            {tracks.map((track, i) => <TrackControls key={i} track={track} index={i} />)}
-            <div
-              className={`${styles.newTrack} ${tracks.length % 2 !== 1 ? styles.even : ''}`}
-              onClick={handleAddNewTrack}
-              role="button"
-              tabIndex={0}
-            >
-              Add new track
+        <Timeline />
+        <div className={styles.scrollable}>
+          <div className={styles.content}>
+            <div className={styles.trackControls}>
+              {trackControls}
+              <div
+                className={`${styles.newTrack} ${tracks.length % 2 !== 1 ? styles.even : ''}`}
+                onClick={handleAddNewTrack}
+                role="button"
+                tabIndex={0}
+              >
+                Add new track
+              </div>
             </div>
-          </div>
-        </div>
-        <div className={styles.scrollableMain} onScroll={handleScroll}>
-          <div className={styles.mainContent}>
-            <Timeline />
-            <div className={styles.tracks}>
-              {renderableTracks}
+            <div className={styles.tracks} onScroll={handleScroll} ref={tracksRef}>
+              {tracksLoading ? <Spinner /> : renderableTracks}
             </div>
           </div>
         </div>
       </div>
-      <PlayBackControls />
+      <PlayBackControls style={{ 'pointer-events': 'none' }} />
+      <SongPicker songs={[exampleSong]} />
     </div>
+
   );
 });
 

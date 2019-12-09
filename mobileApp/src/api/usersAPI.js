@@ -483,3 +483,110 @@ export function unfollowUser(token, username) {
             return error
         });
 }
+
+export function getFollowers(username, token) {
+
+    let url = `${API_URL}api/v1/users/followers?username=${username}`;
+    var request = new Request(url, {
+        method: "GET",
+        headers: new Headers({
+            "Content-Type": "application/json",
+            "Authorization": 'Bearer ' + token,
+        }),
+    });
+    if (__DEV__) {
+        console.log("getFollowers : request " + JSON.stringify(request))
+    }
+
+    return fetch(request)
+        .then(response => {
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
+        })
+        .then(responseJson => {
+            if (__DEV__) {
+                console.log("getFollowers : response " + JSON.stringify(responseJson))
+            }
+            return responseJson;
+        })
+        .catch(error => {
+            if (__DEV__) {
+                console.log("getFollowers : error " + JSON.stringify(error))
+            }
+            return error
+        });
+}
+
+export function getFollowing(username, token) {
+
+    let url = `${API_URL}api/v1/users/following?username=${username}`;
+    var request = new Request(url, {
+        method: "GET",
+        headers: new Headers({
+            "Content-Type": "application/json",
+            "Authorization": 'Bearer ' + token,
+        }),
+    });
+    if (__DEV__) {
+        console.log("getFollowing : request " + JSON.stringify(request))
+    }
+
+    return fetch(request)
+        .then(response => {
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
+        })
+        .then(responseJson => {
+            if (__DEV__) {
+                console.log("getFollowing : response " + JSON.stringify(responseJson))
+            }
+            return responseJson;
+        })
+        .catch(error => {
+            if (__DEV__) {
+                console.log("getFollowing : error " + JSON.stringify(error))
+            }
+            return error
+        });
+}
+
+export function getUserTimeline(token, posts_only, songs_only) {
+
+    let url = `${API_URL}api/v1/users/timeline`;
+    if (posts_only) {
+        url = url + `?posts_only=${posts_only}`
+    } else if (songs_only) {
+        url = url + `?songs_only=${songs_only}`
+    }
+    var request = new Request(url, {
+        method: "GET",
+        headers: new Headers({
+            "Content-Type": "application/json",
+            "Authorization": 'Bearer ' + token,
+        }),
+    });
+    if (__DEV__) {
+        console.log("getUserTimeline : request " + JSON.stringify(request))
+    }
+
+    return fetch(request)
+        .then(response => {
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
+        })
+        .then(responseJson => {
+            if (__DEV__) {
+                console.log("getUserTimeline : response " + JSON.stringify(responseJson))
+            }
+            return responseJson;
+        })
+        .catch(error => {
+            if (__DEV__) {
+                console.log("getUserTimeline : error " + JSON.stringify(error))
+            }
+            return error
+        });
+}

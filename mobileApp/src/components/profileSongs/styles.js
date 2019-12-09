@@ -62,6 +62,7 @@ export default StyleSheet.create({
     textShadowColor: '#666',
   },
   authorNameText: {
+    paddingLeft: 5,
     color: '#FFF',
     fontSize: 14,
     marginTop: 5,
@@ -74,5 +75,32 @@ export default StyleSheet.create({
     color: '#FFF',
     fontSize: 16,
     width: width,
-  }
+  },
+  likes: {
+    fontSize: 18,
+    color: '#FFF',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 1,
+    textShadowColor: '#666',
+  },
+  likeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    position: 'absolute',
+    bottom: 0,
+    right: 0
+  },
+  likeImg: {
+
+  },
+  userContainer: {
+    paddingTop: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  profilePic: {
+    width: 25,
+    height: 25,
+    borderRadius: 13,
+  },
 })

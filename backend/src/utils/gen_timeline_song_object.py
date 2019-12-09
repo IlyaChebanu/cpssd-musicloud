@@ -16,10 +16,12 @@ def gen_timeline_song_object(song_list):
         "username": song_list[1],
         "title": song_list[2],
         "duration": song_list[3],
-        "created": song_list[4],
+        "created": song_list[6],
         "public": song_list[5],
         "url": song_list[7],
         "cover": song_list[8],
         "likes": song_list[10],
-        "type": song_list[11]
+        "profiler": song_list[11],
+        "like_status": song_list[12],
+        "type": song_list[13]
     }

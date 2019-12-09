@@ -92,6 +92,7 @@ export default class MusicPlayer extends React.Component {
     render() {
         let profilePic = require('../../assets/images/profilePlaceholder.png')
         let goBackButton = require('../../assets/images/black_arrow_down.png')
+        let placeholderImg = require('../../assets/images/cloud.png')
         let songImage = this.state.songData[7]
         let playButtonImg = this.state.isPaused ? require('../../assets/images/play_arrow.png') : require('../../assets/images/pause.png')
         return (
@@ -110,17 +111,17 @@ export default class MusicPlayer extends React.Component {
                     controls={true}
                     style={styles.backgroundVideo} />
 
-                <Image source={{ uri: songImage }} style={styles.songImg} />
+                {songImage ? <Image source={{ uri: songImage }} style={styles.songImg} /> : <Image style={styles.songImg} source={placeholderImg} />}
                 <TouchableOpacity onPress={() => this.handleGoBack()} >
                     <Image source={goBackButton} style={styles.goBackButton} />
                 </TouchableOpacity>
                 <View style={styles.textContainer}>
-                    <Text style={styles.songNameText}>{this.state.songData[2]}</Text>
+                    <Text style={styles.songNameText}>{this.state.songData.title}</Text>
                     <TouchableOpacity onPress={() => this.handleProfileClick()} >
                         <View style={styles.profileContainer}>
                             {this.props.profilePic ? <Image style={styles.profilePic} source={{ uri: this.props.profilePic }} /> :
                                 <Image style={styles.profilePic} source={profilePic} />}
-                            <Text style={styles.songAuthorText}>{this.state.songData[1]}</Text>
+                            <Text style={styles.songAuthorText}>{this.state.songData.username}</Text>
                         </View>
                     </TouchableOpacity>
                 </View>

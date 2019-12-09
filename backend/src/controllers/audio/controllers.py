@@ -15,7 +15,8 @@ from ...middleware.auth_required import auth_required
 from ...middleware.sql_err_catcher import sql_err_catcher
 from ...utils.logger import log
 from ...utils import (
-    permitted_to_edit, gen_scroll_tokens, gen_song_object, gen_playlist_object
+    permitted_to_edit, gen_scroll_tokens, gen_song_object, gen_playlist_object,
+    notification_sender
 )
 from ...models.audio import (
     insert_song, insert_song_state, get_song_state, get_all_compiled_songs,
@@ -28,7 +29,8 @@ from ...models.audio import (
     delete_playlist, get_playlists, get_number_of_playlists,
     get_number_of_songs_in_playlist, get_playlist_data, add_to_playlist,
     remove_from_playlist, get_from_playlist, update_playlist_timestamp,
-    update_playlist_name, update_publised_timestamp
+    update_playlist_name, update_publised_timestamp, notify_like_dids,
+    notify_song_dids, update_song_name
 )
 from ...models.users import get_user_via_username
 from ...models.errors import NoResults
@@ -76,6 +78,41 @@ def create_song(user_data):
     return {
         "message": "Your song project has been created", "sid": row_id
     }, 200
+
+
+@AUDIO.route("/rename", methods=["PATCH"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def rename_song(user_data):
+    """
+    Endpoint for renaming new song.
+    """
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "sid": {
+                "type": "integer",
+                "minimum": 1
+            },
+            "title": {
+                "type": "string",
+                "minLength": 1
+            }
+        },
+        "required": ["sid", "title"]
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    if not permitted_to_edit(request.json.get("sid"), user_data.get("uid")):
+        return {"message": "You can't rename that song!"}, 401
+
+    update_song_name(request.json.get("title"), request.json.get("sid"))
+
+    return {"message": "Song renamed"}, 200
 
 
 @AUDIO.route("/state", methods=["POST"])
@@ -129,14 +166,14 @@ def load_song(user_data):
     if not sid:
         return {"message": "sid param can't be empty!"}, 422
     if permitted_to_edit(sid, user_data.get("uid")):
-        return {"song_state": get_song_state(sid)}, 200
+        return {"song_state": json.loads(get_song_state(sid))}, 200
     return {"message": "You are not permitted to edit song: " + sid}, 403
 
 
 @AUDIO.route("/compiled_songs", methods=["GET"])
 @sql_err_catcher()
-@auth_required()
-def get_compiled_songs():  # pylint: disable=R0912,R0915
+@auth_required(return_user=True)
+def get_compiled_songs(user_data):  # pylint: disable=R0912,R0915
     """
     Endpoint for getting all publicly available songs.
     """
@@ -176,11 +213,11 @@ def get_compiled_songs():  # pylint: disable=R0912,R0915
 
         if uid:
             compiled_songs = get_all_compiled_songs_by_uid(
-                uid, start_index, songs_per_page
+                uid, start_index, songs_per_page, user_data.get("uid")
             )
         else:
             compiled_songs = get_all_compiled_songs(
-                start_index, songs_per_page
+                start_index, songs_per_page, user_data.get("uid")
             )
 
         res = []
@@ -226,11 +263,11 @@ def get_compiled_songs():  # pylint: disable=R0912,R0915
     if username:
         uid = get_user_via_username(username)[0][0]
         compiled_songs = get_all_compiled_songs_by_uid(
-            uid, start_index, songs_per_page
+            uid, start_index, songs_per_page, user_data.get("uid")
         )
     else:
         compiled_songs = get_all_compiled_songs(
-            start_index, songs_per_page
+            start_index, songs_per_page, user_data.get("uid")
         )
 
     res = []
@@ -259,8 +296,8 @@ def get_compiled_songs():  # pylint: disable=R0912,R0915
 
 @AUDIO.route("/song", methods=["GET"])
 @sql_err_catcher()
-@auth_required()
-def get_song():
+@auth_required(return_user=True)
+def get_song(user_data):
     """
     Endpoint for getting info for a single song.
     """
@@ -268,7 +305,7 @@ def get_song():
     if not sid:
         return {"message": "sid param can't be empty!"}, 422
 
-    song = get_song_data(sid)[0]
+    song = get_song_data(sid, user_data.get("uid"))[0]
     res = gen_song_object(song)
     return {"song": res}, 200
 
@@ -297,7 +334,7 @@ def like_song(user_data):
         return {"message": str(exc)}, 422
 
     try:
-        get_song_data(request.json.get("sid"))
+        get_song_data(request.json.get("sid"), user_data.get("uid"))
     except NoResults:
         return {"message": "Song does not exist!"}, 400
 
@@ -305,6 +342,15 @@ def like_song(user_data):
 
     if (user_data.get("uid"), request.json.get("sid")) not in like_pair:
         post_like(user_data.get("uid"), request.json.get("sid"))
+
+    try:
+        dids = []
+        for did in notify_like_dids(request.json.get("sid")):
+            dids += did
+        message = user_data.get("username") + " just liked your song!"
+        notification_sender(message, dids, "New Like")
+    except NoResults:
+        pass
 
     return {"message": "Song liked"}, 200
 
@@ -440,8 +486,8 @@ def get_editable_songs(user_data):
 
 @AUDIO.route("/liked_songs", methods=["GET"])
 @sql_err_catcher()
-@auth_required()
-def get_liked_songs():
+@auth_required(return_user=True)
+def get_liked_songs(user_data):
     """
     Endpoint for getting all the songs a user has liked.
     """
@@ -479,7 +525,7 @@ def get_liked_songs():
         start_index = (current_page * songs_per_page) - songs_per_page
 
         liked_songs = get_all_liked_songs_by_uid(
-            uid, start_index, songs_per_page
+            uid, start_index, songs_per_page, user_data.get("uid")
         )
 
         res = []
@@ -524,7 +570,7 @@ def get_liked_songs():
 
     uid = get_user_via_username(username)[0][0]
     liked_songs = get_all_liked_songs_by_uid(
-        uid, start_index, songs_per_page
+        uid, start_index, songs_per_page, user_data.get("uid")
     )
 
     res = []
@@ -582,6 +628,15 @@ def publish_song(user_data):
         request.json.get("sid"),
         str(datetime.datetime.utcnow())
     )
+
+    try:
+        dids = []
+        for did in notify_song_dids(user_data.get("uid")):
+            dids += did
+        message = user_data.get("username") + " just dropped a new song!"
+        notification_sender(message, dids, "New Song")
+    except NoResults:
+        pass
 
     return {"message": "Song published."}, 200
 
@@ -959,7 +1014,9 @@ def get_my_playlist_songs(user_data):  # pylint: disable=R0911
 
         start_index = (current_page * songs_per_page) - songs_per_page
 
-        songs = get_playlist_data(pid, start_index, songs_per_page)
+        songs = get_playlist_data(
+            pid, start_index, songs_per_page, user_data.get("uid")
+        )
 
         res = []
         for song in songs:
@@ -1001,7 +1058,9 @@ def get_my_playlist_songs(user_data):  # pylint: disable=R0911
     total_pages = token.get("total_pages")
     start_index = (current_page * songs_per_page) - songs_per_page
 
-    songs = get_playlist_data(pid, start_index, songs_per_page)
+    songs = get_playlist_data(
+        pid, start_index, songs_per_page, user_data.get("uid")
+    )
 
     res = []
     for song in songs:
@@ -1062,7 +1121,9 @@ def add_song_to_playlist(user_data):  # pylint: disable=R0911
         return {"message": "Not permitted to add to that playlist"}, 401
 
     try:
-        song_data = get_song_data(request.json.get('sid'))[0]
+        song_data = get_song_data(
+            request.json.get('sid'), user_data.get("uid")
+        )[0]
         if not song_data[5] or not song_data[6]:
             return {"message": "That song is private"}, 401
     except NoResults:

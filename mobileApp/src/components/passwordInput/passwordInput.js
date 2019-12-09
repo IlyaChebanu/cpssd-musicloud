@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, TouchableOpacity, Image, Text, TextInput, Platform } from 'react-native';
+import { View, TouchableOpacity, Image, Text, TextInput, Platform, Animated } from 'react-native';
 import GLOBALS from '../../utils/globalStrings';
 import styles from './styles';
 
@@ -28,6 +28,9 @@ export default class PasswordInput extends Component {
         if (prevProps.editable != this.props.editable) {
             this.setState({ editable: this.props.editable })
         }
+        if (prevProps.style != this.props.style) {
+            this.setState({ style: this.props.style })
+        }
     }
 
     togglePassword() {
@@ -51,10 +54,18 @@ export default class PasswordInput extends Component {
         this.textInput.focus()
     }
 
+    clearText() {
+        this.textInput.clear()
+    }
+
+    clearFocus() {
+        this.textInput.blur()
+    }
+
     render() {
-        let visibleImg = this.state.maskPassword ? require("../../assets/images/visibility.png") : require("../../assets/images/visibility_off.png")
+        let visibleImg = this.state.maskPassword ? require("../../assets/images/visibility_off.png") : require("../../assets/images/visibility.png")
         return (
-            <View style={[this.props.style, styles.container, !this.state.editable && styles.disabledContainer]} >
+            <Animated.View style={[this.props.style, styles.container, !this.state.editable && styles.disabledContainer]} >
                 <TouchableOpacity activeOpacity={1} onPress={() => this.handleInputClick()}>
                     <View style={styles.subContainer} >
                         <Text style={this.state.editable ? styles.loginLabelName : styles.disableLabelName}>{this.state.labelName}</Text>
@@ -76,7 +87,7 @@ export default class PasswordInput extends Component {
                     </TouchableOpacity >
 
                 </TouchableOpacity>
-            </View >
+            </Animated.View >
         )
     }
 } 

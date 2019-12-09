@@ -7,7 +7,7 @@ import history from '../history';
 
 axios.interceptors.response.use((res) => res, (err) => {
   const state = store.getState();
-  const res = err.response;
+  const res = err.response || { status: null };
   if ([500, 422].includes(res.status)) {
     store.dispatch(showNotification({
       message: 'An unknown error has occured. Please contact the site owners.',
@@ -27,8 +27,13 @@ axios.interceptors.response.use((res) => res, (err) => {
         message: 'Permission to perform action denied.',
       }));
     }
+    if (res.status === 404) {
+      store.dispatch(showNotification({
+        message: 'Object not found.',
+      }));
+    }
   }
-  return err.response;
+  return res;
 });
 
 const API_URL = 'http://dcumusicloud.com:5000/api';
@@ -74,38 +79,23 @@ const generatePresignedPost = (dir, filename, filetype) => axios.post(
 
 const putMedia = (signedUrl, file, options) => axios.put(
   signedUrl, file, options,
-).catch((e) => e.response);
+);
 
 // TODO: use extra params to make use of signed url without public access to the bucket
-const makeSignedUrl = (object) => {
-  const url = new URL(object.url + object.fields.key);
-  return url.href;
-};
+const makeSignedUrl = (object) => (new URL(object.url + object.fields.key)).href;
 
 export const uploadFile = async (dir, f) => {
   let url = '';
-  try {
-    const res = await generatePresignedPost(dir, f.name, f.type);
-
-    const options = {
+  const res = await generatePresignedPost(dir, f.name, f.type);
+  if (res.status === 200) {
+    url = makeSignedUrl(res.data.signed_url);
+    await putMedia(url, f, {
       headers: {
         'Content-Type': f.type,
       },
-    };
-    if (res.status === 200) {
-      const data = new FormData();
-      data.append('file', f.file);
-      const putAudio = async () => {
-        url = makeSignedUrl(res.data.signed_url);
-
-        await putMedia(url, data, options);
-      };
-      putAudio();
-    }
-  } catch (err) {
-    return err.response;
+    });
   }
-  return url.toString();
+  return url;
 };
 
 export const saveState = (songId, songState) => axios.post(
@@ -118,6 +108,75 @@ export const saveState = (songId, songState) => axios.post(
 
 export const getUserDetails = (username) => axios.get(
   `${API_URL}/v1/users?username=${username}`,
+  {
+    headers: getAuth(),
+  },
+);
+
+export const patchUserDetails = (reqData) => axios.patch(
+  `${API_URL}/v1/users`,
+  reqData,
+  {
+    headers: getAuth(),
+  },
+);
+
+export const getEditableSongs = () => axios.get(
+  `${API_URL}/v1/audio/editable_songs?songs_per_page=100`,
+  {
+    headers: getAuth(),
+  },
+);
+
+export const getSongState = (sid) => axios.get(
+  `${API_URL}/v1/audio/state?sid=${sid}`,
+  {
+    headers: getAuth(),
+  },
+);
+
+export const createNewSong = (title) => axios.post(
+  `${API_URL}/v1/audio`,
+  { title },
+  {
+    headers: getAuth(),
+  },
+);
+
+export const patchSongName = (sid, title) => axios.patch(
+  `${API_URL}/v1/audio/rename`,
+  { sid, title },
+  {
+    headers: getAuth(),
+  },
+);
+
+export const getTimeline = () => axios.get(
+  `${API_URL}/v1/users/timeline`,
+  {
+    headers: getAuth(),
+  },
+);
+
+export const likeSong = (sid) => axios.post(
+  `${API_URL}/v1/audio/like`,
+  { sid },
+  {
+    headers: getAuth(),
+  },
+);
+
+export const unlikeSong = (sid) => axios.post(
+  `${API_URL}/v1/audio/unlike`,
+  { sid },
+  {
+    headers: getAuth(),
+  },
+);
+
+export const createPost = (message) => axios.post(
+  `${API_URL}/v1/users/post`,
+  { message },
   {
     headers: getAuth(),
   },

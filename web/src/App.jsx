@@ -13,6 +13,8 @@ import Registration from './pages/Registration/Registration';
 import Reverify from './pages/Reverify/Reverify';
 import Studio from './pages/Studio/Studio';
 import Profile from './pages/Profile/Profile';
+import Settings from './pages/Settings/Settings';
+import Feed from './pages/Feed/Feed';
 
 
 const App = () => (
@@ -28,6 +30,8 @@ const App = () => (
       <Route path="/discover" component={Discover} />
       <Route path="/studio" component={Studio} />
       <Route path="/profile" component={Profile} />
+      <Route path="/settings" component={Settings} />
+      <Route path="/feed" component={Feed} />
     </Switch>
   </Router>
 );

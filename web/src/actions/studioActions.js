@@ -108,6 +108,13 @@ export const setGridSize = (gridSize) => (dispatch) => {
   });
 };
 
+export const setGridWidth = (width) => (dispatch) => {
+  dispatch({
+    type: 'SET_GRID_WIDTH',
+    width,
+  });
+};
+
 export const setGridSnapEnabled = (bool) => (dispatch) => {
   dispatch({
     type: 'SET_GRID_SNAP_ENABLED',
@@ -141,5 +148,38 @@ export const setClipboard = (sample) => (dispatch) => {
   dispatch({
     type: 'SET_CLIPBOARD',
     sample,
+  });
+};
+
+export const setSongTitle = (title) => (dispatch) => {
+  dispatch({
+    type: 'SET_SONG_TITLE',
+    title,
+  });
+};
+
+export const hideSongPicker = () => (dispatch) => {
+  dispatch({
+    type: 'SONG_PICKER_HIDE',
+  });
+};
+
+export const showSongPicker = () => (dispatch) => {
+  dispatch({
+    type: 'SONG_PICKER_SHOW',
+  });
+};
+
+export const setSongName = (songName) => (dispatch) => {
+  dispatch({
+    type: 'SET_SONG_NAME',
+    songName,
+  });
+};
+
+export const setSongId = (songId) => (dispatch) => {
+  dispatch({
+    type: 'SET_SONG_ID',
+    songId,
   });
 };

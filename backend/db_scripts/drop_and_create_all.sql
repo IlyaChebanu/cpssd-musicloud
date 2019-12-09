@@ -6,18 +6,24 @@ DROP TABLE `musicloud_db`.`Posts`;
 DROP TABLE `musicloud_db`.`Logins`;
 DROP TABLE `musicloud_db`.`Followers`;
 DROP TABLE `musicloud_db`.`Song_State`;
-DROP TABLE `musicloud_db`.`Users`;
-DROP TABLE `musicloud_db`.`Songs`;
-DROP TABLE `musicloud_db`.`Playlists`;
 DROP TABLE `musicloud_db`.`Playlist_State`;
+DROP TABLE `musicloud_db`.`Notifications`;
+DROP TABLE `musicloud_db`.`Playlists`;
+DROP TABLE `musicloud_db`.`Songs`;
+DROP TABLE `musicloud_db`.`Users`;
+
 
 CREATE TABLE `musicloud_db`.`Users` (
     `uid` INT UNIQUE NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `email` VARCHAR(255) NOT NULL UNIQUE,
     `username` VARCHAR(100) NOT NULL UNIQUE,
-    `password` VARCHAR(100) NOT NULL,
+    `password` TEXT NOT NULL,
     `verified` TINYINT DEFAULT 0,
-    `profiler` VARCHAR(255)
+    `profiler` VARCHAR(255),
+    `silence_follow_notifcation` TINYINT DEFAULT 0,
+    `silence_post_notifcation` TINYINT DEFAULT 0,
+    `silence_song_notifcation` TINYINT DEFAULT 0,
+    `silence_like_notifcation` TINYINT DEFAULT 0
 );
 
 CREATE TABLE `musicloud_db`.`Songs` (
@@ -103,4 +109,10 @@ CREATE TABLE `musicloud_db`.`Playlist_State` (
     `sid` INT NOT NULL,
     FOREIGN KEY (sid) REFERENCES Songs(sid),
     FOREIGN KEY (pid) REFERENCES Playlists(pid)
+);
+
+CREATE TABLE `musicloud_db`.`Notifications` (
+    `did` VARCHAR(255) NOT NULL UNIQUE PRIMARY KEY,
+    `uid` INT NOT NULL,
+    FOREIGN KEY (uid) REFERENCES Users(uid)
 );

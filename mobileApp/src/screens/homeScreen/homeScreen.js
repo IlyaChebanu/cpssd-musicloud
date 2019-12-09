@@ -25,7 +25,7 @@ class HomeScreen extends React.Component {
 
   getOtherUserDetails(username) {
     getUserInfo(username, this.props.token).then(response => {
-      if (response.status===200) {
+      if (response.status === 200) {
         this.props.setOtherUserData(response.data)
       }
     })
@@ -33,18 +33,18 @@ class HomeScreen extends React.Component {
 
   handleSongClick(item, index) {
     this.props.setSongData(item)
-    this.props.setSongId(item[0])
-    this.props.setSongUrl(item[6])
-    this.getOtherUserDetails(item[1])
+    this.props.setSongId(item.sid)
+    this.props.setSongUrl(item.url)
+    this.getOtherUserDetails(item.username)
     this.props.navigateToMusicPlayerScreen()
   }
 
   getSongs() {
-    getCompiledSongs(this.props.token, '', 10).then(response => {
+    getCompiledSongs(this.props.token, '').then(response => {
       if (response.status === 200) {
-        this.setState({ songsData: response.data.compiled_songs})
+        this.setState({ songsData: response.data.songs })
       } else {
-        
+
       }
     })
   }
@@ -59,18 +59,23 @@ class HomeScreen extends React.Component {
   }
 
   renderSong({ item, index }) {
-    let songName = item[2]
-    let authorName = item[1]
-    let songImage = item[7]
-    let genre = item[8]
+    let songName = item.title
+    let authorName = item.username
+    let songImage = item.cover
     let playImage = require('../../assets/images/play.png')
+    let songLikes = item.likes
+    let likeImg = require('../../assets/images/like.png')
+    let placeholderImg = require('../../assets/images/cloud.png')
     return (
       <TouchableOpacity style={styles.songContainer} onPress={() => this.handleSongClick(item, index)}>
-        <Image style={styles.songImage} source={{uri: songImage}} />
+        {songImage ? <Image style={styles.songImage} source={{ uri: songImage }} /> : <Image style={styles.songImage} source={placeholderImg} />}
         <Image style={styles.playImage} source={playImage} />
         <View style={styles.songDetailsContainer}>
           <Text style={styles.songNameText}>{songName}</Text>
           <Text style={styles.authorNameText}>{authorName}</Text>
+          <View style={styles.likeContainer}>
+            <Text style={styles.likes}>{songLikes}</Text><Image style={styles.likeImg} source={likeImg} />
+          </View>
         </View>
       </TouchableOpacity>
     );
@@ -86,7 +91,7 @@ class HomeScreen extends React.Component {
             style={styles.discoverFlatList}
             data={this.state.songsData}
             renderItem={this.renderSong.bind(this)}
-            keyExtractor={item => String(item)}
+            keyExtractor={item => String(item.sid)}
             extraData={this.state.songsData}
           />
         </View>

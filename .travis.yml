@@ -3,18 +3,20 @@ matrix:
     - language: python
       python:
         - "3.6"
+      before_install:
+        - cd backend
       install:
-        - pip install -r backend/requirements.txt
+        - pip install -r requirements.txt
       script:
-        - pytest --cov-fail-under=65 --cov=backend/src backend/tests && pylint backend/
+        - pytest --cov-fail-under=65 --cov=src/ tests/ && pylint src/ tests/ run.py
     - language: node_js
       node_js:
         - node
       cache: npm
+      before_install:
+        - cd web
       install:
-        - npm install web/
-      before_script:
-        - cd web/
+        - npm install
       script: npm run lint
 
 notifications:
