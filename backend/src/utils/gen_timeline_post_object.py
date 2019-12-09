@@ -16,5 +16,5 @@ def gen_timeline_post_object(post_list):
         "created": post_list[6],
         "message": post_list[9],
         "profiler": post_list[11],
-        "type": post_list[13]
+        "type": post_list[14]
     }
