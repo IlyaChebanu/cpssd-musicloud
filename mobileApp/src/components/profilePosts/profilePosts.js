@@ -93,7 +93,7 @@ export default class ProfilePosts extends React.Component {
           style={styles.postFlatList}
           data={this.state.posts}
           renderItem={this.renderPost.bind(this)}
-          keyExtractor={item => String(item)}
+          keyExtractor={item => String(item.created)}
           extraData={this.state.posts}
         />
       </View>

@@ -14,6 +14,8 @@ export default StyleSheet.create({
   },
   followContainer: {
     flex: 1,
+    position: 'absolute',
+    top: 80,
   },
   followTabs: {
     flexDirection: 'row',
@@ -25,6 +27,8 @@ export default StyleSheet.create({
   },
   likedSongsContainer: {
     flex: 1,
+    position: 'absolute',
+    top: 80,
   },
   profileTabs: {
     flexDirection: 'row',
