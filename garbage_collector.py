@@ -1,11 +1,19 @@
 """
 Garbage collection script
 """
-import traceback
+import os
 
 import mysql.connector
 
-from ..config import MYSQL_CONFIG
+
+# MySQL credentials for our RDS instance.
+MYSQL_CONFIG = {
+    'user': os.environ['MUSICLOUD_DB_USER'],
+    'password': os.environ['MUSICLOUD_DB_PASSWORD'],
+    'host': 'musicloud.c3aguwab64mp.eu-west-1.rds.amazonaws.com',
+    'database': 'musicloud_db',
+    'raise_on_warnings': True
+}
 
 
 def query(query_string, query_args, get_row=False, get_insert_row_id=False):
@@ -50,3 +58,7 @@ def query(query_string, query_args, get_row=False, get_insert_row_id=False):
         return res
     except mysql.connector.errors.IntegrityError:
         raise mysql.connector.errors.IntegrityError
+
+
+def main():
+
