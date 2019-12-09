@@ -34,13 +34,13 @@ export default class MultiPurposeButton extends Component {
 
     render() {
         return (
-            <View style={this.state.style}>
+            <Animated.View style={this.state.style}>
                 <TouchableOpacity style={styles.buttonContainer} onPress={() => this.handleButtonClick()}>
                     <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} colors={['#FF0265', '#E78D35']} style={styles.button}>
                         <Text style={styles.buttonLabelName}>{this.state.buttonName}</Text>
                     </LinearGradient>
                 </TouchableOpacity>
-            </View>
+            </Animated.View>
         )
     }
 }
