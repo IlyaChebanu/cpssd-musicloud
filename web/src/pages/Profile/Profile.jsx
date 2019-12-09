@@ -1,5 +1,5 @@
 import React, {
-  memo, useEffect, useState, useMemo, useCallback
+  memo, useEffect, useState, useMemo, useCallback,
 } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -9,7 +9,7 @@ import PostCard from '../../components/PostCard/PostCard';
 import ProfileBlock from '../../components/ProfileBlock';
 import AddPost from '../../components/AddPost';
 import { useUpdateUserDetails } from '../../helpers/hooks';
-import {getCompiledSongs, getTimeline, getUserPosts} from '../../helpers/api';
+import { getCompiledSongs, getUserPosts } from '../../helpers/api';
 import OwnSongCard from '../../components/OwnSongCard';
 import Spinner from '../../components/Spinner';
 import { hideSongPicker, setSongId, setSongName } from '../../actions/studioActions';
@@ -45,7 +45,7 @@ const Profile = memo((props) => {
     if (res.status === 200) {
       setGotPosts(res.data.posts);
     }
-  }, []);
+  }, [username]);
 
   useEffect(() => {
     refreshPosts();
