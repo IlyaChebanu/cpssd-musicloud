@@ -96,7 +96,11 @@ const Profile = memo((props) => {
 
       <div className={styles.contentWrapper}>
         <title className={styles.sectionTitle}>Posts</title>
-        {username === user.username ? <AddPost /> : <div />}
+        {
+          username === user.username
+            ? <AddPost placeholder={`What do you want to say ${username}?`} />
+            : <div />
+        }
         <div className={styles.blogs}>
           {loadingPosts ? <Spinner /> : ownPostCards}
         </div>
