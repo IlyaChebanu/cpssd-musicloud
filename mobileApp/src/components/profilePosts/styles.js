@@ -53,11 +53,28 @@ export default StyleSheet.create({
     padding: 10,
     fontSize: 14,
   },
+  userContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    position: 'absolute',
+    bottom: 10,
+    left: 10,
+  },
+  username: {
+    paddingLeft: 10,
+    fontSize: 12,
+    color: '#FFF',
+  },
   timeAgo: {
     fontSize: 12,
     color: '#C3C3C3',
     position: 'absolute',
     bottom: 10,
-    left: 10
+    right: 10
+  },
+  profilePic: {
+    width: 25,
+    height: 25,
+    borderRadius: 13,
   },
 })

@@ -29,7 +29,7 @@ class UserProfileScreen extends React.Component {
   }
 
   render() {
-    var logoImage = require("../../assets/images/logo.png");
+    var logoImage = require("../../assets/images/logo1.png");
     var arrowDownImg = require("../../assets/images/arrow_down.png");
     return (
       <SafeAreaView forceInset={{ bottom: 'never' }} style={{ 'backgroundColor': '#3D4044', 'flex': 1 }}>

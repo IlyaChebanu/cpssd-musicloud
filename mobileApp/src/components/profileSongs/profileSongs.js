@@ -7,6 +7,7 @@ import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import ProfileComponent from "../profileComponent/profileComponent";
 import { getCompiledSongs } from "../../api/audioAPI";
+import { getUserTimeline } from "../../api/usersAPI";
 
 class ProfileSongs extends React.Component {
   constructor(props) {
@@ -21,11 +22,11 @@ class ProfileSongs extends React.Component {
   }
 
   getSongs() {
-    getCompiledSongs(this.props.accessToken, this.props.username).then(response => {
+    getUserTimeline(this.props.accessToken, false, true).then(response => {
       if (response.status === 200) {
-        this.setState({ songsData: response.data.songs})
+        this.setState({ songsData: response.data.timeline })
       } else {
-        
+
       }
     })
   }
@@ -40,7 +41,7 @@ class ProfileSongs extends React.Component {
   handleFollowerClick() {
     this.props.handleFollowersClick()
   }
-  
+
   handleFollowingClick() {
     this.props.handleFollowingsClick()
   }
@@ -53,11 +54,11 @@ class ProfileSongs extends React.Component {
     return (
       <View style={styles.container}>
         <Text style={styles.profileTitleText}>{"PROFILE"}</Text>
-        <ProfileComponent 
-          handleFollowerClick={this.handleFollowerClick.bind(this)} 
-          handleFollowingClick={this.handleFollowingClick.bind(this)} 
-          handleLikedSongClick={this.handleLikedSongClick.bind(this)} 
-          accessToken={this.props.accessToken} 
+        <ProfileComponent
+          handleFollowerClick={this.handleFollowerClick.bind(this)}
+          handleFollowingClick={this.handleFollowingClick.bind(this)}
+          handleLikedSongClick={this.handleLikedSongClick.bind(this)}
+          accessToken={this.props.accessToken}
           username={this.props.username} />
         <Text style={styles.titleText}>{"Songs"}</Text>
         {this.state.songsData.length === 0 ? <Text style={styles.noSongsText}>{'User has no songs yet'}</Text> : null}
@@ -72,13 +73,20 @@ class ProfileSongs extends React.Component {
     let playImage = require('../../assets/images/play.png')
     let songLikes = item.likes
     let likeImg = require('../../assets/images/like.png')
+    let placeholderImg = require('../../assets/images/cloud.png')
+    let profilePicUrl = item.profiler
+    let profilePic = require('../../assets/images/profilePlaceholder.png')
     return (
       <TouchableOpacity style={styles.songContainer} onPress={() => this.handleSongClick(item, index)}>
-        <Image style={styles.songImage} source={{uri: songImage}} />
+        {songImage ? <Image style={styles.songImage} source={{ uri: songImage }} /> : <Image style={styles.songImage} source={placeholderImg} />}
         <Image style={styles.playImage} source={playImage} />
         <View style={styles.songDetailsContainer}>
           <Text style={styles.songNameText}>{songName}</Text>
-          <Text style={styles.authorNameText}>{authorName}</Text>
+          <View style={styles.userContainer}>
+            {profilePicUrl ? <Image style={styles.profilePic} source={{ uri: profilePicUrl }} /> :
+              <Image style={styles.profilePic} source={profilePic} />}
+            <Text style={styles.authorNameText}>{authorName}</Text>
+          </View>
           <View style={styles.likeContainer}>
             <Text style={styles.likes}>{songLikes}</Text><Image style={styles.likeImg} source={likeImg} />
           </View>

@@ -92,6 +92,7 @@ export default class MusicPlayer extends React.Component {
     render() {
         let profilePic = require('../../assets/images/profilePlaceholder.png')
         let goBackButton = require('../../assets/images/black_arrow_down.png')
+        let placeholderImg = require('../../assets/images/cloud.png')
         let songImage = this.state.songData[7]
         let playButtonImg = this.state.isPaused ? require('../../assets/images/play_arrow.png') : require('../../assets/images/pause.png')
         return (
@@ -110,7 +111,7 @@ export default class MusicPlayer extends React.Component {
                     controls={true}
                     style={styles.backgroundVideo} />
 
-                <Image source={{ uri: songImage }} style={styles.songImg} />
+                {songImage ? <Image source={{ uri: songImage }} style={styles.songImg} /> : <Image style={styles.songImg} source={placeholderImg} />}
                 <TouchableOpacity onPress={() => this.handleGoBack()} >
                     <Image source={goBackButton} style={styles.goBackButton} />
                 </TouchableOpacity>

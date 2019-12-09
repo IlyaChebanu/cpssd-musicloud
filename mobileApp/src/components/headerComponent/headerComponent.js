@@ -9,7 +9,7 @@ export default class HeaderComponent extends React.Component {
     }
 
     render() {
-        var logoImage = require("../../assets/images/logo.png");
+        var logoImage = require("../../assets/images/logo1.png");
         var menuImage = require("../../assets/images/menu.png");
         var arrowBack = require("../../assets/images/back_arrow.png")
         return (
