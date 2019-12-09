@@ -139,7 +139,7 @@ const SongFeedCard = memo(({
           <div className={styles.coverWrapper} onMouseEnter={coverEnter} onMouseLeave={coverLeave}>
             <Img src={[coverImage, CloudQuestion]} alt="song cover art" loader={<Spinner />} style={coverStyle} />
             <LikeIcon className={`${styles.like} ${coverHover ? styles.hovered : ''}`} onClick={handleLikeSong} />
-            <LikeIcon className={`${styles.like} ${styles.likeGradient} ${!coverHover ? styles.hide : ''} ${songLiked ? styles.liked : ''}`} onClick={handleLikeSong} />
+            <LikeIcon className={`${styles.like} ${styles.likeGradient} ${!coverHover ? styles.hide : ''} ${songLiked ? styles.liked : ''}`} />
           </div>
           <div className={styles.songInfo}>
             <div className={styles.textBlock}>
