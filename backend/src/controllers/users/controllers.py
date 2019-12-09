@@ -253,8 +253,8 @@ def reverify():
 
 @USERS.route("", methods=["GET"])
 @sql_err_catcher()
-@auth_required()
-def user():
+@auth_required(return_user=True)
+def user(user_data):
     """
     Endpoint to get a user's information.
     """
@@ -262,25 +262,31 @@ def user():
     if not username:
         return {"message": "Username param can't be empty!"}, 422
 
-    user_data = get_user_via_username(username)
-    follower_data = get_follower_count(user_data[0][0])
-    following_data = get_following_count(user_data[0][0])
-    songs = get_song_count(user_data[0][0])
-    user_posts = get_number_of_posts(user_data[0][0])
-    likes = get_number_of_likes(user_data[0][0])
-
+    user_info = get_user_via_username(username)
+    follower_data = get_follower_count(user_info[0][0])
+    following_data = get_following_count(user_info[0][0])
+    songs = get_song_count(user_info[0][0])
+    user_posts = get_number_of_posts(user_info[0][0])
+    likes = get_number_of_likes(user_info[0][0])
+    if user_data.get("username").lower() == username.lower():
+        follow_status = None
+    else:
+        follow_status = len(
+            get_following_pair(user_data.get("uid"), user_info[0][0])
+        )
     return {
-        "profile_pic_url": user_data[0][5],
-        "username": user_data[0][2],
+        "profile_pic_url": user_info[0][5],
+        "username": user_info[0][2],
         "followers": follower_data,
         "following": following_data,
         "songs": songs,
         "posts": user_posts,
         "likes": likes,
-        "follow_notification_status": user_data[0][6],
-        "post_notification_status": user_data[0][7],
-        "song_notification_status": user_data[0][8],
-        "like_notification_status": user_data[0][9]
+        "follow_status": follow_status,
+        "follow_notification_status": user_info[0][6],
+        "post_notification_status": user_info[0][7],
+        "song_notification_status": user_info[0][8],
+        "like_notification_status": user_info[0][9]
     }, 200
 
 

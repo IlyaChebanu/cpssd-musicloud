@@ -642,6 +642,7 @@ class UserTests(unittest.TestCase):
             expected_body = {
                 'followers': 1,
                 'following': 2,
+                'follow_status': 0,
                 'likes': 5,
                 'follow_notification_status': 0,
                 'post_notification_status': 0,
