@@ -1,4 +1,5 @@
 /* eslint-disable no-nested-ternary */
+/* eslint-disable no-unused-vars */
 import React, {
   memo, useState, useCallback, useMemo, useRef,
 } from 'react';
@@ -148,7 +149,7 @@ const SongCard = memo((props) => {
             <LikeIcon className={styles.likeIcon} onClick={handleLikeSong} />
             <LikeIcon className={`${styles.likeIcon} ${styles.gradient} ${songLiked ? styles.liked : ''}`} />
           </div>
-          <p className={styles.likes}>{`${songLiked ? likes + 1 : likes}`}</p>
+          <p className={styles.likes}>{`${songLiked ? likes + 1 : likes} likes`}</p>
         </div>
         {playerShowing && audioPlayer}
       </div>
@@ -160,17 +161,24 @@ SongCard.propTypes = {
   className: PropTypes.string,
   id: PropTypes.number.isRequired,
   isLiked: PropTypes.bool,
-  coverImage: PropTypes.string.isRequired,
-  url: PropTypes.string.isRequired,
-  likes: PropTypes.number.isRequired,
-  title: PropTypes.string.isRequired,
-  username: PropTypes.string.isRequired,
-  profileImg: PropTypes.string.isRequired,
+  coverImage: PropTypes.string,
+  url: PropTypes.string,
+  likes: PropTypes.number,
+  title: PropTypes.string,
+  username: PropTypes.string,
+  profileImg: PropTypes.string,
 };
 
 SongCard.defaultProps = {
   className: '',
   isLiked: false,
+  coverImage: null,
+  url: '',
+  likes: null,
+  title: '',
+  username: '',
+  profileImg: null,
+
 };
 
 SongCard.displayName = 'SongCard';

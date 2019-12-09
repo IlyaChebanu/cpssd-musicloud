@@ -2373,6 +2373,7 @@ class UserTests(unittest.TestCase):
                 8,
                 "http://profiler.fake",
                 0,
+                "a description",
                 "song"
             ],
             [
@@ -2388,6 +2389,7 @@ class UserTests(unittest.TestCase):
                 "a message",
                 None,
                 "http://profiler.fake",
+                None,
                 None,
                 "post"
             ]
@@ -2407,7 +2409,7 @@ class UserTests(unittest.TestCase):
                 'timeline': [
                     {
                         'cover': 'http://cover.com',
-                        'created': '1986-08-09 11:22:40',
+                        'created': '2019-12-01 15:38:12',
                         'duration': 155000,
                         'likes': 8,
                         'profiler': "http://profiler.fake",
@@ -2417,6 +2419,7 @@ class UserTests(unittest.TestCase):
                         'type': 'song',
                         'url': 'http://fake.com',
                         'username': 'username',
+                        'description': 'a description',
                         'like_status': 0
                     },
                     {
@@ -2451,6 +2454,7 @@ class UserTests(unittest.TestCase):
                 "a message",
                 None,
                 "http://profiler.fake",
+                None,
                 None,
                 "post"
             ]
@@ -2509,6 +2513,7 @@ class UserTests(unittest.TestCase):
                 8,
                 "http://profiler.fake",
                 0,
+                'a description',
                 "song"
             ]
         ]
@@ -2535,7 +2540,7 @@ class UserTests(unittest.TestCase):
                 'timeline': [
                     {
                         'cover': 'http://cover.com',
-                        'created': '1986-08-09 11:22:40',
+                        'created': '2019-12-01 15:38:12',
                         'duration': 155000,
                         'likes': 8,
                         'public': 1,
@@ -2545,6 +2550,7 @@ class UserTests(unittest.TestCase):
                         'url': 'http://fake.com',
                         'username': 'username',
                         "profiler": "http://profiler.fake",
+                        'description': 'a description',
                         "like_status": 0
                     }
                 ],

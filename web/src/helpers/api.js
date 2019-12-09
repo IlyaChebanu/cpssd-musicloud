@@ -182,8 +182,31 @@ export const createPost = (message) => axios.post(
   },
 );
 
+export const getUserPosts = (username) => axios.get(
+  `${API_URL}/v1/users/posts?posts_per_page=100&username=${username}`,
+  {
+    headers: getAuth(),
+  },
+);
+
 export const getCompiledSongs = (username) => axios.get(
   `${API_URL}/v1/audio/compiled_songs?${username ? `username=${username}` : ''}`,
+  {
+    headers: getAuth(),
+  },
+);
+
+export const postFollow = (username) => axios.post(
+  `${API_URL}/v1/users/follow`,
+  { username },
+  {
+    headers: getAuth(),
+  },
+);
+
+export const postUnfollow = (username) => axios.post(
+  `${API_URL}/v1/users/unfollow`,
+  { username },
   {
     headers: getAuth(),
   },

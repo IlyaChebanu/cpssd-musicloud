@@ -206,7 +206,7 @@ const Header = memo((props) => {
           <Link to="/studio" className={selected === 0 ? styles.selected : ''}>Studio</Link>
           <Link to="/feed" className={selected === 1 ? styles.selected : ''}>Feed</Link>
           <Link to="/discover" className={selected === 2 ? styles.selected : ''}>Discover</Link>
-          <Link to="/profile" className={selected === 3 ? styles.selected : ''}>Profile</Link>
+          <Link to={`/profile?username=${user.username}`} className={selected === 3 ? styles.selected : ''}>Profile</Link>
         </nav>
         <div className={styles.pictureWrapper}>
           <CircularImage src={profilePicUrl} />
