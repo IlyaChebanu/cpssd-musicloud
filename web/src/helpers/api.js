@@ -181,3 +181,10 @@ export const createPost = (message) => axios.post(
     headers: getAuth(),
   },
 );
+
+export const getCompiledSongs = (username) => axios.get(
+  `${API_URL}/v1/audio/compiled_songs?${username ? `username=${username}` : ''}`,
+  {
+    headers: getAuth(),
+  },
+);
