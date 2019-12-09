@@ -61,4 +61,21 @@ def query(query_string, query_args, get_row=False, get_insert_row_id=False):
 
 
 def main():
+    try:
+        old_loging_removal_query = (
+            "DELETE FROM Logins WHERE time_issued < (NOW() - INTERVAL 7 DAY)"
+        )
+        query(old_loging_removal_query, ())
+        old_resets_removal_query = (
+            "DELETE FROM Resets WHERE time_issued < (NOW() - INTERVAL 30 "
+            "MINUTE)"
+        )
+        query(old_resets_removal_query, ())
+        print("Garbage collection successful")
+    except Exception as exc:
+        print("Garbage collection failed")
+        raise exc
 
+
+if __name__ == "__main__":
+    main()
