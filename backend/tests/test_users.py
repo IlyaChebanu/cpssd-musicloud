@@ -611,13 +611,14 @@ class UserTests(unittest.TestCase):
             )
         self.assertEqual(401, res.status_code)
 
+    @mock.patch('backend.src.controllers.users.controllers.get_following_pair')
     @mock.patch('backend.src.controllers.users.controllers.get_follower_count')
     @mock.patch('backend.src.controllers.users.controllers.get_following_count')
     @mock.patch('backend.src.controllers.users.controllers.get_song_count')
     @mock.patch('backend.src.controllers.users.controllers.get_number_of_posts')
     @mock.patch('backend.src.controllers.users.controllers.get_number_of_likes')
     @mock.patch('backend.src.controllers.users.controllers.get_user_via_username')
-    def test_get_user_success(self, mocked_user, likes, posts, songs, following, follower):  # pylint: disable=R0913
+    def test_get_user_success(self, mocked_user, likes, posts, songs, following, follower, follow_status):  # pylint: disable=R0913
         """
         Ensure getting a user's info is successful.
         """
@@ -626,6 +627,7 @@ class UserTests(unittest.TestCase):
         songs.return_value = 3
         following.return_value = 2
         follower.return_value = 1
+        follow_status.return_value = []
         mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 0, "http://image.fake", 0, 0, 0, 0]]
         test_req_data = {
             "username": "username",
