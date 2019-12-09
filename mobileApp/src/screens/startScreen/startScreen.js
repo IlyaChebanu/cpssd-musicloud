@@ -88,6 +88,7 @@ class StartScreen extends React.Component {
       this.props.setAuthToken(token)
       this.props.setUsername(username)
       this.props.navigateToHomeScreen()
+      animateTimingNative(this.animatedStartButtons, 0, 500, Easing.ease)
     } else {
       animateTimingNative(this.animatedStartButtons, 0, 500, Easing.ease)
     }

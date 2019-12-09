@@ -16,7 +16,7 @@ export const AppNavigator = createStackNavigator({
     [screenNames.MUSIC_PLAYER_SCREEN]: { screen: MusicPlayerScreen},
     [screenNames.USER_PROFILE_SCREEN]: { screen: userProfileScreen},
 }, {
-        initialRouteName: [screenNames.START_SCREEN],
+        initialRouteName: [screenNames.HOME_SCREEN],
         // Default config for all screens
         headerMode: "none",
         navigationOptions: {
