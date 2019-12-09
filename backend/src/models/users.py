@@ -636,9 +636,9 @@ def get_timeline(uid, start_index, items_per_page):
         "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid "
         "AND Song_Likes.uid=%s) AS like_status, "
         "'song' AS type FROM "
-        "Songs WHERE uid IN "
+        "Songs WHERE (uid IN "
         "(SELECT Followers.following FROM Followers WHERE follower=%s)"
-        " OR uid=%s AND public=1) UNION (SELECT NULL AS sid, "
+        " OR uid=%s) AND public=1) UNION (SELECT NULL AS sid, "
         "(SELECT username FROM Users WHERE Posts.uid=Users.uid) as usernanme"
         ", NULL AS title,"
         "NULL AS duration, NULL AS created, NULL AS public, time, NULL AS url,"
@@ -683,9 +683,9 @@ def get_timeline_length(uid):
         "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid "
         "AND Song_Likes.uid=%s) AS like_status, "
         "'song' AS type FROM "
-        "Songs WHERE uid IN "
+        "Songs WHERE (uid IN "
         "(SELECT Followers.following FROM Followers WHERE follower=%s)"
-        " OR uid=%s AND public=1) UNION (SELECT NULL AS sid, "
+        " OR uid=%s) AND public=1) UNION (SELECT NULL AS sid, "
         "(SELECT username FROM Users WHERE Posts.uid=Users.uid) as usernanme"
         ", NULL AS title,"
         "NULL AS duration, NULL AS created, NULL AS public, time, NULL AS url,"
@@ -798,9 +798,9 @@ def get_timeline_song_only(uid, start_index, items_per_page):
         "(SELECT profiler FROM Users WHERE Songs.uid=Users.uid) as profiler,"
         "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid "
         "AND Song_Likes.uid=%s) AS like_status, 'song' AS type FROM "
-        "Songs WHERE uid IN "
+        "Songs WHERE (uid IN "
         "(SELECT Followers.following FROM Followers WHERE follower=%s)"
-        " OR uid=%s AND public=1)) AS Sp ORDER BY `time` DESC LIMIT %s, %s;"
+        " OR uid=%s) AND public=1)) AS Sp ORDER BY `time` DESC LIMIT %s, %s;"
     )
     args = (
         uid,
@@ -833,9 +833,9 @@ def get_timeline_song_only_length(uid):
         "(SELECT profiler FROM Users WHERE Songs.uid=Users.uid) as profiler, "
         "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid "
         "AND Song_Likes.uid=%s) AS like_status, 'song' AS type FROM "
-        "Songs WHERE uid IN "
+        "Songs WHERE (uid IN "
         "(SELECT Followers.following FROM Followers WHERE follower=%s)"
-        " OR uid=%s AND public=1)) AS Sp ORDER BY `time` DESC;"
+        " OR uid=%s) AND public=1)) AS Sp ORDER BY `time` DESC;"
     )
     args = (
         uid,
