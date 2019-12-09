@@ -46,6 +46,10 @@ class ProfileScreen extends React.Component {
     }
   }
 
+  componentDidMount() {
+    this.getLikedSongs()
+  }
+
   handleSongsClick() {
     this.setState({ screenState: [...this.state.screenState, 1], profileTab: 1 })
     animateTimingPromiseNative(this.animatedSongsScreen, 1, 400, Easing.ease).then(
@@ -92,10 +96,6 @@ class ProfileScreen extends React.Component {
         this.animatedFollowersScreen.setValue(0)
       }
     )
-  }
-
-  componentDidMount() {
-    this.getLikedSongs()
   }
 
   renderProfile() {

@@ -28,6 +28,7 @@ export default StyleSheet.create({
   likedSongsContainer: {
     flex: 1,
     position: 'absolute',
+    height: height - 125,
     top: 80,
   },
   profileTabs: {
