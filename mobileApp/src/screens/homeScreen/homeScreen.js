@@ -62,9 +62,11 @@ class HomeScreen extends React.Component {
     let songName = item.title
     let authorName = item.username
     let songImage = item.cover
+    let likedSong = item.like_status
     let playImage = require('../../assets/images/play.png')
     let songLikes = item.likes
     let likeImg = require('../../assets/images/like.png')
+    let likedImg = require('../../assets/images/like_color.png')
     let placeholderImg = require('../../assets/images/cloud.png')
     return (
       <TouchableOpacity style={styles.songContainer} onPress={() => this.handleSongClick(item, index)}>
@@ -73,9 +75,13 @@ class HomeScreen extends React.Component {
         <View style={styles.songDetailsContainer}>
           <Text style={styles.songNameText}>{songName}</Text>
           <Text style={styles.authorNameText}>{authorName}</Text>
-          <View style={styles.likeContainer}>
-            <Text style={styles.likes}>{songLikes}</Text><Image style={styles.likeImg} source={likeImg} />
-          </View>
+          {likedSong ?
+            <View style={styles.likeContainer}>
+              <Text style={styles.likedText}>{songLikes}</Text><Image style={styles.likeImg} source={likedImg} />
+            </View> :
+            <View style={styles.likeContainer}>
+              <Text style={styles.likes}>{songLikes}</Text><Image style={styles.likeImg} source={likeImg} />
+            </View>}
         </View>
       </TouchableOpacity>
     );

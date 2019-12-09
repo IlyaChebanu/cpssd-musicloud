@@ -75,6 +75,8 @@ class UserProfileSongs extends React.Component {
     let placeholderImg = require('../../assets/images/cloud.png')
     let profilePicUrl = item.profiler
     let profilePic = require('../../assets/images/profilePlaceholder.png')
+    let likedSong = item.like_status
+    let likedImg = require('../../assets/images/like_color.png')
     return (
       <TouchableOpacity style={styles.songContainer} onPress={() => this.handleSongClick(item, index)}>
         {songImage ? <Image style={styles.songImage} source={{ uri: songImage }} /> : <Image style={styles.songImage} source={placeholderImg} />}
@@ -86,9 +88,12 @@ class UserProfileSongs extends React.Component {
               <Image style={styles.profilePic} source={profilePic} />}
             <Text style={styles.authorNameText}>{authorName}</Text>
           </View>
+          {likedSong ? <View style={styles.likeContainer}>
+              <Text style={styles.likedText}>{songLikes}</Text><Image style={styles.likeImg} source={likedImg} />
+            </View> :
           <View style={styles.likeContainer}>
             <Text style={styles.likes}>{songLikes}</Text><Image style={styles.likeImg} source={likeImg} />
-          </View>
+          </View>}
         </View>
       </TouchableOpacity>
     );
