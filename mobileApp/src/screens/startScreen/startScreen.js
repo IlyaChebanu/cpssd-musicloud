@@ -557,7 +557,7 @@ class StartScreen extends React.Component {
     })
     const titleVerticalPosition = this.animatedTitle.interpolate({
       inputRange: [0, 1],
-      outputRange: [width / 2 + 53, 0]
+      outputRange: [height / 2 - 106, 0]
     })
     const backArrowPosition = this.animatedTitle.interpolate({
       inputRange: [0, 1],
