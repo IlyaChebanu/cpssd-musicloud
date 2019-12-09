@@ -15,7 +15,6 @@ import {
 import { showNotification } from '../../actions/notificationsActions';
 import { ReactComponent as Logo } from '../../assets/logo.svg';
 import { ReactComponent as SignOutIcon } from '../../assets/icons/sign-out-alt-light.svg';
-import ProfilePicture from '../../assets/profiler.jpg';
 import CircularImage from '../CircularImage';
 import Dropdown from '../Dropdown';
 
@@ -46,9 +45,10 @@ import {
 
 const Header = memo((props) => {
   const {
-    selected, studio, children, dispatch, history,
+    selected, studio, children, dispatch, history, user,
   } = props;
   const { tempo, tracks, songId } = studio;
+  const { profilePicUrl } = user;
   const [nameInput, setNameInput] = useState(studio.songName);
 
   const handleSaveState = useCallback(async () => {
@@ -206,10 +206,10 @@ const Header = memo((props) => {
           <Link to="/studio" className={selected === 0 ? styles.selected : ''}>Studio</Link>
           <Link to="/feed" className={selected === 1 ? styles.selected : ''}>Feed</Link>
           <Link to="/discover" className={selected === 2 ? styles.selected : ''}>Discover</Link>
-          <Link to="/profile" className={selected === 3 ? styles.selected : ''}>Profile</Link>
+          <Link to={`/profile?username=${user.username}`} className={selected === 3 ? styles.selected : ''}>Profile</Link>
         </nav>
         <div className={styles.pictureWrapper}>
-          <CircularImage src={ProfilePicture} />
+          <CircularImage src={profilePicUrl} />
           <div className={styles.signout} onClick={handleSignout} role="button" tabIndex={0}>
             <SignOutIcon />
           </div>
@@ -224,6 +224,7 @@ Header.propTypes = {
   history: PropTypes.object.isRequired,
   selected: PropTypes.number.isRequired,
   studio: PropTypes.object.isRequired,
+  user: PropTypes.object.isRequired,
   children: PropTypes.node,
 };
 
