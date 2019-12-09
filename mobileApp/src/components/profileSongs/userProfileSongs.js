@@ -23,9 +23,9 @@ class UserProfileSongs extends React.Component {
   getSongs() {
     getCompiledSongs(this.props.accessToken, this.props.username).then(response => {
       if (response.status === 200) {
-        this.setState({ songsData: response.data.songs})
+        this.setState({ songsData: response.data.songs })
       } else {
-        
+
       }
     })
   }
@@ -37,11 +37,28 @@ class UserProfileSongs extends React.Component {
     this.props.navigateToMusicPlayerScreen()
   }
 
+  handleFollowerClick() {
+    this.props.handleFollowersClick()
+  }
+
+  handleFollowingClick() {
+    this.props.handleFollowingsClick()
+  }
+
+  handleLikedSongClick() {
+    this.props.handleLikedSongsClick()
+  }
+
   renderheader() {
     return (
       <View style={styles.container}>
         <Text style={styles.profileTitleText}>{"PROFILE"}</Text>
-        <UserProfileComponent accessToken={this.props.accessToken} username={this.props.username} />
+        <UserProfileComponent
+          handleFollowerClick={this.handleFollowerClick.bind(this)}
+          handleFollowingClick={this.handleFollowingClick.bind(this)}
+          handleLikedSongClick={this.handleLikedSongClick.bind(this)}
+          accessToken={this.props.accessToken}
+          username={this.props.username} />
         <Text style={styles.titleText}>{"Songs"}</Text>
         {this.state.songsData.length === 0 ? <Text style={styles.noSongsText}>{'User has no songs yet'}</Text> : null}
       </View>
@@ -56,13 +73,19 @@ class UserProfileSongs extends React.Component {
     let songLikes = item.likes
     let likeImg = require('../../assets/images/like.png')
     let placeholderImg = require('../../assets/images/cloud.png')
+    let profilePicUrl = item.profiler
+    let profilePic = require('../../assets/images/profilePlaceholder.png')
     return (
       <TouchableOpacity style={styles.songContainer} onPress={() => this.handleSongClick(item, index)}>
-        {songImage ? <Image style={styles.songImage} source={{uri: songImage}} /> : <Image style={styles.songImage} source={placeholderImg} />}
+        {songImage ? <Image style={styles.songImage} source={{ uri: songImage }} /> : <Image style={styles.songImage} source={placeholderImg} />}
         <Image style={styles.playImage} source={playImage} />
         <View style={styles.songDetailsContainer}>
           <Text style={styles.songNameText}>{songName}</Text>
-          <Text style={styles.authorNameText}>{authorName}</Text>
+          <View style={styles.userContainer}>
+            {profilePicUrl ? <Image style={styles.profilePic} source={{ uri: profilePicUrl }} /> :
+              <Image style={styles.profilePic} source={profilePic} />}
+            <Text style={styles.authorNameText}>{authorName}</Text>
+          </View>
           <View style={styles.likeContainer}>
             <Text style={styles.likes}>{songLikes}</Text><Image style={styles.likeImg} source={likeImg} />
           </View>

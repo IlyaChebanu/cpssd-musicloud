@@ -68,10 +68,23 @@ class UserProfileComponent extends React.Component {
     })
   }
 
+  handleFollowerClick() {
+    this.props.handleFollowerClick()
+  }
+
+  handleFollowingClick() {
+    this.props.handleFollowingClick()
+  }
+
+  handleLikedSongClick() {
+    this.props.handleLikedSongClick()
+  }
+
   render() {
     let profilePic = require('../../assets/images/profilePlaceholder.png')
     let profilePicUrl = this.props.otherUserData.profile_pic_url
     let userData = this.props.otherUserData
+    let isMyProfile = this.props.username === this.props.otherUserData.username
     return (
       <View>
         <Text style={styles.usernameText}>{this.props.otherUserData.username}</Text>
@@ -80,26 +93,32 @@ class UserProfileComponent extends React.Component {
             <Image style={styles.profilePic} source={profilePic} />}
 
           <View style={styles.statsContainer}>
+          <TouchableOpacity style={styles.link} onPress={() => this.handleFollowerClick()}>
+              <Text style={styles.profileText}><Text style={styles.profileNum}>{userData.followers}</Text>{' followers'}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => this.handleFollowingClick()}>
+              <Text style={styles.profileText}><Text style={styles.profileNum}>{userData.following}</Text>{' following'}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => this.handleLikedSongClick()}>
+              <Text style={styles.profileText}><Text style={styles.profileNum}>{userData.likes}</Text>{' liked songs'}</Text>
+            </TouchableOpacity>
             <Text style={styles.profileText}>
-              <Text style={styles.profileNum}>{userData.followers}</Text>{' followers'}{'\n'}
-              <Text style={styles.profileNum}>{userData.following}</Text>{' following'}{'\n'}
               <Text style={styles.profileNum}>{userData.songs}</Text>{' songs'}{'\n'}
               <Text style={styles.profileNum}>{userData.posts}</Text>{' posts'}{'\n'}
-              <Text style={styles.profileNum}>{userData.likes}</Text>{' likes'}
             </Text>
           </View>
         </View>
         <View style={styles.followingContainer}>
-          {this.state.following ? <TouchableOpacity style={styles.followingButton} onPress={() => this.handleUnFollow()}>
+          {(this.state.following && !isMyProfile) ? <TouchableOpacity style={styles.followingButton} onPress={() => this.handleUnFollow()}>
             <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} colors={['#FF0265', '#E78D35']} style={styles.button}>
               <Text style={styles.followText}>{'Following ✓'}</Text>
             </LinearGradient>
-          </TouchableOpacity> :
+          </TouchableOpacity> : !isMyProfile ?
             <TouchableOpacity style={styles.followingNotButton} onPress={() => this.handleFollow()}>
               <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} colors={['#FF0265', '#E78D35']} style={styles.button}>
                 <Text style={styles.followText}>{'Follow'}</Text>
               </LinearGradient>
-            </TouchableOpacity>}
+            </TouchableOpacity> : null}
         </View>
       </View>
     )
@@ -109,6 +128,7 @@ class UserProfileComponent extends React.Component {
 function mapStateToProps(state) {
   return {
     token: state.home.token,
+    username: state.home.username,
     otherUserData: state.user.otherUserData,
     following: state.user.following,
   };
