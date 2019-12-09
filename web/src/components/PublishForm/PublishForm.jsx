@@ -48,8 +48,6 @@ const PublishForm = memo((props) => {
   const handleSetName = useCallback(async () => {
     dispatch(setSongName(nameInput));
     setNameInput(nameInput);
-    // const res = patchSongName(studio.songId, nameInput);
-    // return res.status === 200;
   }, [dispatch, nameInput]);
 
   const handleKeyDown = useCallback((e) => {
