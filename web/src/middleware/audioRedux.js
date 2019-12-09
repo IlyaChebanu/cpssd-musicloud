@@ -67,8 +67,8 @@ const scheduleSample = (state, sample, context = audioContext, offline = false) 
 
 export const renderTracks = (studio) => {
   const samples = [];
-  studio.tracks.forEach((track) => {
-    track.samples.forEach((sample, i) => {
+  studio.tracks.forEach((track, i) => {
+    track.samples.forEach((sample) => {
       sample.volume = track.volume;
       sample.track = i;
       sample.buffer = bufferStore[sample.url];
@@ -115,6 +115,9 @@ export default (store) => {
         currentBeat = state.loop.start;
         store.dispatch(playingStartBeat(state.loop.start));
         store.dispatch(playingStartTime(audioContext.currentTime));
+        Object.values(scheduledSamples).forEach((sample) => {
+          sample.old = true;
+        });
       }
       store.dispatch(setCurrentBeat(currentBeat));
     }
@@ -143,14 +146,20 @@ export default (store) => {
           sample.track = i;
           sample.buffer = bufferStore[sample.url];
           sample.endTime = endTime;
-          return (endTime > audioContext.currentTime && startTime <= audioContext.currentTime)
-            || (startTime >= audioContext.currentTime && startTime < startTime + OVERLAP);
+          return (
+            endTime > audioContext.currentTime
+              && startTime <= audioContext.currentTime
+          )
+          || (
+            startTime >= audioContext.currentTime
+              && startTime < audioContext.currentTime + OVERLAP
+          );
         }));
       });
 
       // Schedule samples
       schedulableSamples.forEach((sample) => {
-        if (!(sample.id in scheduledSamples)) {
+        if (!(sample.id in scheduledSamples) || scheduledSamples[sample.id].old) {
           const source = scheduleSample(state, sample);
           scheduledSamples[sample.id] = { ...sample, ...source };
         }
