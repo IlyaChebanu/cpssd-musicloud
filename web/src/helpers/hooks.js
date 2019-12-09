@@ -25,7 +25,7 @@ export const useUpdateUserDetails = () => {
       if(!username){
         getUserDetails(user.username).then((res) => {
         if (res.status === 200) {
-          dispatchProfileData(res)
+          dispatchProfileData(res);
         } else {
           store.dispatch(showNotification({ message: 'An unknown error has occurred.' }));
         }
@@ -33,7 +33,7 @@ export const useUpdateUserDetails = () => {
       } else {
         getUserDetails(username).then((res) => {
         if (res.status === 200) {
-          dispatchProfileData(res)
+          dispatchProfileData(res);
         } else {
           store.dispatch(showNotification({ message: 'An unknown error has occurred.' }));
         }
