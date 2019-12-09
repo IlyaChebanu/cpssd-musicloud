@@ -27,6 +27,11 @@ axios.interceptors.response.use((res) => res, (err) => {
         message: 'Permission to perform action denied.',
       }));
     }
+    if (res.status === 404) {
+      store.dispatch(showNotification({
+        message: 'Object not found.',
+      }));
+    }
   }
   return res;
 });
@@ -141,6 +146,37 @@ export const createNewSong = (title) => axios.post(
 export const patchSongName = (sid, title) => axios.patch(
   `${API_URL}/v1/audio/rename`,
   { sid, title },
+  {
+    headers: getAuth(),
+  },
+);
+
+export const getTimeline = () => axios.get(
+  `${API_URL}/v1/users/timeline`,
+  {
+    headers: getAuth(),
+  },
+);
+
+export const likeSong = (sid) => axios.post(
+  `${API_URL}/v1/audio/like`,
+  { sid },
+  {
+    headers: getAuth(),
+  },
+);
+
+export const unlikeSong = (sid) => axios.post(
+  `${API_URL}/v1/audio/unlike`,
+  { sid },
+  {
+    headers: getAuth(),
+  },
+);
+
+export const createPost = (message) => axios.post(
+  `${API_URL}/v1/users/post`,
+  { message },
   {
     headers: getAuth(),
   },

@@ -6,13 +6,13 @@
 .inner div {
   position: absolute;
   animation: spin 1s linear infinite;
-  width: 100px;
-  height: 100px;
+  width: 100%;
+  height: 100%;
   top: 0px;
   left: 0px;
   border-radius: 50%;
-  box-shadow: 0 4px 0 0 #fff;
-  transform-origin: 50px 50px;
+  box-shadow: 0 2px 0 0 #fff;
+  transform-origin: 50% 50%;
 }
 .spinner {
   width: 100%;
@@ -24,8 +24,10 @@
   background: none;
 }
 .inner {
-  width: 100px;
-  height: 100px;
+  max-width: 100px;
+  max-height: 100px;
+  width: calc(100% - 5px);
+  height: calc(100% - 5px);
   position: relative;
   transform: translateZ(0) scale(1);
   backface-visibility: hidden;

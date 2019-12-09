@@ -7,6 +7,7 @@
     "jsx-a11y/click-events-have-key-events": "off",
     "jsx-a11y/no-noninteractive-element-interactions": "off",
     "jsx-a11y/accessible-emoji": "off",
+    "jsx-a11y/media-has-caption": "off",
     "react/forbid-prop-types": "off",
     "no-console": ["warn", { "allow": ["warn", "error"] }]
   },
