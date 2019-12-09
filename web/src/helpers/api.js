@@ -182,16 +182,15 @@ export const createPost = (message) => axios.post(
   },
 );
 
-
-export const getCompiledSongs = (username) => axios.get(
-  `${API_URL}/v1/audio/compiled_songs?songs_per_page=100&username=${username}`,
+export const getUserPosts = (username) => axios.get(
+  `${API_URL}/v1/users/posts?posts_per_page=100&username=${username}`,
   {
     headers: getAuth(),
   },
 );
 
-export const getUserPosts = (username) => axios.get(
-  `${API_URL}/v1/users/posts?posts_per_page=100&username=${username}`,
+export const getCompiledSongs = (username) => axios.get(
+  `${API_URL}/v1/audio/compiled_songs?${username ? `username=${username}` : ''}`,
   {
     headers: getAuth(),
   },

@@ -49,6 +49,7 @@ const Header = memo((props) => {
     selected, studio, children, dispatch, history, user,
   } = props;
   const { tempo, tracks, songId } = studio;
+  const { profilePicUrl } = user;
   const [nameInput, setNameInput] = useState(studio.songName);
 
   const handleSaveState = useCallback(async () => {
@@ -209,7 +210,7 @@ const Header = memo((props) => {
           <Link to={`/profile?username=${user.username}`} className={selected === 3 ? styles.selected : ''}>Profile</Link>
         </nav>
         <div className={styles.pictureWrapper}>
-          <CircularImage src={ProfilePicture} />
+          <CircularImage src={profilePicUrl} />
           <div className={styles.signout} onClick={handleSignout} role="button" tabIndex={0}>
             <SignOutIcon />
           </div>

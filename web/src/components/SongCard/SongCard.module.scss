@@ -1,5 +1,4 @@
 .wrapper {
-  height: 270px;
   width: 150px;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
   border-radius: 25px;
@@ -14,20 +13,22 @@
 .username {
   color: white;
   font-size: 12px;
-  margin-left: 10px;
+  margin: 0 0 0 10px;
 }
 
 .title {
   color: white;
   font-size: 14px;
-  margin: 4px 0px 4px 0px;
+  margin: 10px 0px 0px 0px;
 }
 
 .details {
   padding: 0px 10px 0px 10px;
+
   span {
     display: flex;
     align-items: center;
+    margin: 10px 0;
   }
 }
 
@@ -44,4 +45,46 @@
     width: auto;
     height: 100%;
   }
+}
+
+.likesWrapper {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.likeIconWrapper {
+  position: relative;
+  width: 20px;
+  height: 20px;
+}
+
+.likeIcon {
+  width: 20px;
+  height: 20px;
+  fill: white;
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  &.gradient {
+    pointer-events: none;
+    fill: url(#gradient);
+    transition: opacity 200ms;
+    opacity: 0;
+
+    &.liked {
+      opacity: 1;
+    }
+  }
+}
+
+.likes {
+  color: #C3C3C3;
+  font-size: 12px;
+  margin: 0 0 0 5px;
 }
