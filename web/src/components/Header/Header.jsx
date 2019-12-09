@@ -7,6 +7,7 @@ import cookie from 'js-cookie';
 import { connect } from 'react-redux';
 import { withRouter, Link } from 'react-router-dom';
 import toWav from 'audiobuffer-to-wav';
+import _ from 'lodash';
 import styles from './Header.module.scss';
 import { deleteToken } from '../../actions/userActions';
 import {
@@ -129,14 +130,14 @@ const Header = memo((props) => {
   }, [dispatch, handleSaveState]);
 
   const tracksAndSamplesSet = useCallback(() => {
-    if (!studio.tracks) {
+    if (_.isEmpty(studio.tracks)) {
       dispatch(showNotification({ message: 'Please add a track first', type: 'info' }));
       return false;
     }
 
     let hasSamples = false;
     studio.tracks.forEach((track) => {
-      if (track.samples) {
+      if (!_.isEmpty(track.samples)) {
         hasSamples = true;
       }
     });
@@ -148,7 +149,7 @@ const Header = memo((props) => {
   }, [dispatch, studio.tracks]);
 
   const handlePublishSong = useCallback(async () => {
-    if (!tracksAndSamplesSet) {
+    if (!tracksAndSamplesSet()) {
       return;
     }
     dispatch(showPublishForm());
