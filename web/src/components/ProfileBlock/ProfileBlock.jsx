@@ -80,12 +80,12 @@ const ProfileBlock = memo((props) => {
           onSubmit={goToFollow}
         >
           <SubmitButton
-              className={
-                  username !== user.username && user.follow_status !== 1
-                      ? styles.followButton
-                      : styles.hide
-              }
-              text="Follow"
+            className={
+                username !== user.username && user.follow_status !== 1
+                  ? styles.followButton
+                  : styles.hide
+            }
+            text="Follow"
           />
         </form>
         <form
@@ -97,12 +97,12 @@ const ProfileBlock = memo((props) => {
           onSubmit={goToFollow}
         >
           <SubmitButton
-              className={
-                  username !== user.username && user.follow_status === 1
-                      ? styles.followButton
-                      : styles.hide
-              }
-              text="Unfollow"
+            className={
+                username !== user.username && user.follow_status === 1
+                  ? styles.followButton
+                  : styles.hide
+            }
+            text="Unfollow"
           />
         </form>
       </div>
