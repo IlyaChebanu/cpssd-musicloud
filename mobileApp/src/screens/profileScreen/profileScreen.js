@@ -152,8 +152,11 @@ class ProfileScreen extends React.Component {
     )
   }
 
-  handleLikedSongClick() {
-
+  handleLikedSongClick(item, index) {
+    this.props.setSongData(item)
+    this.props.setSongId(item.sid)
+    this.props.setSongUrl(item.url)
+    this.props.navigateToMusicPlayerScreen()
   }
 
   getLikedSongs() {
