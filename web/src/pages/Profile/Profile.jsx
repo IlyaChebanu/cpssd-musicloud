@@ -1,24 +1,25 @@
-import React, { memo, useEffect, useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import React, {
+  memo, useEffect, useState, useMemo,
+} from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import styles from './Profile.module.scss';
 import Header from '../../components/Header';
 import PostCard from '../../components/PostCard/PostCard';
 import ProfileBlock from '../../components/ProfileBlock';
 import AddPost from '../../components/AddPost';
 import { useUpdateUserDetails } from '../../helpers/hooks';
-import PropTypes from "prop-types";
-import { connect } from "react-redux";
-import { getCompiledSongs, getUserPosts } from "../../helpers/api";
-import OwnSongCard from "../../components/OwnSongCard";
-import Spinner from "../../components/Spinner";
-import { hideSongPicker, setSongId, setSongName } from "../../actions/studioActions";
+import { getCompiledSongs, getUserPosts } from '../../helpers/api';
+import OwnSongCard from '../../components/OwnSongCard';
+import Spinner from '../../components/Spinner';
+import { hideSongPicker, setSongId, setSongName } from '../../actions/studioActions';
 
 
 const Profile = memo((props) => {
   useUpdateUserDetails();
   const { dispatch, user, history } = props;
-  let url = new URL(window.location.href);
-  let username = url.searchParams.get("username");
+  const url = new URL(window.location.href);
+  const username = url.searchParams.get('username');
 
   const [gotSongs, setGotSongs] = useState([]);
   const [gotPosts, setGotPosts] = useState([]);
@@ -55,27 +56,27 @@ const Profile = memo((props) => {
       songName={`${song.title}`}
       className={styles.songCard}
       onClick={() => {
-        if(username === user.username) {
-            dispatch(setSongName(song.title));
-            dispatch(setSongId(song.sid));
-            dispatch(hideSongPicker());
-            history.push("/studio");
-        } else {
-            return false;
+        if (username === user.username) {
+          dispatch(setSongName(song.title));
+          dispatch(setSongId(song.sid));
+          dispatch(hideSongPicker());
+          history.push('/studio');
+          return true;
         }
+        return false;
       }}
       imageSrc={song.cover}
     />
-  )), [dispatch, gotSongs, history]);
+  )), [dispatch, gotSongs, history, user.username, username]);
 
   const ownPostCards = useMemo(() => gotPosts.map((post) => (
     <PostCard
-        className={styles.blogCard}
-        message={post[0]}
-        time={post[1]}
-        username={username}
+      className={styles.blogCard}
+      message={post[0]}
+      time={post[1]}
+      username={username}
     />
-  )), [dispatch, gotPosts, history, username]);
+  )), [gotPosts, username]);
 
   return (
     <div className={styles.wrapper}>
@@ -95,7 +96,7 @@ const Profile = memo((props) => {
 
       <div className={styles.contentWrapper}>
         <title className={styles.sectionTitle}>Posts</title>
-          {username === user.username ? <AddPost /> : <div/>}
+        {username === user.username ? <AddPost /> : <div />}
         <div className={styles.blogs}>
           {loadingPosts ? <Spinner /> : ownPostCards}
         </div>
@@ -105,9 +106,9 @@ const Profile = memo((props) => {
 });
 
 Profile.propTypes = {
-    dispatch: PropTypes.func.isRequired,
-    history: PropTypes.object.isRequired,
-    user: PropTypes.object.isRequired
+  dispatch: PropTypes.func.isRequired,
+  history: PropTypes.object.isRequired,
+  user: PropTypes.object.isRequired,
 };
 
 Profile.displayName = 'Profile';

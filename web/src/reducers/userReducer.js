@@ -77,7 +77,7 @@ export default (state = {
     case 'SET_FOLLOW_STATUS':
       return {
         ...state,
-        follow_status: action.status
+        follow_status: action.status,
       };
     default:
       return state;

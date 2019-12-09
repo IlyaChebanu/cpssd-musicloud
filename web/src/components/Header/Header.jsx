@@ -46,7 +46,7 @@ import {
 
 const Header = memo((props) => {
   const {
-    selected, studio, children, dispatch, history, user
+    selected, studio, children, dispatch, history, user,
   } = props;
   const { tempo, tracks, songId } = studio;
   const [nameInput, setNameInput] = useState(studio.songName);
@@ -206,7 +206,7 @@ const Header = memo((props) => {
           <Link to="/studio" className={selected === 0 ? styles.selected : ''}>Studio</Link>
           <Link to="/feed" className={selected === 1 ? styles.selected : ''}>Feed</Link>
           <Link to="/discover" className={selected === 2 ? styles.selected : ''}>Discover</Link>
-          <Link to={"/profile?username=" + user.username} className={selected === 3 ? styles.selected : ''}>Profile</Link>
+          <Link to={`/profile?username=${user.username}`} className={selected === 3 ? styles.selected : ''}>Profile</Link>
         </nav>
         <div className={styles.pictureWrapper}>
           <CircularImage src={ProfilePicture} />
@@ -224,6 +224,7 @@ Header.propTypes = {
   history: PropTypes.object.isRequired,
   selected: PropTypes.number.isRequired,
   studio: PropTypes.object.isRequired,
+  user: PropTypes.object.isRequired,
   children: PropTypes.node,
 };
 
