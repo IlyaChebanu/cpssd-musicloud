@@ -15,7 +15,6 @@ import {
 import { showNotification } from '../../actions/notificationsActions';
 import { ReactComponent as Logo } from '../../assets/logo.svg';
 import { ReactComponent as SignOutIcon } from '../../assets/icons/sign-out-alt-light.svg';
-import ProfilePicture from '../../assets/profiler.jpg';
 import CircularImage from '../CircularImage';
 import Dropdown from '../Dropdown';
 
@@ -225,6 +224,7 @@ Header.propTypes = {
   history: PropTypes.object.isRequired,
   selected: PropTypes.number.isRequired,
   studio: PropTypes.object.isRequired,
+  user: PropTypes.object.isRequired,
   children: PropTypes.node,
 };
 

@@ -13,6 +13,7 @@ import { ReactComponent as LikeIcon } from '../../assets/icons/favorite-24px.svg
 import { unlikeSong, likeSong } from '../../helpers/api';
 import Spinner from '../Spinner';
 import { lerp } from '../../helpers/utils';
+import history from '../../history';
 
 const SongCard = memo((props) => {
   const {
@@ -26,8 +27,6 @@ const SongCard = memo((props) => {
   const [loading, setLoading] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [songDuration, setSongDuration] = useState(1);
-
-  const [coverHover, setCoverHover] = useState(false);
 
   const playerRef = useRef();
 
@@ -47,7 +46,8 @@ const SongCard = memo((props) => {
     />
   ), [url]);
 
-  const playAudio = useCallback(() => {
+  const playAudio = useCallback((e) => {
+    e.stopPropagation();
     if (!playerRef.current) {
       setPlayerShowing(true);
       setLoading(true);
@@ -57,14 +57,11 @@ const SongCard = memo((props) => {
     }
   }, [playerRef]);
 
-  const pauseAudio = useCallback(() => {
+  const pauseAudio = useCallback((e) => {
+    e.stopPropagation();
     setPlaying(false);
     playerRef.current.pause();
   }, [playerRef]);
-
-  const progressStyle = useMemo(() => ({
-    width: `${(currentTime / songDuration) * 100}%`,
-  }), [currentTime, songDuration]);
 
   const songSeekStart = useCallback((ev) => {
     const bb = ev.target.getBoundingClientRect();
@@ -117,33 +114,32 @@ const SongCard = memo((props) => {
     })();
   }, [id, songLiked]);
 
-  const coverEnter = useCallback(() => {
-    setCoverHover(true);
-  }, []);
+  const seekBarStyle = useMemo(() => ({
+    width: `${(currentTime / songDuration) * 100}%`,
+  }), [currentTime, songDuration]);
 
-  const coverLeave = useCallback(() => {
-    setCoverHover(false);
-  }, []);
+  const gotoProfile = useCallback(() => {
+    history.push(`/profile?username=${username}`);
+  }, [username]);
 
   return (
     <div className={`${styles.wrapper} ${className}`}>
       <div className={styles.thumbWrapper}>
-        <div className={styles.thumbWrapper} onMouseEnter={coverEnter} onMouseLeave={coverLeave}>
+        <div className={styles.thumbWrapper} onMouseDown={songSeekStart} role="navigation">
           <Img src={[coverImage, CloudQuestion]} alt="song cover art" loader={<Spinner />} />
+          <div className={styles.seekBar} style={seekBarStyle} />
           <div className={styles.playbackControls}>
             {loading
               ? <Spinner className={styles.playPause} />
               : playing
-                ? <PauseIcon className={styles.playPause} onClick={pauseAudio} />
-                : <PlayIcon className={styles.playPause} onClick={playAudio} />}
+                ? <PauseIcon className={styles.playPause} onMouseDown={pauseAudio} />
+                : <PlayIcon className={styles.playPause} onMouseDown={playAudio} />}
           </div>
-          {/* <LikeIcon className={`${styles.like} ${coverHover ? styles.hovered : ''}`} onClick={handleLikeSong} />
-            <LikeIcon className={`${styles.like} ${styles.likeGradient} ${!coverHover ? styles.hide : ''} ${songLiked ? styles.liked : ''}`} /> */}
         </div>
       </div>
       <div className={styles.details}>
         <p className={styles.title}>{title}</p>
-        <span>
+        <span onClick={gotoProfile} role="button" tabIndex={0}>
           <CircularImage className={styles.profilePic} src={profileImg} />
           <p className={styles.username}>{username}</p>
         </span>
@@ -164,6 +160,12 @@ SongCard.propTypes = {
   className: PropTypes.string,
   id: PropTypes.number.isRequired,
   isLiked: PropTypes.bool,
+  coverImage: PropTypes.string.isRequired,
+  url: PropTypes.string.isRequired,
+  likes: PropTypes.number.isRequired,
+  title: PropTypes.string.isRequired,
+  username: PropTypes.string.isRequired,
+  profileImg: PropTypes.string.isRequired,
 };
 
 SongCard.defaultProps = {
