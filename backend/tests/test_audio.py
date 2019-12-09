@@ -839,7 +839,7 @@ class AudioTests(unittest.TestCase):
                 follow_redirects=True
             )
             self.assertEqual(200, res.status_code)
-            expected_body = {'song': {'sid': 1, 'username': 'username', 'like_status': 0, 'title': 'A test song', 'duration': 0, 'created': 'Wed, 13 Nov 2019 17:07:39 GMT', 'public': 1, 'url': None, 'cover': None, 'likes': 8, 'description': 'a description' }}
+            expected_body = {'song': {'sid': 1, 'username': 'username', 'like_status': 0, 'title': 'A test song', 'duration': 0, 'created': 'Wed, 13 Nov 2019 17:07:39 GMT', 'public': 1, 'url': None, 'cover': None, 'likes': 8, 'description': 'a description'}}
             self.assertEqual(expected_body, json.loads(res.data))
 
     def test_get_song_data_fail_missing_sid(self):
