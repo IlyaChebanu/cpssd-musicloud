@@ -560,7 +560,7 @@ def update_compiled_url(sid, url, duration):
     """
     sql = (
         "UPDATE Songs "
-        "SET url = %s AND duration = %s "
+        "SET url = %s, duration = %s "
         "WHERE sid = %s"
     )
     args = (
