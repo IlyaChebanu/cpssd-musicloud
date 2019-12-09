@@ -82,7 +82,7 @@ export default (state = {
     case 'SET_PROFILER':
       return {
         ...state,
-        profiler: action.profilerURL
+        profiler: action.profilerURL,
       };
     default:
       return state;

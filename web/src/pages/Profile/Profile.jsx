@@ -11,12 +11,12 @@ import AddPost from '../../components/AddPost';
 import { useUpdateUserDetails } from '../../helpers/hooks';
 import { getCompiledSongs, getUserPosts } from '../../helpers/api';
 import Spinner from '../../components/Spinner';
-import SongCard from "../../components/SongCard";
+import SongCard from '../../components/SongCard';
 
 
 const Profile = memo((props) => {
   useUpdateUserDetails();
-  const { dispatch, user, history } = props;
+  const { dispatch, user } = props;
   const url = new URL(window.location.href);
   const username = url.searchParams.get('username');
 
@@ -61,7 +61,7 @@ const Profile = memo((props) => {
       likes={song.likes}
       profileImg={user.profiler}
     />
-  )), [dispatch, gotSongs, history, user.username, username]);
+  )), [gotSongs, user.profiler]);
 
   const ownPostCards = useMemo(() => gotPosts.map((post) => (
     <PostCard
@@ -71,7 +71,7 @@ const Profile = memo((props) => {
       username={username}
       profileImg={user.profiler}
     />
-  )), [gotPosts, username]);
+  )), [gotPosts, user.profiler, username]);
 
   return (
     <div className={styles.wrapper}>

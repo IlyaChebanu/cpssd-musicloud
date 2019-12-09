@@ -2,7 +2,8 @@ import { useEffect } from 'react';
 import store from '../store';
 import { getUserDetails } from './api';
 import {
-  setProfilePicUrl, setFollowers, setFollowing, setLikes, setPosts, setSongs, setFollowStatus, setProfiler,
+  setProfilePicUrl, setFollowers, setFollowing, setLikes, setPosts, setSongs, setFollowStatus,
+  setProfiler,
 } from '../actions/userActions';
 import { showNotification } from '../actions/notificationsActions';
 
