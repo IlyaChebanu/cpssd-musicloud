@@ -8,23 +8,64 @@ export default StyleSheet.create({
       alignItems: 'center',
       backgroundColor: '#F5FCFF',
     },
-    logoContainer: {
-      marginTop: height/2-140,
-      flexDirection: 'row',
+    arrowBackContainer: {
       alignItems: 'center',
+      width: 32,
+      height: 32,
+      left: 10,
+      resizeMode: 'contain',
+      position: 'absolute',
+      top: 50 + 42,
+    },
+    logoContainer: {
+
     },
     logo: {
-      marginLeft: 30,
+      position: 'absolute',
+      top: 50,
+      left: 30,
       width: width-60,
       resizeMode: 'contain'
     },
+    parentContainer: {
+      position: 'absolute', 
+      width: width,
+      top: 180,
+    },
+    forgotButton: {
+      alignSelf: 'flex-end',
+      marginRight: 20,
+      marginTop: 20,
+      marginBottom: 20,
+    },
+    forgotText: {
+      color: '#FFF',
+    },
     signInButton: {
-      position: 'absolute',
-      bottom: height > 600 ? 100 : 50,
+      marginBottom: 20,
     },
     createButton: {
+
+    },
+    resetButton: {
       position: 'absolute',
-      bottom: height > 600 ? 190 : 140,
+    },
+    buttonsContainer: {
+      position: 'absolute',
+      bottom: 60,
+      zIndex: 2,
+    },
+    verifyContainer: {
+      top: -25,
+      position: 'absolute',
+      paddingLeft: 20,
+      paddingBottom: 5,
+    },
+    verifyLink: {
+      textDecorationLine: 'underline'
+    },
+    verifyText: {
+      color: '#FFF',
     },
     topVector: {
       position: 'absolute',

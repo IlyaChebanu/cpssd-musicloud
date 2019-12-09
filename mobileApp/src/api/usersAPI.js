@@ -547,3 +547,42 @@ export function getFollowing(username, token) {
             return error
         });
 }
+
+export function getUserTimeline(token, posts_only, songs_only) {
+
+    let url = `${API_URL}api/v1/users/timeline`;
+    if (posts_only) {
+        url = url + `?posts_only=${posts_only}`
+    } else if (songs_only) {
+        url = url + `?songs_only=${songs_only}`
+    }
+    var request = new Request(url, {
+        method: "GET",
+        headers: new Headers({
+            "Content-Type": "application/json",
+            "Authorization": 'Bearer ' + token,
+        }),
+    });
+    if (__DEV__) {
+        console.log("getUserTimeline : request " + JSON.stringify(request))
+    }
+
+    return fetch(request)
+        .then(response => {
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
+        })
+        .then(responseJson => {
+            if (__DEV__) {
+                console.log("getUserTimeline : response " + JSON.stringify(responseJson))
+            }
+            return responseJson;
+        })
+        .catch(error => {
+            if (__DEV__) {
+                console.log("getUserTimeline : error " + JSON.stringify(error))
+            }
+            return error
+        });
+}
