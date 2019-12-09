@@ -15,7 +15,7 @@ const Discover = () => {
 
   return (
     <div className={styles.wrapper}>
-      <Header selected={1} />
+      <Header selected={2} />
       <div className={styles.contentWrapper}>
         <MusicSearch className={styles.musicSearch} />
         <div className={styles.songs}>
