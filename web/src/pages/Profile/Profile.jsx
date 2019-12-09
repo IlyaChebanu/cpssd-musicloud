@@ -1,5 +1,5 @@
 import React, {
-  memo, useEffect, useState, useMemo,
+  memo, useEffect, useState, useMemo, useCallback
 } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -9,7 +9,7 @@ import PostCard from '../../components/PostCard/PostCard';
 import ProfileBlock from '../../components/ProfileBlock';
 import AddPost from '../../components/AddPost';
 import { useUpdateUserDetails } from '../../helpers/hooks';
-import { getCompiledSongs, getUserPosts } from '../../helpers/api';
+import {getCompiledSongs, getTimeline, getUserPosts} from '../../helpers/api';
 import OwnSongCard from '../../components/OwnSongCard';
 import Spinner from '../../components/Spinner';
 import { hideSongPicker, setSongId, setSongName } from '../../actions/studioActions';
@@ -38,17 +38,18 @@ const Profile = memo((props) => {
     getSongs();
   }, [dispatch, username]);
 
+  const refreshPosts = useCallback(async () => {
+    setLoadingPosts(true);
+    const res = await getUserPosts(username);
+    setLoadingPosts(false);
+    if (res.status === 200) {
+      setGotPosts(res.data.posts);
+    }
+  }, []);
+
   useEffect(() => {
-    const getPosts = async () => {
-      setLoadingPosts(true);
-      const res = await getUserPosts(username);
-      setLoadingPosts(false);
-      if (res.status === 200) {
-        setGotPosts(res.data.posts);
-      }
-    };
-    getPosts();
-  }, [dispatch, username]);
+    refreshPosts();
+  }, [refreshPosts]);
 
   const ownSongCards = useMemo(() => gotSongs.map((song) => (
     <OwnSongCard
@@ -98,7 +99,7 @@ const Profile = memo((props) => {
         <title className={styles.sectionTitle}>Posts</title>
         {
           username === user.username
-            ? <AddPost placeholder={`What do you want to say ${username}?`} />
+            ? <AddPost onSubmit={refreshPosts} placeholder={`What do you want to say ${username}?`} />
             : <div />
         }
         <div className={styles.blogs}>
