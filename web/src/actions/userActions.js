@@ -71,3 +71,10 @@ export const setLikes = (likes) => (dispatch) => {
     likes,
   });
 };
+
+export const setFollowStatus = (status) => (dispatch) => {
+  dispatch({
+    type: 'SET_FOLLOW_STATUS',
+    status,
+  });
+};

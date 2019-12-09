@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import store from '../store';
 import { getUserDetails } from './api';
-import { setProfilePicUrl, setFollowers, setFollowing, setLikes, setPosts, setSongs } from '../actions/userActions';
+import { setProfilePicUrl, setFollowers, setFollowing, setLikes, setPosts, setSongs, setFollowStatus } from '../actions/userActions';
 import { showNotification } from '../actions/notificationsActions';
 
 
@@ -18,6 +18,7 @@ export const useUpdateUserDetails = () => {
     store.dispatch(setLikes(res.data.likes));
     store.dispatch(setPosts(res.data.posts));
     store.dispatch(setSongs(res.data.songs));
+    store.dispatch(setFollowStatus(res.data.follow_status));
   };
 
   useEffect(() => {

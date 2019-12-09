@@ -19,7 +19,6 @@ const PostCard = memo(({
       <p className={styles.text}>
         {message}
       </p>
-      <p className={styles.timestamp}>16 minutes ago</p>
     </span>
   </div>
 ));

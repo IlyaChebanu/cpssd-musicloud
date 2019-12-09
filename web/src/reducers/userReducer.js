@@ -74,6 +74,11 @@ export default (state = {
         ...state,
         likes: action.likes,
       };
+    case 'SET_FOLLOW_STATUS':
+      return {
+        ...state,
+        follow_status: action.status
+      };
     default:
       return state;
   }

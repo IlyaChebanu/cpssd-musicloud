@@ -2,50 +2,52 @@ import React, { memo, useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './Profile.module.scss';
 import Header from '../../components/Header';
-import SongCard from '../../components/SongCard';
 import PostCard from '../../components/PostCard/PostCard';
 import ProfileBlock from '../../components/ProfileBlock';
 import AddPost from '../../components/AddPost';
 import { useUpdateUserDetails } from '../../helpers/hooks';
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { getCompiledSongs } from "../../helpers/api";
+import { getCompiledSongs, getUserPosts } from "../../helpers/api";
 import OwnSongCard from "../../components/OwnSongCard";
 import Spinner from "../../components/Spinner";
 import { hideSongPicker, setSongId, setSongName } from "../../actions/studioActions";
 
 
-const blogCards = [];
-for (let i = 0; i < 3; i += 1) {
-  blogCards.push(<PostCard className={styles.blogCard} />);
-}
-
-const songCards = [];
-for (let i = 0; i < 4; i += 1) {
-  songCards.push(<SongCard className={styles.songCard} />);
-}
-
 const Profile = memo((props) => {
   useUpdateUserDetails();
-  const { dispatch, user, history, selected } = props;
+  const { dispatch, user, history } = props;
   let url = new URL(window.location.href);
   let username = url.searchParams.get("username");
 
   const [gotSongs, setGotSongs] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [gotPosts, setGotPosts] = useState([]);
+  const [loadingSongs, setLoadingSongs] = useState(false);
+  const [loadingPosts, setLoadingPosts] = useState(false);
 
   useEffect(() => {
     const getSongs = async () => {
-      setLoading(true);
+      setLoadingSongs(true);
       const res = await getCompiledSongs(username);
-      setLoading(false);
+      setLoadingSongs(false);
       if (res.status === 200) {
         setGotSongs(res.data.songs);
       }
     };
     getSongs();
-  }, [dispatch, username, selected]);
+  }, [dispatch, username]);
 
+  useEffect(() => {
+    const getPosts = async () => {
+      setLoadingPosts(true);
+      const res = await getUserPosts(username);
+      setLoadingPosts(false);
+      if (res.status === 200) {
+        setGotPosts(res.data.posts);
+      }
+    };
+    getPosts();
+  }, [dispatch, username]);
 
   const ownSongCards = useMemo(() => gotSongs.map((song) => (
     <OwnSongCard
@@ -66,6 +68,14 @@ const Profile = memo((props) => {
     />
   )), [dispatch, gotSongs, history]);
 
+  const ownPostCards = useMemo(() => gotPosts.map((post) => (
+    <PostCard
+        className={styles.blogCard}
+        message={post[0]}
+        time={post[1]}
+        username={username}
+    />
+  )), [dispatch, gotPosts, history, username]);
 
   return (
     <div className={styles.wrapper}>
@@ -77,9 +87,8 @@ const Profile = memo((props) => {
       <div className={styles.contentWrapper}>
         <title className={styles.sectionTitle}>Songs</title>
         <div className={styles.songs}>
-          {loading ? <Spinner /> : ownSongCards}
+          {loadingSongs ? <Spinner /> : ownSongCards}
         </div>
-        <Link to="." className={styles.link}>See more</Link>
       </div>
 
       {/* Blogs section */}
@@ -88,8 +97,7 @@ const Profile = memo((props) => {
         <title className={styles.sectionTitle}>Posts</title>
           {username === user.username ? <AddPost /> : <div/>}
         <div className={styles.blogs}>
-          {blogCards}
-          <Link to="." className={styles.link}>See more</Link>
+          {loadingPosts ? <Spinner /> : ownPostCards}
         </div>
       </div>
     </div>
