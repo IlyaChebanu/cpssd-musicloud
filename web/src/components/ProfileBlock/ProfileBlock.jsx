@@ -7,6 +7,18 @@ import styles from './ProfileBlock.module.scss';
 import SubmitButton from '../SubmitButton';
 import history from '../../history';
 import CloudQuestion from '../../assets/cloud-question.jpg';
+import { getUserDetails, postFollow, postUnfollow } from '../../helpers/api';
+import store from '../../store';
+import {
+  setFollowers,
+  setFollowing,
+  setFollowStatus,
+  setLikes,
+  setPosts,
+  setProfiler,
+  setSongs,
+} from '../../actions/userActions';
+import { showNotification } from '../../actions/notificationsActions';
 
 const ProfileBlock = memo((props) => {
   const { className, user } = props;
@@ -18,10 +30,44 @@ const ProfileBlock = memo((props) => {
     history.push('/settings');
   }, []);
 
-  const goToFollow = useCallback((e) => {
-    e.preventDefault();
-    history.push(`/profile?username=${username}`);
+  const refreshProfile = useCallback(() => {
+    getUserDetails(username).then((res) => {
+      if (res.status === 200) {
+        store.dispatch(setProfiler(res.data.profile_pic_url));
+        store.dispatch(setFollowers(res.data.followers));
+        store.dispatch(setFollowing(res.data.following));
+        store.dispatch(setLikes(res.data.likes));
+        store.dispatch(setPosts(res.data.posts));
+        store.dispatch(setSongs(res.data.songs));
+        store.dispatch(setFollowStatus(res.data.follow_status));
+      } else {
+        store.dispatch(showNotification({ message: 'An unknown error has occurred.' }));
+      }
+    });
   }, [username]);
+
+  const follow = useCallback(async (e) => {
+    e.preventDefault();
+    const res = await postFollow(username);
+    if (res.status === 200) {
+      store.dispatch(setFollowStatus(1));
+      refreshProfile();
+      return true;
+    }
+    return false;
+  }, [refreshProfile, username]);
+
+  const unfollow = useCallback(async (e) => {
+    e.preventDefault();
+    const res = await postUnfollow(username);
+    if (res.status === 200) {
+      store.dispatch(setFollowStatus(0));
+      refreshProfile();
+      return true;
+    }
+    return false;
+  }, [refreshProfile, username]);
+
 
   return (
     <div className={`${styles.wrapper} ${className}`}>
@@ -77,7 +123,7 @@ const ProfileBlock = memo((props) => {
                 ? styles.followButton
                 : styles.hid
           }
-          onSubmit={goToFollow}
+          onSubmit={follow}
         >
           <SubmitButton
             className={
@@ -94,7 +140,7 @@ const ProfileBlock = memo((props) => {
                 ? styles.followButton
                 : styles.hide
           }
-          onSubmit={goToFollow}
+          onSubmit={unfollow}
         >
           <SubmitButton
             className={

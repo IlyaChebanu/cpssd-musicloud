@@ -195,3 +195,19 @@ export const getCompiledSongs = (username) => axios.get(
     headers: getAuth(),
   },
 );
+
+export const postFollow = (username) => axios.post(
+  `${API_URL}/v1/users/follow`,
+  { username },
+  {
+    headers: getAuth(),
+  },
+);
+
+export const postUnfollow = (username) => axios.post(
+  `${API_URL}/v1/users/unfollow`,
+  { username },
+  {
+    headers: getAuth(),
+  },
+);
