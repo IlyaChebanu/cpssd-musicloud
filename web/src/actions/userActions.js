@@ -85,3 +85,15 @@ export const setProfiler = (profilerURL) => (dispatch) => {
     profilerURL,
   });
 };
+
+export const hideUsersPopup = () => (dispatch) => {
+  dispatch({
+    type: 'USERS_POPUP_HIDE',
+  });
+};
+
+export const showUsersPopup = () => (dispatch) => {
+  dispatch({
+    type: 'USERS_POPUP_SHOW',
+  });
+};

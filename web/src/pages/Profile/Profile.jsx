@@ -9,7 +9,9 @@ import PostCard from '../../components/PostCard/PostCard';
 import ProfileBlock from '../../components/ProfileBlock';
 import AddPost from '../../components/AddPost';
 import { useUpdateUserDetails } from '../../helpers/hooks';
-import { getCompiledSongs, getUserPosts } from '../../helpers/api';
+import {
+  getCompiledSongs, getUserPosts,
+} from '../../helpers/api';
 import Spinner from '../../components/Spinner';
 import SongCard from '../../components/SongCard';
 
@@ -22,6 +24,7 @@ const Profile = memo((props) => {
 
   const [gotSongs, setGotSongs] = useState([]);
   const [gotPosts, setGotPosts] = useState([]);
+
   const [loadingSongs, setLoadingSongs] = useState(false);
   const [loadingPosts, setLoadingPosts] = useState(false);
 
@@ -72,6 +75,7 @@ const Profile = memo((props) => {
       profileImg={user.profiler}
     />
   )), [gotPosts, user.profiler, username]);
+
 
   return (
     <div className={styles.wrapper}>
