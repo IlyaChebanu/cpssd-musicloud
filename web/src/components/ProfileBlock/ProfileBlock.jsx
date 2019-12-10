@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { memo, useCallback } from 'react';
+import React, { memo, useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -7,20 +7,40 @@ import styles from './ProfileBlock.module.scss';
 import SubmitButton from '../SubmitButton';
 import history from '../../history';
 import CloudQuestion from '../../assets/cloud-question.jpg';
-import { getUserDetails, postFollow, postUnfollow } from '../../helpers/api';
+import {
+  getUserDetails, postFollow, postUnfollow, getFollowers, getFollowing,
+} from '../../helpers/api';
 import store from '../../store';
-import { setFollowers, setFollowStatus } from '../../actions/userActions';
+import {
+  setFollowers, setFollowStatus, showUsersPopup,
+} from '../../actions/userActions';
 import { showNotification } from '../../actions/notificationsActions';
+import UsersPopup from '../UsersPopup/UsersPopup';
 
 const ProfileBlock = memo((props) => {
-  const { className, user } = props;
+  const { dispatch, className, user } = props;
   const url = new URL(window.location.href);
   const username = url.searchParams.get('username');
-
+  const [gotUsers, setGotUsers] = useState([]);
+  const [follower, setFollower] = useState(false);
   const goToSettings = useCallback((e) => {
     e.preventDefault();
     history.push('/settings');
   }, []);
+
+  const getMyFollowers = useCallback(async () => {
+    const res = await getFollowers(username);
+    setGotUsers(res.data.followers);
+    setFollower(true);
+    dispatch(showUsersPopup());
+  }, [dispatch, username]);
+
+  const getMyFollowing = useCallback(async () => {
+    const res = await getFollowing(username);
+    setGotUsers(res.data.following);
+    setFollower(false);
+    dispatch(showUsersPopup());
+  }, [dispatch, username]);
 
   const refreshProfile = useCallback(() => {
     getUserDetails(username).then((res) => {
@@ -66,15 +86,15 @@ const ProfileBlock = memo((props) => {
         />
         <div className={styles.stats}>
           <div className={styles.stat}>
-            <Link to={`/profile?username=${username}`} className={styles.num}>
+            <p className={styles.num} style={{ cursor: 'pointer' }} onClick={getMyFollowers}>
               {typeof user.followers === 'number' ? user.followers : '?'}
-            </Link>
+            </p>
             <p className={styles.class}>followers</p>
           </div>
           <div className={styles.stat}>
-            <Link to={`/profile?username=${username}`} className={styles.num}>
+            <p className={styles.num} style={{ cursor: 'pointer' }} onClick={getMyFollowing}>
               {typeof user.following === 'number' ? user.following : '?'}
-            </Link>
+            </p>
             <p className={styles.class}>following</p>
           </div>
           <div className={styles.stat}>
@@ -140,12 +160,14 @@ const ProfileBlock = memo((props) => {
       <div>
         <p className={styles.username}>{username}</p>
       </div>
+      <UsersPopup follower={follower} users={gotUsers} />
     </div>
   );
 });
 
 
 ProfileBlock.propTypes = {
+  dispatch: PropTypes.func.isRequired,
   className: PropTypes.string,
   user: PropTypes.object.isRequired,
 };

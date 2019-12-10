@@ -238,6 +238,20 @@ export const postUnfollow = (username) => axios.post(
   },
 );
 
+export const getFollowers = (username) => axios.get(
+  `${API_URL}/v1/users/followers?username=${username}&users_per_page=10000`,
+  {
+    headers: getAuth(),
+  },
+);
+
+export const getFollowing = (username) => axios.get(
+  `${API_URL}/v1/users/following?username=${username}&users_per_page=10000`,
+  {
+    headers: getAuth(),
+  },
+);
+
 export const addSongCoverArt = (reqData) => axios.patch(
   `${API_URL}/v1/audio/cover_art`,
   reqData,
