@@ -7,10 +7,12 @@ import cookie from 'js-cookie';
 import { connect } from 'react-redux';
 import { withRouter, Link } from 'react-router-dom';
 import toWav from 'audiobuffer-to-wav';
+import _ from 'lodash';
 import styles from './Header.module.scss';
 import { deleteToken } from '../../actions/userActions';
 import {
   deleteToken as deleteTokenAPI, saveState, uploadFile, createNewSong, patchSongName,
+  setSongCompiledUrl,
 } from '../../helpers/api';
 import { showNotification } from '../../actions/notificationsActions';
 import { ReactComponent as Logo } from '../../assets/logo.svg';
@@ -39,8 +41,8 @@ import {
   stop,
   setSampleTime,
   setSampleLoading,
+  showPublishForm,
 } from '../../actions/studioActions';
-
 
 const Header = memo((props) => {
   const {
@@ -75,7 +77,7 @@ const Header = memo((props) => {
     const track = { ...studio.tracks[studio.selectedTrack] };
     fileSelector.onchange = function onChange() {
       const sampleFile = fileSelector.files[0];
-      const response = uploadFile('audio', sampleFile, cookie.get('token'));
+      const response = uploadFile('audio', sampleFile);
       const cast = Promise.resolve(response);
       cast.then((url) => {
         sampleState = {
@@ -111,9 +113,9 @@ const Header = memo((props) => {
   const exportAction = useCallback(async () => {
     const renderedBuffer = await renderTracks(studio);
     const encoded = toWav(renderedBuffer);
-
     forceDownload([new DataView(encoded)], 'audio/wav', `${studio.songName}.wav`); // for mp3 [new DataView] not needed
   }, [studio]);
+
 
   const handleShowSongPicker = useCallback(async () => {
     if (await handleSaveState()) {
@@ -140,22 +142,55 @@ const Header = memo((props) => {
     }
   }, [dispatch, handleSaveState]);
 
+  const tracksAndSamplesSet = useCallback(() => {
+    if (_.isEmpty(studio.tracks)) {
+      dispatch(showNotification({ message: 'Please add a track first', type: 'info' }));
+      return false;
+    }
+
+    let hasSamples = false;
+    studio.tracks.forEach((track) => {
+      if (!_.isEmpty(track.samples)) {
+        hasSamples = true;
+      }
+    });
+    if (!hasSamples) {
+      dispatch(showNotification({ message: 'Please add a sample first', type: 'info' }));
+      return false;
+    }
+    return true;
+  }, [dispatch, studio.tracks]);
+
+  const handlePublishSong = useCallback(async () => {
+    if (!tracksAndSamplesSet()) {
+      return;
+    }
+    if (await handleSaveState()) {
+      dispatch(showPublishForm());
+      const renderedBuffer = await renderTracks(studio);
+      const encoded = toWav(renderedBuffer);
+      const res = await uploadFile('compiled_audio', new File([encoded], `${studio.songName}.wav`, { type: 'audio/wav' }));
+      const songData = {
+        url: res,
+        sid: studio.songId,
+        duration: 1,
+      };
+      setSongCompiledUrl(songData);
+    }
+  }, [dispatch, handleSaveState, studio, tracksAndSamplesSet]);
+
+
   const fileDropdownItems = useMemo(() => [
     { name: 'New', action: handleHideSongPicker, icon: newIcon },
     { name: 'Open', action: handleShowSongPicker, icon: openIcon },
-    { name: 'Publish', icon: publishIcon },
+    { name: 'Publish', action: handlePublishSong, icon: publishIcon },
     { name: 'Save', icon: saveIcon, action: handleSaveState },
     { name: 'Import', icon: importIcon, action: handleSampleImport },
     { name: 'Export', icon: exportIcon, action: exportAction },
     { name: 'Generate', icon: generateIcon },
     { name: 'Exit', icon: exitIcon },
-  ], [
-    exportAction,
-    handleHideSongPicker,
-    handleSampleImport,
-    handleSaveState,
-    handleShowSongPicker,
-  ]);
+  ], [exportAction, handleHideSongPicker, handlePublishSong,
+    handleSampleImport, handleSaveState, handleShowSongPicker]);
 
   const editDropdownItems = useMemo(() => [
     { name: 'Edit 1' },

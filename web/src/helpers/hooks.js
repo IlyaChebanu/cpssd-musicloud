@@ -30,6 +30,7 @@ export const useUpdateUserDetails = () => {
         getUserDetails(user.username).then((res) => {
           if (res.status === 200) {
             dispatchProfileData(res);
+            store.dispatch(setProfilePicUrl(res.data.profile_pic_url));
           } else {
             store.dispatch(showNotification({ message: 'An unknown error has occurred.' }));
           }

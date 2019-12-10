@@ -717,9 +717,9 @@ def get_playlist_data(pid, start_index, songs_per_page, uid):
         "title, duration, created, public, url, cover, "
         "(SELECT COUNT(*) FROM Song_Likes WHERE "
         "Songs.sid = Song_Likes.sid) as likes, "
-        "(SELECT COUNT(*) FROM Song_Likes, description WHERE "
-        "Song_Likes.sid=Songs.sid AND Song_Likes.uid=%s) FROM Songs "
-        "INNER JOIN Playlist_State ON "
+        "(SELECT COUNT(*) FROM Song_Likes WHERE "
+        "Song_Likes.sid=Songs.sid AND Song_Likes.uid=%s) , description FROM "
+        "Songs INNER JOIN Playlist_State ON "
         "Playlist_State.sid = Songs.sid WHERE Playlist_State.pid = %s "
         "AND Songs.public = 1 LIMIT %s, %s;"
     )

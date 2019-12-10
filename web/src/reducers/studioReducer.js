@@ -7,6 +7,7 @@ export default (
     },
     songId: null,
     songName: 'New Song',
+    songDescription: '',
     gridSize: 1,
     gridWidth: 1,
     gridSnapEnabled: true,
@@ -27,6 +28,8 @@ export default (
     title: 'Untitled',
     songPickerHidden: false,
     sampleEffectsHidden: true,
+    publishFormHidden: true,
+    songImageUrl: null,
   },
   action,
 ) => {
@@ -196,10 +199,25 @@ export default (
         ...state,
         sampleEffectsHidden: false,
       };
+    case 'PUBLISH_FORM_HIDE':
+      return {
+        ...state,
+        publishFormHidden: true,
+      };
+    case 'PUBLISH_FORM_SHOW':
+      return {
+        ...state,
+        publishFormHidden: false,
+      };
     case 'SET_SONG_NAME':
       return {
         ...state,
         songName: action.songName,
+      };
+    case 'SET_SONG_DESCRIPTION':
+      return {
+        ...state,
+        songDescription: action.description,
       };
     case 'SET_SONG_ID':
       return {
@@ -253,6 +271,11 @@ export default (
           });
           return track;
         }),
+      };
+    case 'SET_SONG_IMAGE_URL':
+      return {
+        ...state,
+        songImageUrl: action.songImageUrl,
       };
     default:
       return state;
