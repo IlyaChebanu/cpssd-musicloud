@@ -7,6 +7,7 @@ import {
 import {
   audioContext, bufferStore,
 } from '../helpers/constants';
+import { lerp } from '../helpers/utils';
 
 const LOOKAHEAD = 25; // ms
 const OVERLAP = 100/* ms */ / 1000;
@@ -57,7 +58,10 @@ const scheduleSample = (state, sample, context = audioContext, offline = false) 
   if (!solo) {
     volume = track.mute ? 0 : sample.volume;
   }
-  gain.gain.setValueAtTime(volume, 0);
+  gain.gain.setValueAtTime(0, startTime);
+  gain.gain.linearRampToValueAtTime(volume, lerp(startTime, endTime, sample.fade.fadeIn));
+  gain.gain.setValueAtTime(volume, lerp(startTime, endTime, 1 - sample.fade.fadeOut));
+  gain.gain.linearRampToValueAtTime(0, endTime);
   pan.pan.setValueAtTime(track.pan, 0);
 
   source.start(startTime, offline ? 0 : offset);
@@ -205,6 +209,7 @@ export default (store) => {
           if (!solo) {
             volume = track.mute ? 0 : track.volume;
           }
+
           sample.gain.gain.setValueAtTime(volume, audioContext.currentTime);
           sample.pan.pan.setValueAtTime(track.pan, audioContext.currentTime);
         });
@@ -214,6 +219,12 @@ export default (store) => {
           await Promise.all(action.tracks.map(async (track) => {
             if (track.samples) {
               await Promise.all(track.samples.map(async (sample) => {
+                if (!sample.fade) {
+                  sample.fade = {
+                    fadeIn: 0,
+                    fadeOut: 0,
+                  };
+                }
                 if (!bufferStore[sample.url]) {
                   await store.dispatch(setSampleLoading(true));
                   const res = await axios.get(sample.url, { responseType: 'arraybuffer' });

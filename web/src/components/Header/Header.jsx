@@ -47,7 +47,7 @@ const Header = memo((props) => {
     selected, studio, children, dispatch, history, user,
   } = props;
   const { tempo, tracks, songId } = studio;
-  const { profilePicUrl } = user;
+  const { profiler } = user;
   const [nameInput, setNameInput] = useState(studio.songName);
 
   const handleSaveState = useCallback(async () => {
@@ -84,6 +84,10 @@ const Header = memo((props) => {
           id: genId(),
           time: studio.currentBeat,
           track: studio.selectedTrack,
+          fade: {
+            fadeIn: 0,
+            fadeOut: 0,
+          },
         };
         track.samples.push(sampleState);
         dispatch(setTrackAtIndex(track, studio.selectedTrack));
@@ -208,7 +212,7 @@ const Header = memo((props) => {
           <Link to={`/profile?username=${user.username}`} className={selected === 3 ? styles.selected : ''}>Profile</Link>
         </nav>
         <div className={styles.pictureWrapper}>
-          <CircularImage src={profilePicUrl} />
+          <CircularImage src={profiler} />
           <div className={styles.signout} onClick={handleSignout} role="button" tabIndex={0}>
             <SignOutIcon />
           </div>

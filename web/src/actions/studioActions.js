@@ -204,3 +204,11 @@ export const setSongId = (songId) => (dispatch) => {
     songId,
   });
 };
+
+export const setSampleFade = (id, fade) => (dispatch) => {
+  dispatch({
+    type: 'SET_SAMPLE_FADE',
+    id,
+    fade,
+  });
+};

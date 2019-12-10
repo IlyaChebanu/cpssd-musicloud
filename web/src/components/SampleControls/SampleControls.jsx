@@ -1,21 +1,31 @@
 import React, {
-  useCallback, memo, useState, useEffect,
+  useCallback, memo, useState, useEffect, useMemo,
 } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
+import _ from 'lodash';
 import styles from './SampleControls.module.scss';
 import {
-  setSampleName,
+  setSampleName, setSampleFade,
 } from '../../actions/studioActions';
 import { ReactComponent as Knob } from '../../assets/icons/Knob.svg';
+import { clamp, lerp } from '../../helpers/utils';
 
 const SampleControls = memo((props) => {
   const {
-    dispatch, studio, tracks,
+    dispatch, studio,
   } = props;
 
   const [nameInput, setNameInput] = useState(studio.selectedSample);
+
+  const track = useMemo(() => (
+    studio.tracks[studio.selectedTrack]
+  ), [studio.selectedTrack, studio.tracks]);
+
+  const sample = (
+    track && _.find(track.samples, (s) => s.id === studio.selectedSample)
+  ) || { fade: {} };
 
   const handleSetSampleName = useCallback(async () => {
     dispatch(setSampleName(nameInput));
@@ -26,24 +36,78 @@ const SampleControls = memo((props) => {
     if (studio.tracks === undefined) {
       return;
     }
-    const track = studio.tracks[studio.selectedTrack];
-    if (track === undefined) {
+    if (!track) {
       return;
     }
     if (studio.selectedTrack !== -1 && studio.selectedSample !== -1) {
-      const sample = track.samples.filter((s) => s.id === studio.selectedSample)[0];
-      if (sample === undefined) {
+      if (!sample) {
         return;
       }
       setNameInput(sample.name);
     }
-  }, [studio.sampleName, studio.selectedSample, studio.selectedTrack, studio.tracks, tracks]);
+  }, [sample, studio.selectedSample, studio.selectedTrack, studio.tracks, track]);
 
 
   const handleChange = useCallback((e) => {
     setNameInput(e.target.value);
     dispatch(setSampleName(e.target.value, studio.selectedSample));
   }, [dispatch, studio.selectedSample]);
+
+  const handleFadeIn = useCallback((ev) => {
+    ev.preventDefault();
+    const startPos = ev.screenY;
+    const startVal = (sample.fade && sample.fade.fadeIn) || 0;
+    let lastVal = startVal;
+    const handleMouseMove = (e) => {
+      const pos = e.screenY;
+      const val = clamp(0, 1, startVal - (pos - startPos) / 200);
+      if (val !== lastVal) {
+        lastVal = val;
+        if (val + sample.fade.fadeOut > 1) {
+          sample.fade.fadeOut = 1 - val;
+        }
+        dispatch(setSampleFade(sample.id, { ...sample.fade, fadeIn: val }));
+      }
+    };
+    const handleDragStop = () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleDragStop);
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleDragStop);
+  }, [dispatch, sample.fade, sample.id]);
+
+  const fadeInStyle = useMemo(() => ({
+    transform: `rotate(${lerp(-140, 140, sample.fade.fadeIn || 0)}deg)`,
+  }), [sample.fade]);
+
+  const handleFadeOut = useCallback((ev) => {
+    ev.preventDefault();
+    const startPos = ev.screenY;
+    const startVal = (sample.fade && sample.fade.fadeOut) || 0;
+    let lastVal = startVal;
+    const handleMouseMove = (e) => {
+      const pos = e.screenY;
+      const val = clamp(0, 1, startVal - (pos - startPos) / 200);
+      if (val !== lastVal) {
+        lastVal = val;
+        if (val + sample.fade.fadeIn > 1) {
+          sample.fade.fadeIn = 1 - val;
+        }
+        dispatch(setSampleFade(sample.id, { ...sample.fade, fadeOut: val }));
+      }
+    };
+    const handleDragStop = () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleDragStop);
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleDragStop);
+  }, [dispatch, sample.fade, sample.id]);
+
+  const fadeOutStyle = useMemo(() => ({
+    transform: `rotate(${lerp(-140, 140, sample.fade.fadeOut || 0)}deg)`,
+  }), [sample.fade]);
 
   return (
     <div
@@ -63,11 +127,11 @@ const SampleControls = memo((props) => {
         </span>
         <div className={styles.buttons}>
           <span>
-            <Knob />
+            <Knob onMouseDown={handleFadeIn} style={fadeInStyle} />
             <p>Fade in</p>
           </span>
           <span>
-            <Knob />
+            <Knob onMouseDown={handleFadeOut} style={fadeOutStyle} />
             <p>Fade out</p>
           </span>
           <span>
