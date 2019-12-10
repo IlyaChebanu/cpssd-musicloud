@@ -83,3 +83,77 @@ export function getLikedSongs(token, username, songs_per_page) {
             return error
         });
 }
+
+export function postLikeSong(token, sid) {
+
+    let url = `${API_URL}api/v1/audio/like`;
+    var request = new Request(url, {
+        method: "POST",
+        headers: new Headers({
+            "Content-Type": "application/json",
+            "Authorization": 'Bearer ' + token,
+        }),
+        body: JSON.stringify({
+            "sid": sid
+        })
+    });
+    if (__DEV__) {
+        console.log("postLikeSong : request " + JSON.stringify(request))
+    }
+
+    return fetch(request)
+        .then(response => {
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
+        })
+        .then(responseJson => {
+            if (__DEV__) {
+                console.log("postLikeSong : response " + JSON.stringify(responseJson))
+            }
+            return responseJson;
+        })
+        .catch(error => {
+            if (__DEV__) {
+                console.log("postLikeSong : error " + JSON.stringify(error))
+            }
+            return error
+        });
+}
+
+export function postUnlikeSong(token, sid) {
+
+    let url = `${API_URL}api/v1/audio/unlike`;
+    var request = new Request(url, {
+        method: "POST",
+        headers: new Headers({
+            "Content-Type": "application/json",
+            "Authorization": 'Bearer ' + token,
+        }),
+        body: JSON.stringify({
+            "sid": sid
+        })
+    });
+    if (__DEV__) {
+        console.log("postLikeSong : request " + JSON.stringify(request))
+    }
+
+    return fetch(request)
+        .then(response => {
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
+        })
+        .then(responseJson => {
+            if (__DEV__) {
+                console.log("postLikeSong : response " + JSON.stringify(responseJson))
+            }
+            return responseJson;
+        })
+        .catch(error => {
+            if (__DEV__) {
+                console.log("postLikeSong : error " + JSON.stringify(error))
+            }
+            return error
+        });
+}

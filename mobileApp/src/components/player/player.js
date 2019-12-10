@@ -6,6 +6,7 @@ import Video from 'react-native-video';
 import styles from "./styles";
 import { formattedTime } from '../../utils/helpers';
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { postLikeSong, postUnlikeSong } from "../../api/audioAPI";
 
 const { width, height } = Dimensions.get('window');
 
@@ -64,7 +65,7 @@ export default class Player extends React.Component {
     }
 
     onLoad(params) {
-        this.setState({ numLikes: this.props.songs[this.state.songIndex].likes})
+        this.setState({ numLikes: this.props.songs[this.state.songIndex].likes, liked: this.props.songs[this.state.songIndex].like_status})
         this.setState({ songDuration: params.duration });
     }
 
@@ -95,11 +96,15 @@ export default class Player extends React.Component {
     }
 
     likeSong() {
-        this.setState({ liked: !this.state.liked, numLikes: this.state.numLikes + 1 })
+        postLikeSong(this.props.accessToken, this.props.songs[this.state.songIndex].sid).then(response => {
+            this.setState({ liked: !this.state.liked, numLikes: this.state.numLikes + 1 })
+        })
     }
 
     unlikeSong() {
-        this.setState({ liked: !this.state.liked, numLikes: this.state.numLikes - 1 })
+        postUnlikeSong(this.props.accessToken, this.props.songs[this.state.songIndex].sid).then(response => {
+            this.setState({ liked: !this.state.liked, numLikes: this.state.numLikes - 1 })
+        })
     }
 
     render() {
