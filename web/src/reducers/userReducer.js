@@ -14,6 +14,7 @@ if (token) {
 
 
 export default (state = {
+  usersPopupHidden: true,
   token,
   username,
   profilePicUrl: '',
@@ -83,6 +84,16 @@ export default (state = {
       return {
         ...state,
         profiler: action.profilerURL,
+      };
+    case 'USERS_POPUP_SHOW':
+      return {
+        ...state,
+        usersPopupHidden: false,
+      };
+    case 'USERS_POPUP_HIDE':
+      return {
+        ...state,
+        usersPopupHidden: true,
       };
     default:
       return state;
