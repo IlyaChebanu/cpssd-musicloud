@@ -152,17 +152,19 @@ const Header = memo((props) => {
     if (!tracksAndSamplesSet()) {
       return;
     }
-    dispatch(showPublishForm());
-    const renderedBuffer = await renderTracks(studio);
-    const encoded = toWav(renderedBuffer);
-    const res = await uploadFile('compiled_audio', new File([encoded], `${studio.songName}.wav`, { type: 'audio/wav' }));
-    const songData = {
-      url: res,
-      sid: studio.songId,
-      duration: 1,
-    };
-    setSongCompiledUrl(songData);
-  }, [dispatch, studio, tracksAndSamplesSet]);
+    if (await handleSaveState()) {
+      dispatch(showPublishForm());
+      const renderedBuffer = await renderTracks(studio);
+      const encoded = toWav(renderedBuffer);
+      const res = await uploadFile('compiled_audio', new File([encoded], `${studio.songName}.wav`, { type: 'audio/wav' }));
+      const songData = {
+        url: res,
+        sid: studio.songId,
+        duration: 1,
+      };
+      setSongCompiledUrl(songData);
+    }
+  }, [dispatch, handleSaveState, studio, tracksAndSamplesSet]);
 
 
   const fileDropdownItems = useMemo(() => [
