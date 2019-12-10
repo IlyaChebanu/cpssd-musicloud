@@ -9,14 +9,15 @@ import { SafeAreaView } from "react-navigation";
 import HeaderComponent from "../../components/headerComponent/headerComponent";
 import MusicPlayer from "../../components/musicPlayer/musicPlayer";
 import { getUserInfo } from "../../api/usersAPI";
+import Player from "../../components/player/player";
 
 class MusicPlayerScreen extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-        //   userDetails: {},
+            //   userDetails: {},
         };
-      }
+    }
 
     componentDidMount() {
         // this.getUserDetails()
@@ -27,7 +28,13 @@ class MusicPlayerScreen extends React.Component {
     }
 
     handleAuthorClick() {
+        this.props.navigateBack()
         this.props.navigateToUserProfileScreen()
+    }
+
+    navBack() {
+        this.props.setSongUpdate(!this.props.songUpdate)
+        this.props.navigateBack()
     }
 
     render() {
@@ -38,19 +45,18 @@ class MusicPlayerScreen extends React.Component {
                 <View style={{ 'backgroundColor': '#1B1E23', 'flex': 1 }}>
                     <View style={styles.headerContainer}>
                         <Image style={styles.logo} source={logoImage} />
-                        <TouchableOpacity style={styles.arrowDown} onPress={() => this.props.navigateBack()}>
+                        <TouchableOpacity style={styles.arrowDown} onPress={() => this.navBack()}>
                             <Image style={styles.arrowDownImg} source={arrowDownImg} />
                         </TouchableOpacity>
                     </View>
                     {/* <HeaderComponent navigation={this.props.navigation} /> */}
-                    <MusicPlayer 
-                        songData={this.props.songData}
-                        profilePic={this.props.otherUserData.profile_pic_url && this.props.otherUserData.profile_pic_url}
-                        videoUrl={this.props.songUrl}
-                        arrowClick={() => this.props.navigateBack()}
-                        musicDidEnd={this.musicDidEnd.bind(this)}
-                        navigation={this.props.navigation}
-                        handleAuthorClick={this.handleAuthorClick.bind(this)} />
+                    <Player
+                        songIndex={this.props.songIndex}
+                        handleProfileClick={this.handleAuthorClick.bind(this)}
+                        accessToken={this.props.token}
+                        profilePic={this.props.otherUserData.profile_pic_url ? this.props.otherUserData.profile_pic_url : null}
+                        songs={this.props.songData}
+                    />
                 </View>
 
             </SafeAreaView>
@@ -63,8 +69,10 @@ function mapStateToProps(state) {
         token: state.home.token,
         otherUserData: state.user.otherUserData,
         songId: state.song.songId,
+        songIndex: state.song.songIndex,
         songUrl: state.song.songUrl,
         songData: state.song.songData,
+        songUpdate: state.song.songUpdate,
     };
 }
 

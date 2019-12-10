@@ -62,15 +62,15 @@ export default StyleSheet.create({
     },
     back: {
       marginTop: 22,
-      marginLeft: width > 320 ? 45 : 25,
+      marginLeft: width > 320 ? 35 : 25,
     },
     play: {
-      marginLeft: width > 320 ? 50 : 25,
-      marginRight: width > 320 ? 50 : 25,
+      marginLeft: width > 320 ? 40 : 25,
+      marginRight: width > 320 ? 40 : 25,
     },
     forward: {
       marginTop: 22,
-      marginRight: width > 320 ? 45 : 25,
+      marginRight: width > 320 ? 35 : 25,
     },
     addplaylist: {
       marginTop: 26,

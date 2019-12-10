@@ -92,7 +92,8 @@ export default class Player extends React.Component {
     }
 
     handleProfileClick() {
-
+        this.setState({ playing: false });
+        this.props.handleProfileClick()
     }
 
     likeSong() {
