@@ -5,7 +5,7 @@ export default StyleSheet.create({
     container: {
       flex: 1,
       alignItems: 'center',
-      backgroundColor: '#000',
+      backgroundColor: '#1B1E23',
     },
     profileImg: {
       width: 25,
@@ -130,5 +130,5 @@ export default StyleSheet.create({
       shadowOffset: {width: 0, height: 0},
       shadowRadius: 2,
       shadowOpacity: 1,
-    }
+    },
   });

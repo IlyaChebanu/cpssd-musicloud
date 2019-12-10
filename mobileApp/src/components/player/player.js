@@ -33,7 +33,7 @@ export default class Player extends React.Component {
     }
 
     addToPlaylist() {
-
+        this.props.handlePlaylistClick()
     }
 
     goBackward() {
