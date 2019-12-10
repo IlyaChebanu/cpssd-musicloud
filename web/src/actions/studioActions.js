@@ -170,6 +170,19 @@ export const showSongPicker = () => (dispatch) => {
   });
 };
 
+export const hidePublishForm = () => (dispatch) => {
+  dispatch({
+    type: 'PUBLISH_FORM_HIDE',
+  });
+};
+
+export const showPublishForm = () => (dispatch) => {
+  dispatch({
+    type: 'PUBLISH_FORM_SHOW',
+  });
+};
+
+
 export const setSongName = (songName) => (dispatch) => {
   dispatch({
     type: 'SET_SONG_NAME',
@@ -177,9 +190,24 @@ export const setSongName = (songName) => (dispatch) => {
   });
 };
 
+export const setSongDescription = (description) => (dispatch) => {
+  dispatch({
+    type: 'SET_SONG_DESCRIPTION',
+    description,
+  });
+};
+
+
 export const setSongId = (songId) => (dispatch) => {
   dispatch({
     type: 'SET_SONG_ID',
     songId,
+  });
+};
+
+export const setSongImageUrl = (songImageUrl) => (dispatch) => {
+  dispatch({
+    type: 'SET_SONG_IMAGE_URL',
+    songImageUrl,
   });
 };
