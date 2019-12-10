@@ -96,10 +96,6 @@ const Header = memo((props) => {
             cutoff: 0,
             time: 0.3,
           },
-          delay: {
-            time: 0,
-            feedback: 0,
-          },
         };
         track.samples.push(sampleState);
         dispatch(setTrackAtIndex(track, studio.selectedTrack));

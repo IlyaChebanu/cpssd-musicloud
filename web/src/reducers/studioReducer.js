@@ -256,22 +256,6 @@ export default (
           return track;
         }),
       };
-    case 'SET_SAMPLE_DELAY':
-      return {
-        ...state,
-        tracks: state.tracks.map((track) => {
-          track.samples = track.samples.map((sample) => {
-            if (sample.id === action.id) {
-              return {
-                ...sample,
-                delay: action.delay,
-              };
-            }
-            return sample;
-          });
-          return track;
-        }),
-      };
     case 'SET_SONG_IMAGE_URL':
       return {
         ...state,

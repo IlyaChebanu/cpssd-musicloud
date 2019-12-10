@@ -49,21 +49,10 @@ const scheduleSample = (state, sample, context = audioContext, offline = false) 
   const pan = context.createStereoPanner();
   const reverb = Reverb(context);
   const gain = context.createGain();
-  const delayNode = context.createDelay(100);
-  const feedbackNode = context.createGain();
-  const bypassNode = context.createGain();
   source.connect(pan);
   pan.connect(reverb);
-  // delayNode.connect(feedbackNode);
-  // feedbackNode.connect(delayNode);
-  // delayNode.connect(bypassNode);
-  // bypassNode.connect(reverb);
   reverb.connect(gain);
   gain.connect(context.globalGain);
-
-  delayNode.delayTime.value = sample.delay.time;
-  feedbackNode.gain.value = sample.delay.feedback;
-  bypassNode.gain.value = 1;
 
   reverb.time = sample.reverb.time * 10;
   reverb.wet.value = sample.reverb.wet;
@@ -255,12 +244,6 @@ export default (store) => {
                     dry: 1,
                     cutoff: 0,
                     time: 0.3,
-                  };
-                }
-                if (!sample.delay) {
-                  sample.delay = {
-                    time: 0,
-                    feedback: 0,
                   };
                 }
                 if (!bufferStore[sample.url]) {

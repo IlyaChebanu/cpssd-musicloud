@@ -241,14 +241,6 @@ export const setSampleReverb = (id, reverb) => (dispatch) => {
   });
 };
 
-export const setSampleDelay = (id, delay) => (dispatch) => {
-  dispatch({
-    type: 'SET_SAMPLE_DELAY',
-    id,
-    delay,
-  });
-};
-
 export const setSongImageUrl = (songImageUrl) => (dispatch) => {
   dispatch({
     type: 'SET_SONG_IMAGE_URL',
