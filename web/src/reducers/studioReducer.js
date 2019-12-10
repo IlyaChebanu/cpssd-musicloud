@@ -222,6 +222,22 @@ export default (
           return track;
         }),
       };
+    case 'SET_SAMPLE_REVERB':
+      return {
+        ...state,
+        tracks: state.tracks.map((track) => {
+          track.samples = track.samples.map((sample) => {
+            if (sample.id === action.id) {
+              return {
+                ...sample,
+                reverb: action.reverb,
+              };
+            }
+            return sample;
+          });
+          return track;
+        }),
+      };
     default:
       return state;
   }

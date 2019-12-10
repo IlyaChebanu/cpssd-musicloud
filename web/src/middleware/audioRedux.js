@@ -1,6 +1,7 @@
 /* eslint-disable no-param-reassign */
 import axios from 'axios';
 import _ from 'lodash';
+import Reverb from 'soundbank-reverb';
 import {
   playingStartTime, setCurrentBeat, playingStartBeat, setSampleLoading, stop,
 } from '../actions/studioActions';
@@ -45,11 +46,18 @@ const scheduleSample = (state, sample, context = audioContext, offline = false) 
   const source = context.createBufferSource();
   source.buffer = sample.buffer;
 
-  const gain = context.createGain();
   const pan = context.createStereoPanner();
+  const reverb = Reverb(context);
+  const gain = context.createGain();
   source.connect(pan);
-  pan.connect(gain);
+  pan.connect(reverb);
+  reverb.connect(gain);
   gain.connect(context.globalGain);
+
+  reverb.time = sample.reverb.time * 10;
+  reverb.wet.value = sample.reverb.wet;
+  reverb.dry.value = sample.reverb.dry;
+  reverb.cutoff.value = sample.reverb.cutoff * 10000;
 
   const track = state.tracks[sample.track];
   const soloTrack = _.findIndex(state.tracks, 'solo');
@@ -223,6 +231,14 @@ export default (store) => {
                   sample.fade = {
                     fadeIn: 0,
                     fadeOut: 0,
+                  };
+                }
+                if (!sample.reverb) {
+                  sample.reverb = {
+                    wet: 1,
+                    dry: 1,
+                    cutoff: 0,
+                    time: 0.3,
                   };
                 }
                 if (!bufferStore[sample.url]) {

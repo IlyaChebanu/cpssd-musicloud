@@ -7,7 +7,7 @@ import { withRouter } from 'react-router-dom';
 import _ from 'lodash';
 import styles from './SampleControls.module.scss';
 import {
-  setSampleName, setSampleFade,
+  setSampleName, setSampleFade, setSampleReverb,
 } from '../../actions/studioActions';
 import { ReactComponent as Knob } from '../../assets/icons/Knob.svg';
 import { clamp, lerp } from '../../helpers/utils';
@@ -25,7 +25,7 @@ const SampleControls = memo((props) => {
 
   const sample = (
     track && _.find(track.samples, (s) => s.id === studio.selectedSample)
-  ) || { fade: {} };
+  ) || { fade: {}, reverb: {} };
 
   const handleSetSampleName = useCallback(async () => {
     dispatch(setSampleName(nameInput));
@@ -109,6 +109,106 @@ const SampleControls = memo((props) => {
     transform: `rotate(${lerp(-140, 140, sample.fade.fadeOut || 0)}deg)`,
   }), [sample.fade]);
 
+  const handleReverbDry = useCallback((ev) => {
+    ev.preventDefault();
+    const startPos = ev.screenY;
+    const startVal = (sample.reverb && sample.reverb.dry) || 0;
+    let lastVal = startVal;
+    const handleMouseMove = (e) => {
+      const pos = e.screenY;
+      const val = clamp(0, 1, startVal - (pos - startPos) / 200);
+      if (val !== lastVal) {
+        lastVal = val;
+        dispatch(setSampleReverb(sample.id, { ...sample.reverb, dry: val }));
+      }
+    };
+    const handleDragStop = () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleDragStop);
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleDragStop);
+  }, [dispatch, sample.id, sample.reverb]);
+
+  const reverbDryStyle = useMemo(() => ({
+    transform: `rotate(${lerp(-140, 140, sample.reverb.dry || 0)}deg)`,
+  }), [sample.reverb]);
+
+  const handleReverbWet = useCallback((ev) => {
+    ev.preventDefault();
+    const startPos = ev.screenY;
+    const startVal = (sample.reverb && sample.reverb.wet) || 0;
+    let lastVal = startVal;
+    const handleMouseMove = (e) => {
+      const pos = e.screenY;
+      const val = clamp(0, 1, startVal - (pos - startPos) / 200);
+      if (val !== lastVal) {
+        lastVal = val;
+        dispatch(setSampleReverb(sample.id, { ...sample.reverb, wet: val }));
+      }
+    };
+    const handleDragStop = () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleDragStop);
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleDragStop);
+  }, [dispatch, sample.id, sample.reverb]);
+
+  const reverbWetStyle = useMemo(() => ({
+    transform: `rotate(${lerp(-140, 140, sample.reverb.wet || 0)}deg)`,
+  }), [sample.reverb]);
+
+  const handleReverbCutoff = useCallback((ev) => {
+    ev.preventDefault();
+    const startPos = ev.screenY;
+    const startVal = (sample.reverb && sample.reverb.cutoff) || 0;
+    let lastVal = startVal;
+    const handleMouseMove = (e) => {
+      const pos = e.screenY;
+      const val = clamp(0, 1, startVal - (pos - startPos) / 200);
+      if (val !== lastVal) {
+        lastVal = val;
+        dispatch(setSampleReverb(sample.id, { ...sample.reverb, cutoff: val }));
+      }
+    };
+    const handleDragStop = () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleDragStop);
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleDragStop);
+  }, [dispatch, sample.id, sample.reverb]);
+
+  const reverbCutoffStyle = useMemo(() => ({
+    transform: `rotate(${lerp(-140, 140, sample.reverb.cutoff || 0)}deg)`,
+  }), [sample.reverb]);
+
+  const handleReverbTime = useCallback((ev) => {
+    ev.preventDefault();
+    const startPos = ev.screenY;
+    const startVal = (sample.reverb && sample.reverb.time) || 0;
+    let lastVal = startVal;
+    const handleMouseMove = (e) => {
+      const pos = e.screenY;
+      const val = clamp(0, 1, startVal - (pos - startPos) / 200);
+      if (val !== lastVal) {
+        lastVal = val;
+        dispatch(setSampleReverb(sample.id, { ...sample.reverb, time: val }));
+      }
+    };
+    const handleDragStop = () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleDragStop);
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleDragStop);
+  }, [dispatch, sample.id, sample.reverb]);
+
+  const reverbTimeStyle = useMemo(() => ({
+    transform: `rotate(${lerp(-140, 140, sample.reverb.time || 0)}deg)`,
+  }), [sample.reverb]);
+
   return (
     <div
       style={{
@@ -135,8 +235,20 @@ const SampleControls = memo((props) => {
             <p>Fade out</p>
           </span>
           <span>
-            <Knob />
-            <p>Reverb</p>
+            <Knob onMouseDown={handleReverbWet} style={reverbWetStyle} />
+            <p>Reverb wet</p>
+          </span>
+          <span>
+            <Knob onMouseDown={handleReverbDry} style={reverbDryStyle} />
+            <p>Reverb dry</p>
+          </span>
+          <span>
+            <Knob onMouseDown={handleReverbCutoff} style={reverbCutoffStyle} />
+            <p>Reverb cut-off</p>
+          </span>
+          <span>
+            <Knob onMouseDown={handleReverbTime} style={reverbTimeStyle} />
+            <p>Reverb time</p>
           </span>
           <span>
             <Knob />

@@ -88,6 +88,12 @@ const Header = memo((props) => {
             fadeIn: 0,
             fadeOut: 0,
           },
+          reverb: {
+            wet: 1,
+            dry: 1,
+            cutoff: 0,
+            time: 0.3,
+          },
         };
         track.samples.push(sampleState);
         dispatch(setTrackAtIndex(track, studio.selectedTrack));

@@ -212,3 +212,11 @@ export const setSampleFade = (id, fade) => (dispatch) => {
     fade,
   });
 };
+
+export const setSampleReverb = (id, reverb) => (dispatch) => {
+  dispatch({
+    type: 'SET_SAMPLE_REVERB',
+    id,
+    reverb,
+  });
+};
