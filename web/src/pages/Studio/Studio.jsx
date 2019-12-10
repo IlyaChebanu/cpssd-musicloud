@@ -32,6 +32,7 @@ import { saveState, getSongState } from '../../helpers/api';
 import { useUpdateUserDetails } from '../../helpers/hooks';
 import store from '../../store';
 import Spinner from '../../components/Spinner/Spinner';
+import PublishForm from '../../components/PublishForm/PublishForm';
 
 const Studio = memo((props) => {
   const { dispatch, tracks, studio } = props;
@@ -355,6 +356,7 @@ const Studio = memo((props) => {
       </div>
       <PlayBackControls style={{ 'pointer-events': 'none' }} />
       <SongPicker songs={[exampleSong]} />
+      <PublishForm />
     </div>
 
   );
