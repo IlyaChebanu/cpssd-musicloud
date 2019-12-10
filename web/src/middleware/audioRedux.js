@@ -8,7 +8,7 @@ import {
 import {
   audioContext, bufferStore,
 } from '../helpers/constants';
-import { lerp } from '../helpers/utils';
+import { lerp, genId } from '../helpers/utils';
 
 const LOOKAHEAD = 25; // ms
 const OVERLAP = 100/* ms */ / 1000;
@@ -182,9 +182,14 @@ export default (store) => {
 
       // Schedule samples
       schedulableSamples.forEach((sample) => {
-        if (!(sample.id in scheduledSamples) || scheduledSamples[sample.id].old) {
+        if (
+          !sample.schedulerId
+            || !(sample.schedulerId in scheduledSamples)
+            || scheduledSamples[sample.schedulerId].old
+        ) {
+          sample.schedulerId = genId();
           const source = scheduleSample(state, sample);
-          scheduledSamples[sample.id] = { ...sample, ...source };
+          scheduledSamples[sample.schedulerId] = { ...sample, ...source };
         }
       });
     }
