@@ -18,12 +18,19 @@ class PlaylistScreen extends React.Component {
             playlistSongData: [],
             screenState: 1,
             playlistTitle: '',
+            pid: null,
         };
     }
 
     componentDidMount() {
         this.getPlaylist()
     }
+
+    componentDidUpdate(prevProps, prevState) {
+        if (prevProps.songUpdate !== this.props.songUpdate) {
+          this.getPlaylistSongs(this.state.pid)
+        }
+      }
 
     getPlaylistSongs(pid) {
         getPlaylistSongs(this.props.token, pid).then(response => {
@@ -43,7 +50,7 @@ class PlaylistScreen extends React.Component {
     }
 
     handlePlaylistClick(item) {
-        this.setState({ playlistTitle: item.title })
+        this.setState({ playlistTitle: item.title, pid: item.pid })
         this.getPlaylistSongs(item.pid)
     }
 
@@ -151,6 +158,7 @@ class PlaylistScreen extends React.Component {
 function mapStateToProps(state) {
     return {
         token: state.home.token,
+        songUpdate: state.song.songUpdate,
     };
 }
 
