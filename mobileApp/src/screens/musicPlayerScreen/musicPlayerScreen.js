@@ -7,7 +7,6 @@ import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import { SafeAreaView } from "react-navigation";
 import HeaderComponent from "../../components/headerComponent/headerComponent";
-import MusicPlayer from "../../components/musicPlayer/musicPlayer";
 import { getUserInfo } from "../../api/usersAPI";
 import Player from "../../components/player/player";
 import { getPlaylist, postPlaylistSong, postPlaylist } from "../../api/audioAPI";
