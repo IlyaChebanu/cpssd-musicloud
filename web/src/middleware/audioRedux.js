@@ -53,11 +53,11 @@ const scheduleSample = (state, sample, context = audioContext, offline = false) 
   const feedbackNode = context.createGain();
   const bypassNode = context.createGain();
   source.connect(pan);
-  pan.connect(delayNode);
-  delayNode.connect(feedbackNode);
-  feedbackNode.connect(delayNode);
-  delayNode.connect(bypassNode);
-  bypassNode.connect(reverb);
+  pan.connect(reverb);
+  // delayNode.connect(feedbackNode);
+  // feedbackNode.connect(delayNode);
+  // delayNode.connect(bypassNode);
+  // bypassNode.connect(reverb);
   reverb.connect(gain);
   gain.connect(context.globalGain);
 
