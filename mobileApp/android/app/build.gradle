@@ -179,6 +179,8 @@ android {
 }
 
 dependencies {
+    implementation 'me.pushy:sdk:1.0.54'
+    implementation 'me.pushy:sdk-react-native:1.0.13'
     implementation project(':react-native-splash-screen')
     implementation project(':react-native-linear-gradient')
     implementation fileTree(dir: "libs", include: ["*.jar"])

@@ -14,6 +14,7 @@
     "axios": "^0.19.0",
     "buffer": "^5.4.3",
     "moment": "^2.24.0",
+    "pushy-react-native": "^1.0.13",
     "react": "16.9.0",
     "react-native": "0.61.2",
     "react-native-fs": "^2.16.2",
