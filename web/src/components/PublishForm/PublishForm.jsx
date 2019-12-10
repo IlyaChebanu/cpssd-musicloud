@@ -15,7 +15,7 @@ import {
   uploadFile, publishSong, addSongCoverArt, patchSongName, patchSongDescription,
 } from '../../helpers/api';
 import Spinner from '../Spinner/Spinner';
-import SubmitButton from '../SubmitButton/SubmitButton';
+import Button from '../Button/Button';
 
 const PublishForm = memo((props) => {
   const {
@@ -129,16 +129,14 @@ const PublishForm = memo((props) => {
             className={styles.input}
             placeholder="Describe your song"
           />
+          <Button
+            className={styles.publishButton}
+            onClick={handlePublishSong}
+          >
+            Publish
+          </Button>
         </div>
       </div>
-      <form
-        onSubmit={handlePublishSong}
-      >
-        <SubmitButton
-          text="Publish"
-          className={styles.publishButton}
-        />
-      </form>
     </div>
   );
 });
