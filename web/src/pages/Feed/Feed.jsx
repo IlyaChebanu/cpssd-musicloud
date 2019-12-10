@@ -48,6 +48,7 @@ function Feed() {
           username={feedItem.username}
           title={feedItem.title}
           url={feedItem.url}
+          description={feedItem.description}
           duration={feedItem.duration}
           likes={feedItem.likes}
           coverImage={feedItem.cover}

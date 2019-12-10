@@ -7,7 +7,7 @@ import styles from './SongPicker.module.scss';
 import OwnSongCard from '../OwnSongCard';
 import NewSong from '../NewSong/NewSong';
 import {
-  setTracks, hideSongPicker, setTempo, setSongName, setSongId,
+  setTracks, hideSongPicker, setTempo, setSongName, setSongDescription, setSongId, setSongImageUrl,
 } from '../../actions/studioActions';
 import { getEditableSongs, createNewSong } from '../../helpers/api';
 import Spinner from '../Spinner/Spinner';
@@ -47,7 +47,9 @@ const SongPicker = memo((props) => {
       songName={`${song.title}`}
       className={styles.songCard}
       onClick={() => {
+        dispatch(setSongImageUrl(song.cover));
         dispatch(setSongName(song.title));
+        dispatch(setSongDescription(song.description));
         dispatch(setSongId(song.sid));
         dispatch(hideSongPicker());
       }}

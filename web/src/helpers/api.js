@@ -151,6 +151,14 @@ export const patchSongName = (sid, title) => axios.patch(
   },
 );
 
+export const patchSongDescription = (sid, description) => axios.patch(
+  `${API_URL}/v1/audio/description`,
+  { sid, description },
+  {
+    headers: getAuth(),
+  },
+);
+
 export const getTimeline = () => axios.get(
   `${API_URL}/v1/users/timeline`,
   {
@@ -189,8 +197,26 @@ export const getUserPosts = (username) => axios.get(
   },
 );
 
+
+export const setSongCompiledUrl = (reqData) => axios.patch(
+  `${API_URL}/v1/audio/compiled_url`,
+  reqData,
+  {
+    headers: getAuth(),
+  },
+);
+
 export const getCompiledSongs = (username) => axios.get(
   `${API_URL}/v1/audio/compiled_songs?${username ? `username=${username}` : ''}`,
+  {
+    headers: getAuth(),
+  },
+);
+
+
+export const publishSong = (sid) => axios.post(
+  `${API_URL}/v1/audio/publish`,
+  { sid },
   {
     headers: getAuth(),
   },
@@ -207,6 +233,14 @@ export const postFollow = (username) => axios.post(
 export const postUnfollow = (username) => axios.post(
   `${API_URL}/v1/users/unfollow`,
   { username },
+  {
+    headers: getAuth(),
+  },
+);
+
+export const addSongCoverArt = (reqData) => axios.patch(
+  `${API_URL}/v1/audio/cover_art`,
+  reqData,
   {
     headers: getAuth(),
   },
