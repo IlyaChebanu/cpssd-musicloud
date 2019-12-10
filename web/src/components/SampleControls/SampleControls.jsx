@@ -7,7 +7,7 @@ import { withRouter } from 'react-router-dom';
 import _ from 'lodash';
 import styles from './SampleControls.module.scss';
 import {
-  setSampleName, setSampleFade, setSampleReverb,
+  setSampleName, setSampleFade, setSampleReverb, setSampleDelay,
 } from '../../actions/studioActions';
 import { ReactComponent as Knob } from '../../assets/icons/Knob.svg';
 import { clamp, lerp } from '../../helpers/utils';
@@ -25,7 +25,7 @@ const SampleControls = memo((props) => {
 
   const sample = (
     track && _.find(track.samples, (s) => s.id === studio.selectedSample)
-  ) || { fade: {}, reverb: {} };
+  ) || { fade: {}, reverb: {}, delay: {} };
 
   const handleSetSampleName = useCallback(async () => {
     dispatch(setSampleName(nameInput));
@@ -209,6 +209,56 @@ const SampleControls = memo((props) => {
     transform: `rotate(${lerp(-140, 140, sample.reverb.time || 0)}deg)`,
   }), [sample.reverb]);
 
+  const handleDelayTime = useCallback((ev) => {
+    ev.preventDefault();
+    const startPos = ev.screenY;
+    const startVal = (sample.delay && sample.delay.time) || 0;
+    let lastVal = startVal;
+    const handleMouseMove = (e) => {
+      const pos = e.screenY;
+      const val = clamp(0, 1, startVal - (pos - startPos) / 200);
+      if (val !== lastVal) {
+        lastVal = val;
+        dispatch(setSampleDelay(sample.id, { ...sample.delay, time: val }));
+      }
+    };
+    const handleDragStop = () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleDragStop);
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleDragStop);
+  }, [dispatch, sample.delay, sample.id]);
+
+  const delayTimeStyle = useMemo(() => ({
+    transform: `rotate(${lerp(-140, 140, sample.delay.time || 0)}deg)`,
+  }), [sample.delay]);
+
+  const handleDelayFeedback = useCallback((ev) => {
+    ev.preventDefault();
+    const startPos = ev.screenY;
+    const startVal = (sample.delay && sample.delay.feedback) || 0;
+    let lastVal = startVal;
+    const handleMouseMove = (e) => {
+      const pos = e.screenY;
+      const val = clamp(0, 1, startVal - (pos - startPos) / 200);
+      if (val !== lastVal) {
+        lastVal = val;
+        dispatch(setSampleDelay(sample.id, { ...sample.delay, feedback: val }));
+      }
+    };
+    const handleDragStop = () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleDragStop);
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleDragStop);
+  }, [dispatch, sample.delay, sample.id]);
+
+  const delayFeedbackStyle = useMemo(() => ({
+    transform: `rotate(${lerp(-140, 140, sample.delay.feedback || 0)}deg)`,
+  }), [sample.delay]);
+
   return (
     <div
       style={{
@@ -251,8 +301,12 @@ const SampleControls = memo((props) => {
             <p>Reverb time</p>
           </span>
           <span>
-            <Knob />
-            <p>Delay</p>
+            <Knob onMouseDown={handleDelayTime} style={delayTimeStyle} />
+            <p>Delay time</p>
+          </span>
+          <span>
+            <Knob onMouseDown={handleDelayFeedback} style={delayFeedbackStyle} />
+            <p>Delay feedback</p>
           </span>
         </div>
       </span>

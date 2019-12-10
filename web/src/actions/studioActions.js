@@ -220,3 +220,11 @@ export const setSampleReverb = (id, reverb) => (dispatch) => {
     reverb,
   });
 };
+
+export const setSampleDelay = (id, delay) => (dispatch) => {
+  dispatch({
+    type: 'SET_SAMPLE_DELAY',
+    id,
+    delay,
+  });
+};
