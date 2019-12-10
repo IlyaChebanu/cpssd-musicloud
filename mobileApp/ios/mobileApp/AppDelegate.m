@@ -11,6 +11,7 @@
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
 #import "RNSplashScreen.h"
+#import "../../node_modules/react-native-orientation/iOS/RCTOrientation/Orientation.h"
 
 @implementation AppDelegate
 
@@ -31,6 +32,10 @@
   [RNSplashScreen show];
   return YES;
 }
+
+- (UIInterfaceOrientationMask)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window {
+   return [Orientation getOrientation];
+ }
 
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
 {
