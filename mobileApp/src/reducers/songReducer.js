@@ -1,6 +1,6 @@
 import * as Actions from '../actions/actionTypes'
 
-let initialState = { songId: '', songUrl: '', songData: [], songIndex: 0 };
+let initialState = { songId: '', songUrl: '', songData: [], songIndex: 0, songUpdate: false, };
 
 const SongReducer = (state = initialState, action) => {
 
@@ -16,6 +16,10 @@ const SongReducer = (state = initialState, action) => {
         case Actions.SET_SONG_URL:
             return Object.assign({}, state, {
                 songUrl: action.songUrl
+            });
+        case Actions.SET_SONG_UPDATE:
+            return Object.assign({}, state, {
+                songUpdate: action.songUpdate
             });
         case Actions.SET_SONG_DATA:
             return Object.assign({}, state, {

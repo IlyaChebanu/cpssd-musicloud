@@ -23,6 +23,12 @@ class HomeScreen extends React.Component {
     this.getSongs()
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.songUpdate !== this.props.songUpdate) {
+      this.getSongs()
+    }
+  }
+
   getOtherUserDetails(username) {
     getUserInfo(username, this.props.token).then(response => {
       if (response.status === 200) {
@@ -32,8 +38,9 @@ class HomeScreen extends React.Component {
   }
 
   handleSongClick(item, index) {
-    this.props.setSongData(item)
+    this.props.setSongData(this.state.songsData)
     this.props.setSongId(item.sid)
+    this.props.setSongIndex(index)
     this.props.setSongUrl(item.url)
     this.getOtherUserDetails(item.username)
     this.props.navigateToMusicPlayerScreen()
@@ -111,6 +118,7 @@ class HomeScreen extends React.Component {
 function mapStateToProps(state) {
   return {
     token: state.home.token,
+    songUpdate: state.song.songUpdate,
   };
 }
 

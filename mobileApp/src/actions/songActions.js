@@ -22,6 +22,13 @@ export function setSongUrl(songUrl) {
     }
 }
 
+export function setSongUpdate(songUpdate) {
+    return {
+        type: actionsTypes.SET_SONG_UPDATE,
+        songUpdate
+    }
+}
+
 export function setSongData(songData) {
     return {
         type: actionsTypes.SET_SONG_DATA,

@@ -40,6 +40,12 @@ class UserProfileScreen extends React.Component {
     this.getLikedSongs()
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.songUpdate !== this.props.songUpdate) {
+      this.getLikedSongs()
+    }
+  }
+
   getLikedSongs() {
     getLikedSongs(this.props.token, this.props.otherUserData.username).then(response => {
       if (response.status === 200) {
@@ -49,7 +55,8 @@ class UserProfileScreen extends React.Component {
   }
 
   handleLikedSongClick(item, index) {
-    this.props.setSongData(item)
+    this.props.setSongData(this.state.likedSongsData)
+    this.props.setSongIndex(index)
     this.props.setSongId(item.sid)
     this.props.setSongUrl(item.url)
     this.props.navigateToMusicPlayerScreen()
@@ -349,6 +356,7 @@ function mapStateToProps(state) {
     token: state.home.token,
     username: state.home.username,
     otherUserData: state.user.otherUserData,
+    songUpdate: state.song.songUpdate,
   };
 }
 

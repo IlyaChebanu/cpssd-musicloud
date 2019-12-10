@@ -21,6 +21,12 @@ class ProfileSongs extends React.Component {
     this.getSongs()
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.songUpdate !== this.props.songUpdate) {
+      this.getSongs()
+    }
+  }
+
   getSongs() {
     getUserTimeline(this.props.accessToken, false, true).then(response => {
       if (response.status === 200) {
@@ -32,7 +38,8 @@ class ProfileSongs extends React.Component {
   }
 
   handleSongClick(item, index) {
-    this.props.setSongData(item)
+    this.props.setSongData(this.state.songsData)
+    this.props.setSongIndex(index)
     this.props.setSongId(item.sid)
     this.props.setSongUrl(item.url)
     this.props.navigateToMusicPlayerScreen()
@@ -121,6 +128,7 @@ function mapStateToProps(state) {
   return {
     token: state.home.token,
     username: state.home.username,
+    songUpdate: state.song.songUpdate,
   };
 }
 
