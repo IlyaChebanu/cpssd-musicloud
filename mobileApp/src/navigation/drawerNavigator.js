@@ -7,6 +7,7 @@ import MenuDrawer from "../components/menuDrawer/menuDrawer"
 import * as screenNames from "./screenNames";
 import { createStackNavigator } from 'react-navigation-stack';
 import UserSettingsScreen from '../screens/userSettingsScreen/userSettingsScreen';
+import playlistScreen from '../screens/playlistScreen/playlistScreen';
 
 const DrawerConfig = {
     drawerPosition: 'right',
@@ -25,6 +26,9 @@ export const DrawerNavigator = createDrawerNavigator({
     Settings: {
         screen: UserSettingsScreen
     },
+    Playlist: {
+        screen: playlistScreen
+    }
 },
     DrawerConfig
 );

@@ -25,7 +25,6 @@ class MusicPlayerScreen extends React.Component {
     }
 
     componentDidMount() {
-        // this.getUserDetails()
         this.getPlaylist()
     }
 
