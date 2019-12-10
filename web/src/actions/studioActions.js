@@ -130,6 +130,14 @@ export const setSampleTime = (time, id) => (dispatch) => {
   });
 };
 
+export const setSampleName = (name, id) => (dispatch) => {
+  dispatch({
+    type: 'SET_SAMPLE_NAME',
+    name,
+    id,
+  });
+};
+
 export const setSelectedTrack = (track) => (dispatch) => {
   dispatch({
     type: 'SET_SELECTED_TRACK',
@@ -170,6 +178,18 @@ export const showSongPicker = () => (dispatch) => {
   });
 };
 
+export const hideSampleEffects = () => (dispatch) => {
+  dispatch({
+    type: 'SAMPLE_EFFECTS_HIDE',
+  });
+};
+
+export const showSampleEffects = () => (dispatch) => {
+  dispatch({
+    type: 'SAMPLE_EFFECTS_SHOW',
+  });
+};
+
 export const hidePublishForm = () => (dispatch) => {
   dispatch({
     type: 'PUBLISH_FORM_HIDE',
@@ -202,6 +222,30 @@ export const setSongId = (songId) => (dispatch) => {
   dispatch({
     type: 'SET_SONG_ID',
     songId,
+  });
+};
+
+export const setSampleFade = (id, fade) => (dispatch) => {
+  dispatch({
+    type: 'SET_SAMPLE_FADE',
+    id,
+    fade,
+  });
+};
+
+export const setSampleReverb = (id, reverb) => (dispatch) => {
+  dispatch({
+    type: 'SET_SAMPLE_REVERB',
+    id,
+    reverb,
+  });
+};
+
+export const setSampleDelay = (id, delay) => (dispatch) => {
+  dispatch({
+    type: 'SET_SAMPLE_DELAY',
+    id,
+    delay,
   });
 };
 

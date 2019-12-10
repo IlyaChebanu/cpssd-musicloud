@@ -40,7 +40,6 @@ import {
   setSongId,
   stop,
   setSampleTime,
-  setSelectedSample,
   setSampleLoading,
   showPublishForm,
 } from '../../actions/studioActions';
@@ -50,7 +49,7 @@ const Header = memo((props) => {
     selected, studio, children, dispatch, history, user,
   } = props;
   const { tempo, tracks, songId } = studio;
-  const { profilePicUrl } = user;
+  const { profiler } = user;
   const [nameInput, setNameInput] = useState(studio.songName);
 
   const handleSaveState = useCallback(async () => {
@@ -83,15 +82,29 @@ const Header = memo((props) => {
       cast.then((url) => {
         sampleState = {
           url,
+          name: sampleFile.name,
           id: genId(),
           time: studio.currentBeat,
           track: studio.selectedTrack,
+          fade: {
+            fadeIn: 0,
+            fadeOut: 0,
+          },
+          reverb: {
+            wet: 1,
+            dry: 1,
+            cutoff: 0,
+            time: 0.3,
+          },
+          delay: {
+            time: 0,
+            feedback: 0,
+          },
         };
         track.samples.push(sampleState);
         dispatch(setTrackAtIndex(track, studio.selectedTrack));
       });
     };
-    dispatch(setSelectedSample(sampleState.id));
     dispatch(setSampleTime(sampleState.time, sampleState.id));
     dispatch(setSampleLoading(true));
     dispatch(setTracks(studio.tracks));
@@ -244,7 +257,7 @@ const Header = memo((props) => {
           <Link to={`/profile?username=${user.username}`} className={selected === 3 ? styles.selected : ''}>Profile</Link>
         </nav>
         <div className={styles.pictureWrapper}>
-          <CircularImage src={profilePicUrl} />
+          <CircularImage src={profiler} />
           <div className={styles.signout} onClick={handleSignout} role="button" tabIndex={0}>
             <SignOutIcon />
           </div>
