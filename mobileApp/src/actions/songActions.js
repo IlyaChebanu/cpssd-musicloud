@@ -8,6 +8,13 @@ export function setSongId(songId) {
     }
 }
 
+export function setSongIndex(songIndex) {
+    return {
+        type: actionsTypes.SET_SONG_INDEX,
+        songIndex
+    }
+}
+
 export function setSongUrl(songUrl) {
     return {
         type: actionsTypes.SET_SONG_URL,
