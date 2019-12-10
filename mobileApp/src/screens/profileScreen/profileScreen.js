@@ -46,6 +46,16 @@ class ProfileScreen extends React.Component {
     }
   }
 
+  componentDidMount() {
+    this.getLikedSongs()
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.songUpdate !== this.props.songUpdate) {
+      this.getLikedSongs()
+    }
+  }
+
   handleSongsClick() {
     this.setState({ screenState: [...this.state.screenState, 1], profileTab: 1 })
     animateTimingPromiseNative(this.animatedSongsScreen, 1, 400, Easing.ease).then(
@@ -92,10 +102,6 @@ class ProfileScreen extends React.Component {
         this.animatedFollowersScreen.setValue(0)
       }
     )
-  }
-
-  componentDidMount() {
-    this.getLikedSongs()
   }
 
   renderProfile() {
@@ -152,8 +158,12 @@ class ProfileScreen extends React.Component {
     )
   }
 
-  handleLikedSongClick() {
-
+  handleLikedSongClick(item, index) {
+    this.props.setSongData(this.state.likedSongsData)
+    this.props.setSongIndex(index)
+    this.props.setSongId(item.sid)
+    this.props.setSongUrl(item.url)
+    this.props.navigateToMusicPlayerScreen()
   }
 
   getLikedSongs() {
@@ -171,6 +181,8 @@ class ProfileScreen extends React.Component {
     let playImage = require('../../assets/images/play.png')
     let songLikes = item.likes
     let likeImg = require('../../assets/images/like.png')
+    let likedSong = item.like_status
+    let likedImg = require('../../assets/images/like_color.png')
     let placeholderImg = require('../../assets/images/cloud.png')
     return (
       <TouchableOpacity style={styles.songContainer} onPress={() => this.handleLikedSongClick(item, index)}>
@@ -179,9 +191,12 @@ class ProfileScreen extends React.Component {
         <View style={styles.songDetailsContainer}>
           <Text style={styles.songNameText}>{songName}</Text>
           <Text style={styles.authorNameText}>{authorName}</Text>
+          {likedSong ? <View style={styles.likeContainer}>
+              <Text style={styles.likedText}>{songLikes}</Text><Image style={styles.likeImg} source={likedImg} />
+            </View> :
           <View style={styles.likeContainer}>
             <Text style={styles.likes}>{songLikes}</Text><Image style={styles.likeImg} source={likeImg} />
-          </View>
+          </View>}
         </View>
       </TouchableOpacity>
     )
@@ -339,6 +354,7 @@ function mapStateToProps(state) {
     token: state.home.token,
     username: state.home.username,
     userData: state.user.userData,
+    songUpdate: state.song.songUpdate,
   };
 }
 

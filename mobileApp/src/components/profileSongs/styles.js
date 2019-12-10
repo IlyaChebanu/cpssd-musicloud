@@ -76,6 +76,13 @@ export default StyleSheet.create({
     fontSize: 16,
     width: width,
   },
+  likedText: {
+    fontSize: 18,
+    color: '#F4414F',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 1,
+    textShadowColor: '#666',
+  },
   likes: {
     fontSize: 18,
     color: '#FFF',

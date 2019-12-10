@@ -5,81 +5,40 @@ export default StyleSheet.create({
   container: {
     flex: 1,
   },
-  headerContainer: {
-    backgroundColor: '#3D4044',
-    height: 80,
+  playlistTitleText: {
+    color: '#FFF',
+    fontSize: 24,
+  },
+  playlistFlatlist: {
+    paddingTop: 20,
+  },
+  playitemContainer: {
+    padding: 5,
+    marginLeft: 20,
+    marginRight: 20,
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#FFF',
+  },
+
+  arrowBack: {
+    marginLeft: 15,
+  },
+  titleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingLeft: 20,
-    paddingRight: 20,
-  },
-  logo: {
-    resizeMode: 'contain',
-    width: 160,
-  },
-  arrowDownImg: {
-    resizeMode: 'contain',
-    height: 32,
-    width: 32,
+    marginBottom: 20,
   },
   titleText: {
     color: 'white',
     fontSize: 24,
-    paddingLeft: 20,
+    paddingLeft: 10,
     paddingRight: 20,
+    // marginBottom: 20,
+  },
+  playlistSongsFlatlist: {
     paddingTop: 20,
   },
-  profileTabs: {
-    flexDirection: 'row',
-    height: 50,
-    backgroundColor: 'rgba(61,64,68,0.75)',
-  },
-  activeTab: {
-    backgroundColor: 'rgba(255,255,255,0.07)',
-    position: 'absolute',
-    borderBottomColor: '#FFF',
-    borderBottomWidth: 4,
-    bottom: 0,
-    top: 0,
-    right: 0,
-    left: 0,
-  },
-  tabClick: {
-    height: '100%',
-    width: width/2,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  profilePostTab: {
-    flex: 1,
-  },
-  profileSongTab: {
-    flex: 1,
-  },
-  tabTitleText: {
-    color: '#FFF'
-  },
-  followContainer: {
-    flex: 1,
-    position: 'absolute',
-    top: 80,
-  },
-  followTabs: {
-    flexDirection: 'row',
-    height: 50,
-    backgroundColor: 'rgba(61,64,68,0.75)',
-  },
-  profileContainer: {
-    flex: 1,
-  },
-  likedSongsContainer: {
-    flex: 1,
-    position: 'absolute',
-    height: height - 125,
-    top: 80,
-  },
-
   songContainer: {
     width: width - 40,
     height: 220,
@@ -126,12 +85,6 @@ export default StyleSheet.create({
     textShadowRadius: 1,
     textShadowColor: '#666',
   },
-  noSongsText: {
-    textAlign: 'center',
-    color: '#FFF',
-    fontSize: 16,
-    width: width,
-  },
   likedText: {
     fontSize: 18,
     color: '#F4414F',
@@ -152,16 +105,5 @@ export default StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     right: 0
-  },
-  likeImg: {
-
-  },
-  likedSongTitleText: {
-    color: 'white',
-    fontSize: 24,
-    paddingLeft: 20,
-    paddingRight: 20,
-    paddingBottom: 10,
-    paddingTop: 20,
   },
 })

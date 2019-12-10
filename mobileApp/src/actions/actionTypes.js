@@ -14,7 +14,9 @@ export const SET_EMAIL = 'set_email';
 
 //Song actions
 export const SET_SONG_ID = 'set_song_id';
+export const SET_SONG_INDEX = 'set_song_index';
 export const SET_SONG_URL = 'set_song_url';
+export const SET_SONG_UPDATE = 'set_song_update';
 export const SET_SONG_DATA = 'set_song_data';
 
 //User actions

@@ -28,6 +28,7 @@ export default StyleSheet.create({
   likedSongsContainer: {
     flex: 1,
     position: 'absolute',
+    height: height - 125,
     top: 80,
   },
   profileTabs: {
@@ -112,6 +113,13 @@ export default StyleSheet.create({
     color: '#FFF',
     fontSize: 16,
     width: width,
+  },
+  likedText: {
+    fontSize: 18,
+    color: '#F4414F',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 1,
+    textShadowColor: '#666',
   },
   likes: {
     fontSize: 18,
