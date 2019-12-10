@@ -18,24 +18,9 @@ export const navigateToStartScreen = () =>
         routeName: screenNames.START_SCREEN
     });
 
-export const navigateToLoginScreen = () =>
-    NavigationActions.navigate({
-        routeName: screenNames.LOGIN_SCREEN
-    });
-
-export const navigateToRegisterScreen = () =>
-    NavigationActions.navigate({
-        routeName: screenNames.REGISTER_SCREEN
-    });
-
 export const navigateToHomeScreen = () =>
     NavigationActions.navigate({
         routeName: screenNames.HOME_SCREEN
-    });
-
-export const navigateToForgotPasswordScreen = () =>
-    NavigationActions.navigate({
-        routeName: screenNames.FORGOT_PASSWORD_SCREEN
     });
 
 export const navigateToMusicPlayerScreen = () =>

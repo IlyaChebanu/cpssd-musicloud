@@ -1,0 +1,163 @@
+.wrapper {
+  background-color: #36393D;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  transition: height 1s;
+  margin-bottom: 30px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.songFeedCard {
+  flex: 1;
+  display: block;
+  margin: 10px;
+}
+
+.postHeader {
+  display: flex;
+  align-items: center;
+}
+
+.content {
+  display: flex;
+  margin: 5px 0px 5px 0px;
+  color: white;
+  font-size: 14px;
+
+  img {
+    width: auto;
+    height: auto;
+    max-width: 150px;
+    max-height: 150px;
+    border-radius: 25px;
+  }
+}
+
+.playbackControl {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.progressBar {
+  border: 2px solid white;
+  border-radius: 10px;
+  width: 100%;
+  height: 10px;
+  margin: 0 10px;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.progressBarInner {
+  background-color: white;
+  border-radius: 10px;
+  height: 10px;
+  position: relative;
+  pointer-events: none;
+}
+
+.currentTime {
+  width: 50px;
+  margin: 0;
+}
+
+.textBlock span {
+  display: flex;
+  align-items: center;
+}
+
+.playPause {
+  width: 30px;
+  height: 30px;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.songInfo {
+  flex: 1;
+  margin-left: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.title {
+  margin: 0 10px 0 0;
+  font-size: 18px;
+}
+
+.description {
+  margin-top: 10px;
+}
+
+.username {
+  color: white;
+  font-size: 16px;
+  margin: 0 10px;
+}
+
+.timestamp {
+  display: flex;
+  color: #C3C3C3;
+  font-size: 12px;
+  margin: 0;
+}
+
+.profiler {
+  width: 30px;
+  height: 30px;
+}
+
+.coverWrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+
+  img {
+    transition: filter 200ms;
+  }
+}
+
+.like {
+  position: absolute;
+  height: 50%;
+  width: auto;
+  fill: white;
+  margin: auto;
+  left: 0;
+  right: 0;
+  opacity: 0;
+  transition: opacity 200ms, fill 200ms;
+
+  &.hovered {
+    opacity: 1;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}
+
+.likeGradient {
+  fill: url(#gradient);
+  opacity: 0;
+  pointer-events: none;
+
+  &.liked {
+    opacity: 1;
+  }
+
+  &.hide {
+    opacity: 0;
+  }
+}

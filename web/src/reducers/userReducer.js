@@ -49,6 +49,41 @@ export default (state = {
         ...state,
         profilePicUrl: undefined,
       };
+    case 'SET_FOLLOWERS':
+      return {
+        ...state,
+        followers: action.followers,
+      };
+    case 'SET_FOLLOWING':
+      return {
+        ...state,
+        following: action.following,
+      };
+    case 'SET_POSTS':
+      return {
+        ...state,
+        posts: action.posts,
+      };
+    case 'SET_SONGS':
+      return {
+        ...state,
+        songs: action.songs,
+      };
+    case 'SET_LIKES':
+      return {
+        ...state,
+        likes: action.likes,
+      };
+    case 'SET_FOLLOW_STATUS':
+      return {
+        ...state,
+        follow_status: action.status,
+      };
+    case 'SET_PROFILER':
+      return {
+        ...state,
+        profiler: action.profilerURL,
+      };
     default:
       return state;
   }

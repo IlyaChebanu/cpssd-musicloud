@@ -1,25 +1,46 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './Discover.module.scss';
 import Header from '../../components/Header';
 import MusicSearch from '../../components/MusicSearch';
 import SongCard from '../../components/SongCard';
 import { useUpdateUserDetails } from '../../helpers/hooks';
-
-const songCards = [];
-for (let i = 0; i < 10; i += 1) {
-  songCards.push(<SongCard key={i} className={styles.songCard} />);
-}
+import { getCompiledSongs } from '../../helpers/api';
+import Spinner from '../../components/Spinner/Spinner';
 
 const Discover = () => {
   useUpdateUserDetails();
 
+  const [songs, setSongs] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      const res = await getCompiledSongs();
+      setLoading(false);
+      if (res.status === 200) {
+        setSongs(res.data.songs.map((song) => (
+          <SongCard
+            id={song.sid}
+            username={song.username}
+            title={song.title}
+            duration={song.duration}
+            url={song.url}
+            cover={song.cover}
+            likes={song.likes}
+          />
+        )));
+      }
+    })();
+  }, []);
+
   return (
     <div className={styles.wrapper}>
-      <Header selected={1} />
+      <Header selected={2} />
       <div className={styles.contentWrapper}>
         <MusicSearch className={styles.musicSearch} />
         <div className={styles.songs}>
-          {songCards}
+          {loading ? <Spinner /> : songs}
         </div>
       </div>
     </div>
