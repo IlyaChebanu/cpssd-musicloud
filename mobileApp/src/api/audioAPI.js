@@ -157,3 +157,146 @@ export function postUnlikeSong(token, sid) {
             return error
         });
 }
+
+export function getPlaylist(token) {
+
+    let url = `${API_URL}api/v1/audio/playlist`;
+    var request = new Request(url, {
+        method: "GET",
+        headers: new Headers({
+            "Content-Type": "application/json",
+            "Authorization": 'Bearer ' + token,
+        }),
+    });
+    if (__DEV__) {
+        console.log("getPlaylist : request " + JSON.stringify(request))
+    }
+
+    return fetch(request)
+        .then(response => {
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
+        })
+        .then(responseJson => {
+            if (__DEV__) {
+                console.log("getPlaylist : response " + JSON.stringify(responseJson))
+            }
+            return responseJson;
+        })
+        .catch(error => {
+            if (__DEV__) {
+                console.log("getPlaylist : error " + JSON.stringify(error))
+            }
+            return error
+        });
+}
+
+export function postPlaylist(token, title) {
+
+    let url = `${API_URL}api/v1/audio/playlist`;
+    var request = new Request(url, {
+        method: "POST",
+        headers: new Headers({
+            "Content-Type": "application/json",
+            "Authorization": 'Bearer ' + token,
+        }),
+        body: JSON.stringify({
+            "title": title
+        })
+    });
+    if (__DEV__) {
+        console.log("postPlaylist : request " + JSON.stringify(request))
+    }
+
+    return fetch(request)
+        .then(response => {
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
+        })
+        .then(responseJson => {
+            if (__DEV__) {
+                console.log("postPlaylist : response " + JSON.stringify(responseJson))
+            }
+            return responseJson;
+        })
+        .catch(error => {
+            if (__DEV__) {
+                console.log("postPlaylist : error " + JSON.stringify(error))
+            }
+            return error
+        });
+}
+
+export function getPlaylistSongs(token, pid) {
+
+    let url = `${API_URL}api/v1/audio/playlist_songs?pid=${pid}`;
+    var request = new Request(url, {
+        method: "GET",
+        headers: new Headers({
+            "Content-Type": "application/json",
+            "Authorization": 'Bearer ' + token,
+        }),
+    });
+    if (__DEV__) {
+        console.log("getPlaylistSongs : request " + JSON.stringify(request))
+    }
+
+    return fetch(request)
+        .then(response => {
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
+        })
+        .then(responseJson => {
+            if (__DEV__) {
+                console.log("getPlaylistSongs : response " + JSON.stringify(responseJson))
+            }
+            return responseJson;
+        })
+        .catch(error => {
+            if (__DEV__) {
+                console.log("getPlaylistSongs : error " + JSON.stringify(error))
+            }
+            return error
+        });
+}
+
+export function postPlaylistSong(token, pid, sid) {
+
+    let url = `${API_URL}api/v1/audio/playlist_songs`;
+    var request = new Request(url, {
+        method: "POST",
+        headers: new Headers({
+            "Content-Type": "application/json",
+            "Authorization": 'Bearer ' + token,
+        }),
+        body: JSON.stringify({
+            "pid": pid,
+            "sid": sid
+        })
+    });
+    if (__DEV__) {
+        console.log("postPlaylistSong : request " + JSON.stringify(request))
+    }
+
+    return fetch(request)
+        .then(response => {
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
+        })
+        .then(responseJson => {
+            if (__DEV__) {
+                console.log("postPlaylistSong : response " + JSON.stringify(responseJson))
+            }
+            return responseJson;
+        })
+        .catch(error => {
+            if (__DEV__) {
+                console.log("postPlaylistSong : error " + JSON.stringify(error))
+            }
+            return error
+        });
+}
