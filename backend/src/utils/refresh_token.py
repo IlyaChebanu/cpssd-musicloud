@@ -29,8 +29,8 @@ def refresh_token(access_token):
         )
 
         # Decrypt the token contents
-        f = Fernet(ENCRYPTION_KEY.encode())
-        decrypted_contents = f.decrypt(access_token['data'].encode())
+        fernet = Fernet(ENCRYPTION_KEY.encode())
+        decrypted_contents = fernet.decrypt(access_token['data'].encode())
         contents = ast.literal_eval(decrypted_contents.decode())
 
     except Exception as exc:

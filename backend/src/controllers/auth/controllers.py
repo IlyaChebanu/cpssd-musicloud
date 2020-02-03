@@ -102,8 +102,8 @@ def login():
     }
 
     # Encrypt the contents of our JWT.
-    f = Fernet(ENCRYPTION_KEY.encode())
-    encrypted_payload = f.encrypt(str(jwt_payload).encode()).decode()
+    fernet = Fernet(ENCRYPTION_KEY.encode())
+    encrypted_payload = fernet.encrypt(str(jwt_payload).encode()).decode()
 
     access_token = jwt.encode(
         {"data": encrypted_payload},
