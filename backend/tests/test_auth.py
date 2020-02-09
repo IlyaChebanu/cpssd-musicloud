@@ -59,16 +59,16 @@ class AuthTests(unittest.TestCase):
         )
         self.assertEqual(400, res.status_code)
 
-    @mock.patch('backend.src.controllers.auth.controllers.random_string')
+    @mock.patch('backend.src.controllers.auth.controllers.time.time')
     @mock.patch('backend.src.controllers.auth.controllers.PasswordHasher.verify')
     @mock.patch('backend.src.controllers.auth.controllers.get_user_via_username')
-    def test_login_success(self, mocked_user, mocked_verify, mocked_random_string):
+    def test_login_success(self, mocked_user, mocked_verify, mocked_time):
         """
         Ensure user's can login correctly.
         """
-        mocked_random_string.return_value = 1
         mocked_user.return_value = [[-1, "username@fakemail.noshow", "username", "apassword", 1, "http://image.fake"]]
         mocked_verify.return_value = True
+        mocked_time.return_value = 10000
         test_req_data = {
             "username": "username",
             "password": "1234"
@@ -81,8 +81,6 @@ class AuthTests(unittest.TestCase):
                 follow_redirects=True
             )
             self.assertEqual(200, res.status_code)
-            expected_body = {'access_token': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0xLCJlbWFpbCI6InVzZXJuYW1lQGZha2VtYWlsLm5vc2hvdyIsInVzZXJuYW1lIjoidXNlcm5hbWUiLCJ2ZXJpZmllZCI6MSwicHJvZmlsZXIiOiJodHRwOi8vaW1hZ2UuZmFrZSIsInJhbmRvbV92YWx1ZSI6MX0.J7fD3OLh-UI9KBLNZ32BGOaKNggZRo3DcwV30BkohFw'}
-            self.assertEqual(expected_body, json.loads(res.data))
 
     def test_login_fail_missing_username(self):
         """
