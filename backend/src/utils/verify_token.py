@@ -26,6 +26,8 @@ def verify_token(access_token):
     fernet = Fernet(ENCRYPTION_KEY.encode())
     decrypted_contents = fernet.decrypt(access_token['data'].encode())
     contents = ast.literal_eval(decrypted_contents.decode())
+    contents["uid"] = access_token['uid']
+    contents["iat"] = access_token['iat']
 
     login = get_login(contents.get("uid"), encoded_token)
     if not login:
