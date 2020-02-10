@@ -92,21 +92,23 @@ def login():
 
     time_issued = datetime.datetime.utcnow()
 
-    jwt_payload = {
-        'uid': user[0][0],
+    secure_payload = {
         'email': user[0][1],
         'username': user[0][2],
         'verified': user[0][4],
-        'profiler': user[0][5],
-        'iat': int(time.time())
+        'profiler': user[0][5]
     }
 
-    # Encrypt the contents of our JWT.
+    # Encrypt the sensitive contents of our JWT.
     fernet = Fernet(ENCRYPTION_KEY.encode())
-    encrypted_payload = fernet.encrypt(str(jwt_payload).encode()).decode()
+    encrypted_payload = fernet.encrypt(str(secure_payload).encode()).decode()
 
     access_token = jwt.encode(
-        {"data": encrypted_payload},
+        {
+            'uid': user[0][0],
+            "data": encrypted_payload,
+            'iat': int(time.time())
+        },
         JWT_SECRET,
         algorithm='HS256'
     )
