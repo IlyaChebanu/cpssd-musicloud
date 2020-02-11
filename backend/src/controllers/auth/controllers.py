@@ -93,8 +93,8 @@ def login():
     time_issued = datetime.datetime.utcnow()
 
     secure_payload = {
+        'uid': user[0][0],
         'email': user[0][1],
-        'username': user[0][2],
         'verified': user[0][4],
         'profiler': user[0][5]
     }
@@ -105,7 +105,7 @@ def login():
 
     access_token = jwt.encode(
         {
-            'uid': user[0][0],
+            'username': user[0][2],
             "data": encrypted_payload,
             'iat': int(time.time())
         },
