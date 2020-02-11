@@ -1,6 +1,6 @@
 var Buffer = require('buffer/').Buffer;
 
-const API_URL = 'http://dcumusicloud.com:5000/'
+const API_URL = 'https://dcumusicloud.com:5000/'
 const S3_URL = 'https://dcumusicloudbucket.s3.amazonaws.com/'
 
 export function postFile(token, dir, fileName, fileType) {

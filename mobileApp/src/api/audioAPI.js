@@ -1,4 +1,4 @@
-const API_URL = 'http://dcumusicloud.com:5000/'
+const API_URL = 'https://dcumusicloud.com:5000/'
 
 export function getCompiledSongs(token, username, songs_per_page) {
 
