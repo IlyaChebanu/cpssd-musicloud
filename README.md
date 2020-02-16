@@ -1,6 +1,10 @@
 # MusiCloud [![Build Status](https://travis-ci.com/CPSSD/MusiCloud.svg?token=VTsNQCkWWmZRNF9jfpa7&branch=master)](https://travis-ci.com/CPSSD/MusiCloud)
 This repo contains the code for the MusiCloud online music mixing service.
 
+## URLs
+- Production site = https://dcumusicloud.com
+- Development site (May be unstable!) = http://dcumusicloud.webhop.me
+
 ## Prerequisites 
 ### Backend:
 - [Python 3](https://www.python.org/downloads/)
