@@ -16,7 +16,7 @@ tags:
   - name: "s3"
     description: "S3 Bucket operations"
 schemes:
-  - "http"
+  - "https"
 paths:
   /audio:
     post:
