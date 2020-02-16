@@ -8,7 +8,7 @@ import os
 MYSQL_CONFIG = {
     'user': os.environ['MUSICLOUD_DB_USER'],
     'password': os.environ['MUSICLOUD_DB_PASSWORD'],
-    'host': 'musicloud.c3aguwab64mp.eu-west-1.rds.amazonaws.com',
+    'host': os.environ['MUSICLOUD_DB_HOST'],
     'database': 'musicloud_db',
     'raise_on_warnings': True
 }
@@ -21,7 +21,7 @@ SMTP_CONFIG = {
 }
 
 # Host domain for our service.
-HOST = "dcumusicloud.com:5000"
+HOST = os.environ['MUSICLOUD_DOMAIN']
 
 # JWT signing key.
 JWT_SECRET = os.environ['MUSICLOUD_JWT_SECRET']
@@ -38,7 +38,7 @@ AWS_CREDS = {
 RESET_TIMEOUT = 30
 
 # AWS S3 bucket URL.
-BUCKET_URL = "https://dcumusicloudbucket.s3-eu-west-1.amazonaws.com/"
+BUCKET_URL = os.environ['MUSICLOUD_AWS_BUCKET_URL']
 
 # Toggle Logging
 LOGGING = True

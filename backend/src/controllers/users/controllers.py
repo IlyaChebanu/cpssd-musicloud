@@ -184,7 +184,7 @@ def register():
             continue
 
     subject = "MusiCloud Email Verification"
-    url = "http://" + HOST + "/api/v1/auth/verify?code=" + code
+    url = "https://" + HOST + "/api/v1/auth/verify?code=" + code
     body = (
         "Welcome to MusiCloud. Please click on this URL to verify "
         "your account:\n" + url
@@ -237,7 +237,7 @@ def reverify():
         code = code[0][0]
 
     subject = "MusiCloud Email Verification"
-    url = "http://" + HOST + "/api/v1/auth/verify?code=" + code
+    url = "https://" + HOST + "/api/v1/auth/verify?code=" + code
     body = (
         "Welcome to MusiCloud. Please click on this URL to verify "
         "your account:\n" + url
@@ -583,7 +583,7 @@ def patch_user(user_data):
                 continue
 
         subject = "MusiCloud Email Verification"
-        url = "http://" + HOST + "/api/v1/auth/verify?code=" + code
+        url = "https://" + HOST + "/api/v1/auth/verify?code=" + code
         body = (
             "Welcome to MusiCloud. Please click on this URL to verify your "
             "account:\n" + url
