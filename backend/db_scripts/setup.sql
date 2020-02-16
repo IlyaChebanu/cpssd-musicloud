@@ -1,3 +1,5 @@
+CREATE DATABASE `musicloud_db`;
+
 CREATE TABLE `musicloud_db`.`Users` (
     `uid` INT UNIQUE NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `email` VARCHAR(255) NOT NULL UNIQUE,
