@@ -17,7 +17,7 @@ const SampleControls = memo((props) => {
     dispatch, studio,
   } = props;
 
-  const [nameInput, setNameInput] = useState(studio.selectedSample);
+  const [nameInput, setNameInput] = useState(studio.selectedSample || '');
 
   const track = useMemo(() => (
     studio.tracks[studio.selectedTrack]
@@ -29,7 +29,7 @@ const SampleControls = memo((props) => {
 
   const handleSetSampleName = useCallback(async () => {
     dispatch(setSampleName(nameInput));
-    setNameInput(nameInput);
+    // setNameInput(nameInput);
   }, [dispatch, nameInput]);
 
   useEffect(() => {
@@ -43,7 +43,7 @@ const SampleControls = memo((props) => {
       if (!sample) {
         return;
       }
-      setNameInput(sample.name);
+      setNameInput(sample.name || '');
     }
   }, [sample, studio.selectedSample, studio.selectedTrack, studio.tracks, track]);
 
@@ -260,8 +260,13 @@ const SampleControls = memo((props) => {
 SampleControls.propTypes = {
   dispatch: PropTypes.func.isRequired,
   studio: PropTypes.object.isRequired,
-  selectedSample: PropTypes.string.isRequired,
-  tracks: PropTypes.arrayOf(PropTypes.object).isRequired,
+  selectedSample: PropTypes.string,
+  tracks: PropTypes.arrayOf(PropTypes.object),
+};
+
+SampleControls.defaultProps = {
+  selectedSample: '',
+  tracks: [],
 };
 
 SampleControls.displayName = 'SampleControls';

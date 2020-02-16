@@ -23,7 +23,7 @@ export default (
     sampleLoading: false,
     tracks: [],
     selectedTrack: 0,
-    selectedSample: -1,
+    selectedSample: '',
     clipboard: {},
     title: 'Untitled',
     songPickerHidden: false,

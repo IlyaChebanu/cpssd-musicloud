@@ -10,54 +10,54 @@ import {
 } from '../helpers/constants';
 import { lerp, genId } from '../helpers/utils';
 
-const LOOKAHEAD = 25; // ms
-const OVERLAP = 100/* ms */ / 1000;
+const getEffectsObject = (context, sample) => {
+  const obj = {
+    context,
+    pan: context.createStereoPanner(),
+    reverb: Reverb(context),
+    gain: context.createGain(),
+  };
 
-const getSampleTimes = (context, state, sample) => {
+  obj.reverb.time = sample.reverb.time * 10;
+  obj.reverb.wet.value = sample.reverb.wet;
+  obj.reverb.dry.value = sample.reverb.dry;
+  obj.reverb.cutoff.value = sample.reverb.cutoff * 10000;
+  return obj;
+};
+
+const getSampleTimes = (currentTime, state, sample, scheduleAhead) => {
   const secondsPerBeat = 60 / state.tempo;
-  const beatsPerSecond = state.tempo / 60;
-  const { currentBeat } = state;
+  const currentBeat = sample.offline ? 1 : state.currentBeat;
 
   let sampleTime = sample.time;
-  // Use 100ms lookahead to set sampleTime if we're near the end of the loop
-  if (
-    state.loopEnabled
-    && sample.time < currentBeat
-    && currentBeat > state.loop.stop - 0.1 * beatsPerSecond
-  ) {
+  if (scheduleAhead) {
     sampleTime = state.loop.stop + sample.time - state.loop.start;
   }
 
-  const startTime = context.currentTime + (sampleTime - currentBeat) * secondsPerBeat;
+  const startTime = currentTime + (sampleTime - currentBeat) * secondsPerBeat;
   const offset = Math.max(0, (currentBeat - sampleTime) * secondsPerBeat);
   const endTime = (
-    context.currentTime + sample.duration + (sampleTime - currentBeat) * secondsPerBeat
+    currentTime + sample.duration + (sampleTime - currentBeat) * secondsPerBeat
   );
-  return [startTime, endTime, offset];
+  return { startTime, endTime, offset };
 };
 
 
-const scheduleSample = (state, sample, context = audioContext, offline = false) => {
-  const [startTime, endTime, offset] = getSampleTimes(
-    context,
-    offline ? { ...state, currentBeat: 0 } : state,
+const scheduleSample = (currentTime, state, sample, scheduleAhead) => {
+  const { startTime, endTime, offset } = getSampleTimes(
+    currentTime,
+    state,
     sample,
+    scheduleAhead,
   );
-  const source = context.createBufferSource();
-  source.buffer = sample.buffer;
 
-  const pan = context.createStereoPanner();
-  const reverb = Reverb(context);
-  const gain = context.createGain();
-  source.connect(pan);
-  pan.connect(reverb);
-  reverb.connect(gain);
-  gain.connect(context.globalGain);
+  const effects = getEffectsObject(sample.context, sample);
 
-  reverb.time = sample.reverb.time * 10;
-  reverb.wet.value = sample.reverb.wet;
-  reverb.dry.value = sample.reverb.dry;
-  reverb.cutoff.value = sample.reverb.cutoff * 10000;
+  const source = effects.context.createBufferSource();
+  source.buffer = bufferStore[sample.id].buffer;
+  source.connect(effects.pan);
+  effects.pan.connect(effects.gain);
+  effects.gain.connect(sample.context.globalGain);
 
   const track = state.tracks[sample.track];
   const soloTrack = _.findIndex(state.tracks, 'solo');
@@ -66,24 +66,27 @@ const scheduleSample = (state, sample, context = audioContext, offline = false) 
   if (!solo) {
     volume = track.mute ? 0 : sample.volume;
   }
-  gain.gain.setValueAtTime(0, startTime);
-  gain.gain.linearRampToValueAtTime(volume, lerp(startTime, endTime, sample.fade.fadeIn));
-  gain.gain.setValueAtTime(volume, lerp(startTime, endTime, 1 - sample.fade.fadeOut));
-  gain.gain.linearRampToValueAtTime(0, endTime);
-  pan.pan.setValueAtTime(track.pan, 0);
 
-  source.start(startTime, offline ? 0 : offset);
-  source.stop(endTime);
-  return { source, gain, pan };
+  effects.gain.gain.setValueAtTime(0, startTime);
+  effects.gain.gain.linearRampToValueAtTime(
+    volume,
+    lerp(startTime, endTime, sample.fade.fadeIn),
+  );
+  effects.gain.gain.setValueAtTime(
+    volume,
+    lerp(startTime, endTime, 1 - sample.fade.fadeOut),
+  );
+  effects.gain.gain.linearRampToValueAtTime(0, endTime);
+  effects.pan.pan.setValueAtTime(track.pan, 0);
+
+  source.start(startTime, offset);
+  return { source, effects };
 };
 
 export const renderTracks = (studio) => {
   const samples = [];
-  studio.tracks.forEach((track, i) => {
+  studio.tracks.forEach((track) => {
     track.samples.forEach((sample) => {
-      sample.volume = track.volume;
-      sample.track = i;
-      sample.buffer = bufferStore[sample.url];
       samples.push(sample);
     });
   });
@@ -99,7 +102,10 @@ export const renderTracks = (studio) => {
   offlineAudioContext.globalGain.connect(offlineAudioContext.destination);
 
   samples.forEach((sample) => {
-    scheduleSample(studio, sample, offlineAudioContext, true);
+    sample = { ...sample, ...bufferStore[sample.id] };
+    sample.context = offlineAudioContext;
+    sample.offline = true;
+    scheduleSample(offlineAudioContext.currentTime, studio, sample);
   });
 
   return offlineAudioContext.startRendering();
@@ -111,7 +117,7 @@ export default (store) => {
 
   // Update currentBeat in redux to animate seek bar
   const beatUpdate = () => {
-    const state = store.getState().studio;
+    let state = store.getState().studio;
     if (state.playing && window.location.pathname !== '/studio') {
       store.dispatch(stop);
     }
@@ -120,79 +126,91 @@ export default (store) => {
       const secondsPerBeat = 60 / state.tempo;
       let currentBeat = (
         state.playingStartBeat
-          + (audioContext.currentTime - state.playingStartTime)
-          / secondsPerBeat
+        + (audioContext.currentTime - state.playingStartTime)
+        / secondsPerBeat
       );
       if (state.loopEnabled && currentBeat > state.loop.stop) {
-        currentBeat = state.loop.start;
+        currentBeat = state.loop.start + currentBeat - state.loop.stop;
+        store.dispatch(setCurrentBeat(currentBeat));
         store.dispatch(playingStartBeat(state.loop.start));
         store.dispatch(playingStartTime(audioContext.currentTime));
+        state = store.getState().studio;
         Object.values(scheduledSamples).forEach((sample) => {
           sample.old = true;
         });
+        const samples = [];
+        state.tracks.forEach((track) => {
+          track.samples.forEach((sample) => {
+            if (sample.time + (sample.duration * (state.tempo / 60)) < state.currentBeat) {
+              return;
+            }
+            if (state.loopEnabled && sample.time > state.loop.stop) {
+              return;
+            }
+            samples.push(sample);
+          });
+        });
+
+        samples.forEach((sample) => {
+          sample = { ...sample, ...bufferStore[sample.id] };
+          sample.schedulerId = genId();
+          sample.context = audioContext;
+          const nextLoop = scheduleSample(audioContext.currentTime, state, sample, true);
+          scheduledSamples[`${sample.schedulerId}next`] = {
+            ...sample,
+            source: nextLoop.source,
+            effects: nextLoop.effects,
+          };
+        });
+      } else {
+        store.dispatch(setCurrentBeat(currentBeat));
       }
-      store.dispatch(setCurrentBeat(currentBeat));
     }
   };
-
-  setInterval(() => {
-    const state = store.getState().studio;
-    if (state.playing) {
-      if (audioContext.state === 'suspended') {
-        audioContext.resume();
-      }
-
-      // Delete played samples
-      Object.entries(scheduledSamples).forEach(([id, sample]) => {
-        if (sample.endTime < audioContext.currentTime) {
-          delete scheduledSamples[id];
-        }
-      });
-
-      // Find schedulable samples
-      const schedulableSamples = [];
-      state.tracks.forEach((track, i) => {
-        schedulableSamples.push(...track.samples.filter((sample) => {
-          const [startTime, endTime] = getSampleTimes(audioContext, state, sample);
-          sample.volume = track.volume;
-          sample.track = i;
-          sample.buffer = bufferStore[sample.url];
-          sample.endTime = endTime;
-          return (
-            endTime > audioContext.currentTime
-              && startTime <= audioContext.currentTime
-          )
-          || (
-            startTime >= audioContext.currentTime
-              && startTime < audioContext.currentTime + OVERLAP
-          );
-        }));
-      });
-
-      // Schedule samples
-      schedulableSamples.forEach((sample) => {
-        if (
-          !sample.schedulerId
-            || !(sample.schedulerId in scheduledSamples)
-            || scheduledSamples[sample.schedulerId].old
-        ) {
-          sample.schedulerId = genId();
-          const source = scheduleSample(state, sample);
-          scheduledSamples[sample.schedulerId] = { ...sample, ...source };
-        }
-      });
-    }
-  }, LOOKAHEAD);
 
   return (next) => async (action) => {
     let state;
     switch (action.type) {
-      case 'STUDIO_PLAY':
+      case 'STUDIO_PLAY': {
         store.dispatch(playingStartTime(audioContext.currentTime));
-        requestAnimationFrame(beatUpdate);
         state = store.getState().studio;
         store.dispatch(playingStartBeat(state.currentBeat));
+        state.playingStartBeat = state.currentBeat;
+        requestAnimationFrame(beatUpdate);
+
+        const samples = [];
+        state.tracks.forEach((track) => {
+          track.samples.forEach((sample) => {
+            if (
+              (state.loopEnabled
+                && (sample.time + (sample.duration * (state.tempo / 60)) >= state.loop.start
+                && sample.time < state.loop.stop)
+              )
+            ) {
+              samples.push(sample);
+            }
+          });
+        });
+
+        samples.forEach((sample) => {
+          sample = { ...sample, ...bufferStore[sample.id] };
+          sample.schedulerId = genId();
+          sample.context = audioContext;
+          const currentLoop = scheduleSample(audioContext.currentTime, state, sample);
+          const nextLoop = scheduleSample(audioContext.currentTime, state, sample, true);
+          scheduledSamples[sample.schedulerId] = {
+            ...sample,
+            source: currentLoop.source,
+            effects: currentLoop.effects,
+          };
+          scheduledSamples[`${sample.schedulerId}next`] = {
+            ...sample,
+            source: nextLoop.source,
+            effects: nextLoop.effects,
+          };
+        });
         break;
+      }
 
       case 'STUDIO_PAUSE':
         state = store.getState().studio;
@@ -227,33 +245,38 @@ export default (store) => {
           sample.pan.pan.setValueAtTime(track.pan, audioContext.currentTime);
         });
 
-        // Verify that all the tracks have buffers
+        // Verify that all the tracks have bufferscs
         if (action.tracks) {
-          await Promise.all(action.tracks.map(async (track) => {
+          await Promise.all(action.tracks.map(async (track, i) => {
             if (track.samples) {
               await Promise.all(track.samples.map(async (sample) => {
-                if (!sample.fade) {
-                  sample.fade = {
-                    fadeIn: 0,
-                    fadeOut: 0,
-                  };
-                }
-                if (!sample.reverb) {
-                  sample.reverb = {
-                    wet: 1,
-                    dry: 1,
-                    cutoff: 0,
-                    time: 0.3,
-                  };
-                }
-                if (!bufferStore[sample.url]) {
+                sample.fade = {
+                  fadeIn: 0,
+                  fadeOut: 0,
+                  ...sample.fade,
+                };
+                sample.reverb = {
+                  wet: 1,
+                  dry: 1,
+                  cutoff: 0,
+                  time: 0.3,
+                  ...sample.reverb,
+                };
+                sample.track = i;
+                sample.volume = track.volume;
+
+                if (!(sample.id in bufferStore)) {
                   await store.dispatch(setSampleLoading(true));
                   const res = await axios.get(sample.url, { responseType: 'arraybuffer' });
                   const buffer = await audioContext.decodeAudioData(res.data);
-                  bufferStore[sample.url] = buffer;
+                  bufferStore[sample.id] = {
+                    buffer,
+                    duration: buffer.duration,
+                    webAudio: getEffectsObject(audioContext, sample),
+                    sample,
+                  };
                   store.dispatch(setSampleLoading(false));
                 }
-                sample.duration = bufferStore[sample.url].duration;
               }));
             }
           }));
@@ -263,34 +286,44 @@ export default (store) => {
       case 'SET_TRACK':
         state = store.getState().studio;
         // React to volume change
-        Object.values(scheduledSamples).forEach((sample) => {
-          const track = state.tracks[sample.track];
-          const soloTrack = _.findIndex(state.tracks, 'solo');
-          const solo = soloTrack !== -1 && soloTrack !== sample.track;
-          let newVol = 0;
-          if (!solo) {
-            newVol = track.mute ? 0 : track.volume;
-          }
-          sample.gain.gain.setValueAtTime(newVol, audioContext.currentTime);
-          sample.pan.pan.setValueAtTime(track.pan, audioContext.currentTime);
-        });
+        // Object.values(scheduledSamples).forEach((sample) => {
+        //   const track = state.tracks[sample.track];
+        //   const soloTrack = _.findIndex(state.tracks, 'solo');
+        //   const solo = soloTrack !== -1 && soloTrack !== sample.track;
+        //   let newVol = 0;
+        //   if (!solo) {
+        //     newVol = track.mute ? 0 : track.volume;
+        //   }
+        //   sample.gain.gain.setValueAtTime(newVol, audioContext.currentTime);
+        //   sample.pan.pan.setValueAtTime(track.pan, audioContext.currentTime);
+        // });
 
         // Verify that all the track has buffers
-        await Promise.all(action.track.samples.map(async (sample) => {
-          if (!bufferStore[sample.url]) {
-            await store.dispatch(setSampleLoading(true));
-            const res = await axios.get(sample.url, { responseType: 'arraybuffer' });
-            const buffer = await audioContext.decodeAudioData(res.data);
-            bufferStore[sample.url] = buffer;
-            store.dispatch(setSampleLoading(false));
-          }
-          sample.duration = bufferStore[sample.url].duration;
-        }));
+        // await Promise.all(action.track.samples.map(async (sample) => {
+        //   if (!bufferStore[sample.url]) {
+        //     await store.dispatch(setSampleLoading(true));
+        //     const res = await axios.get(sample.url, { responseType: 'arraybuffer' });
+        //     const buffer = await audioContext.decodeAudioData(res.data);
+        //     bufferStore[sample.url] = buffer;
+        //     store.dispatch(setSampleLoading(false));
+        //   }
+        //   sample.duration = bufferStore[sample.url].duration;
+        // }));
         break;
 
       case 'SET_VOLUME':
         audioContext.globalGain.gain.setValueAtTime(action.volume, audioContext.currentTime);
         break;
+
+      case 'SET_SAMPLE_REVERB': {
+        const sample = bufferStore[action.id];
+        sample.webAudio.reverb.time = action.reverb.time * 10;
+        sample.webAudio.reverb.wet.value = action.reverb.wet;
+        sample.webAudio.reverb.dry.value = action.reverb.dry;
+        sample.webAudio.reverb.cutoff.value = action.reverb.cutoff * 10000;
+
+        break;
+      }
 
       default:
         break;

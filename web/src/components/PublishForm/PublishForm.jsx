@@ -22,8 +22,8 @@ const PublishForm = memo((props) => {
     studio, dispatch,
   } = props;
   const { publishFormHidden, songImageUrl } = studio;
-  const [nameInput, setNameInput] = useState(studio.songName);
-  const [description, setDescription] = useState(studio.songDescription);
+  const [nameInput, setNameInput] = useState(studio.songName || '');
+  const [description, setDescription] = useState(studio.songDescription || '');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {

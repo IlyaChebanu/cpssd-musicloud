@@ -49,7 +49,7 @@ const SongPicker = memo((props) => {
       onClick={() => {
         dispatch(setSongImageUrl(song.cover));
         dispatch(setSongName(song.title));
-        dispatch(setSongDescription(song.description));
+        dispatch(setSongDescription(song.description || ''));
         dispatch(setSongId(song.sid));
         dispatch(hideSongPicker());
       }}

@@ -21,7 +21,7 @@ const Sample = memo((props) => {
     sampleEffectsHidden,
   } = props;
 
-  const buffer = useMemo(() => bufferStore[sample.url], [sample.url]);
+  const buffer = useMemo(() => bufferStore[sample.id].buffer, [sample.id]);
 
   const waveform = useMemo(() => {
     if (buffer) {
@@ -64,7 +64,7 @@ const Sample = memo((props) => {
   }, [tempo, sample.track, sample.id, selectedSample, buffer, gridSize]);
 
   const handleDragSample = useCallback((ev) => {
-    dispatch(setSelectedSample(props.sample.id));
+    dispatch(setSelectedSample(props.sample.id || ''));
     const initialMousePos = ev.screenX;
     const initialTime = props.sample.time;
     const handleMouseMove = (e) => {
