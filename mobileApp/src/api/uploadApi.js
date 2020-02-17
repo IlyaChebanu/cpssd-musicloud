@@ -85,44 +85,18 @@ export function putUploadAudioFile(urlKey, uri, fileType) {
 
     let url = `${S3_URL}${urlKey}`;
 
-    let formData = new FormData();
-    formData.append('file', {
-        name: `/kamil/testing.${fileType}`,
-        type: `audio/x-m4a`,
-        uri: uri,
-    });
-
-
-
-    var request = new Request(url, {
-        method: "PUT",
-        headers: new Headers({
-            "Content-Type": 'multipart/form-data',
-        }),
-        body: formData
-    });
-    if (__DEV__) {
-        console.log("putUploadAudioFile : request " + JSON.stringify(request))
-    }
-
-    return fetch(request)
-        .then(response => {
-            if (response.status === 200) {
-                return response.status
+    let xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+        if( xhr.readyState === 4) {
+            if( xhr.status === 200) {
+                console.log('successfully uploaded');
+                console.log(xhr.status);
             } else {
-                return response.status
+                console.log('failed to upload')
             }
-        })
-        .then(responseJson => {
-            if (__DEV__) {
-                console.log("putUploadAudioFile : response " + JSON.stringify(responseJson))
-            }
-            return responseJson;
-        })
-        .catch(error => {
-            if (__DEV__) {
-                console.log("putUploadAudioFile : error " + JSON.stringify(error))
-            }
-            return error
-        });
+        }
+    }
+    xhr.open('PUT', url);
+    xhr.setRequestHeader('Content-Type', 'audio/x-m4a');
+    xhr.send({uri: uri, type: 'audio/x-m4a', name:'recording.m4a'});
 }
