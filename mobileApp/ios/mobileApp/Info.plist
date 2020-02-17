@@ -20,6 +20,8 @@
 		<string>Octicons.ttf</string>
 		<string>Zocial.ttf</string>
 	</array>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Uses the microphone to record music for upload.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>to upload profile picture</string>
 	<key>NSPhotoLibraryUsageDescription</key>
