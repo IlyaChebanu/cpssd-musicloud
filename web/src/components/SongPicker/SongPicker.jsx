@@ -35,7 +35,7 @@ const SongPicker = memo((props) => {
   const handleCreateNewSong = useCallback(async () => {
     const res = await createNewSong('New Song');
     if (res.status === 200) {
-      window.history.pushState(null, null, `/studio?sid=$${res.data.sid}`);
+      window.history.pushState(null, null, `/studio?sid=${res.data.sid}`);
       dispatch(setTracks([]));
       dispatch(setTempo(140));
       dispatch(setSongName('New Song'));
@@ -58,7 +58,7 @@ const SongPicker = memo((props) => {
         dispatch(setSongImageUrl(song.cover));
         dispatch(setSongName(song.title));
         dispatch(setSongDescription(song.description));
-        window.history.pushState(null, null, `/studio?sid=$${song.sid}`);
+        window.history.pushState(null, null, `/studio?sid=${song.sid}`);
         dispatch(hideSongPicker());
       }}
       imageSrc={song.cover}

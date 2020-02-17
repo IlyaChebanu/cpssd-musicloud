@@ -130,7 +130,7 @@ const Header = memo((props) => {
       if (res.status === 200) {
         dispatch(stop);
         dispatch(setTracks([]));
-        window.history.pushState(null, null, `/studio?sid=$${res.data.sid}`);
+        window.history.pushState(null, null, `/studio?sid=${res.data.sid}`);
         dispatch(setTempo(140));
         dispatch(setSongName('New Song'));
         dispatch(hideSongPicker());
@@ -220,13 +220,10 @@ const Header = memo((props) => {
   }, []);
 
   const handleSetName = useCallback(async () => {
-    if (songId) {
-      dispatch(setSongName(nameInput));
-      setNameInput(nameInput);
-      const res = patchSongName(songId, nameInput);
-      return res.status === 200;
-    }
-    return false;
+    dispatch(setSongName(nameInput));
+    setNameInput(nameInput);
+    const res = patchSongName(songId, nameInput);
+    return res.status === 200;
   }, [dispatch, nameInput, songId]);
 
   const handleKeyDown = useCallback((e) => {
