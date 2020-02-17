@@ -12,7 +12,7 @@ import styles from './Header.module.scss';
 import { deleteToken } from '../../actions/userActions';
 import {
   deleteToken as deleteTokenAPI, saveState, uploadFile, createNewSong, patchSongName,
-  setSongCompiledUrl,
+  setSongCompiledUrl
 } from '../../helpers/api';
 import { showNotification } from '../../actions/notificationsActions';
 import { ReactComponent as Logo } from '../../assets/logo.svg';
@@ -37,7 +37,6 @@ import {
   showSongPicker,
   setTempo,
   setSongName,
-  setSongId,
   stop,
   setSampleTime,
   setSampleLoading,
@@ -48,8 +47,10 @@ const Header = memo((props) => {
   const {
     selected, studio, children, dispatch, history, user,
   } = props;
-  const { tempo, tracks, songId } = studio;
+  const { tempo, tracks } = studio;
   const [nameInput, setNameInput] = useState(studio.songName);
+  const urlParams = new URLSearchParams(window.location.search);
+  const songId = Number(urlParams.get('sid'));
 
   const handleSaveState = useCallback(async () => {
     if (!songId) return true;
@@ -60,7 +61,7 @@ const Header = memo((props) => {
       return true;
     }
     return false;
-  }, [tempo, tracks, songId, dispatch]);
+  }, [tempo, tracks, dispatch, songId]);
 
 
   const handleSampleImport = useCallback(() => {
@@ -116,7 +117,7 @@ const Header = memo((props) => {
     if (await handleSaveState()) {
       dispatch(stop);
       dispatch(setTracks([]));
-      dispatch(setSongId(null));
+      window.history.pushState(null, null, "/studio");
       dispatch(setSongName('New Song'));
       dispatch(setTempo(140));
       dispatch(showSongPicker());
@@ -129,7 +130,7 @@ const Header = memo((props) => {
       if (res.status === 200) {
         dispatch(stop);
         dispatch(setTracks([]));
-        dispatch(setSongId(res.data.sid));
+        window.history.pushState(null, null, "/studio?sid=" + res.data.sid);
         dispatch(setTempo(140));
         dispatch(setSongName('New Song'));
         dispatch(hideSongPicker());
@@ -157,22 +158,24 @@ const Header = memo((props) => {
   }, [dispatch, studio.tracks]);
 
   const handlePublishSong = useCallback(async () => {
-    if (!tracksAndSamplesSet()) {
-      return;
+    if(songId){
+      if (!tracksAndSamplesSet()) {
+        return;
+      }
+      if (await handleSaveState()) {
+        dispatch(showPublishForm());
+        const renderedBuffer = await renderTracks(studio);
+        const encoded = toWav(renderedBuffer);
+        const res = await uploadFile('compiled_audio', new File([encoded], `${studio.songName}.wav`, { type: 'audio/wav' }));
+        const songData = {
+          url: res,
+          sid: songId,
+          duration: 1,
+        };
+        setSongCompiledUrl(songData);
+      }
     }
-    if (await handleSaveState()) {
-      dispatch(showPublishForm());
-      const renderedBuffer = await renderTracks(studio);
-      const encoded = toWav(renderedBuffer);
-      const res = await uploadFile('compiled_audio', new File([encoded], `${studio.songName}.wav`, { type: 'audio/wav' }));
-      const songData = {
-        url: res,
-        sid: studio.songId,
-        duration: 1,
-      };
-      setSongCompiledUrl(songData);
-    }
-  }, [dispatch, handleSaveState, studio, tracksAndSamplesSet]);
+  }, [dispatch, handleSaveState, studio, tracksAndSamplesSet, songId]);
 
 
   const fileDropdownItems = useMemo(() => [
@@ -217,11 +220,13 @@ const Header = memo((props) => {
   }, []);
 
   const handleSetName = useCallback(async () => {
-    dispatch(setSongName(nameInput));
-    setNameInput(nameInput);
-    const res = patchSongName(studio.songId, nameInput);
-    return res.status === 200;
-  }, [dispatch, nameInput, studio.songId]);
+    if(songId){
+      dispatch(setSongName(nameInput));
+      setNameInput(nameInput);
+      const res = patchSongName(songId, nameInput);
+      return res.status === 200;
+    }
+  }, [dispatch, nameInput, songId]);
 
   const handleKeyDown = useCallback((e) => {
     if (e.key === 'Enter') {

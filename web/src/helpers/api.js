@@ -259,3 +259,10 @@ export const addSongCoverArt = (reqData) => axios.patch(
     headers: getAuth(),
   },
 );
+
+export const getSongInfo = (sid) => axios.get(
+  `${API_URL}/v1/audio/song?sid=` + sid,
+  {
+    headers: getAuth(),
+  },
+);
