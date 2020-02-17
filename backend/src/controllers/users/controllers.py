@@ -15,7 +15,7 @@ from flask import Blueprint
 from flask import request
 from jsonschema import validate, ValidationError
 
-from ...config import HOST, RESET_TIMEOUT, JWT_SECRET
+from ...config import HOST, RESET_TIMEOUT, JWT_SECRET, PROTOCOL
 from ...models.errors import NoResults
 from ...utils.logger import log
 from ...utils import (
@@ -184,7 +184,7 @@ def register():
             continue
 
     subject = "MusiCloud Email Verification"
-    url = "https://" + HOST + "/api/v1/auth/verify?code=" + code
+    url = PROTOCOL + HOST + "/api/v1/auth/verify?code=" + code
     body = (
         "Welcome to MusiCloud. Please click on this URL to verify "
         "your account:\n" + url
@@ -237,7 +237,7 @@ def reverify():
         code = code[0][0]
 
     subject = "MusiCloud Email Verification"
-    url = "https://" + HOST + "/api/v1/auth/verify?code=" + code
+    url = PROTOCOL + HOST + "/api/v1/auth/verify?code=" + code
     body = (
         "Welcome to MusiCloud. Please click on this URL to verify "
         "your account:\n" + url
@@ -583,7 +583,7 @@ def patch_user(user_data):
                 continue
 
         subject = "MusiCloud Email Verification"
-        url = "https://" + HOST + "/api/v1/auth/verify?code=" + code
+        url = PROTOCOL + HOST + "/api/v1/auth/verify?code=" + code
         body = (
             "Welcome to MusiCloud. Please click on this URL to verify your "
             "account:\n" + url
