@@ -23,6 +23,9 @@ SMTP_CONFIG = {
 # Host domain for our service.
 HOST = os.environ['MUSICLOUD_DOMAIN']
 
+# Protocol for out service.
+PROTOCOL = os.environ['MUSICLOUD_PROTOCOL']
+
 # JWT signing key.
 JWT_SECRET = os.environ['MUSICLOUD_JWT_SECRET']
 
