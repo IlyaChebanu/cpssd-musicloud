@@ -16,6 +16,7 @@ import { getInvalidUserSettingsDetails } from "../../utils/helpers";
 import ToggleSwitch from '../../components/toggleSwitch/toggleSwitch';
 import Orientation from 'react-native-orientation';
 import { writeDataToStorage, SETTINGS_PORTRAIT_DATA_KEY } from "../../utils/localStorage";
+import CustomAlertComponent from "../../components/alertComponent/customAlert";
 
 class UserSettingsScreen extends React.Component {
     constructor(props) {
@@ -29,18 +30,10 @@ class UserSettingsScreen extends React.Component {
             maskOldPassword: true,
             maskNewPassword: true,
             maskNewPasswordRepeat: true,
+            showAlert: false,
+            alertTitle: '',
+            alertMessage: '',
         }
-    }
-
-    showAlert(title, text, action) {
-        Alert.alert(
-            title,
-            text,
-            [
-                { text: 'OK', onPress: action },
-            ],
-            { cancelable: false },
-        );
     }
 
     setEmailTextInput(text) {
@@ -76,13 +69,13 @@ class UserSettingsScreen extends React.Component {
         if (invalidFields.length === 0) {
             patchUserDetails(this.state.oldPassword, this.state.newPassword, this.state.email, this.props.token).then(response => {
                 if (response.status === 200) {
-                    this.showAlert('Success', response.data.message);
+                    this.setState({ alertTitle: 'Success', alertMessage: response.data.message ,showAlert: true })
                 } else {
-                    this.showAlert('Error', (response.data.message));
+                    this.setState({ alertTitle: 'Error', alertMessage: response.data.message ,showAlert: true })
                 }
             });
         } else {
-            this.showAlert('Error', "Invalid: " + invalidFields.join(', '));
+            this.setState({ alertTitle: 'Error', alertMessage: "Invalid: " + invalidFields.join(', ') ,showAlert: true })
         }
     }
 
@@ -96,9 +89,21 @@ class UserSettingsScreen extends React.Component {
         }
     }
 
+    onPressAlertPositiveButton = () => {
+        this.setState({ showAlert: false })
+    };
+
     render() {
         return (
             <SafeAreaView forceInset={{ bottom: 'never' }} style={{ 'backgroundColor': '#3D4044', 'flex': 1 }}>
+                <CustomAlertComponent
+                    displayAlert={this.state.showAlert}
+                    alertTitleText={this.state.alertTitle}
+                    alertMessageText={this.state.alertMessage}
+                    displayPositiveButton={true}
+                    positiveButtonText={'OK'}
+                    onPressPositiveButton={this.onPressAlertPositiveButton}
+                />
                 <View style={{ 'backgroundColor': '#1B1E23', 'flex': 1 }}>
                     <HeaderComponent navigation={this.props.navigation} />
                     <View style={styles.container}>

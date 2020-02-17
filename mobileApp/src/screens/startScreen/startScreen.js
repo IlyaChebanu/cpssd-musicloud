@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from 'react-redux';
 import { ActionCreators } from '../../actions/index';
 import { bindActionCreators } from 'redux';
-import { StyleSheet, Text, View, Image, TouchableOpacity, Animated, Easing, Dimensions, Alert } from "react-native";
+import { StyleSheet, Text, View, Image, TouchableOpacity, Animated, Easing, Dimensions } from "react-native";
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import MultiPurposeButton from "../../components/multiPurposeButton/multiPurposeButton";
@@ -536,7 +536,6 @@ class StartScreen extends React.Component {
       this.setState({ alertState: 0 })
     }
     this.setState({ showAlert: false})
-    // alert('Positive Button Clicked');
   };
 
   render() {

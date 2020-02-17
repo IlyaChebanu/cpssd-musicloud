@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from 'react-redux';
 import { ActionCreators } from '../../actions/index';
 import { bindActionCreators } from 'redux';
-import { StyleSheet, Text, View, Image, Alert } from "react-native";
+import { StyleSheet, Text, View, Image } from "react-native";
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import { getUserInfo, patchUserPictureUrl, followUser, unfollowUser } from "../../api/usersAPI";
@@ -23,17 +23,6 @@ class UserProfileComponent extends React.Component {
   componentDidMount() {
     let obj = this.props.following
     this.setState({ following: obj[this.props.otherUserData.username] })
-  }
-
-  showAlert(title, text, action) {
-    Alert.alert(
-      title,
-      text,
-      [
-        { text: 'OK', onPress: action },
-      ],
-      { cancelable: false },
-    );
   }
 
   getOtherUserDetails(username) {
