@@ -18,6 +18,7 @@ SMTP_CONFIG = {
     'user': os.environ['MUSICLOUD_SMTP_USER'],
     'password': os.environ['MUSICLOUD_SMTP_PASSWORD'],
     'server': os.environ['MUSICLOUD_SMTP_SERVER'],
+    'sender': os.environ['MUSICLOUD_SMTP_SENDER']
 }
 
 # Host domain for our service.
