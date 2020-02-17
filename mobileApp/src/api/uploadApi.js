@@ -97,6 +97,6 @@ export function putUploadAudioFile(urlKey, uri, fileType) {
         }
     }
     xhr.open('PUT', url);
-    xhr.setRequestHeader('Content-Type', 'audio/x-m4a');
-    xhr.send({uri: uri, type: 'audio/x-m4a', name:'recording.m4a'});
+    xhr.setRequestHeader('Content-Type', `audio/x-${fileType}`);
+    xhr.send({uri: uri, type: `audio/x-${fileType}`, name:`recording.${fileType}`});
 }

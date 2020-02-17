@@ -13,11 +13,6 @@ import { ratio } from '../../utils/styles';
 import { postFile, putUploadFile, putUploadAudioFile } from "../../api/uploadApi";
 
 const { width, height } = Dimensions.get('window');
-const audioRecorderPlayer = new AudioRecorderPlayer();
-const path = Platform.select({
-    ios: 'hello.m4a',
-    android: 'musicloud/hello.mp4', // should give extra dir name in android. Won't grant permission to the first level of dir.
-});
 
 class StudioScreen extends React.Component {
     constructor(props) {
@@ -114,30 +109,24 @@ class StudioScreen extends React.Component {
     };
 
     onStopPlay = async () => {
-        // console.log('onStopPlay');
-        // this.audioRecorderPlayer.stopPlayer();
-        // this.audioRecorderPlayer.removePlayBackListener();
-        this.uploadAudio()
+        console.log('onStopPlay');
+        this.audioRecorderPlayer.stopPlayer();
+        this.audioRecorderPlayer.removePlayBackListener();
+        // this.uploadAudio()
     };
 
     async uploadAudio() {
-        // const path = Platform.select({
-        //     ios: 'hello.m4a',
-        //     android: 'musicloud/hello.mp4', // should give extra dir name in android. Won't grant permission to the first level of dir.
-        // });
-        let filetype = 'm4a'
-        let randomString = Math.random().toString(36).substr(2, 7)
-        randomString = randomString + '.m4a'
-        await postFile(this.props.token, 'audio', '/kamil/testing.m4a', 'audio/x-m4a').then(response => {
+
+        let filetype = Platform.ios ? 'm4a' : 'mp4'
+        let filename = '/kamil/' + 'testing' + filetype
+        await postFile(this.props.token, 'audio', filename, `audio/x-${filetype}`).then(response => {
             if (isNaN(response)) {
                 if (response.signed_url.fields.key) {
                   this.setState({ urlKey: response.signed_url.fields.key })
                   let urlKey = response.signed_url.fields.key
-                  let signedUrl = response.signed_url.url
-                //   let picUrl = signedUrl + urlKey
                   putUploadAudioFile(urlKey, this.state.uri, filetype).then(response => {
                     if (response === 200) {
-                    //   this.props.setPicUrl(picUrl)
+                        // successful uploaded audio
                     } else {
                       this.setState({alertTitle: 'Error', alertMessage: 'Failed to upload', showAlert: true })
                     }
@@ -155,15 +144,6 @@ class StudioScreen extends React.Component {
 
         return (
             <View style={styles.recordContainer}>
-                {/* <Text>{'test'}</Text>
-                <Text style={styles.txtRecordCounter}>{this.state.recordTime}</Text>
-                <TouchableOpacity onPress={this.onStartRecord}>
-                    <Text style={[styles.txt, styles.btn]}>RECORD</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={this.onStopRecord}>
-                    <Text style={[styles.txt, styles.btn]}>STOP</Text>
-                </TouchableOpacity> */}
-
                 <Text style={styles.titleTxt}>{'Record'}</Text>
                 <Text style={styles.txtRecordCounter}>{this.state.recordTime}</Text>
                 <View style={styles.viewRecorder}>
@@ -204,6 +184,11 @@ class StudioScreen extends React.Component {
 
                     </View>
                 </View>
+                <View>
+                    <TouchableOpacity>
+                        <Text>{'Upload'}</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
         )
     }
@@ -224,7 +209,6 @@ class StudioScreen extends React.Component {
 function mapStateToProps(state) {
     return {
         token: state.home.token,
-        // userData: state.user.userData,
     };
 }
 
