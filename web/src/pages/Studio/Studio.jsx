@@ -266,10 +266,9 @@ const Studio = memo((props) => {
           if (songState.tempo) dispatch(setTempo(songState.tempo));
           const res2 = await getSongInfo(songId);
           if (res2.status === 200) {
-            const song = res2.data.song;
-            dispatch(setSongImageUrl(song.cover));
-            dispatch(setSongName(song.title));
-            dispatch(setSongDescription(song.description));
+            dispatch(setSongImageUrl(res2.data.song.cover));
+            dispatch(setSongName(res2.data.song.title));
+            dispatch(setSongDescription(res2.data.song.description));
             dispatch(hideSongPicker());
           }
         }
@@ -326,7 +325,7 @@ const Studio = memo((props) => {
     if (songId) {
       const res = await saveState(songId, songState);
       if (res.status === 200) {
-        dispatch(showNotification({message: 'Song saved', type: 'info'}));
+        dispatch(showNotification({ message: 'Song saved', type: 'info' }));
       }
     }
   }, [studio.tempo, tracks, dispatch, songId]);

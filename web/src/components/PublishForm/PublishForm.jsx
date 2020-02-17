@@ -70,7 +70,7 @@ const PublishForm = memo((props) => {
 
   const handlePublishSong = useCallback(async (e) => {
     e.preventDefault();
-    if(songId) {
+    if (songId) {
       if (songImageUrl) {
         await addSongCoverArt({
           url: studio.songImageUrl,

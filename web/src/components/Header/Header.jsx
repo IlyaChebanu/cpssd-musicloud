@@ -12,7 +12,7 @@ import styles from './Header.module.scss';
 import { deleteToken } from '../../actions/userActions';
 import {
   deleteToken as deleteTokenAPI, saveState, uploadFile, createNewSong, patchSongName,
-  setSongCompiledUrl
+  setSongCompiledUrl,
 } from '../../helpers/api';
 import { showNotification } from '../../actions/notificationsActions';
 import { ReactComponent as Logo } from '../../assets/logo.svg';
@@ -117,7 +117,7 @@ const Header = memo((props) => {
     if (await handleSaveState()) {
       dispatch(stop);
       dispatch(setTracks([]));
-      window.history.pushState(null, null, "/studio");
+      window.history.pushState(null, null, '/studio');
       dispatch(setSongName('New Song'));
       dispatch(setTempo(140));
       dispatch(showSongPicker());
@@ -130,7 +130,7 @@ const Header = memo((props) => {
       if (res.status === 200) {
         dispatch(stop);
         dispatch(setTracks([]));
-        window.history.pushState(null, null, "/studio?sid=" + res.data.sid);
+        window.history.pushState(null, null, `/studio?sid=$${res.data.sid}`);
         dispatch(setTempo(140));
         dispatch(setSongName('New Song'));
         dispatch(hideSongPicker());
@@ -158,7 +158,7 @@ const Header = memo((props) => {
   }, [dispatch, studio.tracks]);
 
   const handlePublishSong = useCallback(async () => {
-    if(songId){
+    if (songId) {
       if (!tracksAndSamplesSet()) {
         return;
       }
@@ -220,12 +220,13 @@ const Header = memo((props) => {
   }, []);
 
   const handleSetName = useCallback(async () => {
-    if(songId){
+    if (songId) {
       dispatch(setSongName(nameInput));
       setNameInput(nameInput);
       const res = patchSongName(songId, nameInput);
       return res.status === 200;
     }
+    return false;
   }, [dispatch, nameInput, songId]);
 
   const handleKeyDown = useCallback((e) => {
