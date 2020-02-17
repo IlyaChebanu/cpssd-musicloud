@@ -81,7 +81,7 @@ export function putUploadFile(urlKey, file, fileType) {
         });
 }
 
-export function putUploadAudioFile(urlKey, uri, fileType) {
+export function putUploadAudioFile(urlKey, uri, fileType, onSuccess, onFail) {
 
     let url = `${S3_URL}${urlKey}`;
 
@@ -90,8 +90,9 @@ export function putUploadAudioFile(urlKey, uri, fileType) {
         if( xhr.readyState === 4) {
             if( xhr.status === 200) {
                 console.log('successfully uploaded');
-                console.log(xhr.status);
+                onSuccess();
             } else {
+                onFail()
                 console.log('failed to upload')
             }
         }
