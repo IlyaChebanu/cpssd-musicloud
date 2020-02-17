@@ -217,14 +217,6 @@ export const setSongDescription = (description) => (dispatch) => {
   });
 };
 
-
-export const setSongId = (songId) => (dispatch) => {
-  dispatch({
-    type: 'SET_SONG_ID',
-    songId,
-  });
-};
-
 export const setSampleFade = (id, fade) => (dispatch) => {
   dispatch({
     type: 'SET_SAMPLE_FADE',

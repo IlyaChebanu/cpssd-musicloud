@@ -246,10 +246,12 @@ const Studio = memo((props) => {
   const tracksRef = useRef();
 
   useEffect(() => {
-    if (studio.songId) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const songId = urlParams.get('songId');
+    if (songId) {
       (async () => {
         setTracksLoading(true);
-        const res = await getSongState(studio.songId);
+        const res = await getSongState(songId);
         setTracksLoading(false);
         if (res.status === 200) {
           const songState = res.data.song_state;
@@ -258,7 +260,7 @@ const Studio = memo((props) => {
         }
       })();
     }
-  }, [dispatch, studio.songId]);
+  }, [dispatch]);
 
   useEffect(() => {
     const latest = tracks.reduce((m, track) => {
@@ -305,11 +307,13 @@ const Studio = memo((props) => {
     /* The user who has edit permission for the song by default it Kamil. */
     /* You can add your uid and the sid 1001 to the Song_Editors table to */
     /* save from your account. */
-    const res = await saveState(studio.songId, songState);
+    const urlParams = new URLSearchParams(window.location.search);
+    const songId = urlParams.get('songId');
+    const res = await saveState(songId, songState);
     if (res.status === 200) {
       dispatch(showNotification({ message: 'Song saved', type: 'info' }));
     }
-  }, [studio.tempo, studio.songId, tracks, dispatch]);
+  }, [studio.tempo, tracks, dispatch]);
 
   const renderableTracks = useMemo(() => tracks.map((t, i) => (
     <Track index={i} track={t} key={i} className={styles.track} />
