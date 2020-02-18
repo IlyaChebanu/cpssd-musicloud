@@ -20,3 +20,9 @@ export function clearReduxState() {
     }
 }
 
+export function setOnlineStatus(isOnline) {
+    return {
+        type: actionsTypes.SET_ONLINE_STATUS,
+        isOnline
+    }
+}

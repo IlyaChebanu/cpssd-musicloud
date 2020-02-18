@@ -1,6 +1,6 @@
 import * as Actions from '../actions/actionTypes'
 
-let initialState = { token: '', username: '', };
+let initialState = { token: '', username: '', isOnline: true, };
 
 const HomeReducer = (state = initialState, action) => {
 
@@ -12,6 +12,10 @@ const HomeReducer = (state = initialState, action) => {
         case Actions.SET_USERNAME:
             return Object.assign({}, state, {
                 username: action.username
+            });
+        case Actions.SET_ONLINE_STATUS:
+            return Object.assign({}, state, {
+                isOnline: action.isOnline
             });
         default:
             return state;
