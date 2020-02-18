@@ -12,6 +12,7 @@ import AudioRecorderPlayer from 'react-native-audio-recorder-player';
 import { ratio, screenWidth } from '../../utils/styles';
 import { postFile, putUploadFile, putUploadAudioFile } from "../../api/uploadApi";
 import CustomAlertComponent from "../../components/alertComponent/customAlert";
+import DocumentPicker from 'react-native-document-picker';
 
 const { width, height } = Dimensions.get('window');
 
@@ -38,8 +39,28 @@ class StudioScreen extends React.Component {
         this.audioRecorderPlayer = new AudioRecorderPlayer();
     }
 
-    handleUploadButtonClick() {
-        // this.setState({ screenState: 3 })
+    async handleUploadButtonClick() {
+        try {
+            const res = await DocumentPicker.pick({
+              type: [DocumentPicker.types.audio],
+            });
+            let extension = res.type.split('/').slice(-1)[0]
+            let filename = `/${this.props.username}/${res.name}.${extension}`
+            this.uploadSelectedAudio(filename, res.type, res.uri)
+            console.log(
+              res.uri,
+              res.type, // mime type
+              res.name,
+              res.size
+            );
+          } catch (err) {
+            if (DocumentPicker.isCancel(err)) {
+              // User cancelled the picker, exit any dialogs or menus and move on
+            } else {
+              throw err;
+            }
+          }
+
     }
 
     handleRecordButtonClick() {
@@ -169,6 +190,18 @@ class StudioScreen extends React.Component {
     uploadAudioFail() {
         this.setState({ uploading: false })
         this.setState({ alertTitle: 'Error', alertMessage: 'Failed to upload recording', showAlert: true })
+    }
+
+    async uploadSelectedAudio(filename, filetype, uri) {
+        await postFile(this.props.token, 'audio', filename, `audio/x-${filetype}`).then(response => {
+            if (isNaN(response)) {
+                if (response.signed_url.fields.key) {
+                    this.setState({ urlKey: response.signed_url.fields.key })
+                    let urlKey = response.signed_url.fields.key
+                    putUploadAudioFile(urlKey, uri, filetype, this.uploadAudioSuccess.bind(this), this.uploadAudioFail.bind(this))
+                }
+            }
+        })
     }
 
     async uploadAudio() {
@@ -318,6 +351,7 @@ class StudioScreen extends React.Component {
 function mapStateToProps(state) {
     return {
         token: state.home.token,
+        username: state.home.username,
     };
 }
 
