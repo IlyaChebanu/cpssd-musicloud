@@ -25,7 +25,7 @@ export default StyleSheet.create({
       top: 50,
       left: 30,
       width: width-60,
-      resizeMode: 'contain'
+      resizeMode: 'contain',
     },
     parentContainer: {
       position: 'absolute', 

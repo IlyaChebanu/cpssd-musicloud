@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from 'react-redux';
 import { ActionCreators } from '../../actions/index';
 import { bindActionCreators } from 'redux';
-import { StyleSheet, Text, View, Image, TouchableOpacity, Animated, Easing, Dimensions, Alert } from "react-native";
+import { StyleSheet, Text, View, Image, TouchableOpacity, Animated, Easing, Dimensions } from "react-native";
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import MultiPurposeButton from "../../components/multiPurposeButton/multiPurposeButton";
@@ -15,6 +15,7 @@ import PasswordInput from "../../components/passwordInput/passwordInput";
 import { getInvalidLoginDetails, getInvalidForgotPasswordDetails, getInvalidRegisterDetails } from "../../utils/helpers";
 import { loginUser, passwordResetInitialize, passwordResetConfirm, registerUser, reVerifyEmail } from "../../api/usersAPI";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import CustomAlertComponent from "../../components/alertComponent/customAlert";
 
 const { width, height } = Dimensions.get('window');
 
@@ -72,6 +73,10 @@ class StartScreen extends React.Component {
       passwordRepeat: '',
       maskPassword: true,
       maskPasswordRepeat: true,
+      showAlert: false,
+      alertTitle: '',
+      alertMessage: '',
+      alertState: 0,
     };
   }
 
@@ -200,7 +205,7 @@ class StartScreen extends React.Component {
     animateCustomRegisterNative(this.animatedRegDetails, regArr, 2, 350, Easing.ease, 75).then(
       () => {
         this.setState({ screenState: [STATE_LOGIN] })
-        this.showAlert('Account Succesfully Created', 'Account created with username: ' + this.state.usernameReg)
+        this.setState({ alertTitle: 'Account Succesfully Created', alertMessage: 'Account created with username: ' + this.state.usernameReg, showAlert: true })
       }
     )
     animateCustomLoginNative(this.animatedLoginDetails, loginArr, 1, 350, Easing.ease, 75)
@@ -248,11 +253,11 @@ class StartScreen extends React.Component {
           animateCustomForgotNative(this.animatedForgotDetails, forgotArr, 1, 350, Easing.ease, 75).then(
             () => {
               this.setState({ screenState: [STATE_FORGOT_PASSWORD_FINISH] })
-              this.showAlert('Email Sent', `Please check your email: ${this.state.email} for verification code`)
+              this.setState({ alertTitle: 'Email Sent', alertMessage: `Please check your email: ${this.state.email} for verification code`, showAlert: true })
             }
           )
         } else {
-          this.showAlert('Error', response.data.message ? response.data.message : 'PasswordResetInitialize failed')
+          this.setState({ alertTitle: 'Error', alertMessage: response.data.message ? response.data.message : 'PasswordResetInitialize failed', showAlert: true })
         }
       })
     } else {
@@ -287,20 +292,20 @@ class StartScreen extends React.Component {
           this.props.navigateToHomeScreen()
           this.resetLoginDetails()
         } else {
-          this.showAlert('Error', response.data.message ? response.data.message : 'LoginUser Failed')
+          this.setState({ alertTitle: 'Error', alertMessage: response.data.message ? response.data.message : 'LoginUser Failed', showAlert: true })
         }
       })
     } else {
-      this.showAlert('Error', "Invalid: " + invalidFields.join(', '))
+      this.setState({ alertTitle: 'Error', alertMessage: `Invalid: ${invalidFields.join(', ')}`, showAlert: true })
     }
   }
 
   handleVerifyClick() {
     reVerifyEmail(this.props.email).then(response => {
       if (response.status === 200) {
-        this.showAlert('Verication email resent', ('Verification email sent to: ' + this.props.email))
+        this.setState({ alertTitle: 'Verication email resent', alertMessage: 'Verification email sent to: ' + this.props.email, showAlert: true })
       } else {
-        this.showAlert('Error', response.data.message ? response.data.message : 'VerifyEmail Failed')
+        this.setState({ alertTitle: 'Error', alertMessage: response.data.message ? response.data.message : 'VerifyEmail Failed', showAlert: true })
       }
     })
   }
@@ -370,11 +375,11 @@ class StartScreen extends React.Component {
           this.props.setNewAccount(true)
           this.animateToLoginFromCreate()
         } else {
-          this.showAlert('Error', response.data.message ? response.data.message : 'registerUser failed')
+          this.setState({ alertTitle: 'Error', alertMessage: response.data.message ? response.data.message : 'registerUser failed', showAlert: true })
         }
       })
     } else {
-      this.showAlert('Error', "Invalid: " + invalidFields.join(', '))
+      this.setState({ alertTitle: 'Error', alertMessage: "Invalid: " + invalidFields.join(', '), showAlert: true })
     }
   }
 
@@ -447,22 +452,18 @@ class StartScreen extends React.Component {
 
   // Forgot Password
 
-  handleResetOkClick = () => {
-    this.animateToLogin()
-  }
-
   handleConfirmResetClick() {
     let invalidFields = getInvalidForgotPasswordDetails(this.state.password, this.state.passwordRepeat, this.state.code)
     if (invalidFields.length === 0) {
       passwordResetConfirm(this.state.email, Number(this.state.code), this.state.password).then(response => {
         if (response.status === 200) {
-          this.showAlert('Password Sucessfully reset', 'Password succesfully reset. Press Ok to log in.', this.handleResetOkClick)
+          this.setState({ alertTitle: 'Password Sucessfully reset', alertMessage: 'Password succesfully reset. Press Ok to log in.', showAlert: true, alertState: 1 })
         } else {
-          this.showAlert('Error', response.data.message ? response.data.message : 'PasswordResetConfirm Failed')
+          this.setState({ alertTitle: 'Error', alertMessage: response.data.message ? response.data.message : 'PasswordResetConfirm Failed', showAlert: true })
         }
       })
     } else {
-      this.showAlert('Error', "Invalid: " + invalidFields.join(', '))
+      this.setState({ alertTitle: 'Error', alertMessage: "Invalid: " + invalidFields.join(', '), showAlert: true })
     }
   }
 
@@ -543,16 +544,13 @@ class StartScreen extends React.Component {
     )
   }
 
-  showAlert(title, text, action) {
-    Alert.alert(
-      title,
-      text,
-      [
-        { text: 'OK', onPress: action },
-      ],
-      { cancelable: false },
-    );
-  }
+  onPressAlertPositiveButton = () => {
+    if (this.state.alertState === 1) {
+      this.animateToLogin()
+      this.setState({ alertState: 0 })
+    }
+    this.setState({ showAlert: false})
+  };
 
   render() {
     var logoImage = require("../../assets/images/logo1.png");
@@ -591,6 +589,18 @@ class StartScreen extends React.Component {
     })
     return (
       <View style={{ 'backgroundColor': '#1B1E23', 'flex': 1 }}>
+        <CustomAlertComponent
+          displayAlert={this.state.showAlert}
+          // displayAlertIcon={true}
+          alertTitleText={this.state.alertTitle}
+          alertMessageText={this.state.alertMessage}
+          displayPositiveButton={true}
+          positiveButtonText={'OK'}
+          // displayNegativeButton={true}
+          // negativeButtonText={'CANCEL'}
+          onPressPositiveButton={this.onPressAlertPositiveButton}
+          // onPressNegativeButton={this.onPressAlertNegativeButton}
+        />
         <Image style={styles.topVector} source={topVector} />
         <View style={styles.logoContainer}>
           <Animated.View style={[styles.arrowBackContainer, { transform: [{ translateX: backArrowPosition }] }]}>
