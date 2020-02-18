@@ -14,6 +14,7 @@ if (token) {
 
 
 export default (state = {
+  usersPopupHidden: true,
   token,
   username,
   profilePicUrl: '',
@@ -48,6 +49,51 @@ export default (state = {
       return {
         ...state,
         profilePicUrl: undefined,
+      };
+    case 'SET_FOLLOWERS':
+      return {
+        ...state,
+        followers: action.followers,
+      };
+    case 'SET_FOLLOWING':
+      return {
+        ...state,
+        following: action.following,
+      };
+    case 'SET_POSTS':
+      return {
+        ...state,
+        posts: action.posts,
+      };
+    case 'SET_SONGS':
+      return {
+        ...state,
+        songs: action.songs,
+      };
+    case 'SET_LIKES':
+      return {
+        ...state,
+        likes: action.likes,
+      };
+    case 'SET_FOLLOW_STATUS':
+      return {
+        ...state,
+        follow_status: action.status,
+      };
+    case 'SET_PROFILER':
+      return {
+        ...state,
+        profiler: action.profilerURL,
+      };
+    case 'USERS_POPUP_SHOW':
+      return {
+        ...state,
+        usersPopupHidden: false,
+      };
+    case 'USERS_POPUP_HIDE':
+      return {
+        ...state,
+        usersPopupHidden: true,
       };
     default:
       return state;

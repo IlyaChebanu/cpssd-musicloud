@@ -9,6 +9,10 @@ const HomeReducer = (state = initialState, action) => {
             return Object.assign({}, state, {
                 token: action.token
             });
+        case Actions.SET_DEVICE_TOKEN:
+            return Object.assign({}, state, {
+                deviceToken: action.deviceToken
+            });
         case Actions.SET_USERNAME:
             return Object.assign({}, state, {
                 username: action.username

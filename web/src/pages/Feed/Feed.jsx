@@ -37,6 +37,7 @@ function Feed() {
           message={feedItem.message}
           username={feedItem.username}
           time={feedItem.created}
+          profileImg={feedItem.profiler}
         />
       );
     }
@@ -47,11 +48,13 @@ function Feed() {
           username={feedItem.username}
           title={feedItem.title}
           url={feedItem.url}
+          description={feedItem.description}
           duration={feedItem.duration}
           likes={feedItem.likes}
           coverImage={feedItem.cover}
           isLiked={Boolean(feedItem.like_status)}
           id={feedItem.sid}
+          profileImg={feedItem.profiler}
         />
       );
     }

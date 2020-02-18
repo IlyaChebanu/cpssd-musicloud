@@ -5,18 +5,18 @@ import cookie from 'js-cookie';
 import { uploadFile } from '../../helpers/api';
 
 
-const FileUploader = memo(() => {
+const FileUploader = memo((type) => {
   // receives array of files that are being uploaded to s3 bucket when submit button is clicked
   const handleSubmit = useCallback((files, allFiles) => {
     allFiles.forEach((f) => {
-      uploadFile('audio', f, cookie.get('token'));
+      uploadFile(type, f, cookie.get('token'));
       f.remove();
     });
-  }, []);
+  }, [type]);
   return (
     <Dropzone
       onSubmit={handleSubmit}
-      accept="audio/*"
+      accept={`${type}/*`}
     />
   );
 });

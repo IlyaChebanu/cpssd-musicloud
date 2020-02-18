@@ -7,15 +7,16 @@ import cookie from 'js-cookie';
 import { connect } from 'react-redux';
 import { withRouter, Link } from 'react-router-dom';
 import toWav from 'audiobuffer-to-wav';
+import _ from 'lodash';
 import styles from './Header.module.scss';
 import { deleteToken } from '../../actions/userActions';
 import {
   deleteToken as deleteTokenAPI, saveState, uploadFile, createNewSong, patchSongName,
+  setSongCompiledUrl,
 } from '../../helpers/api';
 import { showNotification } from '../../actions/notificationsActions';
 import { ReactComponent as Logo } from '../../assets/logo.svg';
 import { ReactComponent as SignOutIcon } from '../../assets/icons/sign-out-alt-light.svg';
-import ProfilePicture from '../../assets/profiler.jpg';
 import CircularImage from '../CircularImage';
 import Dropdown from '../Dropdown';
 
@@ -39,14 +40,13 @@ import {
   setSongId,
   stop,
   setSampleTime,
-  setSelectedSample,
   setSampleLoading,
+  showPublishForm,
 } from '../../actions/studioActions';
-
 
 const Header = memo((props) => {
   const {
-    selected, studio, children, dispatch, history,
+    selected, studio, children, dispatch, history, user,
   } = props;
   const { tempo, tracks, songId } = studio;
   const [nameInput, setNameInput] = useState(studio.songName);
@@ -76,20 +76,30 @@ const Header = memo((props) => {
     const track = { ...studio.tracks[studio.selectedTrack] };
     fileSelector.onchange = function onChange() {
       const sampleFile = fileSelector.files[0];
-      const response = uploadFile('audio', sampleFile, cookie.get('token'));
+      const response = uploadFile('audio', sampleFile);
       const cast = Promise.resolve(response);
       cast.then((url) => {
         sampleState = {
           url,
+          name: sampleFile.name,
           id: genId(),
           time: studio.currentBeat,
           track: studio.selectedTrack,
+          fade: {
+            fadeIn: 0,
+            fadeOut: 0,
+          },
+          reverb: {
+            wet: 1,
+            dry: 1,
+            cutoff: 0,
+            time: 0.3,
+          },
         };
         track.samples.push(sampleState);
         dispatch(setTrackAtIndex(track, studio.selectedTrack));
       });
     };
-    dispatch(setSelectedSample(sampleState.id));
     dispatch(setSampleTime(sampleState.time, sampleState.id));
     dispatch(setSampleLoading(true));
     dispatch(setTracks(studio.tracks));
@@ -98,9 +108,9 @@ const Header = memo((props) => {
   const exportAction = useCallback(async () => {
     const renderedBuffer = await renderTracks(studio);
     const encoded = toWav(renderedBuffer);
-
     forceDownload([new DataView(encoded)], 'audio/wav', `${studio.songName}.wav`); // for mp3 [new DataView] not needed
   }, [studio]);
+
 
   const handleShowSongPicker = useCallback(async () => {
     if (await handleSaveState()) {
@@ -127,22 +137,55 @@ const Header = memo((props) => {
     }
   }, [dispatch, handleSaveState]);
 
+  const tracksAndSamplesSet = useCallback(() => {
+    if (_.isEmpty(studio.tracks)) {
+      dispatch(showNotification({ message: 'Please add a track first', type: 'info' }));
+      return false;
+    }
+
+    let hasSamples = false;
+    studio.tracks.forEach((track) => {
+      if (!_.isEmpty(track.samples)) {
+        hasSamples = true;
+      }
+    });
+    if (!hasSamples) {
+      dispatch(showNotification({ message: 'Please add a sample first', type: 'info' }));
+      return false;
+    }
+    return true;
+  }, [dispatch, studio.tracks]);
+
+  const handlePublishSong = useCallback(async () => {
+    if (!tracksAndSamplesSet()) {
+      return;
+    }
+    if (await handleSaveState()) {
+      dispatch(showPublishForm());
+      const renderedBuffer = await renderTracks(studio);
+      const encoded = toWav(renderedBuffer);
+      const res = await uploadFile('compiled_audio', new File([encoded], `${studio.songName}.wav`, { type: 'audio/wav' }));
+      const songData = {
+        url: res,
+        sid: studio.songId,
+        duration: 1,
+      };
+      setSongCompiledUrl(songData);
+    }
+  }, [dispatch, handleSaveState, studio, tracksAndSamplesSet]);
+
+
   const fileDropdownItems = useMemo(() => [
     { name: 'New', action: handleHideSongPicker, icon: newIcon },
     { name: 'Open', action: handleShowSongPicker, icon: openIcon },
-    { name: 'Publish', icon: publishIcon },
+    { name: 'Publish', action: handlePublishSong, icon: publishIcon },
     { name: 'Save', icon: saveIcon, action: handleSaveState },
     { name: 'Import', icon: importIcon, action: handleSampleImport },
     { name: 'Export', icon: exportIcon, action: exportAction },
     { name: 'Generate', icon: generateIcon },
     { name: 'Exit', icon: exitIcon },
-  ], [
-    exportAction,
-    handleHideSongPicker,
-    handleSampleImport,
-    handleSaveState,
-    handleShowSongPicker,
-  ]);
+  ], [exportAction, handleHideSongPicker, handlePublishSong,
+    handleSampleImport, handleSaveState, handleShowSongPicker]);
 
   const editDropdownItems = useMemo(() => [
     { name: 'Edit 1' },
@@ -206,10 +249,10 @@ const Header = memo((props) => {
           <Link to="/studio" className={selected === 0 ? styles.selected : ''}>Studio</Link>
           <Link to="/feed" className={selected === 1 ? styles.selected : ''}>Feed</Link>
           <Link to="/discover" className={selected === 2 ? styles.selected : ''}>Discover</Link>
-          <Link to="/profile" className={selected === 3 ? styles.selected : ''}>Profile</Link>
+          <Link to={`/profile?username=${user.username}`} className={selected === 3 ? styles.selected : ''}>Profile</Link>
         </nav>
         <div className={styles.pictureWrapper}>
-          <CircularImage src={ProfilePicture} />
+          <CircularImage src={user.profilePicUrl} />
           <div className={styles.signout} onClick={handleSignout} role="button" tabIndex={0}>
             <SignOutIcon />
           </div>
@@ -224,6 +267,7 @@ Header.propTypes = {
   history: PropTypes.object.isRequired,
   selected: PropTypes.number.isRequired,
   studio: PropTypes.object.isRequired,
+  user: PropTypes.object.isRequired,
   children: PropTypes.node,
 };
 

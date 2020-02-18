@@ -5,6 +5,7 @@ export const SET_DUMMY_NAME = "set_dummy_name";
 
 //Home actions
 export const SET_AUTH_TOKEN = 'set_auth_token';
+export const SET_DEVICE_TOKEN = 'set_device_token';
 export const SET_USERNAME = 'set_username';
 export const SET_ONLINE_STATUS = 'set_online_status';
 

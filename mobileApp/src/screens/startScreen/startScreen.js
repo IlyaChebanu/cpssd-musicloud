@@ -8,6 +8,7 @@ import styles from "./styles";
 import MultiPurposeButton from "../../components/multiPurposeButton/multiPurposeButton";
 import { writeDataToStorage, readStorageData, TOKEN_DATA_KEY, USERNAME_DATA_KEY, SETTINGS_PORTRAIT_DATA_KEY } from "../../utils/localStorage";
 import Orientation from 'react-native-orientation';
+import Pushy from 'pushy-react-native';
 import { animateTimingNative, animateCustomLoginNative, animateCustomRegisterNative, animateCustomForgotNative, animateTimingPromiseNative } from "../../utils/animate";
 import LoginInput from "../../components/loginInput/loginInput";
 import PasswordInput from "../../components/passwordInput/passwordInput";
@@ -78,6 +79,18 @@ class StartScreen extends React.Component {
       alertState: 0,
       showExitAlert: false,
     };
+  }
+
+  componentDidMount() {
+    // Register the device for push notifications
+    Pushy.register().then(async (deviceToken) => {
+      if (__DEV__) {
+        console.log('pushy deviceToken token: ' + deviceToken)
+      }
+      this.props.setDeviceToken(deviceToken)
+    }).catch((err) => {
+      console.error(err);
+    });
   }
 
   async loadCorrectFlow() {
@@ -288,9 +301,10 @@ class StartScreen extends React.Component {
   }
 
   handleLoginClick() {
+    let deviceToken = this.props.deviceToken
     let invalidFields = getInvalidLoginDetails(this.state.usernameLogin.trim(), this.state.passwordLogin)
     if (invalidFields.length == 0) {
-      loginUser(this.state.usernameLogin, this.state.passwordLogin).then(response => {
+      loginUser(this.state.usernameLogin, this.state.passwordLogin, deviceToken).then(response => {
         if (response.data.access_token) {
           this.saveLoginDetails(response.data.access_token)
           this.props.setNewAccount(false)
@@ -661,6 +675,7 @@ function mapStateToProps(state) {
     token: state.home.token,
     newAccount: state.reg.newAccount,
     email: state.reg.email,
+    deviceToken: state.home.deviceToken,
   };
 }
 

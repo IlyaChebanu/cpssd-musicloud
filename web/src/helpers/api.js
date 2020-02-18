@@ -36,7 +36,7 @@ axios.interceptors.response.use((res) => res, (err) => {
   return res;
 });
 
-const API_URL = 'http://dcumusicloud.com:5000/api';
+const API_URL = 'https://dcumusicloud.com:5000/api';
 
 const getAuth = () => ({
   Authorization: `Bearer ${store.getState().user.token}`,
@@ -122,7 +122,7 @@ export const patchUserDetails = (reqData) => axios.patch(
 );
 
 export const getEditableSongs = () => axios.get(
-  `${API_URL}/v1/audio/editable_songs?songs_per_page=100`,
+  `${API_URL}/v1/audio/editable_songs?songs_per_page=10000`,
   {
     headers: getAuth(),
   },
@@ -146,6 +146,14 @@ export const createNewSong = (title) => axios.post(
 export const patchSongName = (sid, title) => axios.patch(
   `${API_URL}/v1/audio/rename`,
   { sid, title },
+  {
+    headers: getAuth(),
+  },
+);
+
+export const patchSongDescription = (sid, description) => axios.patch(
+  `${API_URL}/v1/audio/description`,
+  { sid, description },
   {
     headers: getAuth(),
   },
@@ -177,6 +185,76 @@ export const unlikeSong = (sid) => axios.post(
 export const createPost = (message) => axios.post(
   `${API_URL}/v1/users/post`,
   { message },
+  {
+    headers: getAuth(),
+  },
+);
+
+export const getUserPosts = (username) => axios.get(
+  `${API_URL}/v1/users/posts?posts_per_page=100&username=${username}`,
+  {
+    headers: getAuth(),
+  },
+);
+
+
+export const setSongCompiledUrl = (reqData) => axios.patch(
+  `${API_URL}/v1/audio/compiled_url`,
+  reqData,
+  {
+    headers: getAuth(),
+  },
+);
+
+export const getCompiledSongs = (username) => axios.get(
+  `${API_URL}/v1/audio/compiled_songs?${username ? `username=${username}` : ''}`,
+  {
+    headers: getAuth(),
+  },
+);
+
+
+export const publishSong = (sid) => axios.post(
+  `${API_URL}/v1/audio/publish`,
+  { sid },
+  {
+    headers: getAuth(),
+  },
+);
+
+export const postFollow = (username) => axios.post(
+  `${API_URL}/v1/users/follow`,
+  { username },
+  {
+    headers: getAuth(),
+  },
+);
+
+export const postUnfollow = (username) => axios.post(
+  `${API_URL}/v1/users/unfollow`,
+  { username },
+  {
+    headers: getAuth(),
+  },
+);
+
+export const getFollowers = (username) => axios.get(
+  `${API_URL}/v1/users/followers?username=${username}&users_per_page=10000`,
+  {
+    headers: getAuth(),
+  },
+);
+
+export const getFollowing = (username) => axios.get(
+  `${API_URL}/v1/users/following?username=${username}&users_per_page=10000`,
+  {
+    headers: getAuth(),
+  },
+);
+
+export const addSongCoverArt = (reqData) => axios.patch(
+  `${API_URL}/v1/audio/cover_art`,
+  reqData,
   {
     headers: getAuth(),
   },

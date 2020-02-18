@@ -13,6 +13,33 @@
   &:focus {
     outline: none;
   }
+
+  p {
+    margin-left: 3px;
+    margin-top: 3px;
+    position: absolute;
+    font-size: 11px;
+    height: 80px;
+    width: 70%;
+    font-weight: 700;
+    color: white;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+.edit {
+    padding: 0 auto;
+    margin: 0 auto;
+    overflow: hidden;
+    position: absolute;
+    right: 0;
+    height: 15px;
+    &:hover {
+      filter: invert(100%);
+    }
+  }
+  .editing {
+    filter: invert(100%);
+  }
 }
 
 .waveform {
@@ -23,4 +50,19 @@
 
 .bar {
   width: 1px;
+}
+
+.fadeWrapper {
+  pointer-events: none;
+  border-radius: 10px;
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  svg {
+    pointer-events: none;
+  }
 }

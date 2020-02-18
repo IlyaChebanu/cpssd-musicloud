@@ -1,12 +1,14 @@
 /* eslint-disable no-param-reassign */
 import axios from 'axios';
 import _ from 'lodash';
+import Reverb from 'soundbank-reverb';
 import {
   playingStartTime, setCurrentBeat, playingStartBeat, setSampleLoading, stop,
 } from '../actions/studioActions';
 import {
   audioContext, bufferStore,
 } from '../helpers/constants';
+import { lerp, genId } from '../helpers/utils';
 
 const LOOKAHEAD = 25; // ms
 const OVERLAP = 100/* ms */ / 1000;
@@ -44,11 +46,18 @@ const scheduleSample = (state, sample, context = audioContext, offline = false) 
   const source = context.createBufferSource();
   source.buffer = sample.buffer;
 
-  const gain = context.createGain();
   const pan = context.createStereoPanner();
+  const reverb = Reverb(context);
+  const gain = context.createGain();
   source.connect(pan);
-  pan.connect(gain);
+  pan.connect(reverb);
+  reverb.connect(gain);
   gain.connect(context.globalGain);
+
+  reverb.time = sample.reverb.time * 10;
+  reverb.wet.value = sample.reverb.wet;
+  reverb.dry.value = sample.reverb.dry;
+  reverb.cutoff.value = sample.reverb.cutoff * 10000;
 
   const track = state.tracks[sample.track];
   const soloTrack = _.findIndex(state.tracks, 'solo');
@@ -57,7 +66,10 @@ const scheduleSample = (state, sample, context = audioContext, offline = false) 
   if (!solo) {
     volume = track.mute ? 0 : sample.volume;
   }
-  gain.gain.setValueAtTime(volume, 0);
+  gain.gain.setValueAtTime(0, startTime);
+  gain.gain.linearRampToValueAtTime(volume, lerp(startTime, endTime, sample.fade.fadeIn));
+  gain.gain.setValueAtTime(volume, lerp(startTime, endTime, 1 - sample.fade.fadeOut));
+  gain.gain.linearRampToValueAtTime(0, endTime);
   pan.pan.setValueAtTime(track.pan, 0);
 
   source.start(startTime, offline ? 0 : offset);
@@ -159,9 +171,14 @@ export default (store) => {
 
       // Schedule samples
       schedulableSamples.forEach((sample) => {
-        if (!(sample.id in scheduledSamples) || scheduledSamples[sample.id].old) {
+        if (
+          !sample.schedulerId
+            || !(sample.schedulerId in scheduledSamples)
+            || scheduledSamples[sample.schedulerId].old
+        ) {
+          sample.schedulerId = genId();
           const source = scheduleSample(state, sample);
-          scheduledSamples[sample.id] = { ...sample, ...source };
+          scheduledSamples[sample.schedulerId] = { ...sample, ...source };
         }
       });
     }
@@ -205,6 +222,7 @@ export default (store) => {
           if (!solo) {
             volume = track.mute ? 0 : track.volume;
           }
+
           sample.gain.gain.setValueAtTime(volume, audioContext.currentTime);
           sample.pan.pan.setValueAtTime(track.pan, audioContext.currentTime);
         });
@@ -214,6 +232,20 @@ export default (store) => {
           await Promise.all(action.tracks.map(async (track) => {
             if (track.samples) {
               await Promise.all(track.samples.map(async (sample) => {
+                if (!sample.fade) {
+                  sample.fade = {
+                    fadeIn: 0,
+                    fadeOut: 0,
+                  };
+                }
+                if (!sample.reverb) {
+                  sample.reverb = {
+                    wet: 1,
+                    dry: 1,
+                    cutoff: 0,
+                    time: 0.3,
+                  };
+                }
                 if (!bufferStore[sample.url]) {
                   await store.dispatch(setSampleLoading(true));
                   const res = await axios.get(sample.url, { responseType: 'arraybuffer' });

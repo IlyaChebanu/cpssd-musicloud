@@ -21,5 +21,6 @@ def gen_song_object(song_list):
         "url": song_list[6],
         "cover": song_list[7],
         "likes": song_list[8],
-        "like_status": song_list[9]
+        "like_status": song_list[9],
+        "description": song_list[10]
     }
