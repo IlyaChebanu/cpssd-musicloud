@@ -50,7 +50,7 @@ const Track = memo((props) => {
 
   const samples = useMemo(() => (
     track.samples && track.samples.map(getSample)
-  ), [getSample, track.samples]);
+  ), [getSample, track]);
 
   const handleSetSelected = useCallback(() => {
     dispatch(setSelectedTrack(index));
