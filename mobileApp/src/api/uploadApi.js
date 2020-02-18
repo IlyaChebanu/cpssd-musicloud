@@ -80,3 +80,24 @@ export function putUploadFile(urlKey, file, fileType) {
             return error
         });
 }
+
+export function putUploadAudioFile(urlKey, uri, fileType, onSuccess, onFail) {
+
+    let url = `${S3_URL}${urlKey}`;
+
+    let xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+        if( xhr.readyState === 4) {
+            if( xhr.status === 200) {
+                console.log('successfully uploaded');
+                onSuccess();
+            } else {
+                onFail()
+                console.log('failed to upload')
+            }
+        }
+    }
+    xhr.open('PUT', url);
+    xhr.setRequestHeader('Content-Type', `audio/x-${fileType}`);
+    xhr.send({uri: uri, type: `audio/x-${fileType}`, name:`recording.${fileType}`});
+}

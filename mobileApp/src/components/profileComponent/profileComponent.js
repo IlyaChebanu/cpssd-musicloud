@@ -8,6 +8,7 @@ import styles from "./styles";
 import { getUserInfo, patchUserPictureUrl } from "../../api/usersAPI";
 import PhotoUpload from 'react-native-photo-upload';
 import { postFile, putUploadFile } from "../../api/uploadApi";
+import CustomAlertComponent from "../alertComponent/customAlert";
 
 class ProfileComponent extends React.Component {
   constructor(props) {
@@ -15,22 +16,14 @@ class ProfileComponent extends React.Component {
     this.state = {
       userDetails: {},
       urlKey: '',
+      showAlert: false,
+      alertTitle: '',
+      alertMessage: '',
     };
   }
 
   componentDidMount() {
     this.getUserDetails()
-  }
-
-  showAlert(title, text, action) {
-    Alert.alert(
-      title,
-      text,
-      [
-        { text: 'OK', onPress: action },
-      ],
-      { cancelable: false },
-    );
   }
 
   getUserDetails() {
@@ -64,13 +57,13 @@ class ProfileComponent extends React.Component {
               this.props.setPicUrl(picUrl)
               patchUserPictureUrl(this.props.accessToken, picUrl).then(response => {
                 if (response.status === 200) {
-                  this.showAlert('Sucess', 'Photo uploaded sucessfully')
+                  this.setState({alertTitle: 'Sucess', alertMessage: 'Photo uploaded sucessfully', showAlert: true })
                 } else {
-                  this.showAlert('Error', response.data.message ? response.data.message : 'patchUserPicture failed')
+                  this.setState({alertTitle: 'Error', alertMessage: response.data.message ? response.data.message : 'patchUserPicture failed', showAlert: true })
                 }
               })
             } else {
-              this.showAlert('Error', 'Failed to upload')
+              this.setState({alertTitle: 'Error', alertMessage: 'Failed to upload', showAlert: true })
             }
           })
         }
@@ -90,12 +83,24 @@ class ProfileComponent extends React.Component {
     this.props.handleLikedSongClick()
   }
 
+  onPressAlertPositiveButton = () => {
+    this.setState({ showAlert: false })
+  };
+
   render() {
     let profilePic = require('../../assets/images/profilePlaceholder.png')
     let profilePicUrl = this.props.picUrl
     let userData = this.props.userData
     return (
       <View style={styles.container}>
+        <CustomAlertComponent
+          displayAlert={this.state.showAlert}
+          alertTitleText={this.state.alertTitle}
+          alertMessageText={this.state.alertMessage}
+          displayPositiveButton={true}
+          positiveButtonText={'OK'}
+          onPressPositiveButton={this.onPressAlertPositiveButton}
+        />
 
         <PhotoUpload
           // avatar is Image base64 string
@@ -118,15 +123,15 @@ class ProfileComponent extends React.Component {
         </PhotoUpload>
 
         <View style={styles.statsContainer}>
-            <TouchableOpacity style={styles.link} onPress={() => this.handleFollowerClick()}>
-              <Text style={styles.profileText}><Text style={styles.profileNum}>{userData.followers}</Text>{' followers'}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => this.handleFollowingClick()}>
-              <Text style={styles.profileText}><Text style={styles.profileNum}>{userData.following}</Text>{' following'}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => this.handleLikedSongClick()}>
-              <Text style={styles.profileText}><Text style={styles.profileNum}>{userData.likes}</Text>{' liked songs'}</Text>
-            </TouchableOpacity>
+          <TouchableOpacity style={styles.link} onPress={() => this.handleFollowerClick()}>
+            <Text style={styles.profileText}><Text style={styles.profileNum}>{userData.followers}</Text>{' followers'}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => this.handleFollowingClick()}>
+            <Text style={styles.profileText}><Text style={styles.profileNum}>{userData.following}</Text>{' following'}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => this.handleLikedSongClick()}>
+            <Text style={styles.profileText}><Text style={styles.profileNum}>{userData.likes}</Text>{' liked songs'}</Text>
+          </TouchableOpacity>
           <Text style={styles.profileText}>
             <Text style={styles.profileNum}>{userData.songs}</Text>{' songs'}{'\n'}
             <Text style={styles.profileNum}>{userData.posts}</Text>{' posts'}{'\n'}

@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from 'react-redux';
 import { ActionCreators } from '../../actions/index';
 import { bindActionCreators } from 'redux';
-import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList, Animated, Easing, Dimensions } from "react-native";
+import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList, Animated, Easing, Dimensions, BackHandler } from "react-native";
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import HeaderComponent from "../../components/headerComponent/headerComponent";
@@ -14,6 +14,7 @@ import FollowingComponent from "../../components/followingComponent/followingCom
 import FollowerComponent from "../../components/followerComponent/followerComponent";
 import { getLikedSongs } from "../../api/audioAPI";
 import { animateTimingNative, animateTimingPromiseNative } from "../../utils/animate";
+import CustomAlertComponent from "../../components/alertComponent/customAlert";
 
 const { width, height } = Dimensions.get('window');
 
@@ -43,11 +44,28 @@ class ProfileScreen extends React.Component {
       activeFollowTab: 1,
       profileScreen: 1,
       likedSongsData: [],
+      showExitAlert: false,
     }
   }
 
   componentDidMount() {
     this.getLikedSongs()
+    BackHandler.addEventListener('hardwareBackPress', this.handleAndroidBackPress);
+  }
+
+  componentWillUnmount() {
+    BackHandler.removeEventListener('hardwareBackPress', this.handleAndroidBackPress);
+  }
+
+  handleAndroidBackPress = () => {
+    if (this.state.screenState.some(r => [1, 2].indexOf(r) >= 0)) {
+      this.setState({ showExitAlert: true })
+      return true
+    } else {
+      this.onArrowClick()
+      return true;
+    }
+
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -192,11 +210,11 @@ class ProfileScreen extends React.Component {
           <Text style={styles.songNameText}>{songName}</Text>
           <Text style={styles.authorNameText}>{authorName}</Text>
           {likedSong ? <View style={styles.likeContainer}>
-              <Text style={styles.likedText}>{songLikes}</Text><Image style={styles.likeImg} source={likedImg} />
-            </View> :
-          <View style={styles.likeContainer}>
-            <Text style={styles.likes}>{songLikes}</Text><Image style={styles.likeImg} source={likeImg} />
-          </View>}
+            <Text style={styles.likedText}>{songLikes}</Text><Image style={styles.likeImg} source={likedImg} />
+          </View> :
+            <View style={styles.likeContainer}>
+              <Text style={styles.likes}>{songLikes}</Text><Image style={styles.likeImg} source={likeImg} />
+            </View>}
         </View>
       </TouchableOpacity>
     )
@@ -334,14 +352,33 @@ class ProfileScreen extends React.Component {
     }
   }
 
+  onPressExitAlertPositiveButton = () => {
+    BackHandler.exitApp()
+    this.setState({ showExitAlert: false })
+  };
+  onPressExitAlertNegativeButton = () => {
+    this.setState({ showExitAlert: false })
+  };
+
   render() {
     let withArrow = (this.state.profileScreen === 2 || this.state.profileScreen === 3)
     return (
       <SafeAreaView forceInset={{ bottom: 'never' }} style={{ 'backgroundColor': '#3D4044', 'flex': 1 }}>
+        <CustomAlertComponent
+          displayAlert={this.state.showExitAlert}
+          alertTitleText={'Confirm exit'}
+          alertMessageText={'Do you want to quit the app?'}
+          displayPositiveButton={true}
+          positiveButtonText={'OK'}
+          displayNegativeButton={true}
+          negativeButtonText={'CANCEL'}
+          onPressPositiveButton={this.onPressExitAlertPositiveButton}
+          onPressNegativeButton={this.onPressExitAlertNegativeButton}
+        />
         <View style={{ 'backgroundColor': '#1B1E23', 'flex': 1 }}>
           <HeaderComponent navigation={this.props.navigation} withArrow={withArrow ? true : false} onArrowClick={this.onArrowClick.bind(this)} />
-          {this.state.screenState.some(r => [1,2].indexOf(r) >= 0) && this.renderProfile()}
-          {this.state.screenState.some(r => [3,4].indexOf(r) >= 0) && this.renderFollow()}
+          {this.state.screenState.some(r => [1, 2].indexOf(r) >= 0) && this.renderProfile()}
+          {this.state.screenState.some(r => [3, 4].indexOf(r) >= 0) && this.renderFollow()}
           {this.state.screenState.some(r => [5].indexOf(r) >= 0) && this.renderLikedSongs()}
         </View>
       </SafeAreaView>

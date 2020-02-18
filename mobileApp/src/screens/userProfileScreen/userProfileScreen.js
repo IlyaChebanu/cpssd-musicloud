@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from 'react-redux';
 import { ActionCreators } from '../../actions/index';
 import { bindActionCreators } from 'redux';
-import { StyleSheet, Text, View, Image, TouchableOpacity, Animated, Easing, Dimensions, FlatList } from "react-native";
+import { StyleSheet, Text, View, Image, TouchableOpacity, Animated, Easing, Dimensions, FlatList, BackHandler } from "react-native";
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import HeaderComponent from "../../components/headerComponent/headerComponent";
@@ -38,6 +38,16 @@ class UserProfileScreen extends React.Component {
 
   componentDidMount() {
     this.getLikedSongs()
+    BackHandler.addEventListener('hardwareBackPress', this.handleAndroidBackPress);
+  }
+
+  componentWillUnmount() {
+    BackHandler.removeEventListener('hardwareBackPress', this.handleAndroidBackPress);
+  }
+
+  handleAndroidBackPress = () => {
+    this.onArrowClick()
+    return true;
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -232,8 +242,8 @@ class UserProfileScreen extends React.Component {
               handleLikedSongsClick={this.handleLikedSongTextClick.bind(this)}
               accessToken={this.props.token}
               username={this.props.otherUserData.username}
-              navigation={this.props.navigation} 
-              />
+              navigation={this.props.navigation}
+            />
           </Animated.View>}
         {this.state.screenState.includes(2) &&
           <Animated.View style={[{ 'flex': 1, position: 'absolute', top: 50, 'width': width, 'height': height - 175 }, { transform: [{ translateX: postsPosition }] }]}>
@@ -275,11 +285,11 @@ class UserProfileScreen extends React.Component {
           <Text style={styles.songNameText}>{songName}</Text>
           <Text style={styles.authorNameText}>{authorName}</Text>
           {likedSong ? <View style={styles.likeContainer}>
-              <Text style={styles.likedText}>{songLikes}</Text><Image style={styles.likeImg} source={likedImg} />
-            </View> :
-          <View style={styles.likeContainer}>
-            <Text style={styles.likes}>{songLikes}</Text><Image style={styles.likeImg} source={likeImg} />
-          </View>}
+            <Text style={styles.likedText}>{songLikes}</Text><Image style={styles.likeImg} source={likedImg} />
+          </View> :
+            <View style={styles.likeContainer}>
+              <Text style={styles.likes}>{songLikes}</Text><Image style={styles.likeImg} source={likeImg} />
+            </View>}
         </View>
       </TouchableOpacity>
     )

@@ -19,7 +19,7 @@ export const AppNavigator = createStackNavigator({
         initialRouteName: [screenNames.HOME_SCREEN],
         // Default config for all screens
         headerMode: "none",
-        navigationOptions: {
+        defaultNavigationOptions: {
             gesturesEnabled: false,
         }
     });

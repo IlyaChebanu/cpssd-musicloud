@@ -12,6 +12,7 @@ import Navigator, { middleware } from "./navigation/navigator";
 import { StatusBar } from "react-native";
 import Orientation from 'react-native-orientation';
 import SplashScreen from 'react-native-splash-screen';
+import OfflineNotice from './components/offlineNotice/offlineNotice'
 import Pushy from 'pushy-react-native';
 import { PermissionsAndroid } from 'react-native';
 
@@ -46,6 +47,7 @@ const App = () => {
       <StatusBar barStyle="light-content" />
       <Provider store={store}>
         <Navigator />
+        <OfflineNotice />
       </Provider>
     </Fragment>
   )

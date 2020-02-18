@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from 'react-redux';
 import { ActionCreators } from '../../actions/index';
 import { bindActionCreators } from 'redux';
-import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList, Alert, TouchableWithoutFeedback, TextInput } from "react-native";
+import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList, Alert, TouchableWithoutFeedback, TextInput, BackHandler } from "react-native";
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import { SafeAreaView } from "react-navigation";
@@ -11,6 +11,7 @@ import { getUserInfo } from "../../api/usersAPI";
 import Player from "../../components/player/player";
 import { getPlaylist, postPlaylistSong, postPlaylist } from "../../api/audioAPI";
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import CustomAlertComponent from "../../components/alertComponent/customAlert";
 
 class MusicPlayerScreen extends React.Component {
     constructor(props) {
@@ -21,22 +22,24 @@ class MusicPlayerScreen extends React.Component {
             showAddPlaylist: false,
             showCreatePlaylist: false,
             playlistTitle: '',
+            showAlert: false,
+            alertTitle: '',
+            alertMessage: '',
         };
     }
 
     componentDidMount() {
         this.getPlaylist()
+        BackHandler.addEventListener('hardwareBackPress', this.handleAndroidBackPress);
     }
 
-    showAlert(title, text, action) {
-        Alert.alert(
-            title,
-            text,
-            [
-                { text: 'OK', onPress: action },
-            ],
-            { cancelable: false },
-        );
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.handleAndroidBackPress);
+    }
+
+    handleAndroidBackPress = () => {
+        this.props.navigateBack()
+        return true;
     }
 
     getPlaylist() {
@@ -64,11 +67,11 @@ class MusicPlayerScreen extends React.Component {
         postPlaylist(this.props.token, this.state.playlistTitle).then(response => {
             if (response.status === 200) {
                 this.setState({ showCreatePlaylist: false })
-                this.showAlert('Playlist Created', `Playlist succesfully created: ${this.state.playlistTitle}`)
+                this.setState({ alertTitle: 'Playlist Created', alertMessage: `Playlist succesfully created: ${this.state.playlistTitle}`, showAlert: true })
                 this.getPlaylist()
             } else {
                 this.setState({ showCreatePlaylist: false })
-                this.showAlert('Error', response.data.message)
+                this.setState({ alertTitle: 'Error', alertMessage: response.data.message, showAlert: true })
             }
         })
     }
@@ -77,7 +80,7 @@ class MusicPlayerScreen extends React.Component {
         return (
             <View style={styles.playlistWindow}>
                 <Text style={styles.newPlayText}>{'Create new playlist'}</Text>
-                <TextInput 
+                <TextInput
                     autoCapitalize={'none'}
                     autoCorrect={false}
                     spellCheck={false}
@@ -97,10 +100,10 @@ class MusicPlayerScreen extends React.Component {
         postPlaylistSong(this.props.token, item.pid, this.props.songId).then(response => {
             if (response.status === 200) {
                 this.setState({ showAddPlaylist: false })
-                this.showAlert('Song Added', `Song succesfully added to ${item.title}`)
+                this.setState({ alertTitle: 'Song Added', alertMessage: `Song succesfully added to ${item.title}`, showAlert: true })
             } else {
                 this.setState({ showAddPlaylist: false })
-                this.showAlert('Error', response.data.message)
+                this.setState({ alertTitle: 'Error', alertMessage: response.data.message, showAlert: true })
             }
         })
     }
@@ -155,11 +158,23 @@ class MusicPlayerScreen extends React.Component {
         this.props.navigateBack()
     }
 
+    onPressAlertPositiveButton = () => {
+        this.setState({ showAlert: false })
+    };
+
     render() {
         var logoImage = require("../../assets/images/logo1.png");
         var arrowDownImg = require("../../assets/images/arrow_down.png");
         return (
             <SafeAreaView forceInset={{ bottom: 'never' }} style={{ 'backgroundColor': '#3D4044', 'flex': 1 }}>
+                <CustomAlertComponent
+                    displayAlert={this.state.showAlert}
+                    alertTitleText={this.state.alertTitle}
+                    alertMessageText={this.state.alertMessage}
+                    displayPositiveButton={true}
+                    positiveButtonText={'OK'}
+                    onPressPositiveButton={this.onPressAlertPositiveButton}
+                />
                 <TouchableWithoutFeedback onPress={() => this.setState({ showAddPlaylist: false, showCreatePlaylist: false })}>
                     <View style={{ 'backgroundColor': '#1B1E23', 'flex': 1 }}>
                         <View style={styles.headerContainer}>

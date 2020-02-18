@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from 'react-redux';
 import { ActionCreators } from '../../actions/index';
 import { bindActionCreators } from 'redux';
-import { StyleSheet, Text, View, Image, Alert } from "react-native";
+import { StyleSheet, Text, View, Image, Alert, BackHandler } from "react-native";
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import LoginInput from "../../components/loginInput/loginInput";
@@ -16,6 +16,7 @@ import { getInvalidUserSettingsDetails } from "../../utils/helpers";
 import ToggleSwitch from '../../components/toggleSwitch/toggleSwitch';
 import Orientation from 'react-native-orientation';
 import { writeDataToStorage, SETTINGS_PORTRAIT_DATA_KEY } from "../../utils/localStorage";
+import CustomAlertComponent from "../../components/alertComponent/customAlert";
 
 class UserSettingsScreen extends React.Component {
     constructor(props) {
@@ -29,18 +30,24 @@ class UserSettingsScreen extends React.Component {
             maskOldPassword: true,
             maskNewPassword: true,
             maskNewPasswordRepeat: true,
+            showAlert: false,
+            alertTitle: '',
+            alertMessage: '',
+            showExitAlert: false,
         }
     }
 
-    showAlert(title, text, action) {
-        Alert.alert(
-            title,
-            text,
-            [
-                { text: 'OK', onPress: action },
-            ],
-            { cancelable: false },
-        );
+    componentDidMount() {
+        BackHandler.addEventListener('hardwareBackPress', this.handleAndroidBackPress);
+    }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.handleAndroidBackPress);
+    }
+
+    handleAndroidBackPress = () => {
+        this.setState({ showExitAlert: true })
+        return true;
     }
 
     setEmailTextInput(text) {
@@ -76,13 +83,13 @@ class UserSettingsScreen extends React.Component {
         if (invalidFields.length === 0) {
             patchUserDetails(this.state.oldPassword, this.state.newPassword, this.state.email, this.props.token).then(response => {
                 if (response.status === 200) {
-                    this.showAlert('Success', response.data.message);
+                    this.setState({ alertTitle: 'Success', alertMessage: response.data.message, showAlert: true })
                 } else {
-                    this.showAlert('Error', (response.data.message));
+                    this.setState({ alertTitle: 'Error', alertMessage: response.data.message, showAlert: true })
                 }
             });
         } else {
-            this.showAlert('Error', "Invalid: " + invalidFields.join(', '));
+            this.setState({ alertTitle: 'Error', alertMessage: "Invalid: " + invalidFields.join(', '), showAlert: true })
         }
     }
 
@@ -96,9 +103,39 @@ class UserSettingsScreen extends React.Component {
         }
     }
 
+    onPressAlertPositiveButton = () => {
+        this.setState({ showAlert: false })
+    };
+    onPressExitAlertPositiveButton = () => {
+        BackHandler.exitApp()
+        this.setState({ showExitAlert: false })
+    };
+    onPressExitAlertNegativeButton = () => {
+        this.setState({ showExitAlert: false })
+    };
+
     render() {
         return (
             <SafeAreaView forceInset={{ bottom: 'never' }} style={{ 'backgroundColor': '#3D4044', 'flex': 1 }}>
+                <CustomAlertComponent
+                    displayAlert={this.state.showAlert}
+                    alertTitleText={this.state.alertTitle}
+                    alertMessageText={this.state.alertMessage}
+                    displayPositiveButton={true}
+                    positiveButtonText={'OK'}
+                    onPressPositiveButton={this.onPressAlertPositiveButton}
+                />
+                <CustomAlertComponent
+                    displayAlert={this.state.showExitAlert}
+                    alertTitleText={'Confirm exit'}
+                    alertMessageText={'Do you want to quit the app?'}
+                    displayPositiveButton={true}
+                    positiveButtonText={'OK'}
+                    displayNegativeButton={true}
+                    negativeButtonText={'CANCEL'}
+                    onPressPositiveButton={this.onPressExitAlertPositiveButton}
+                    onPressNegativeButton={this.onPressExitAlertNegativeButton}
+                />
                 <View style={{ 'backgroundColor': '#1B1E23', 'flex': 1 }}>
                     <HeaderComponent navigation={this.props.navigation} />
                     <View style={styles.container}>
