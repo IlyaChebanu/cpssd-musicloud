@@ -226,7 +226,7 @@ class StudioScreen extends React.Component {
     async uploadAudio() {
 
         let filetype = Platform.OS === 'android' ? 'mp4' : 'm4a'
-        let filename = '/kamil/' + this.state.filename + '.' + filetype
+        let filename = `/${this.props.username}/` + this.state.filename + '.' + filetype
         await postFile(this.props.token, 'audio', filename, `audio/x-${filetype}`).then(response => {
             if (isNaN(response)) {
                 if (response.signed_url.fields.key) {
