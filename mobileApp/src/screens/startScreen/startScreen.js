@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from 'react-redux';
 import { ActionCreators } from '../../actions/index';
 import { bindActionCreators } from 'redux';
-import { StyleSheet, Text, View, Image, TouchableOpacity, Animated, Easing, Dimensions } from "react-native";
+import { StyleSheet, Text, View, Image, TouchableOpacity, Animated, Easing, Dimensions, BackHandler } from "react-native";
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import MultiPurposeButton from "../../components/multiPurposeButton/multiPurposeButton";
@@ -77,6 +77,7 @@ class StartScreen extends React.Component {
       alertTitle: '',
       alertMessage: '',
       alertState: 0,
+      showExitAlert: false,
     };
   }
 
@@ -109,6 +110,24 @@ class StartScreen extends React.Component {
       animateTimingNative(this.animatedStartButtons, 0, 500, Easing.ease)
     } else {
       animateTimingNative(this.animatedStartButtons, 0, 500, Easing.ease)
+    }
+  }
+
+  componentDidMount() {
+    BackHandler.addEventListener('hardwareBackPress', this.handleAndroidBackPress);
+  }
+
+  componentWillUnmount() {
+    BackHandler.removeEventListener('hardwareBackPress', this.handleAndroidBackPress);
+  }
+
+  handleAndroidBackPress = () => {
+    if (this.state.screenState.includes(STATE_STARTUP)) {
+      this.setState({ showExitAlert: true })
+      return true;
+    } else {
+      this.handleBackClick(this.state.screenState)
+      return true;
     }
   }
 
@@ -334,7 +353,7 @@ class StartScreen extends React.Component {
     return (
       <View style={styles.parentContainer}>
         {this.props.newAccount ?
-          <Animated.View style={[styles.verifyContainer, { transform: [{ translateX: leftLoginPositions[0] }] } ]}>
+          <Animated.View style={[styles.verifyContainer, { transform: [{ translateX: leftLoginPositions[0] }] }]}>
             <Text style={styles.verifyText}>{"Did not receive email? "}
               <Text onPress={() => this.handleVerifyClick()} style={styles.verifyLink}>{"Click here"}</Text>
               {" to resend it."}</Text>
@@ -551,6 +570,13 @@ class StartScreen extends React.Component {
     }
     this.setState({ showAlert: false })
   };
+  onPressExitAlertPositiveButton = () => {
+    BackHandler.exitApp()
+    this.setState({ showExitAlert: false })
+  };
+  onPressExitAlertNegativeButton = () => {
+    this.setState({ showExitAlert: false })
+  };
 
   render() {
     var logoImage = require("../../assets/images/logo1.png");
@@ -596,6 +622,17 @@ class StartScreen extends React.Component {
           displayPositiveButton={true}
           positiveButtonText={'OK'}
           onPressPositiveButton={this.onPressAlertPositiveButton}
+        />
+        <CustomAlertComponent
+          displayAlert={this.state.showExitAlert}
+          alertTitleText={'Confirm exit'}
+          alertMessageText={'Do you want to quit the app?'}
+          displayPositiveButton={true}
+          positiveButtonText={'OK'}
+          displayNegativeButton={true}
+          negativeButtonText={'CANCEL'}
+          onPressPositiveButton={this.onPressExitAlertPositiveButton}
+          onPressNegativeButton={this.onPressExitAlertNegativeButton}
         />
         <Image style={styles.topVector} source={topVector} />
         <View style={styles.logoContainer}>

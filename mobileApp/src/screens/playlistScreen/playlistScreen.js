@@ -2,13 +2,14 @@ import React from "react";
 import { connect } from 'react-redux';
 import { ActionCreators } from '../../actions/index';
 import { bindActionCreators } from 'redux';
-import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity, BackHandler } from "react-native";
 import styles from "./styles";
 import { SafeAreaView } from "react-navigation";
 import HeaderComponent from "../../components/headerComponent/headerComponent";
 import { getPlaylist, getPlaylistSongs } from "../../api/audioAPI";
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { getUserInfo } from "../../api/usersAPI";
+import CustomAlertComponent from "../../components/alertComponent/customAlert";
 
 class PlaylistScreen extends React.Component {
     constructor(props) {
@@ -19,18 +20,34 @@ class PlaylistScreen extends React.Component {
             screenState: 1,
             playlistTitle: '',
             pid: null,
+            showExitAlert: false,
         };
     }
 
     componentDidMount() {
         this.getPlaylist()
+        BackHandler.addEventListener('hardwareBackPress', this.handleAndroidBackPress);
+    }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.handleAndroidBackPress);
+    }
+
+    handleAndroidBackPress = () => {
+        if (this.state.screenState === 2) {
+            this.goBack()
+            return true;
+        } else {
+            this.setState({ showExitAlert: true })
+            return true
+        }
     }
 
     componentDidUpdate(prevProps, prevState) {
         if (prevProps.songUpdate !== this.props.songUpdate) {
-          this.getPlaylistSongs(this.state.pid)
+            this.getPlaylistSongs(this.state.pid)
         }
-      }
+    }
 
     getPlaylistSongs(pid) {
         getPlaylistSongs(this.props.token, pid).then(response => {
@@ -55,16 +72,16 @@ class PlaylistScreen extends React.Component {
     }
 
     goBack() {
-        this.setState({ screenState: 1})
+        this.setState({ screenState: 1 })
     }
 
     getOtherUserDetails(username) {
         getUserInfo(username, this.props.token).then(response => {
-          if (response.status === 200) {
-            this.props.setOtherUserData(response.data)
-          }
+            if (response.status === 200) {
+                this.props.setOtherUserData(response.data)
+            }
         })
-      }
+    }
 
     handleSongClick(item, index) {
         this.props.setSongData(this.state.playlistSongData)
@@ -73,7 +90,7 @@ class PlaylistScreen extends React.Component {
         this.props.setSongUrl(item.url)
         this.getOtherUserDetails(item.username)
         this.props.navigateToMusicPlayerScreen()
-      }
+    }
 
     renderPlayItem({ item, index }) {
         return (
@@ -122,9 +139,28 @@ class PlaylistScreen extends React.Component {
         );
     }
 
+    onPressExitAlertPositiveButton = () => {
+        BackHandler.exitApp()
+        this.setState({ showExitAlert: false })
+    };
+    onPressExitAlertNegativeButton = () => {
+        this.setState({ showExitAlert: false })
+    };
+
     render() {
         return (
             <SafeAreaView forceInset={{ bottom: 'never' }} style={{ 'backgroundColor': '#3D4044', 'flex': 1 }}>
+                <CustomAlertComponent
+                    displayAlert={this.state.showExitAlert}
+                    alertTitleText={'Confirm exit'}
+                    alertMessageText={'Do you want to quit the app?'}
+                    displayPositiveButton={true}
+                    positiveButtonText={'OK'}
+                    displayNegativeButton={true}
+                    negativeButtonText={'CANCEL'}
+                    onPressPositiveButton={this.onPressExitAlertPositiveButton}
+                    onPressNegativeButton={this.onPressExitAlertNegativeButton}
+                />
                 <View style={{ 'backgroundColor': '#1B1E23', 'flex': 1 }}>
                     <HeaderComponent navigation={this.props.navigation} />
                     {this.state.screenState === 1 ? <FlatList

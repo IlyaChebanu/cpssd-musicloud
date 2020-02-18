@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from 'react-redux';
 import { ActionCreators } from '../../actions/index';
 import { bindActionCreators } from 'redux';
-import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList, Alert, TouchableWithoutFeedback, TextInput } from "react-native";
+import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList, Alert, TouchableWithoutFeedback, TextInput, BackHandler } from "react-native";
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import { SafeAreaView } from "react-navigation";
@@ -30,6 +30,16 @@ class MusicPlayerScreen extends React.Component {
 
     componentDidMount() {
         this.getPlaylist()
+        BackHandler.addEventListener('hardwareBackPress', this.handleAndroidBackPress);
+    }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.handleAndroidBackPress);
+    }
+
+    handleAndroidBackPress = () => {
+        this.props.navigateBack()
+        return true;
     }
 
     getPlaylist() {
