@@ -7,6 +7,13 @@ export function setAuthToken(token) {
     }
 }
 
+export function setDeviceToken(deviceToken) {
+    return {
+        type: actionsTypes.SET_DEVICE_TOKEN,
+        deviceToken
+    }
+}
+
 export function setUsername(username) {
     return {
         type: actionsTypes.SET_USERNAME,

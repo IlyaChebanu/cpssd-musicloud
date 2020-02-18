@@ -37,6 +37,7 @@ CREATE TABLE `musicloud_db`.`Songs` (
     `url` VARCHAR(255),
     `cover` VARCHAR(255),
     `genre` VARCHAR(50),
+    `description` VARCHAR(512),
     FOREIGN KEY (uid) REFERENCES Users(uid)
 );
 

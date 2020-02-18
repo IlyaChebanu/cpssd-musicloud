@@ -11,3 +11,4 @@ pytest-cov
 boto3
 pylint
 requests
+cryptography

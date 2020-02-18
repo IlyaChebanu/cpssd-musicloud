@@ -1,10 +1,13 @@
 """
 Function for verifying the validity of the provided access_token.
 """
+import ast
 import datetime
 import jwt
 
-from ..config import JWT_SECRET
+from cryptography.fernet import Fernet
+
+from ..config import JWT_SECRET, ENCRYPTION_KEY
 from ..models.auth import get_login
 
 
@@ -18,12 +21,21 @@ def verify_token(access_token):
     """
     encoded_token = access_token
     access_token = jwt.decode(access_token, JWT_SECRET, algorithms=['HS256'])
-    login = get_login(access_token.get("uid"), encoded_token)
+
+    # Decrypt the token contents
+    fernet = Fernet(ENCRYPTION_KEY.encode())
+    decrypted_contents = fernet.decrypt(access_token['data'].encode())
+    contents = ast.literal_eval(decrypted_contents.decode())
+    contents["username"] = access_token['username']
+    contents["iat"] = access_token['iat']
+
+    login = get_login(contents.get("uid"), encoded_token)
     if not login:
         raise ValueError
     time_issued = login[0][2]
     expiry_time = time_issued + datetime.timedelta(days=7)
+    time_issued -= datetime.timedelta(seconds=15)
     now = datetime.datetime.utcnow()
     if (now > expiry_time) or (now < time_issued):
         raise ValueError
-    return access_token
+    return contents

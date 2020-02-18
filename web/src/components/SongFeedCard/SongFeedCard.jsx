@@ -7,7 +7,6 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 import Img from 'react-image';
 import styles from './SongFeedCard.module.scss';
-import ProfilePicture from '../../assets/profiler.jpg';
 import CircularImage from '../CircularImage';
 import CloudQuestion from '../../assets/cloud-question.jpg';
 import Spinner from '../Spinner';
@@ -18,7 +17,7 @@ import { lerp } from '../../helpers/utils';
 import { likeSong, unlikeSong } from '../../helpers/api';
 
 const SongFeedCard = memo(({
-  className, username, time, title, url, likes, coverImage, isLiked, id,
+  className, username, time, title, description, url, likes, coverImage, isLiked, id, profileImg,
 }) => {
   const [playerShowing, setPlayerShowing] = useState(false);
   const [playing, setPlaying] = useState(false);
@@ -114,14 +113,16 @@ const SongFeedCard = memo(({
   const handleLikeSong = useCallback(() => {
     (async () => {
       if (songLiked) {
+        setSongLiked(false);
         const res = await unlikeSong(id);
-        if (res.status === 200) {
-          setSongLiked(false);
+        if (res.status !== 200) {
+          setSongLiked(true);
         }
       } else {
+        setSongLiked(true);
         const res = await likeSong(id);
-        if (res.status === 200) {
-          setSongLiked(true);
+        if (res.status !== 200) {
+          setSongLiked(false);
         }
       }
     })();
@@ -131,7 +132,7 @@ const SongFeedCard = memo(({
     <div className={`${styles.wrapper} ${className}`}>
       <span className={styles.songFeedCard}>
         <span className={styles.postHeader}>
-          <CircularImage src={ProfilePicture} className={styles.profiler} />
+          <CircularImage src={profileImg} className={styles.profiler} />
           <p className={styles.username}>{username}</p>
           <p className={styles.timestamp}>{`published ${moment(time).fromNow()}`}</p>
         </span>
@@ -139,7 +140,7 @@ const SongFeedCard = memo(({
           <div className={styles.coverWrapper} onMouseEnter={coverEnter} onMouseLeave={coverLeave}>
             <Img src={[coverImage, CloudQuestion]} alt="song cover art" loader={<Spinner />} style={coverStyle} />
             <LikeIcon className={`${styles.like} ${coverHover ? styles.hovered : ''}`} onClick={handleLikeSong} />
-            <LikeIcon className={`${styles.like} ${styles.likeGradient} ${!coverHover ? styles.hide : ''} ${songLiked ? styles.liked : ''}`} onClick={handleLikeSong} />
+            <LikeIcon className={`${styles.like} ${styles.likeGradient} ${!coverHover ? styles.hide : ''} ${songLiked ? styles.liked : ''}`} />
           </div>
           <div className={styles.songInfo}>
             <div className={styles.textBlock}>
@@ -147,7 +148,7 @@ const SongFeedCard = memo(({
                 <p className={styles.title}>{title}</p>
                 <p className={styles.timestamp}>{`${songLiked ? likes + 1 : likes} likes`}</p>
               </span>
-              <p className={styles.description}>Song description</p>
+              <p className={styles.description}>{description}</p>
             </div>
             <div className={styles.playbackControl}>
               {loading
@@ -173,16 +174,19 @@ SongFeedCard.propTypes = {
   username: PropTypes.string.isRequired,
   time: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
+  description: PropTypes.string.isRequired,
   url: PropTypes.string.isRequired,
   likes: PropTypes.number.isRequired,
   coverImage: PropTypes.string.isRequired,
   isLiked: PropTypes.bool,
   id: PropTypes.number.isRequired,
+  profileImg: PropTypes.string,
 };
 
 SongFeedCard.defaultProps = {
   className: '',
   isLiked: false,
+  profileImg: '',
 };
 
 SongFeedCard.displayName = 'SongFeedCard';

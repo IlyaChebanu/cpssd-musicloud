@@ -7,6 +7,7 @@ export default (
     },
     songId: null,
     songName: 'New Song',
+    songDescription: '',
     gridSize: 1,
     gridWidth: 1,
     gridSnapEnabled: true,
@@ -26,6 +27,9 @@ export default (
     clipboard: {},
     title: 'Untitled',
     songPickerHidden: false,
+    sampleEffectsHidden: true,
+    publishFormHidden: true,
+    songImageUrl: null,
   },
   action,
 ) => {
@@ -87,6 +91,22 @@ export default (
               return {
                 ...sample,
                 time: action.time,
+              };
+            }
+            return sample;
+          });
+          return track;
+        }),
+      };
+    case 'SET_SAMPLE_NAME':
+      return {
+        ...state,
+        tracks: state.tracks.map((track) => {
+          track.samples = track.samples.map((sample) => {
+            if (sample.id === action.id) {
+              return {
+                ...sample,
+                name: action.name,
               };
             }
             return sample;
@@ -169,15 +189,77 @@ export default (
         ...state,
         songPickerHidden: false,
       };
+    case 'SAMPLE_EFFECTS_HIDE':
+      return {
+        ...state,
+        sampleEffectsHidden: true,
+      };
+    case 'SAMPLE_EFFECTS_SHOW':
+      return {
+        ...state,
+        sampleEffectsHidden: false,
+      };
+    case 'PUBLISH_FORM_HIDE':
+      return {
+        ...state,
+        publishFormHidden: true,
+      };
+    case 'PUBLISH_FORM_SHOW':
+      return {
+        ...state,
+        publishFormHidden: false,
+      };
     case 'SET_SONG_NAME':
       return {
         ...state,
         songName: action.songName,
       };
+    case 'SET_SONG_DESCRIPTION':
+      return {
+        ...state,
+        songDescription: action.description,
+      };
     case 'SET_SONG_ID':
       return {
         ...state,
         songId: action.songId,
+      };
+    case 'SET_SAMPLE_FADE':
+      return {
+        ...state,
+        tracks: state.tracks.map((track) => {
+          track.samples = track.samples.map((sample) => {
+            if (sample.id === action.id) {
+              return {
+                ...sample,
+                fade: action.fade,
+              };
+            }
+            return sample;
+          });
+          return track;
+        }),
+      };
+    case 'SET_SAMPLE_REVERB':
+      return {
+        ...state,
+        tracks: state.tracks.map((track) => {
+          track.samples = track.samples.map((sample) => {
+            if (sample.id === action.id) {
+              return {
+                ...sample,
+                reverb: action.reverb,
+              };
+            }
+            return sample;
+          });
+          return track;
+        }),
+      };
+    case 'SET_SONG_IMAGE_URL':
+      return {
+        ...state,
+        songImageUrl: action.songImageUrl,
       };
     default:
       return state;

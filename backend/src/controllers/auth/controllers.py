@@ -2,8 +2,10 @@
 /auth API controller code.
 """
 import datetime
+import time
 
 import jwt
+from cryptography.fernet import Fernet
 from flask import Blueprint
 from flask import request
 from flask import send_file
@@ -12,9 +14,8 @@ from argon2.exceptions import VerifyMismatchError
 from jsonschema import validate, ValidationError
 from mysql.connector.errors import IntegrityError
 
-from ...config import JWT_SECRET
+from ...config import JWT_SECRET, ENCRYPTION_KEY
 from ...utils.logger import log
-from ...utils import random_string
 from ...models.verification import (
     get_verification_by_code, delete_verification
 )
@@ -91,15 +92,26 @@ def login():
 
     time_issued = datetime.datetime.utcnow()
 
-    jwt_payload = {
+    secure_payload = {
         'uid': user[0][0],
         'email': user[0][1],
-        'username': user[0][2],
         'verified': user[0][4],
-        'profiler': user[0][5],
-        'random_value': random_string(255)
+        'profiler': user[0][5]
     }
-    access_token = jwt.encode(jwt_payload, JWT_SECRET, algorithm='HS256')
+
+    # Encrypt the sensitive contents of our JWT.
+    fernet = Fernet(ENCRYPTION_KEY.encode())
+    encrypted_payload = fernet.encrypt(str(secure_payload).encode()).decode()
+
+    access_token = jwt.encode(
+        {
+            'username': user[0][2],
+            "data": encrypted_payload,
+            'iat': int(time.time())
+        },
+        JWT_SECRET,
+        algorithm='HS256'
+    )
 
     insert_login(user[0][0], access_token.decode('utf-8'), time_issued)
 

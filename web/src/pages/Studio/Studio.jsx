@@ -27,11 +27,13 @@ import Button from '../../components/Button';
 import PlayBackControls from '../../components/PlaybackControls';
 import SongPicker from '../../components/SongPicker';
 import Track from '../../components/Track/Track';
+import SampleControls from '../../components/SampleControls';
 
 import { saveState, getSongState } from '../../helpers/api';
 import { useUpdateUserDetails } from '../../helpers/hooks';
 import store from '../../store';
 import Spinner from '../../components/Spinner/Spinner';
+import PublishForm from '../../components/PublishForm/PublishForm';
 
 const Studio = memo((props) => {
   const { dispatch, tracks, studio } = props;
@@ -332,7 +334,9 @@ const Studio = memo((props) => {
         </Button>
       </Header>
       <div className={styles.contentWrapper}>
+        <SampleControls />
         <SeekBar />
+
         <Timeline />
         <div className={styles.scrollable}>
           <div className={styles.content}>
@@ -355,6 +359,7 @@ const Studio = memo((props) => {
       </div>
       <PlayBackControls style={{ 'pointer-events': 'none' }} />
       <SongPicker songs={[exampleSong]} />
+      <PublishForm />
     </div>
 
   );
