@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from 'react-redux';
 import { ActionCreators } from '../../actions/index';
 import { bindActionCreators } from 'redux';
-import { StyleSheet, Text, View, Image, Alert } from "react-native";
+import { StyleSheet, Text, View, Image, Alert, BackHandler } from "react-native";
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import LoginInput from "../../components/loginInput/loginInput";
@@ -33,7 +33,21 @@ class UserSettingsScreen extends React.Component {
             showAlert: false,
             alertTitle: '',
             alertMessage: '',
+            showExitAlert: false,
         }
+    }
+
+    componentDidMount() {
+        BackHandler.addEventListener('hardwareBackPress', this.handleAndroidBackPress);
+    }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.handleAndroidBackPress);
+    }
+
+    handleAndroidBackPress = () => {
+        this.setState({ showExitAlert: true })
+        return true;
     }
 
     setEmailTextInput(text) {
@@ -69,13 +83,13 @@ class UserSettingsScreen extends React.Component {
         if (invalidFields.length === 0) {
             patchUserDetails(this.state.oldPassword, this.state.newPassword, this.state.email, this.props.token).then(response => {
                 if (response.status === 200) {
-                    this.setState({ alertTitle: 'Success', alertMessage: response.data.message ,showAlert: true })
+                    this.setState({ alertTitle: 'Success', alertMessage: response.data.message, showAlert: true })
                 } else {
-                    this.setState({ alertTitle: 'Error', alertMessage: response.data.message ,showAlert: true })
+                    this.setState({ alertTitle: 'Error', alertMessage: response.data.message, showAlert: true })
                 }
             });
         } else {
-            this.setState({ alertTitle: 'Error', alertMessage: "Invalid: " + invalidFields.join(', ') ,showAlert: true })
+            this.setState({ alertTitle: 'Error', alertMessage: "Invalid: " + invalidFields.join(', '), showAlert: true })
         }
     }
 
@@ -92,6 +106,13 @@ class UserSettingsScreen extends React.Component {
     onPressAlertPositiveButton = () => {
         this.setState({ showAlert: false })
     };
+    onPressExitAlertPositiveButton = () => {
+        BackHandler.exitApp()
+        this.setState({ showExitAlert: false })
+    };
+    onPressExitAlertNegativeButton = () => {
+        this.setState({ showExitAlert: false })
+    };
 
     render() {
         return (
@@ -103,6 +124,17 @@ class UserSettingsScreen extends React.Component {
                     displayPositiveButton={true}
                     positiveButtonText={'OK'}
                     onPressPositiveButton={this.onPressAlertPositiveButton}
+                />
+                <CustomAlertComponent
+                    displayAlert={this.state.showExitAlert}
+                    alertTitleText={'Confirm exit'}
+                    alertMessageText={'Do you want to quit the app?'}
+                    displayPositiveButton={true}
+                    positiveButtonText={'OK'}
+                    displayNegativeButton={true}
+                    negativeButtonText={'CANCEL'}
+                    onPressPositiveButton={this.onPressExitAlertPositiveButton}
+                    onPressNegativeButton={this.onPressExitAlertNegativeButton}
                 />
                 <View style={{ 'backgroundColor': '#1B1E23', 'flex': 1 }}>
                     <HeaderComponent navigation={this.props.navigation} />

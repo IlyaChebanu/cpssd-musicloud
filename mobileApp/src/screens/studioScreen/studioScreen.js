@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from 'react-redux';
 import { ActionCreators } from '../../actions/index';
 import { bindActionCreators } from 'redux';
-import { StyleSheet, Text, View, Image, Dimensions, TouchableOpacity, Platform, TextInput } from "react-native";
+import { StyleSheet, Text, View, Image, Dimensions, TouchableOpacity, Platform, TextInput, BackHandler } from "react-native";
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import HeaderComponent from "../../components/headerComponent/headerComponent";
@@ -22,6 +22,7 @@ class StudioScreen extends React.Component {
         this.state = {
             screenState: 1,
             showAlert: false,
+            showExitAlert: false,
             alertTitle: '',
             alertMessage: '',
             uploading: false,
@@ -39,27 +40,45 @@ class StudioScreen extends React.Component {
         this.audioRecorderPlayer = new AudioRecorderPlayer();
     }
 
+    componentDidMount() {
+        BackHandler.addEventListener('hardwareBackPress', this.handleAndroidBackPress);
+    }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.handleAndroidBackPress);
+    }
+
+    handleAndroidBackPress = () => {
+        if (this.state.screenState === 2) {
+            this.setState({ screenState: 1 })
+            return true;
+        } else {
+            this.setState({ showExitAlert: true })
+            return true
+        }
+    }
+
     async handleUploadButtonClick() {
         try {
             const res = await DocumentPicker.pick({
-              type: [DocumentPicker.types.audio],
+                type: [DocumentPicker.types.audio],
             });
             let extension = res.type.split('/').slice(-1)[0]
             let filename = `/${this.props.username}/${res.name}.${extension}`
             this.uploadSelectedAudio(filename, res.type, res.uri)
             console.log(
-              res.uri,
-              res.type, // mime type
-              res.name,
-              res.size
+                res.uri,
+                res.type, // mime type
+                res.name,
+                res.size
             );
-          } catch (err) {
+        } catch (err) {
             if (DocumentPicker.isCancel(err)) {
-              // User cancelled the picker, exit any dialogs or menus and move on
+                // User cancelled the picker, exit any dialogs or menus and move on
             } else {
-              throw err;
+                throw err;
             }
-          }
+        }
 
     }
 
@@ -90,23 +109,23 @@ class StudioScreen extends React.Component {
         const touchX = e.nativeEvent.locationX;
         console.log(`touchX: ${touchX}`);
         const playWidth =
-          (this.state.currentPositionSec / this.state.currentDurationSec) *
-          (screenWidth - 56 * ratio);
+            (this.state.currentPositionSec / this.state.currentDurationSec) *
+            (screenWidth - 56 * ratio);
         console.log(`currentPlayWidth: ${playWidth}`);
-    
+
         const currentPosition = Math.round(this.state.currentPositionSec);
         console.log(`currentPosition: ${currentPosition}`);
-    
+
         if (playWidth && playWidth < touchX) {
-          const addSecs = Math.round(currentPosition + 3000);
-          this.audioRecorderPlayer.seekToPlayer(addSecs);
-          console.log(`addSecs: ${addSecs}`);
+            const addSecs = Math.round(currentPosition + 3000);
+            this.audioRecorderPlayer.seekToPlayer(addSecs);
+            console.log(`addSecs: ${addSecs}`);
         } else {
-          const subSecs = Math.round(currentPosition - 3000);
-          this.audioRecorderPlayer.seekToPlayer(subSecs);
-          console.log(`subSecs: ${subSecs}`);
+            const subSecs = Math.round(currentPosition - 3000);
+            this.audioRecorderPlayer.seekToPlayer(subSecs);
+            console.log(`subSecs: ${subSecs}`);
         }
-      };
+    };
 
     onStartRecord = async () => {
         this.setState({ recording: true })
@@ -254,7 +273,7 @@ class StudioScreen extends React.Component {
                     <View style={styles.viewPlayer}>
                         <TouchableOpacity
                             style={styles.viewBarWrapper}
-                        onPress={this.onStatusPress}
+                            onPress={this.onStatusPress}
                         >
                             <View style={styles.viewBar}>
                                 <View style={[styles.viewBarPlay, { width: playWidth }]} />
@@ -326,6 +345,14 @@ class StudioScreen extends React.Component {
         this.setState({ showAlert: false })
     };
 
+    onPressExitAlertPositiveButton = () => {
+        BackHandler.exitApp()
+        this.setState({ showExitAlert: false })
+    };
+    onPressExitAlertNegativeButton = () => {
+        this.setState({ showExitAlert: false })
+    };
+
     render() {
         return (
             <SafeAreaView forceInset={{ bottom: 'never' }} style={{ 'backgroundColor': '#3D4044', 'flex': 1 }}>
@@ -336,6 +363,17 @@ class StudioScreen extends React.Component {
                     displayPositiveButton={true}
                     positiveButtonText={'OK'}
                     onPressPositiveButton={this.onPressAlertPositiveButton}
+                />
+                <CustomAlertComponent
+                    displayAlert={this.state.showExitAlert}
+                    alertTitleText={'Confirm exit'}
+                    alertMessageText={'Do you want to quit the app?'}
+                    displayPositiveButton={true}
+                    positiveButtonText={'OK'}
+                    displayNegativeButton={true}
+                    negativeButtonText={'CANCEL'}
+                    onPressPositiveButton={this.onPressExitAlertPositiveButton}
+                    onPressNegativeButton={this.onPressExitAlertNegativeButton}
                 />
                 <View style={{ 'backgroundColor': '#1B1E23', 'flex': 1 }}>
                     <HeaderComponent navigation={this.props.navigation} />
