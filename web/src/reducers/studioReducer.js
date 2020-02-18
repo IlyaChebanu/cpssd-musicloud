@@ -30,6 +30,7 @@ export default (
     sampleEffectsHidden: true,
     publishFormHidden: true,
     songImageUrl: null,
+    showPianoRoll: false,
   },
   action,
 ) => {
@@ -260,6 +261,11 @@ export default (
       return {
         ...state,
         songImageUrl: action.songImageUrl,
+      };
+    case 'SET_SHOW_PIANO_ROLL':
+      return {
+        ...state,
+        showPianoRoll: action.bool,
       };
     default:
       return state;

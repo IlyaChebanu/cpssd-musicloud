@@ -247,3 +247,10 @@ export const setSongImageUrl = (songImageUrl) => (dispatch) => {
     songImageUrl,
   });
 };
+
+export const setShowPianoRoll = (bool) => (dispatch) => {
+  dispatch({
+    type: 'SET_SHOW_PIANO_ROLL',
+    bool,
+  });
+};

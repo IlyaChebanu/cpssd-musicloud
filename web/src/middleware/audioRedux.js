@@ -10,6 +10,39 @@ import {
 } from '../helpers/constants';
 import { lerp, genId } from '../helpers/utils';
 
+// WAM synth experiment
+/*
+let synth;
+
+setTimeout(() => {
+  audioContext.audioWorklet.addModule('https://webaudiomodules.org/wamsdk/wam-processor.js');
+  setTimeout(() => {
+    const wams = document.createElement('script');
+    wams.src = 'https://webaudiomodules.org/wamsdk/wam-controller.js';
+    wams.async = true;
+    wams.onload = () => {
+      const dx7 = document.createElement('script');
+      dx7.src = 'http://webaudiomodules.org/synths/dx7.js';
+      dx7.async = true;
+      dx7.onload = async () => {
+        console.log(audioContext);
+        // eslint-disable-next-line no-undef
+        await WAM.DX7.importScripts(audioContext);
+        // eslint-disable-next-line no-undef
+        synth = new WAM.DX7(audioContext);
+        // setTimeout(() => {
+        // }, 1000);
+        // await dx7.init(new window.AudioContext(), 256);
+      };
+
+      document.body.appendChild(dx7);
+    };
+
+    document.body.appendChild(wams);
+  }, 1000);
+}, 500);
+*/
+
 const getEffectsObject = (context, sample) => {
   const obj = {
     context,
@@ -53,8 +86,14 @@ const scheduleSample = (currentTime, state, sample, scheduleAhead) => {
 
   const effects = getEffectsObject(sample.context, sample);
 
-  const source = effects.context.createBufferSource();
-  source.buffer = bufferStore[sample.id].buffer;
+  let source;
+  if (sample.type === 'pattern') {
+    source = sample.context.createOscillator();
+    source.frequency.setValueAtTime(2 ** ((sample.noteNumber - 49) / 12) * 440, 0);
+  } else {
+    source = sample.context.createBufferSource();
+    source.buffer = sample.buffer;
+  }
   source.connect(effects.pan);
   effects.pan.connect(effects.gain);
   effects.gain.connect(sample.context.globalGain);
@@ -102,7 +141,7 @@ export const renderTracks = (studio) => {
   offlineAudioContext.globalGain.connect(offlineAudioContext.destination);
 
   samples.forEach((sample) => {
-    sample = { ...sample, ...bufferStore[sample.id] };
+    sample = { ...sample, buffer: bufferStore[sample.url] };
     sample.context = offlineAudioContext;
     sample.offline = true;
     scheduleSample(offlineAudioContext.currentTime, studio, sample);
@@ -152,15 +191,47 @@ export default (store) => {
         });
 
         samples.forEach((sample) => {
-          sample = { ...sample, ...bufferStore[sample.id] };
+          sample = { ...sample, buffer: bufferStore[sample.url] };
           sample.schedulerId = genId();
           sample.context = audioContext;
-          const nextLoop = scheduleSample(audioContext.currentTime, state, sample, true);
-          scheduledSamples[`${sample.schedulerId}next`] = {
-            ...sample,
-            source: nextLoop.source,
-            effects: nextLoop.effects,
+          sample.fade = {
+            fadeIn: 0,
+            fadeOut: 0,
+            ...sample.fade,
           };
+          sample.reverb = {
+            wet: 1,
+            dry: 1,
+            cutoff: 0,
+            time: 0.3,
+            ...sample.reverb,
+          };
+          sample.volume = state.tracks[sample.track].volume;
+          if (sample.type === 'pattern') {
+            sample.notes.forEach((note, i) => {
+              const ppq = 1;
+              const noteSample = {
+                ...sample,
+                ...note,
+                schedulerId: `${sample.schedulerId}${i}`,
+                time: sample.time + (0.25 / ppq) * note.tick,
+                duration: (0.25 / ppq) * note.duration * (60 / state.tempo),
+              };
+              const nextLoop = scheduleSample(audioContext.currentTime, state, noteSample, true);
+              scheduledSamples[`${noteSample.schedulerId}next`] = {
+                ...noteSample,
+                source: nextLoop.source,
+                effects: nextLoop.effects,
+              };
+            });
+          } else {
+            const nextLoop = scheduleSample(audioContext.currentTime, state, sample, true);
+            scheduledSamples[`${sample.schedulerId}next`] = {
+              ...sample,
+              source: nextLoop.source,
+              effects: nextLoop.effects,
+            };
+          }
         });
       } else {
         store.dispatch(setCurrentBeat(currentBeat));
@@ -193,21 +264,59 @@ export default (store) => {
         });
 
         samples.forEach((sample) => {
-          sample = { ...sample, ...bufferStore[sample.id] };
+          sample = { ...sample, buffer: bufferStore[sample.url] };
           sample.schedulerId = genId();
           sample.context = audioContext;
-          const currentLoop = scheduleSample(audioContext.currentTime, state, sample);
-          const nextLoop = scheduleSample(audioContext.currentTime, state, sample, true);
-          scheduledSamples[sample.schedulerId] = {
-            ...sample,
-            source: currentLoop.source,
-            effects: currentLoop.effects,
+          sample.fade = {
+            fadeIn: 0,
+            fadeOut: 0,
+            ...sample.fade,
           };
-          scheduledSamples[`${sample.schedulerId}next`] = {
-            ...sample,
-            source: nextLoop.source,
-            effects: nextLoop.effects,
+          sample.reverb = {
+            wet: 1,
+            dry: 1,
+            cutoff: 0,
+            time: 0.3,
+            ...sample.reverb,
           };
+          sample.volume = state.tracks[sample.track].volume;
+          if (sample.type === 'pattern') {
+            sample.notes.forEach((note, i) => {
+              const ppq = 1;
+              const noteSample = {
+                ...sample,
+                ...note,
+                schedulerId: `${sample.schedulerId}${i}`,
+                time: sample.time + (0.25 / ppq) * note.tick,
+                duration: (0.25 / ppq) * note.duration * (60 / state.tempo),
+              };
+              const currentLoop = scheduleSample(audioContext.currentTime, state, noteSample);
+              const nextLoop = scheduleSample(audioContext.currentTime, state, noteSample, true);
+              scheduledSamples[noteSample.schedulerId] = {
+                ...noteSample,
+                source: currentLoop.source,
+                effects: currentLoop.effects,
+              };
+              scheduledSamples[`${noteSample.schedulerId}next`] = {
+                ...noteSample,
+                source: nextLoop.source,
+                effects: nextLoop.effects,
+              };
+            });
+          } else {
+            const currentLoop = scheduleSample(audioContext.currentTime, state, sample);
+            const nextLoop = scheduleSample(audioContext.currentTime, state, sample, true);
+            scheduledSamples[sample.schedulerId] = {
+              ...sample,
+              source: currentLoop.source,
+              effects: currentLoop.effects,
+            };
+            scheduledSamples[`${sample.schedulerId}next`] = {
+              ...sample,
+              source: nextLoop.source,
+              effects: nextLoop.effects,
+            };
+          }
         });
         break;
       }
@@ -241,8 +350,8 @@ export default (store) => {
             volume = track.mute ? 0 : track.volume;
           }
 
-          sample.gain.gain.setValueAtTime(volume, audioContext.currentTime);
-          sample.pan.pan.setValueAtTime(track.pan, audioContext.currentTime);
+          sample.effects.gain.gain.setValueAtTime(volume, audioContext.currentTime);
+          sample.effects.pan.pan.setValueAtTime(track.pan, audioContext.currentTime);
         });
 
         // Verify that all the tracks have bufferscs
@@ -250,33 +359,16 @@ export default (store) => {
           await Promise.all(action.tracks.map(async (track, i) => {
             if (track.samples) {
               await Promise.all(track.samples.map(async (sample) => {
-                sample.fade = {
-                  fadeIn: 0,
-                  fadeOut: 0,
-                  ...sample.fade,
-                };
-                sample.reverb = {
-                  wet: 1,
-                  dry: 1,
-                  cutoff: 0,
-                  time: 0.3,
-                  ...sample.reverb,
-                };
                 sample.track = i;
-                sample.volume = track.volume;
-
-                if (!(sample.id in bufferStore)) {
+                if (!(sample.url in bufferStore)) {
                   await store.dispatch(setSampleLoading(true));
                   const res = await axios.get(sample.url, { responseType: 'arraybuffer' });
                   const buffer = await audioContext.decodeAudioData(res.data);
-                  bufferStore[sample.id] = {
-                    buffer,
-                    duration: buffer.duration,
-                    webAudio: getEffectsObject(audioContext, sample),
-                    sample,
-                  };
+                  bufferStore[sample.url] = buffer;
                   store.dispatch(setSampleLoading(false));
                 }
+                sample.buffer = bufferStore[sample.url];
+                sample.duration = sample.buffer.duration;
               }));
             }
           }));
@@ -286,29 +378,52 @@ export default (store) => {
       case 'SET_TRACK':
         state = store.getState().studio;
         // React to volume change
-        // Object.values(scheduledSamples).forEach((sample) => {
-        //   const track = state.tracks[sample.track];
-        //   const soloTrack = _.findIndex(state.tracks, 'solo');
-        //   const solo = soloTrack !== -1 && soloTrack !== sample.track;
-        //   let newVol = 0;
-        //   if (!solo) {
-        //     newVol = track.mute ? 0 : track.volume;
-        //   }
-        //   sample.gain.gain.setValueAtTime(newVol, audioContext.currentTime);
-        //   sample.pan.pan.setValueAtTime(track.pan, audioContext.currentTime);
-        // });
+        Object.values(scheduledSamples).forEach((sample) => {
+          const track = state.tracks[sample.track];
+          const soloTrack = _.findIndex(state.tracks, 'solo');
+          const solo = soloTrack !== -1 && soloTrack !== sample.track;
+          let newVol = 0;
+          if (!solo) {
+            newVol = track.mute ? 0 : track.volume;
+          }
+
+          sample.effects.gain.gain.setValueAtTime(newVol, audioContext.currentTime);
+          sample.effects.pan.pan.setValueAtTime(track.pan, audioContext.currentTime);
+        });
 
         // Verify that all the track has buffers
-        // await Promise.all(action.track.samples.map(async (sample) => {
-        //   if (!bufferStore[sample.url]) {
-        //     await store.dispatch(setSampleLoading(true));
-        //     const res = await axios.get(sample.url, { responseType: 'arraybuffer' });
-        //     const buffer = await audioContext.decodeAudioData(res.data);
-        //     bufferStore[sample.url] = buffer;
-        //     store.dispatch(setSampleLoading(false));
-        //   }
-        //   sample.duration = bufferStore[sample.url].duration;
-        // }));
+        await Promise.all(action.track.samples.map(async (sample) => {
+          if (!bufferStore[sample.url]) {
+            await store.dispatch(setSampleLoading(true));
+            const res = await axios.get(sample.url, { responseType: 'arraybuffer' });
+            const buffer = await audioContext.decodeAudioData(res.data);
+            bufferStore[sample.url] = buffer;
+            store.dispatch(setSampleLoading(false));
+          }
+          sample.buffer = bufferStore[sample.url];
+          sample.duration = sample.buffer.duration;
+        }));
+        // action.track.samples[action.track.samples.length - 1].type = 'pattern';
+        // action.track.samples[action.track.samples.length - 1].notes = [
+        //   {
+        //     tick: 0,
+        //     velocity: 100,
+        //     noteNumber: 36,
+        //     duration: 1,
+        //   },
+        //   {
+        //     tick: 2,
+        //     velocity: 103,
+        //     noteNumber: 51,
+        //     duration: 1,
+        //   },
+        //   {
+        //     tick: 4,
+        //     velocity: 101,
+        //     noteNumber: 36,
+        //     duration: 1,
+        //   },
+        // ];
         break;
 
       case 'SET_VOLUME':
@@ -316,7 +431,7 @@ export default (store) => {
         break;
 
       case 'SET_SAMPLE_REVERB': {
-        const sample = bufferStore[action.id];
+        const sample = bufferStore[action.url];
         sample.webAudio.reverb.time = action.reverb.time * 10;
         sample.webAudio.reverb.wet.value = action.reverb.wet;
         sample.webAudio.reverb.dry.value = action.reverb.dry;

@@ -1,0 +1,194 @@
+.background {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  z-index: 4;
+  pointer-events: none;
+  background-color: #00000030;
+}
+
+.wrapper {
+  width: 100vw;
+  height: 70vh;
+  background-color: #54565A;
+  position: fixed;
+  bottom: 60px;
+  z-index: 4;
+  border-radius: 15px 15px 0 0;
+  pointer-events: all;
+}
+
+.header {
+  height: 50px;
+
+  .controls {
+    display: flex;
+
+    .left {
+      width: 140px;
+    }
+
+    .right {
+      width: calc(100% - 140px);
+
+      .upper {
+        height: 30px;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 10px 0 0;
+
+        svg {
+          width: 15px;
+
+          &:hover {
+            cursor: pointer;
+          }
+        }
+      }
+
+      .lower {
+        height: 20px;
+        border-radius: 5px 5px 0 0;
+        overflow: hidden;
+      }
+    }
+
+  }
+}
+
+.keyboard {
+  height: calc(100% - 50px);
+  overflow-y: auto;
+  display: flex;
+  align-items: flex-start;
+
+  .keys {
+    display: flex;
+    flex-direction: column-reverse;
+
+    .whiteKey {
+      width: 140px;
+
+      &.wide {
+        height: 40px;
+      }
+
+      height: 30px;
+      background-color: white;
+      border-radius: 0 10px 10px 0;
+      border: none;
+      box-shadow: inset 0px 0px 2px rgba(0, 0, 0, 0.4);
+    }
+
+    .blackKey {
+      width: 100px;
+      height: 20px;
+      background-color: black;
+      position: relative;
+      bottom: -10px;
+      margin-top: -20px;
+      border: none;
+      border-radius: 0 5px 5px 0;
+      box-shadow: inset -10px 5px 10px rgba(255, 255, 255, 0.25);
+    }
+  }
+
+  .keyTracks {
+    flex: 1;
+    display: flex;
+    flex-direction: column-reverse;
+    background-color: #414448;
+
+    .track {
+      width: 100%;
+      height: 19px;
+      position: relative;
+      top: 10px;
+      border-bottom: 1px solid #54565A;
+      display: flex;
+      align-items: center;
+
+      pointer-events: none;
+
+      &:last-child {
+        border-top: 1px solid #54565A;
+        height: 18px;
+      }
+    }
+
+    .white {
+      background-color: #414448;
+    }
+
+    .black {
+      background-color: #36393D;
+    }
+  }
+}
+
+
+.timelineWrapper {
+  height: 20px;
+  flex: 1;
+  background-color: #414448;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+
+  .ticks {
+    height: 20px;
+    width: 100%;
+
+    .bottom {
+      width: 100%;
+      height: 1px;
+      fill: #ADADAD;
+    }
+
+    .tick {
+      height: 5px;
+      fill: #ADADAD;
+      width: 1px;
+    }
+
+    .nums {
+      fill: #ADADAD;
+      font-size: 10px;
+      user-select: none;
+    }
+  }
+}
+
+.tickDividersWrapper {
+  position: absolute;
+  height: calc(100% - 50px);
+  top: 50px;
+  pointer-events: none;
+}
+
+.tickDividers {
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 1px;
+  background-color: #54565A;
+}
+
+.notes {
+  position: relative;
+}
+
+.sampleName {
+
+  input {
+    color: white;
+    border: none;
+    background: none;
+    outline: none;
+    font-size: 18px;
+    width: 200px;
+  }
+
+}
