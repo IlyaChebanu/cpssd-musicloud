@@ -7,9 +7,9 @@ import styles from './SongPicker.module.scss';
 import OwnSongCard from '../OwnSongCard';
 import NewSong from '../NewSong/NewSong';
 import {
-  setTracks, hideSongPicker, setTempo, setSongName, setSongDescription, setSongId, setSongImageUrl,
+  setTracks, hideSongPicker, setTempo, setSongName, setSongDescription, setSongImageUrl,
 } from '../../actions/studioActions';
-import { getEditableSongs, createNewSong } from '../../helpers/api';
+import { getEditableSongs, createNewSong, getSongState } from '../../helpers/api';
 import Spinner from '../Spinner/Spinner';
 
 const SongPicker = memo((props) => {
@@ -29,11 +29,13 @@ const SongPicker = memo((props) => {
       getSongs();
     }
   }, [dispatch, songPickerHidden]);
+  const urlParams = new URLSearchParams(window.location.search);
+  const songId = Number(urlParams.get('sid'));
 
   const handleCreateNewSong = useCallback(async () => {
     const res = await createNewSong('New Song');
     if (res.status === 200) {
-      dispatch(setSongId(res.data.sid));
+      window.history.pushState(null, null, `/studio?sid=${res.data.sid}`);
       dispatch(setTracks([]));
       dispatch(setTempo(140));
       dispatch(setSongName('New Song'));
@@ -46,20 +48,25 @@ const SongPicker = memo((props) => {
       key={song.sid}
       songName={`${song.title}`}
       className={styles.songCard}
-      onClick={() => {
+      onClick={async () => {
+        const res = await getSongState(song.sid);
+        if (res.status === 200) {
+          const songState = res.data.song_state;
+          if (songState.tracks) dispatch(setTracks(songState.tracks));
+          if (songState.tempo) dispatch(setTempo(songState.tempo));
+        }
         dispatch(setSongImageUrl(song.cover));
         dispatch(setSongName(song.title));
-        dispatch(setSongDescription(song.description));
-        dispatch(setSongId(song.sid));
+        dispatch(setSongDescription(song.description || ''));
+        window.history.pushState(null, null, `/studio?sid=${song.sid}`);
         dispatch(hideSongPicker());
       }}
       imageSrc={song.cover}
     />
   )), [dispatch, gotSongs]);
 
-
   return (
-    <div style={{ visibility: songPickerHidden ? 'hidden' : 'visible' }} className={styles.wrapper}>
+    <div style={{ visibility: songPickerHidden || songId ? 'hidden' : 'visible' }} className={styles.wrapper}>
       <div className={styles.songs}>
         <NewSong
           onClick={handleCreateNewSong}

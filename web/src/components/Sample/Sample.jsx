@@ -5,11 +5,11 @@ import { connect } from 'react-redux';
 import _ from 'lodash';
 import { HotKeys } from 'react-hotkeys';
 import styles from './Sample.module.scss';
-import { bufferStore, dColours, colours } from '../../helpers/constants';
+import { dColours, colours } from '../../helpers/constants';
 import { lerp } from '../../helpers/utils';
 import {
   setSampleTime, setTrackAtIndex, setSelectedSample, setClipboard,
-  hideSampleEffects, showSampleEffects,
+  hideSampleEffects, showSampleEffects, setShowPianoRoll,
 } from '../../actions/studioActions';
 
 import editIcon from '../../assets/icons/edit-sample.svg';
@@ -18,10 +18,10 @@ import editIcon from '../../assets/icons/edit-sample.svg';
 const Sample = memo((props) => {
   const {
     sample, tempo, selectedSample, dispatch, gridSnapEnabled, gridSize, tracks,
-    sampleEffectsHidden,
+    sampleEffectsHidden, showPianoRoll,
   } = props;
 
-  const buffer = useMemo(() => bufferStore[sample.url], [sample.url]);
+  const buffer = useMemo(() => sample.buffer, [sample.buffer]);
 
   const waveform = useMemo(() => {
     if (buffer) {
@@ -56,15 +56,23 @@ const Sample = memo((props) => {
     const beatsPerSecond = tempo / 60;
     const colourIdx = sample.track % dColours.length;
     const selected = sample.id === selectedSample;
+    const ppq = 1;
+    let width;
+    if (sample.type === 'pattern') {
+      const latest = _.maxBy(sample.notes, (n) => n.tick + n.duration);
+      width = (0.25 / ppq) * (latest.tick + latest.duration) * (40 * gridSize);
+    } else {
+      width = buffer ? buffer.duration * beatsPerSecond * (40 * gridSize) : 20;
+    }
     return {
-      width: buffer ? buffer.duration * beatsPerSecond * (40 * gridSize) : 20,
+      width,
       backgroundColor: selected ? colours[colourIdx] : dColours[colourIdx],
       zIndex: selected ? 2 : 1,
     };
-  }, [tempo, sample.track, sample.id, selectedSample, buffer, gridSize]);
+  }, [tempo, sample.track, sample.id, sample.type, sample.notes, selectedSample, gridSize, buffer]);
 
   const handleDragSample = useCallback((ev) => {
-    dispatch(setSelectedSample(props.sample.id));
+    dispatch(setSelectedSample(props.sample.id || ''));
     const initialMousePos = ev.screenX;
     const initialTime = props.sample.time;
     const handleMouseMove = (e) => {
@@ -116,6 +124,10 @@ const Sample = memo((props) => {
     }
   }, [dispatch, sampleEffectsHidden]);
 
+  const handleTogglePiano = useCallback(() => {
+    dispatch(setShowPianoRoll(!showPianoRoll));
+  }, [dispatch, showPianoRoll]);
+
 
   return (
     <HotKeys
@@ -130,13 +142,13 @@ const Sample = memo((props) => {
       {sample.id === selectedSample
         ? (
           <img
-            onClick={handleShowHideSampleEffects}
+            onClick={sample.type === 'pattern' ? handleTogglePiano : handleShowHideSampleEffects}
             className={sampleEffectsHidden ? styles.edit : `${styles.editing} ${styles.edit}`}
             src={editIcon}
             alt="edit sample icon"
           />
         ) : ''}
-      {waveform}
+      {sample.type === 'pattern' ? '' : waveform}
       <div className={styles.fadeWrapper}>
         {sample.id === selectedSample && !!(sample.fade.fadeIn || sample.fade.fadeOut) && (
           <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" fill="rgba(0, 0, 0, 0.3)">
@@ -158,6 +170,7 @@ Sample.propTypes = {
   gridSize: PropTypes.number.isRequired,
   tracks: PropTypes.arrayOf(PropTypes.object).isRequired,
   sampleEffectsHidden: PropTypes.bool.isRequired,
+  showPianoRoll: PropTypes.bool.isRequired,
 };
 
 Sample.defaultProps = {
@@ -174,6 +187,7 @@ const mapStateToProps = ({ studio }) => ({
   selectedSample: studio.selectedSample,
   tracks: studio.tracks,
   sampleEffectsHidden: studio.sampleEffectsHidden,
+  showPianoRoll: studio.showPianoRoll,
 });
 
 export default connect(mapStateToProps)(Sample);

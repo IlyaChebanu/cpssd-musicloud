@@ -45,7 +45,7 @@ const Dropdown = memo((props) => {
 
 Dropdown.propTypes = {
   items: PropTypes.arrayOf(PropTypes.object).isRequired,
-  title: PropTypes.string.isRequired,
+  title: PropTypes.node.isRequired,
 };
 
 Dropdown.displayName = 'Dropdown';

@@ -5,7 +5,6 @@ export default (
       start: 1,
       stop: 17,
     },
-    songId: null,
     songName: 'New Song',
     songDescription: '',
     gridSize: 1,
@@ -23,13 +22,14 @@ export default (
     sampleLoading: false,
     tracks: [],
     selectedTrack: 0,
-    selectedSample: -1,
+    selectedSample: '',
     clipboard: {},
     title: 'Untitled',
     songPickerHidden: false,
     sampleEffectsHidden: true,
     publishFormHidden: true,
     songImageUrl: null,
+    showPianoRoll: false,
   },
   action,
 ) => {
@@ -219,11 +219,6 @@ export default (
         ...state,
         songDescription: action.description,
       };
-    case 'SET_SONG_ID':
-      return {
-        ...state,
-        songId: action.songId,
-      };
     case 'SET_SAMPLE_FADE':
       return {
         ...state,
@@ -260,6 +255,11 @@ export default (
       return {
         ...state,
         songImageUrl: action.songImageUrl,
+      };
+    case 'SET_SHOW_PIANO_ROLL':
+      return {
+        ...state,
+        showPianoRoll: action.bool,
       };
     default:
       return state;
