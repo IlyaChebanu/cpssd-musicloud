@@ -5,7 +5,6 @@ export default (
       start: 1,
       stop: 17,
     },
-    songId: null,
     songName: 'New Song',
     songDescription: '',
     gridSize: 1,
@@ -219,11 +218,6 @@ export default (
       return {
         ...state,
         songDescription: action.description,
-      };
-    case 'SET_SONG_ID':
-      return {
-        ...state,
-        songId: action.songId,
       };
     case 'SET_SAMPLE_FADE':
       return {

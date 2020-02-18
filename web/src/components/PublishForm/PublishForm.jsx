@@ -25,6 +25,8 @@ const PublishForm = memo((props) => {
   const [nameInput, setNameInput] = useState(studio.songName || '');
   const [description, setDescription] = useState(studio.songDescription || '');
   const [loading, setLoading] = useState(false);
+  const urlParams = new URLSearchParams(window.location.search);
+  const songId = Number(urlParams.get('sid'));
 
   useEffect(() => {
     if (nameInput !== studio.songName) {
@@ -57,27 +59,31 @@ const PublishForm = memo((props) => {
   }, [handleSetName]);
 
   const uploadCoverToS3 = useCallback(async (img) => {
-    setLoading(true);
-    const res = await uploadFile('cover', img, studio.songId);
-    dispatch(setSongImageUrl(res));
-    setLoading(false);
-  }, [dispatch, studio.songId]);
+    if (songId) {
+      setLoading(true);
+      const res = await uploadFile('cover', img, songId);
+      dispatch(setSongImageUrl(res));
+      setLoading(false);
+    }
+  }, [dispatch, songId]);
 
 
   const handlePublishSong = useCallback(async (e) => {
     e.preventDefault();
-    if (songImageUrl) {
-      await addSongCoverArt({
-        url: studio.songImageUrl,
-        sid: studio.songId,
-      });
+    if (songId) {
+      if (songImageUrl) {
+        await addSongCoverArt({
+          url: studio.songImageUrl,
+          sid: songId,
+        });
+      }
+      dispatch(hidePublishForm());
+      await publishSong(songId);
+      await patchSongName(songId, nameInput);
+      await patchSongDescription(songId, description);
+      dispatch(showNotification({ message: 'Song successfully published!', type: 'info' }));
     }
-    dispatch(hidePublishForm());
-    await publishSong(studio.songId);
-    await patchSongName(studio.songId, nameInput);
-    await patchSongDescription(studio.songId, description);
-    dispatch(showNotification({ message: 'Song successfully published!', type: 'info' }));
-  }, [description, dispatch, nameInput, songImageUrl, studio.songId, studio.songImageUrl]);
+  }, [description, dispatch, nameInput, songImageUrl, studio.songImageUrl, songId]);
 
   const handleCoverChange = useCallback(async () => {
     const fileSelector = document.createElement('input');

@@ -19,7 +19,7 @@ def send_mail(send_to, subject, body):
     None - Sends the mail and returns None.
     """
     # Connect to SMTP server.
-    sent_from = "dcumusicloud@gmail.com"
+    sent_from = SMTP_CONFIG.get("sender")
     email_text = """From: %s\nTo: %s\nSubject: %s\n\n%s
         """ % (sent_from, send_to, subject, body)
     smtp = smtplib.SMTP()

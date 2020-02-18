@@ -8,7 +8,14 @@ import { connect } from 'react-redux';
 import styles from './Studio.module.scss';
 import Header from '../../components/Header';
 import {
-  setTracks, setScroll, setScrollY, setGridWidth, setTempo,
+  setTracks,
+  setScroll,
+  setGridWidth,
+  setTempo,
+  setSongImageUrl,
+  setSongName,
+  setSongDescription,
+  hideSongPicker, showSongPicker,
 } from '../../actions/studioActions';
 import { showNotification } from '../../actions/notificationsActions';
 import kick from '../../assets/basic_sounds/kick.wav';
@@ -29,9 +36,8 @@ import SongPicker from '../../components/SongPicker';
 import Track from '../../components/Track/Track';
 import SampleControls from '../../components/SampleControls';
 
-import { saveState, getSongState } from '../../helpers/api';
+import { saveState, getSongState, getSongInfo } from '../../helpers/api';
 import { useUpdateUserDetails } from '../../helpers/hooks';
-import store from '../../store';
 import Spinner from '../../components/Spinner/Spinner';
 import PublishForm from '../../components/PublishForm/PublishForm';
 import PianoRoll from '../../components/PianoRoll/PianoRoll';
@@ -44,20 +50,34 @@ const Studio = memo((props) => {
   useUpdateUserDetails();
   const tracksRef = useRef();
 
+  const urlParams = new URLSearchParams(window.location.search);
+  const songId = Number(urlParams.get('sid'));
+
   useEffect(() => {
-    if (studio.songId) {
+    if (songId) {
       (async () => {
         setTracksLoading(true);
-        const res = await getSongState(studio.songId);
+        const res = await getSongState(songId);
         setTracksLoading(false);
         if (res.status === 200) {
           const songState = res.data.song_state;
           if (songState.tracks) dispatch(setTracks(songState.tracks));
           if (songState.tempo) dispatch(setTempo(songState.tempo));
+          const res2 = await getSongInfo(songId);
+          if (res2.status === 200) {
+            dispatch(setSongImageUrl(res2.data.song.cover));
+            dispatch(setSongName(res2.data.song.title));
+            dispatch(setSongDescription(res2.data.song.description));
+            dispatch(hideSongPicker());
+          }
         }
       })();
+    } else {
+      dispatch(setTracks([]));
+      dispatch(setTempo(140));
+      dispatch(showSongPicker());
     }
-  }, [dispatch, studio.songId]);
+  }, [dispatch, songId]);
 
   useEffect(() => {
     const latest = tracks.reduce((m, track) => {
@@ -100,15 +120,14 @@ const Studio = memo((props) => {
       tempo: studio.tempo,
       tracks,
     };
-    /* At the moment, this just uses the hardcoded song ID in the state (1001). */
-    /* The user who has edit permission for the song by default it Kamil. */
-    /* You can add your uid and the sid 1001 to the Song_Editors table to */
-    /* save from your account. */
-    const res = await saveState(studio.songId, songState);
-    if (res.status === 200) {
-      dispatch(showNotification({ message: 'Song saved', type: 'info' }));
+
+    if (songId) {
+      const res = await saveState(songId, songState);
+      if (res.status === 200) {
+        dispatch(showNotification({ message: 'Song saved', type: 'info' }));
+      }
     }
-  }, [studio.tempo, studio.songId, tracks, dispatch]);
+  }, [studio.tempo, tracks, dispatch, songId]);
 
   const renderableTracks = useMemo(() => tracks.map((t, i) => (
     <Track index={i} track={{ ...t }} key={i} className={styles.track} />
