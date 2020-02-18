@@ -535,7 +535,7 @@ class StartScreen extends React.Component {
       this.animateToLogin()
       this.setState({ alertState: 0 })
     }
-    this.setState({ showAlert: false})
+    this.setState({ showAlert: false })
   };
 
   render() {
@@ -577,15 +577,11 @@ class StartScreen extends React.Component {
       <View style={{ 'backgroundColor': '#1B1E23', 'flex': 1 }}>
         <CustomAlertComponent
           displayAlert={this.state.showAlert}
-          // displayAlertIcon={true}
           alertTitleText={this.state.alertTitle}
           alertMessageText={this.state.alertMessage}
           displayPositiveButton={true}
           positiveButtonText={'OK'}
-          // displayNegativeButton={true}
-          // negativeButtonText={'CANCEL'}
           onPressPositiveButton={this.onPressAlertPositiveButton}
-          // onPressNegativeButton={this.onPressAlertNegativeButton}
         />
         <Image style={styles.topVector} source={topVector} />
         <View style={styles.logoContainer}>

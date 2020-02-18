@@ -21,7 +21,7 @@ export default class CustomAlertComponent extends React.Component {
         animationType={"fade"}>
         <View style={styles.mainOuterComponent}>
           <View style={styles.mainContainer}>
-            {/* First ROw - Alert Icon and Title */}
+            {/* First Row - Alert Icon and Title */}
             <View style={styles.topPart}>
               {
                   this.props.displayAlertIcon

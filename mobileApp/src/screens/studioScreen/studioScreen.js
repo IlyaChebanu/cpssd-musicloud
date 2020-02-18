@@ -40,7 +40,6 @@ class StudioScreen extends React.Component {
     }
 
     async handleUploadButtonClick() {
-        // this.setState({ screenState: 3 })
         try {
             const res = await DocumentPicker.pick({
               type: [DocumentPicker.types.audio],
