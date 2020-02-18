@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 import axios from 'axios';
 import _ from 'lodash';
-import Reverb from 'soundbank-reverb';
+// import Reverb from 'soundbank-reverb';
 import {
   playingStartTime, setCurrentBeat, playingStartBeat, setSampleLoading, stop,
 } from '../actions/studioActions';
@@ -43,18 +43,18 @@ setTimeout(() => {
 }, 500);
 */
 
-const getEffectsObject = (context, sample) => {
+const getEffectsObject = (context) => {
   const obj = {
     context,
     pan: context.createStereoPanner(),
-    reverb: Reverb(context),
+    // reverb: Reverb(context),
     gain: context.createGain(),
   };
 
-  obj.reverb.time = sample.reverb.time * 10;
-  obj.reverb.wet.value = sample.reverb.wet;
-  obj.reverb.dry.value = sample.reverb.dry;
-  obj.reverb.cutoff.value = sample.reverb.cutoff * 10000;
+  // obj.reverb.time = sample.reverb.time * 10;
+  // obj.reverb.wet.value = sample.reverb.wet;
+  // obj.reverb.dry.value = sample.reverb.dry;
+  // obj.reverb.cutoff.value = sample.reverb.cutoff * 10000;
   return obj;
 };
 
