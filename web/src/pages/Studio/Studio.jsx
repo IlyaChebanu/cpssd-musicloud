@@ -1,12 +1,17 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/no-array-index-key */
 import React, {
-  memo, useCallback, useEffect, useMemo, useRef, useState,
-} from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import styles from './Studio.module.scss';
-import Header from '../../components/Header';
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from "react";
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
+import styles from "./Studio.module.scss";
+import Header from "../../components/Header";
 import {
   setTracks,
   setScroll,
@@ -42,7 +47,9 @@ import Spinner from '../../components/Spinner/Spinner';
 import PublishForm from '../../components/PublishForm/PublishForm';
 import PianoRoll from '../../components/PianoRoll/PianoRoll';
 
+import FileExplorer from "../../components/FileExplorer/FileExplorer";
 const Studio = memo((props) => {
+
   const { dispatch, tracks, studio } = props;
 
   const [tracksLoading, setTracksLoading] = useState(false);
@@ -81,37 +88,45 @@ const Studio = memo((props) => {
 
   useEffect(() => {
     const latest = tracks.reduce((m, track) => {
-      const sampleMax = track.samples ? track.samples.reduce((sm, sample) => {
-        const endTime = sample.time + (sample.duration * (studio.tempo / 60));
-        return Math.max(endTime, sm);
-      }, 1) : 1;
+      const sampleMax = track.samples
+        ? track.samples.reduce((sm, sample) => {
+            const endTime = sample.time + sample.duration * (studio.tempo / 60);
+            return Math.max(endTime, sm);
+          }, 1)
+        : 1;
       return Math.max(sampleMax, m);
     }, 1);
     const width = Math.max(
       latest,
       tracksRef.current
-        ? tracksRef.current.getBoundingClientRect().width / (40 * studio.gridSize)
-        : 0,
+        ? tracksRef.current.getBoundingClientRect().width /
+            (40 * studio.gridSize)
+        : 0
     );
     dispatch(setGridWidth(width));
   }, [dispatch, tracks, studio.gridSize, studio.tempo, tracksRef]);
 
-  const handleScroll = useCallback((e) => {
-    dispatch(setScroll(e.target.scrollLeft));
-  }, [dispatch]);
+  const handleScroll = useCallback(
+    e => {
+      dispatch(setScroll(e.target.scrollLeft));
+    },
+    [dispatch]
+  );
 
   const handleAddNewTrack = useCallback(() => {
-    dispatch(setTracks([
-      ...tracks,
-      {
-        volume: 1,
-        pan: 0,
-        mute: false,
-        solo: false,
-        name: 'New track',
-        samples: [],
-      },
-    ]));
+    dispatch(
+      setTracks([
+        ...tracks,
+        {
+          volume: 1,
+          pan: 0,
+          mute: false,
+          solo: false,
+          name: "New track",
+          samples: []
+        }
+      ])
+    );
   }, [dispatch, tracks]);
 
   const handleSaveState = useCallback(async (e) => {
@@ -133,21 +148,25 @@ const Studio = memo((props) => {
     <Track index={i} track={{ ...t }} key={i} className={styles.track} />
   )), [tracks]);
 
-  const trackControls = useMemo(() => tracks.map((track, i) => (
-    <TrackControls key={i} track={track} index={i} />
-  )), [tracks]);
+  const trackControls = useMemo(
+    () =>
+      tracks.map((track, i) => (
+        <TrackControls key={i} track={track} index={i} />
+      )),
+    [tracks]
+  );
 
-  const trackControlsStyle = useMemo(() => ({
-    transform: `translateY(${-studio.scrollY}px)`,
-  }), [studio.scrollY]);
+  const trackControlsStyle = useMemo(
+    () => ({
+      transform: `translateY(${-studio.scrollY}px)`
+    }),
+    [studio.scrollY]
+  );
 
   return (
     <div className={styles.wrapper}>
       <Header selected={0}>
-        <Button
-          className={styles.saveButton}
-          onClick={handleSaveState}
-        >
+        <Button className={styles.saveButton} onClick={handleSaveState}>
           Save
         </Button>
       </Header>
@@ -156,12 +175,15 @@ const Studio = memo((props) => {
         <SeekBar />
 
         <Timeline />
+
         <div className={styles.scrollable}>
           <div className={styles.content}>
             <div className={styles.trackControls}>
               {trackControls}
               <div
-                className={`${styles.newTrack} ${tracks.length % 2 !== 1 ? styles.even : ''}`}
+                className={`${styles.newTrack} ${
+                  tracks.length % 2 !== 1 ? styles.even : ""
+                }`}
                 onClick={handleAddNewTrack}
                 role="button"
                 tabIndex={0}
@@ -169,7 +191,11 @@ const Studio = memo((props) => {
                 Add new track
               </div>
             </div>
-            <div className={styles.tracks} onScroll={handleScroll} ref={tracksRef}>
+            <div
+              className={styles.tracks}
+              onScroll={handleScroll}
+              ref={tracksRef}
+            >
               {tracksLoading ? <Spinner /> : renderableTracks}
             </div>
           </div>
@@ -178,19 +204,19 @@ const Studio = memo((props) => {
       <PianoRoll />
       <PlayBackControls style={{ 'pointer-events': 'none' }} />
       <SongPicker songs={[]} />
+      <FileExplorer />
       <PublishForm />
     </div>
-
   );
 });
 
 Studio.propTypes = {
   dispatch: PropTypes.func.isRequired,
   tracks: PropTypes.arrayOf(PropTypes.object).isRequired,
-  studio: PropTypes.object.isRequired,
+  studio: PropTypes.object.isRequired
 };
 
-Studio.displayName = 'Studio';
+Studio.displayName = "Studio";
 
 const mapStateToProps = ({ studio }) => ({ studio, tracks: studio.tracks });
 

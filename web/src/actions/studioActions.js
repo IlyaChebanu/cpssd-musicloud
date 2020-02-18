@@ -202,6 +202,17 @@ export const showPublishForm = () => (dispatch) => {
   });
 };
 
+export const hideFileExplorer = () => (dispatch) => {
+  dispatch({
+    type: 'FILE_EXPLORER_HIDE',
+  });
+};
+
+export const showFileExplorer = () => (dispatch) => {
+  dispatch({
+    type: 'FILE_EXPLORER_SHOW',
+  });
+};
 
 export const setSongName = (songName) => (dispatch) => {
   dispatch({

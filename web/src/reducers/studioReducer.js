@@ -26,6 +26,7 @@ export default (
     clipboard: {},
     title: 'Untitled',
     songPickerHidden: false,
+    fileExplorerHidden: true,
     sampleEffectsHidden: true,
     publishFormHidden: true,
     songImageUrl: null,
@@ -208,6 +209,16 @@ export default (
       return {
         ...state,
         publishFormHidden: false,
+      };
+    case 'FILE_EXPLORER_HIDE':
+      return {
+        ...state,
+        fileExplorerHidden: true,
+      };
+    case 'FILE_EXPLORER_SHOW':
+      return {
+        ...state,
+        fileExplorerHidden: false,
       };
     case 'SET_SONG_NAME':
       return {

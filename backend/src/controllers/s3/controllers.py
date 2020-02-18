@@ -56,7 +56,7 @@ def signed_form_post(user_data):
 
     url = s3_client.generate_presigned_post(
         Bucket=AWS_CREDS['Bucket'],
-        Key=directory + "/" + str(user_data.get('uid')) + "_" + file_name,
+        Key=directory + "/" + str(user_data.get('username')) + "/" + file_name,
         Fields={
             'Content-Type': file_type,
         },
