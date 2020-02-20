@@ -15,7 +15,6 @@ import Header from '../../components/Header';
 import {
   setTracks,
   setScroll,
-  setGridWidth,
   setTempo,
   setSongImageUrl,
   setSongName,
@@ -39,6 +38,8 @@ import PublishForm from '../../components/PublishForm/PublishForm';
 import PianoRoll from '../../components/PianoRoll/PianoRoll';
 
 import FileExplorer from '../../components/FileExplorer/FileExplorer';
+
+import { gridResize } from '../../helpers/gridResize';
 
 const Studio = memo((props) => {
   const { dispatch, tracks, studio } = props;
@@ -75,27 +76,11 @@ const Studio = memo((props) => {
       dispatch(setTempo(140));
       dispatch(showSongPicker());
     }
-  }, [dispatch, songId]);
-
-  useEffect(() => {
-    const latest = tracks.reduce((m, track) => {
-      const sampleMax = track.samples
-        ? track.samples.reduce((sm, sample) => {
-          const endTime = sample.time + sample.duration * (studio.tempo / 60);
-          return Math.max(endTime, sm);
-        }, 1)
-        : 1;
-      return Math.max(sampleMax, m);
-    }, 1);
-    const width = Math.max(
-      latest,
-      tracksRef.current
-        ? tracksRef.current.getBoundingClientRect().width
-            / (40 * studio.gridSize)
-        : 0,
-    );
-    dispatch(setGridWidth(width));
-  }, [dispatch, tracks, studio.gridSize, studio.tempo, tracksRef]);
+    window.addEventListener('resize', gridResize);
+    return () => {
+      window.removeEventListener('resize', gridResize);
+    }
+  }, [dispatch, songId, tracks, studio, tracksRef]);
 
   const handleScroll = useCallback(
     (e) => {
