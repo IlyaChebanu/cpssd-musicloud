@@ -25,6 +25,7 @@ const PianoNote = memo(({
   const gridSnapEnabled = true;
 
   const handleDragNote = useCallback((ev) => {
+    ev.stopPropagation();
     const initialMousePos = ev.screenX;
     const initialPosY = ev.screenY;
     const initialTime = noteData.tick;

@@ -34,7 +34,7 @@ export default (
   },
   action,
 ) => {
-  let tracks;
+  // let tracks;
   switch (action.type) {
     case 'STUDIO_PLAY':
       return {
@@ -76,13 +76,14 @@ export default (
         ...state,
         tracks: action.tracks,
       };
-    case 'SET_TRACK':
-      tracks = [...state.tracks];
-      tracks[action.index] = action.track;
+    case 'SET_TRACK': {
+      const tracks = [...state.tracks];
+      tracks[action.index] = { ...action.track };
       return {
         ...state,
         tracks,
       };
+    }
     case 'SET_SAMPLE_TIME':
       return {
         ...state,
