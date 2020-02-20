@@ -77,8 +77,8 @@ const generatePresignedPost = (dir, filename, filetype) => axios.post(
   },
 );
 
-export const generatePresigned = (dir) => axios.post(
-    `${API_URL}/v1/s3/signed-form-post`,
+export const generatePresigned = () => axios.post(
+  `${API_URL}/v1/s3/signed-form-post`,
   {
     dir: 'audio',
     fileName: ' ',
@@ -87,9 +87,7 @@ export const generatePresigned = (dir) => axios.post(
   {
     headers: getAuth(),
   },
-)
-
-
+);
 
 
 const putMedia = (signedUrl, file, options) => axios.put(

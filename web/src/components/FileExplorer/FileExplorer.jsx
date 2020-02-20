@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import AWS from 'aws-sdk';
+import * as s3ls from 's3-ls';
 import styles from './FileExplorer.module.scss';
 import samplesIcon from '../../assets/icons/samples.svg';
 import instrumentsIcon from '../../assets/icons/instruments.svg';
@@ -12,8 +13,6 @@ import { generatePresigned } from '../../helpers/api';
 import store from '../../store';
 import {
   setTrackAtIndex,
-  setTracks,
-  setSampleTime,
   setSampleLoading,
 } from '../../actions/studioActions';
 import { showNotification } from '../../actions/notificationsActions';
@@ -27,7 +26,6 @@ const FileExplorer = memo((props) => {
 
   async function getFiles() {
     const res = await generatePresigned('/');
-    // var AWS = require("aws-sdk");
     const accessKey = res.data.signed_url.fields.AWSAccessKeyId;
     AWS.config.update({
       accessKeyId: accessKey,
@@ -36,12 +34,11 @@ const FileExplorer = memo((props) => {
     });
     setUrl('https://dcumusicloudbucket.s3-eu-west-1.amazonaws.com/');
     const { user } = store.getState();
-    const s3ls = require('s3-ls');
     const lister = s3ls({
       bucket: 'dcumusicloudbucket',
     });
 
-    const { files, _ } = await lister.ls(`/audio/${user.username}`);
+    const { files } = await lister.ls(`/audio/${user.username}`);
     setList(files);
   }
 
@@ -57,7 +54,6 @@ const FileExplorer = memo((props) => {
         return;
       }
       const track = { ...studio.tracks[studio.selectedTrack] };
-      console.log(url + name);
       const sampleState = {
         url: url + name,
         name,
@@ -77,9 +73,7 @@ const FileExplorer = memo((props) => {
       };
       track.samples.push(sampleState);
       dispatch(setTrackAtIndex(track, studio.selectedTrack));
-      // dispatch(setSampleTime(sampleState.time, sampleState.id));
       dispatch(setSampleLoading(true));
-      // dispatch(setTracks(studio.tracks));
     },
     [studio.tracks, studio.selectedTrack, studio.currentBeat, url, dispatch],
   );
@@ -98,7 +92,7 @@ const FileExplorer = memo((props) => {
           <p>Samples</p>
         </li>
       </ul>
-      {list.map((item, i) => (
+      {list.map((item) => (
         <li onClick={() => addSample(item)} className={styles.li}>
           {item.split('/').pop()}
         </li>
@@ -146,6 +140,8 @@ const FileExplorer = memo((props) => {
 
 FileExplorer.propTypes = {
   fileExplorerHidden: PropTypes.bool.isRequired,
+  dispatch: PropTypes.func.isRequired,
+  studio: PropTypes.object.isRequired,
 };
 
 FileExplorer.displayName = 'FileExplorer';
