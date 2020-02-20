@@ -46,8 +46,8 @@ const PianoNote = memo(({
 
       const track = { ...tracks[selectedTrack] };
       const sampleIndex = _.findIndex(track.samples, (s) => s.id === selectedSample);
-      track.samples[sampleIndex].notes[noteData.idx].tick = time;
-      track.samples[sampleIndex].notes[noteData.idx].noteNumber = newNoteNumber;
+      track.samples[sampleIndex].notes[noteData.idx].tick = Math.max(0, time);
+      track.samples[sampleIndex].notes[noteData.idx].noteNumber = Math.min(88, Math.max(1, newNoteNumber));
       dispatch(setTrackAtIndex(track, selectedTrack));
     };
     const handleDragStop = () => {
@@ -86,7 +86,7 @@ const PianoNote = memo(({
       const track = { ...tracks[selectedTrack] };
       const sampleIndex = _.findIndex(track.samples, (s) => s.id === selectedSample);
       const notes = [...track.samples[sampleIndex].notes];
-      notes[noteData.idx] = { ...notes[noteData.idx], duration: time };
+      notes[noteData.idx] = { ...notes[noteData.idx], duration: Math.max(0, time) };
       track.samples[sampleIndex].notes = notes;
       track.samples = [...track.samples];
       dispatch(setTrackAtIndex(track, selectedTrack));

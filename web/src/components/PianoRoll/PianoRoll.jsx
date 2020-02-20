@@ -101,9 +101,9 @@ const PianoRoll = memo(({
     const tick = Math.floor((e.clientX - bb.left - (e.target.scrollLeft / window.devicePixelRatio)) / 40);
 
     const note = {
-      noteNumber,
+      noteNumber: Math.min(88, Math.max(1, noteNumber)),
       duration: 2,
-      tick,
+      tick: Math.max(0, tick),
       velocity: 100,
     };
     const track = { ...tracks[selectedTrack] };
