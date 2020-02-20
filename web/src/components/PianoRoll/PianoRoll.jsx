@@ -29,7 +29,7 @@ for (let i = 0; i < 88; i += 1) {
 
 
 const PianoRoll = memo(({
-  showPianoRoll, selectedSample, tracks, selectedTrack, dispatch,
+  showPianoRoll, selectedSample, tracks, selectedTrack, dispatch, gridWidth,
 }) => {
   if (!showPianoRoll) return null;
 
@@ -37,57 +37,35 @@ const PianoRoll = memo(({
     dispatch(setShowPianoRoll(false));
   }, [dispatch]);
 
-  // const keyNotes = useMemo(() => {
-  //   if (selectedTrack !== -1 && selectedSample) {
-  //     const sampleObj = _.find(tracks[selectedTrack].samples, (s) => s.id === selectedSample);
-  //     const notes = sampleObj.notes.map((n, i) => ({ ...n, idx: i }));
-  //     return _.groupBy(notes, (n) => n.noteNumber);
-  //   }
-  //   return {};
-
-  //   const trackArray = [];
-  //   for (let i = 0; i < 88; i += 1) {
-  //     trackArray.push(
-  //       <div
-  //         className={`${styles.track} ${[0, 2, 3, 5, 7, 8, 10].includes(i % 12) ? styles.white : styles.black}`}
-  //         key={i}
-  //       >
-  //         {keyNotes[i + 1] && keyNotes[i + 1].map((note) => <PianoNote noteData={note} />)}
-  //       </div>,
-  //     );
-  //   }
-  //   return trackArray;
-  // }, [selectedSample, selectedTrack, tracks]);
-
-  const gridWidth = 40;
+  // const gridWidth = 40;
   const gridSize = 4;
   const scroll = 0;
 
   const ticks = useMemo(() => (
-    [...Array(Math.ceil(gridWidth * gridSize) + 1)].map(
+    [...Array(Math.ceil(gridWidth) + 3)].map(
       (_, i) => <rect key={i} x={i * 40} y={14} className={styles.tick} />,
     )
-  ), []);
+  ), [gridWidth]);
 
   const numbers = useMemo(() => (
-    [...Array(Math.ceil(gridWidth) + 1)].map(
+    [...Array(Math.ceil(gridWidth / gridSize) + 1)].map(
       (_, i) => (
         <text key={i} x={i * (40 * gridSize) + 5} y={14} className={styles.nums}>
           {i + 1}
         </text>
       ),
     )
-  ), []);
+  ), [gridWidth]);
 
   const tickDividers = useMemo(() => (
-    [...Array(Math.ceil(gridWidth * gridSize) + 1)].map(
+    [...Array(Math.ceil(gridWidth) + 3)].map(
       (_, i) => <div className={styles.tickDividers} key={i} style={{ left: i * 40 }} />,
     )
-  ), []);
+  ), [gridWidth]);
 
   const widthStyle = useMemo(() => ({
-    width: Math.ceil(gridWidth * gridSize) * 40,
-  }), []);
+    width: Math.ceil(gridWidth) * 40 + 140,
+  }), [gridWidth]);
 
   const wrapperStyle = useMemo(() => ({
     transform: `translateX(${-scroll}px)`,
@@ -204,6 +182,7 @@ PianoRoll.propTypes = {
   tracks: PropTypes.arrayOf(PropTypes.object),
   selectedTrack: PropTypes.number,
   dispatch: PropTypes.func.isRequired,
+  gridWidth: PropTypes.number.isRequired,
 };
 
 PianoRoll.defaultProps = {
@@ -219,6 +198,7 @@ const mapStateToProps = ({ studio }) => ({
   selectedSample: studio.selectedSample,
   tracks: studio.tracks,
   selectedTrack: studio.selectedTrack,
+  gridWidth: studio.gridWidth,
 });
 
 export default connect(mapStateToProps)(PianoRoll);
