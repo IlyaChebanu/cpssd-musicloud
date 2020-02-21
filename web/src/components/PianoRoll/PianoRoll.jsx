@@ -33,66 +33,19 @@ const PianoRoll = memo(({
 }) => {
   if (!showPianoRoll) return null;
 
+  const [tracksRef, setTracksRef] = useState();
+  const [scroll, setScroll] = useState(0);
+
+  const handleScrollX = useCallback((e) => {
+    setScroll(e.target.scrollLeft);
+  }, []);
+
   const handleClose = useCallback(() => {
     dispatch(setShowPianoRoll(false));
   }, [dispatch]);
 
-  // const keyNotes = useMemo(() => {
-  //   if (selectedTrack !== -1 && selectedSample) {
-  //     const sampleObj = _.find(tracks[selectedTrack].samples, (s) => s.id === selectedSample);
-  //     const notes = sampleObj.notes.map((n, i) => ({ ...n, idx: i }));
-  //     return _.groupBy(notes, (n) => n.noteNumber);
-  //   }
-  //   return {};
-
-  //   const trackArray = [];
-  //   for (let i = 0; i < 88; i += 1) {
-  //     trackArray.push(
-  //       <div
-  //         className={`${styles.track} ${[0, 2, 3, 5, 7, 8, 10].includes(i % 12) ? styles.white : styles.black}`}
-  //         key={i}
-  //       >
-  //         {keyNotes[i + 1] && keyNotes[i + 1].map((note) => <PianoNote noteData={note} />)}
-  //       </div>,
-  //     );
-  //   }
-  //   return trackArray;
-  // }, [selectedSample, selectedTrack, tracks]);
-
-  const gridWidth = 40;
   const gridSize = 4;
-  const scroll = 0;
-
-  const ticks = useMemo(() => (
-    [...Array(Math.ceil(gridWidth * gridSize) + 1)].map(
-      (_, i) => <rect key={i} x={i * 40} y={14} className={styles.tick} />,
-    )
-  ), []);
-
-  const numbers = useMemo(() => (
-    [...Array(Math.ceil(gridWidth) + 1)].map(
-      (_, i) => (
-        <text key={i} x={i * (40 * gridSize) + 5} y={14} className={styles.nums}>
-          {i + 1}
-        </text>
-      ),
-    )
-  ), []);
-
-  const tickDividers = useMemo(() => (
-    [...Array(Math.ceil(gridWidth * gridSize) + 1)].map(
-      (_, i) => <div className={styles.tickDividers} key={i} style={{ left: i * 40 }} />,
-    )
-  ), []);
-
-  const widthStyle = useMemo(() => ({
-    width: Math.ceil(gridWidth * gridSize) * 40,
-  }), []);
-
-  const wrapperStyle = useMemo(() => ({
-    transform: `translateX(${-scroll}px)`,
-    ...widthStyle,
-  }), [widthStyle]);
+  const gridSizePx = 40;
 
   const selectedSampleObject = useMemo(() => {
     let found;
@@ -103,23 +56,59 @@ const PianoRoll = memo(({
       handleClose();
       return {};
     }
-    return found;
+    return { ...found };
   }, [handleClose, selectedSample, selectedTrack, tracks]);
 
+  const numTicks = useMemo(() => {
+    if (!tracksRef) return null;
+    const bb = tracksRef.getBoundingClientRect();
+    const latest = _.maxBy(selectedSampleObject.notes, (n) => n.tick + n.duration);
+    return Math.ceil(Math.max(bb.width / gridSizePx, latest ? latest.tick + latest.duration : 0));
+  }, [selectedSampleObject, tracksRef]);
+
+  const ticks = useMemo(() => (
+    [...Array(numTicks)].map(
+      (_, i) => <rect key={i} x={i * 40} y={14} className={styles.tick} />,
+    )
+  ), [numTicks]);
+
+  const numbers = useMemo(() => (
+    [...Array(Math.ceil(numTicks / gridSize) + 1)].map(
+      (_, i) => (
+        <text key={i} x={i * (40 * gridSize) + 5} y={14} className={styles.nums}>
+          {i + 1}
+        </text>
+      ),
+    )
+  ), [numTicks]);
+
+  const widthStyle = useMemo(() => ({
+    width: numTicks * gridSizePx,
+  }), [numTicks]);
+
+  const wrapperStyle = useMemo(() => ({
+    transform: `translateX(${-scroll}px)`,
+    ...widthStyle,
+  }), [scroll, widthStyle]);
+
+  const tickDividers = useMemo(() => [...Array(numTicks)].map(
+    (_, i) => <div className={styles.tickDividers} key={i} style={{ left: i * gridSizePx }} />,
+  ), [numTicks]);
+
   const handleCreateNote = useCallback((e) => {
+    if (e.button !== 0) return;
     e.preventDefault();
     const bb = e.target.getBoundingClientRect();
     const sampleIndex = _.findIndex(tracks[selectedTrack].samples, (s) => s.id === selectedSample);
     const noteNumber = 88 - Math.floor(
-      (e.screenY / window.devicePixelRatio - bb.top - 110 / window.devicePixelRatio) / 20,
+      ((e.clientY - bb.top - 10 - (e.target.scrollTop / window.devicePixelRatio)) / 20),
     );
-    if (noteNumber > 88) return;
-    const tick = Math.floor((e.screenX / window.devicePixelRatio - bb.left) / 40);
+    const tick = Math.floor((e.clientX - bb.left + (e.target.scrollLeft / window.devicePixelRatio)) / 40);
 
     const note = {
-      noteNumber,
+      noteNumber: Math.min(88, Math.max(1, noteNumber)),
       duration: 2,
-      tick,
+      tick: Math.max(0, tick),
       velocity: 100,
     };
     const track = { ...tracks[selectedTrack] };
@@ -181,7 +170,7 @@ const PianoRoll = memo(({
           <div className={styles.keys}>
             {pianoKeys}
           </div>
-          <div className={styles.keyTracks} onMouseDown={handleCreateNote}>
+          <div className={styles.keyTracks} onMouseDown={handleCreateNote} ref={(ref) => setTracksRef(ref)} onScroll={handleScrollX}>
             {pianoTracks}
             <div className={styles.tickDividersWrapper}>
               {tickDividers}

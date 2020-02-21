@@ -60,7 +60,7 @@ const Sample = memo((props) => {
     let width;
     if (sample.type === 'pattern') {
       const latest = _.maxBy(sample.notes, (n) => n.tick + n.duration);
-      width = (0.25 / ppq) * (latest.tick + latest.duration) * (40 * gridSize);
+      width = (0.25 / ppq) * (latest ? latest.tick + latest.duration : 4 * ppq) * (40 * gridSize);
     } else {
       width = buffer ? buffer.duration * beatsPerSecond * (40 * gridSize) : 20;
     }
