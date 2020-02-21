@@ -87,23 +87,30 @@ const Studio = memo((props) => {
   }, [dispatch, songId]);
 
   useEffect(() => {
-    const latest = tracks.reduce((m, track) => {
-      const sampleMax = track.samples
+    const resizeGrid = () => {
+      const latest = tracks.reduce((m, track) => {
+        const sampleMax = track.samples
         ? track.samples.reduce((sm, sample) => {
             const endTime = sample.time + sample.duration * (studio.tempo / 60);
             return Math.max(endTime, sm);
           }, 1)
         : 1;
-      return Math.max(sampleMax, m);
-    }, 1);
-    const width = Math.max(
-      latest,
-      tracksRef.current
-        ? tracksRef.current.getBoundingClientRect().width /
+        return Math.max(sampleMax, m);
+      }, 1);
+      const width = Math.max(
+        latest,
+        tracksRef.current
+          ? tracksRef.current.getBoundingClientRect().width /
             (40 * studio.gridSize)
-        : 0
-    );
-    dispatch(setGridWidth(width));
+          : 0
+      );
+      dispatch(setGridWidth(width));
+    };
+    resizeGrid();
+    window.addEventListener('resize', resizeGrid);
+    return () => {
+      window.removeEventListener('resize', resizeGrid);
+    };
   }, [dispatch, tracks, studio.gridSize, studio.tempo, tracksRef]);
 
   const handleScroll = useCallback(
