@@ -24,7 +24,7 @@ const Timeline = memo(({ gridSize, gridWidth, scroll }) => {
   ), [gridSize, gridWidth]);
 
   const widthStyle = useMemo(() => ({
-    width: Math.ceil(gridWidth * gridSize) * 40,
+    width: Math.ceil(gridWidth * gridSize) * 40 + 10,
   }), [gridSize, gridWidth]);
 
   const wrapperStyle = useMemo(() => ({
