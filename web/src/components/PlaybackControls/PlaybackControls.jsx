@@ -1,22 +1,23 @@
-import React, { useCallback, useState, memo } from "react";
-import PropTypes from "prop-types";
-import { connect } from "react-redux";
-import { withRouter } from "react-router-dom";
-import styles from "./PlaybackControls.module.scss";
-import { ReactComponent as Play } from "../../assets/icons/play-circle-light.svg";
-import { ReactComponent as Pause } from "../../assets/icons/pause-circle-light.svg";
-import { ReactComponent as Back } from "../../assets/icons/go-back.svg";
-import { ReactComponent as Forward } from "../../assets/icons/go-forward.svg";
-import { ReactComponent as ToStart } from "../../assets/icons/to-start.svg";
-import { ReactComponent as FileExplorer } from "../../assets/icons/file-explorer.svg";
-import Slider from "../Slider/Slider";
-import { setCurrentBeat, stop, pause, play } from "../../actions/studioActions";
+import React, { useCallback, memo } from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
+import styles from './PlaybackControls.module.scss';
+import { ReactComponent as Play } from '../../assets/icons/play-circle-light.svg';
+import { ReactComponent as Pause } from '../../assets/icons/pause-circle-light.svg';
+import { ReactComponent as Back } from '../../assets/icons/go-back.svg';
+import { ReactComponent as Forward } from '../../assets/icons/go-forward.svg';
+import { ReactComponent as ToStart } from '../../assets/icons/to-start.svg';
+import { ReactComponent as FileExplorer } from '../../assets/icons/file-explorer.svg';
+import Slider from '../Slider/Slider';
 import {
+  setCurrentBeat, stop, pause, play,
   hideFileExplorer,
-  showFileExplorer
-} from "../../actions/studioActions";
+  showFileExplorer,
+} from '../../actions/studioActions';
 
-const PlaybackControls = memo(props => {
+
+const PlaybackControls = memo((props) => {
   const { dispatch, studio, fileExplorerHidden } = props;
   const { currentBeat, tempo, playing } = studio;
   const handlePlay = useCallback(() => {
@@ -84,14 +85,14 @@ const PlaybackControls = memo(props => {
 PlaybackControls.propTypes = {
   dispatch: PropTypes.func.isRequired,
   studio: PropTypes.object.isRequired,
-  fileExplorerHidden: PropTypes.bool.isRequired
+  fileExplorerHidden: PropTypes.bool.isRequired,
 };
 
-PlaybackControls.displayName = "PlaybackControls";
+PlaybackControls.displayName = 'PlaybackControls';
 
 const mapStateToProps = ({ studio }) => ({
   studio,
-  fileExplorerHidden: studio.fileExplorerHidden
+  fileExplorerHidden: studio.fileExplorerHidden,
 });
 
 export default withRouter(connect(mapStateToProps)(PlaybackControls));
