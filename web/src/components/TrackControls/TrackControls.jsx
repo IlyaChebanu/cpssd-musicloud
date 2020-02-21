@@ -62,15 +62,23 @@ const TrackControls = memo((props) => {
     window.addEventListener('mouseup', handleDragStop);
   }, [dispatch, index, track]);
 
+  const unSoloTracks = useCallback(() => {
+    tracks.forEach((t, i) => {
+      const newTrack = { ...t, solo: false };
+      dispatch(setTrackAtIndex(newTrack, i));
+    });
+  }, [dispatch, tracks]);
+
   const handleTrackMute = useCallback(() => {
     track.mute = !track.mute;
     dispatch(setTrackAtIndex(track, props.index));
   }, [dispatch, props.index, track]);
 
   const handleTrackSolo = useCallback(() => {
+    unSoloTracks();
     const newTrack = { ...track, solo: !track.solo };
     dispatch(setTrackAtIndex(newTrack, index));
-  }, [dispatch, index, track]);
+  }, [dispatch, index, track, unSoloTracks]);
 
   const volumeStyle = useMemo(() => ({
     transform: `rotate(${lerp(-140, 140, track.volume)}deg)`,
