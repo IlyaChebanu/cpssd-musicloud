@@ -44,20 +44,12 @@ export const setTempo = (tempo) => (dispatch) => {
   });
 };
 
-export const setTracks = (tracks) => (dispatch) => {
-  dispatch({
-    type: 'SET_TRACKS',
-    tracks,
-  });
-};
-
-export const setTrackAtIndex = (track, index) => (dispatch) => {
-  dispatch({
-    type: 'SET_TRACK',
-    track,
-    index,
-  });
-};
+// export const setTracks = (tracks) => (dispatch) => {
+//   dispatch({
+//     type: 'SET_TRACKS',
+//     tracks,
+//   });
+// };
 
 export const setSampleLoading = (bool) => (dispatch) => {
   dispatch({
@@ -126,14 +118,6 @@ export const setSampleTime = (time, id) => (dispatch) => {
   dispatch({
     type: 'SET_SAMPLE_TIME',
     time,
-    id,
-  });
-};
-
-export const setSampleName = (name, id) => (dispatch) => {
-  dispatch({
-    type: 'SET_SAMPLE_NAME',
-    name,
     id,
   });
 };
@@ -257,3 +241,53 @@ export const setShowPianoRoll = (bool) => (dispatch) => {
     bool,
   });
 };
+
+export const setCompleteTrackState = (track, index) => (dispatch) => {
+  dispatch({
+    type: 'SET_COMPLETE_TRACK_STATE',
+    track,
+    index,
+  });
+};
+
+export const addTrack = () => {};
+
+export const removeTrack = () => {};
+
+export const setTrackVolume = () => {};
+
+export const setTrackPan = () => {};
+
+export const setTrackMute = () => {};
+
+export const setTrackSolo = () => {};
+
+export const setTrackName = () => {};
+
+export const setSampleTrackIndex = () => {};
+
+export const setSampleStartTime = () => {};
+
+export const setSampleFadeIn = () => {};
+
+export const setSampleFadeOut = () => {};
+
+export const setSampleName = (name, id) => (dispatch) => {
+  dispatch({
+    type: 'SET_SAMPLE_NAME',
+    name,
+    id,
+  });
+};
+
+export const setSampleType = () => {};
+
+export const addPatternNote = () => {};
+
+export const removePatternNote = () => {};
+
+export const setPatternNoteNumber = () => {};
+
+export const setPatternNoteVelocity = () => {};
+
+export const setPatternNoteDuration = () => {};

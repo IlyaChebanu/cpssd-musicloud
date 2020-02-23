@@ -259,6 +259,8 @@ export default (store) => {
               )
             ) {
               samples.push(sample);
+            } else if (!state.loopEnabled) {
+              samples.push(sample);
             }
           });
         });
