@@ -19,6 +19,7 @@ import {
 import { showNotification } from '../../actions/notificationsActions';
 import UsersPopup from '../UsersPopup/UsersPopup';
 import Spinner from '../Spinner';
+import { ReactComponent as EditIcon } from '../../assets/icons/edit-sample.svg';
 
 const ProfileBlock = memo((props) => {
   const { dispatch, className, user } = props;
@@ -110,7 +111,7 @@ const ProfileBlock = memo((props) => {
               src={(user.profilePicUrl && user.profilePicUrl !== '') ? user.profilePicUrl : CloudQuestion}
             />
           )}
-          <p>Change profiler</p>
+          <EditIcon />
         </div>
         <div className={styles.stats}>
           <div className={styles.stat}>

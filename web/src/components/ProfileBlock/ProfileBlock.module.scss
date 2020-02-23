@@ -18,6 +18,7 @@
     border-radius: 20px;
     height: 235px;
     width: 376px;
+    transition: filter 300ms, opacity 300ms;
   }
 
   .stats {
@@ -67,44 +68,44 @@
   }
 
   .imgBlock {
-        margin-right: 200px;
-        padding: 0;
-        transition: filter 300ms;
-        flex: 1;
-        display: flex;
-        align-items: center;
-        position: relative;
-        justify-content: center;
+    margin-right: 200px;
+    padding: 0;
+    transition: filter 300ms;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    position: relative;
+    justify-content: center;
 
-        &:hover {
-            cursor: pointer;
-            content: #000000 url('../../assets/icons/plus-circle-light.svg') center center no-repeat;
-            p {
-                margin: 0px;
-                pointer-events: none;
-                opacity: 1;
-            }
-            .img {
-                opacity: 0.6;
-                transition: filter 300ms, opacity 300ms;
-                filter: grayscale(80%);
-            }
-        }
-        p {
-            position: absolute;
-            margin: auto;
-            z-index: 11;
-            cursor: pointer;
-            color: white;
-            font-size: 18px;
-            transition: opacity 300ms;
-            opacity: 0;
-        }
+    svg {
+      width: 50px;
+      height: 50px;
+      position: absolute;
+      margin: auto;
+      z-index: 11;
+      cursor: pointer;
+      color: white;
+      transition: opacity 300ms;
+      opacity: 0;
+    }
+
+    &:hover {
+      cursor: pointer;
+      content: #000000 url('../../assets/icons/plus-circle-light.svg') center center no-repeat;
+      svg {
+        margin: 0px;
+        pointer-events: none;
+        opacity: 1;
+      }
+      .profilePicture {
+        filter: grayscale(30%);
+      }
+    }
 }
 
-  .spinner {
-        height: 100px;
-        width: 300px;
-        margin-left: auto;
-        margin-right: auto;
-      }
+.spinner {
+  height: 100px;
+  width: 300px;
+  margin-left: auto;
+  margin-right: auto;
+}
