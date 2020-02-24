@@ -3,13 +3,14 @@ import React, { memo, useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import Img from 'react-image';
 import styles from './ProfileBlock.module.scss';
 import SubmitButton from '../SubmitButton';
 import history from '../../history';
 import CloudQuestion from '../../assets/cloud-question.jpg';
 import {
   getUserDetails, postFollow, postUnfollow, getFollowers, getFollowing, uploadFile,
-  changeProfiler
+  changeProfiler,
 } from '../../helpers/api';
 import store from '../../store';
 import {
@@ -17,8 +18,7 @@ import {
 } from '../../actions/userActions';
 import { showNotification } from '../../actions/notificationsActions';
 import UsersPopup from '../UsersPopup/UsersPopup';
-import Spinner from "../Spinner";
-import Img from 'react-image';
+import Spinner from '../Spinner';
 
 const ProfileBlock = memo((props) => {
   const { dispatch, className, user } = props;
@@ -81,7 +81,7 @@ const ProfileBlock = memo((props) => {
     if (username) {
       setLoading(true);
       const res = await uploadFile('profiler', img, username);
-      await changeProfiler({url: res});
+      await changeProfiler({ url: res });
       dispatch(setProfilePicUrl(res));
       setLoading(false);
     }
