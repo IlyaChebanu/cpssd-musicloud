@@ -8,14 +8,17 @@ import SubmitButton from '../SubmitButton';
 import history from '../../history';
 import CloudQuestion from '../../assets/cloud-question.jpg';
 import {
-  getUserDetails, postFollow, postUnfollow, getFollowers, getFollowing,
+  getUserDetails, postFollow, postUnfollow, getFollowers, getFollowing, uploadFile,
+  changeProfiler
 } from '../../helpers/api';
 import store from '../../store';
 import {
-  setFollowers, setFollowStatus, showUsersPopup,
+  setFollowers, setFollowStatus, setProfilePicUrl, showUsersPopup,
 } from '../../actions/userActions';
 import { showNotification } from '../../actions/notificationsActions';
 import UsersPopup from '../UsersPopup/UsersPopup';
+import Spinner from "../Spinner";
+import Img from 'react-image';
 
 const ProfileBlock = memo((props) => {
   const { dispatch, className, user } = props;
@@ -23,6 +26,7 @@ const ProfileBlock = memo((props) => {
   const username = url.searchParams.get('username');
   const [gotUsers, setGotUsers] = useState([]);
   const [follower, setFollower] = useState(false);
+  const [loading, setLoading] = useState(false);
   const goToSettings = useCallback((e) => {
     e.preventDefault();
     history.push('/settings');
@@ -73,17 +77,41 @@ const ProfileBlock = memo((props) => {
     return false;
   }, [refreshProfile, username]);
 
+  const uploadProfilerToS3 = useCallback(async (img) => {
+    if (username) {
+      setLoading(true);
+      const res = await uploadFile('profiler', img, username);
+      await changeProfiler({url: res});
+      dispatch(setProfilePicUrl(res));
+      setLoading(false);
+    }
+  }, [dispatch, username]);
+
+  const handleCoverChange = useCallback(async () => {
+    const fileSelector = document.createElement('input');
+    fileSelector.setAttribute('type', 'file');
+    fileSelector.setAttribute('accept', 'image/*');
+    fileSelector.click();
+    fileSelector.onchange = function onChange() {
+      const img = fileSelector.files[0];
+      uploadProfilerToS3(img);
+    };
+  }, [uploadProfilerToS3]);
 
   return (
     <div className={`${styles.wrapper} ${className}`}>
       <div className={styles.topWrapper}>
-        <img
-          alt="Profiler"
-          className={styles.profilePicture}
-          src={
-          (user.profiler && user.profiler !== '') ? user.profiler : CloudQuestion
-}
-        />
+        <div className={styles.imgBlock}>
+          {loading ? <Spinner className={styles.spinner} /> : (
+            <Img
+              onClick={handleCoverChange}
+              className={styles.profilePicture}
+              alt="Profiler"
+              src={(user.profilePicUrl && user.profilePicUrl !== '') ? user.profilePicUrl : CloudQuestion}
+            />
+          )}
+          <p>Change profiler</p>
+        </div>
         <div className={styles.stats}>
           <div className={styles.stat}>
             <p className={styles.num} style={{ cursor: 'pointer' }} onClick={getMyFollowers}>

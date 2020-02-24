@@ -279,3 +279,11 @@ export const getSongInfo = (sid) => axios.get(
     headers: getAuth(),
   },
 );
+
+export const changeProfiler = (reqData) => axios.patch(
+  `${API_URL}/v1/users/profiler`,
+  reqData,
+  {
+    headers: getAuth(),
+  },
+);
