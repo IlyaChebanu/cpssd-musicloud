@@ -152,7 +152,8 @@ const Sample = memo((props) => {
       <div className={styles.fadeWrapper}>
         {sample.id === selectedSample && !!(sample.fade.fadeIn || sample.fade.fadeOut) && (
           <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" fill="rgba(0, 0, 0, 0.3)">
-            <path d={`M 0 100 L ${sample.fade.fadeIn * 100} 0 L ${(1 - sample.fade.fadeOut) * 100} 0 L 100 100`} />
+            <path d={`M 0 0 L ${sample.fade.fadeIn * 100} 0 L 0 100`} />
+            <path d={`M ${(1 - sample.fade.fadeOut) * 100} 0 L 100 0 L 100 100`} />
           </svg>
         )}
       </div>
