@@ -6,7 +6,6 @@
   flex-direction: column;
   transition: height 1s;
   margin-bottom: 30px;
-
   &:last-child {
     margin-bottom: 0;
   }
@@ -86,6 +85,9 @@
 
 .songInfo {
   flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   margin-left: 10px;
   display: flex;
   flex-direction: column;
@@ -95,6 +97,9 @@
 .title {
   margin: 0 10px 0 0;
   font-size: 18px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .description {
