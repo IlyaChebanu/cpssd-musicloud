@@ -173,7 +173,14 @@ export const patchSongDescription = (sid, description) => axios.patch(
 );
 
 export const getTimeline = () => axios.get(
-  `${API_URL}/v1/users/timeline`,
+  `${API_URL}/v1/users/timeline?items_per_page=100`,
+  {
+    headers: getAuth(),
+  },
+);
+
+export const getNextTimeline = (next) => axios.get(
+  `${API_URL}/v1/users/timeline?next_page=${next}`,
   {
     headers: getAuth(),
   },
@@ -204,14 +211,14 @@ export const createPost = (message) => axios.post(
 );
 
 export const getUserPosts = (username) => axios.get(
-  `${API_URL}/v1/users/posts?posts_per_page=10&username=${username}`,
+  `${API_URL}/v1/users/posts?posts_per_page=100&username=${username}`,
   {
     headers: getAuth(),
   },
 );
 
 export const getNextUserPosts = (next) => axios.get(
-  `${API_URL}/v1/users/posts?posts_per_page=10&next_page=${next}`,
+  `${API_URL}/v1/users/posts?posts_per_page=100&next_page=${next}`,
   {
     headers: getAuth(),
   },
