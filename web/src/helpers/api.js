@@ -204,12 +204,18 @@ export const createPost = (message) => axios.post(
 );
 
 export const getUserPosts = (username) => axios.get(
-  `${API_URL}/v1/users/posts?posts_per_page=100&username=${username}`,
+  `${API_URL}/v1/users/posts?posts_per_page=10&username=${username}`,
   {
     headers: getAuth(),
   },
 );
 
+export const getNextUserPosts = (next) => axios.get(
+  `${API_URL}/v1/users/posts?posts_per_page=10&next_page=${next}`,
+  {
+    headers: getAuth(),
+  },
+);
 
 export const setSongCompiledUrl = (reqData) => axios.patch(
   `${API_URL}/v1/audio/compiled_url`,
@@ -226,6 +232,12 @@ export const getCompiledSongs = (username) => axios.get(
   },
 );
 
+export const getNextCompiledSongs = (next) => axios.get(
+  `${API_URL}/v1/audio/compiled_songs?next_page=${next}`,
+  {
+    headers: getAuth(),
+  },
+);
 
 export const publishSong = (sid) => axios.post(
   `${API_URL}/v1/audio/publish`,

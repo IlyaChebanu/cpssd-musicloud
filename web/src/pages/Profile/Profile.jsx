@@ -1,5 +1,5 @@
 import React, {
-  memo, useEffect, useState, useMemo, useCallback,
+  memo, useEffect, useState, useCallback,
 } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -10,10 +10,11 @@ import ProfileBlock from '../../components/ProfileBlock';
 import AddPost from '../../components/AddPost';
 import { useUpdateUserDetails } from '../../helpers/hooks';
 import {
-  getCompiledSongs, getUserPosts,
+  getCompiledSongs, getUserPosts, getNextCompiledSongs, getNextUserPosts,
 } from '../../helpers/api';
 import Spinner from '../../components/Spinner';
 import SongCard from '../../components/SongCard';
+import InfiniteScroll from "react-infinite-scroll-component";
 
 
 const Profile = memo((props) => {
@@ -24,6 +25,8 @@ const Profile = memo((props) => {
 
   const [gotSongs, setGotSongs] = useState([]);
   const [gotPosts, setGotPosts] = useState([]);
+  const [gotNextSongs, setNextSongs] = useState("");
+  const [gotNextPosts, setNextPosts] = useState("");
 
   const [loadingSongs, setLoadingSongs] = useState(false);
   const [loadingPosts, setLoadingPosts] = useState(false);
@@ -35,10 +38,41 @@ const Profile = memo((props) => {
       setLoadingSongs(false);
       if (res.status === 200) {
         setGotSongs(res.data.songs);
+        if (res.data.next_page) {
+          setNextSongs(res.data.next_page)
+        }
       }
     };
     getSongs();
   }, [dispatch, username]);
+
+  const nextSongs = async() => {
+    setLoadingSongs(true);
+    const res = await getNextCompiledSongs(gotNextSongs);
+    setLoadingSongs(false);
+    if (res.status === 200) {
+      setGotSongs([...gotSongs, ...res.data.songs]);
+      if (res.data.next_page) {
+          setNextSongs(res.data.next_page)
+      } else {
+        setNextSongs("")
+      }
+    }
+  };
+
+  const nextPosts = async() => {
+    setLoadingPosts(true);
+    const res = await getNextUserPosts(gotNextPosts);
+    setLoadingPosts(false);
+    if (res.status === 200) {
+      setGotPosts([...gotPosts, ...res.data.posts]);
+      if (res.data.next_page) {
+          setNextPosts(res.data.next_page)
+      } else {
+        setNextPosts("")
+      }
+    }
+  };
 
   const refreshPosts = useCallback(async () => {
     setLoadingPosts(true);
@@ -46,36 +80,15 @@ const Profile = memo((props) => {
     setLoadingPosts(false);
     if (res.status === 200) {
       setGotPosts(res.data.posts);
+      if (res.data.next_page) {
+          setNextPosts(res.data.next_page)
+      }
     }
   }, [username]);
 
   useEffect(() => {
     refreshPosts();
   }, [refreshPosts]);
-
-  const ownSongCards = useMemo(() => gotSongs.map((song) => (
-    <SongCard
-      id={song.sid}
-      username={song.username}
-      title={song.title}
-      duration={song.duration}
-      url={song.url}
-      cover={song.cover}
-      likes={song.likes}
-      profileImg={user.profiler}
-    />
-  )), [gotSongs, user.profiler]);
-
-  const ownPostCards = useMemo(() => gotPosts.map((post) => (
-    <PostCard
-      className={styles.blogCard}
-      message={post[0]}
-      time={post[1]}
-      username={username}
-      profileImg={user.profiler}
-    />
-  )), [gotPosts, user.profiler, username]);
-
 
   return (
     <div className={styles.wrapper}>
@@ -86,9 +99,29 @@ const Profile = memo((props) => {
       </div>
       <div className={styles.contentWrapper}>
         <title className={styles.sectionTitle}>Songs</title>
-        <div className={styles.songs}>
-          {loadingSongs ? <Spinner /> : ownSongCards}
-        </div>
+          <InfiniteScroll
+            height={500}
+            dataLength={gotSongs.length}
+            next={nextSongs}
+            hasMore={gotNextSongs}
+            loader={loadingSongs ? <Spinner /> : null}
+          >
+            <div className={styles.songs}>
+            {gotSongs.map((song) => (
+              <SongCard
+                key={song.sid}
+                id={song.sid}
+                username={song.username}
+                title={song.title}
+                duration={song.duration}
+                url={song.url}
+                cover={song.cover}
+                likes={song.likes}
+                profileImg={user.profiler}
+              />
+            ))}
+            </div>
+          </InfiniteScroll>
       </div>
 
       {/* Blogs section */}
@@ -100,9 +133,26 @@ const Profile = memo((props) => {
             ? <AddPost onSubmit={refreshPosts} placeholder={`What do you want to say ${username}?`} />
             : <div />
         }
-        <div className={styles.blogs}>
-          {loadingPosts ? <Spinner /> : ownPostCards}
-        </div>
+        <InfiniteScroll
+            height={500}
+            dataLength={gotPosts.length}
+            next={nextPosts}
+            hasMore={gotNextPosts}
+            loader={loadingPosts ? <Spinner /> : null}
+          >
+            <div className={styles.blogs}>
+              {gotPosts.map((post) => (
+                <PostCard
+                  className={styles.blogCard}
+                  key={username + post[1]}
+                  message={post[0]}
+                  time={post[1]}
+                  username={username}
+                  profileImg={user.profiler}
+                />
+              ))}
+            </div>
+        </InfiniteScroll>
       </div>
     </div>
   );
