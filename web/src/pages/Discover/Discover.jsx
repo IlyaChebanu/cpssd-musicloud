@@ -1,4 +1,7 @@
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import React, {
+  useEffect, useState, useCallback, useMemo,
+} from 'react';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import styles from './Discover.module.scss';
 import Header from '../../components/Header';
 import MusicSearch from '../../components/MusicSearch';
@@ -6,13 +9,12 @@ import SongCard from '../../components/SongCard';
 import { useUpdateUserDetails } from '../../helpers/hooks';
 import { getCompiledSongs, getNextCompiledSongs } from '../../helpers/api';
 import Spinner from '../../components/Spinner/Spinner';
-import InfiniteScroll from "react-infinite-scroll-component";
 
 const Discover = () => {
   useUpdateUserDetails();
 
   const [songs, setSongs] = useState([]);
-  const [gotNextSongs, setNextSongs] = useState("");
+  const [gotNextSongs, setNextSongs] = useState('');
 
   useEffect(() => {
     (async () => {
@@ -20,20 +22,20 @@ const Discover = () => {
       if (res.status === 200) {
         setSongs(res.data.songs);
         if (res.data.next_page) {
-          setNextSongs(res.data.next_page)
+          setNextSongs(res.data.next_page);
         }
       }
     })();
   }, []);
 
-  const nextSongs = useCallback(async() => {
+  const nextSongs = useCallback(async () => {
     const res = await getNextCompiledSongs(gotNextSongs);
     if (res.status === 200) {
       setSongs([...songs, ...res.data.songs]);
       if (res.data.next_page) {
-          setNextSongs(res.data.next_page)
+        setNextSongs(res.data.next_page);
       } else {
-        setNextSongs("")
+        setNextSongs('');
       }
     }
   }, [songs, gotNextSongs]);
@@ -64,7 +66,7 @@ const Discover = () => {
           loader={<Spinner />}
         >
           <div className={styles.songs}>
-          {ownSongCards}
+            {ownSongCards}
           </div>
         </InfiniteScroll>
       </div>

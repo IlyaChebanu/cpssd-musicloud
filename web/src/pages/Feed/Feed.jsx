@@ -2,6 +2,7 @@ import React, {
   memo, useState, useEffect, useMemo, useCallback,
 } from 'react';
 import { connect } from 'react-redux';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import styles from './Feed.module.scss';
 import Header from '../../components/Header';
 import { useUpdateUserDetails } from '../../helpers/hooks';
@@ -10,33 +11,31 @@ import Spinner from '../../components/Spinner';
 import PostCard from '../../components/PostCard';
 import SongFeedCard from '../../components/SongFeedCard';
 import AddPost from '../../components/AddPost/AddPost';
-import InfiniteScroll from "react-infinite-scroll-component";
 
 function Feed() {
   useUpdateUserDetails();
 
   const [feedItems, setFeedItems] = useState([]);
-  const [gotNextFeedItems, setNextFeedItems] = useState("");
+  const [gotNextFeedItems, setNextFeedItems] = useState('');
 
   const refreshFeed = useCallback(async () => {
     const res = await getTimeline();
     if (res.status === 200) {
       setFeedItems(res.data.timeline);
-      console.log(res.data);
       if (res.data.next_page) {
-          setNextFeedItems(res.data.next_page)
+        setNextFeedItems(res.data.next_page);
       }
     }
   }, []);
 
-  const nextFeedItems = useCallback(async() => {
+  const nextFeedItems = useCallback(async () => {
     const res = await getNextTimeline(gotNextFeedItems);
     if (res.status === 200) {
       setFeedItems([...feedItems, ...res.data.timeline]);
       if (res.data.next_page) {
-          setNextFeedItems(res.data.next_page)
+        setNextFeedItems(res.data.next_page);
       } else {
-        setNextFeedItems("")
+        setNextFeedItems('');
       }
     }
   }, [feedItems, gotNextFeedItems]);

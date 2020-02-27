@@ -3,6 +3,7 @@ import React, {
 } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import styles from './Profile.module.scss';
 import Header from '../../components/Header';
 import PostCard from '../../components/PostCard/PostCard';
@@ -14,7 +15,6 @@ import {
 } from '../../helpers/api';
 import Spinner from '../../components/Spinner';
 import SongCard from '../../components/SongCard';
-import InfiniteScroll from "react-infinite-scroll-component";
 
 
 const Profile = memo((props) => {
@@ -25,8 +25,8 @@ const Profile = memo((props) => {
 
   const [gotSongs, setGotSongs] = useState([]);
   const [gotPosts, setGotPosts] = useState([]);
-  const [gotNextSongs, setNextSongs] = useState("");
-  const [gotNextPosts, setNextPosts] = useState("");
+  const [gotNextSongs, setNextSongs] = useState('');
+  const [gotNextPosts, setNextPosts] = useState('');
 
   useEffect(() => {
     const getSongs = async () => {
@@ -34,33 +34,33 @@ const Profile = memo((props) => {
       if (res.status === 200) {
         setGotSongs(res.data.songs);
         if (res.data.next_page) {
-          setNextSongs(res.data.next_page)
+          setNextSongs(res.data.next_page);
         }
       }
     };
     getSongs();
   }, [username]);
 
-  const nextSongs = useCallback(async() => {
+  const nextSongs = useCallback(async () => {
     const res = await getNextCompiledSongs(gotNextSongs);
     if (res.status === 200) {
       setGotSongs([...gotSongs, ...res.data.songs]);
       if (res.data.next_page) {
-          setNextSongs(res.data.next_page)
+        setNextSongs(res.data.next_page);
       } else {
-        setNextSongs("")
+        setNextSongs('');
       }
     }
   }, [gotNextSongs, gotSongs]);
 
-  const nextPosts = useCallback(async() => {
+  const nextPosts = useCallback(async () => {
     const res = await getNextUserPosts(gotNextPosts);
     if (res.status === 200) {
       setGotPosts([...gotPosts, ...res.data.posts]);
       if (res.data.next_page) {
-          setNextPosts(res.data.next_page)
+        setNextPosts(res.data.next_page);
       } else {
-        setNextPosts("")
+        setNextPosts('');
       }
     }
   }, [gotNextPosts, gotPosts]);
@@ -70,7 +70,7 @@ const Profile = memo((props) => {
     if (res.status === 200) {
       setGotPosts(res.data.posts);
       if (res.data.next_page) {
-          setNextPosts(res.data.next_page)
+        setNextPosts(res.data.next_page);
       }
     }
   }, [username]);
@@ -113,17 +113,17 @@ const Profile = memo((props) => {
       </div>
       <div className={styles.contentWrapper}>
         <title className={styles.sectionTitle}>Songs</title>
-          <InfiniteScroll
-            height={500}
-            dataLength={gotSongs.length}
-            next={nextSongs}
-            hasMore={gotNextSongs}
-            loader={<Spinner />}
-          >
-            <div className={styles.songs}>
+        <InfiniteScroll
+          height={500}
+          dataLength={gotSongs.length}
+          next={nextSongs}
+          hasMore={gotNextSongs}
+          loader={<Spinner />}
+        >
+          <div className={styles.songs}>
             {ownSongCards}
-            </div>
-          </InfiniteScroll>
+          </div>
+        </InfiniteScroll>
       </div>
 
       {/* Blogs section */}
@@ -136,15 +136,15 @@ const Profile = memo((props) => {
             : <div />
         }
         <InfiniteScroll
-            height={500}
-            dataLength={gotPosts.length}
-            next={nextPosts}
-            hasMore={gotNextPosts}
-            loader={<Spinner />}
-          >
-            <div className={styles.blogs}>
-              {ownPostCards}
-            </div>
+          height={500}
+          dataLength={gotPosts.length}
+          next={nextPosts}
+          hasMore={gotNextPosts}
+          loader={<Spinner />}
+        >
+          <div className={styles.blogs}>
+            {ownPostCards}
+          </div>
         </InfiniteScroll>
       </div>
     </div>
