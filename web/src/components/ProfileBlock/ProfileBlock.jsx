@@ -1,5 +1,4 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-/* eslint-disable no-nested-ternary */
 import React, { memo, useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
@@ -15,7 +14,7 @@ import {
 } from '../../helpers/api';
 import store from '../../store';
 import {
-  setFollowers, setFollowStatus, setProfilePicUrl, showUsersPopup,
+  setFollowers, setFollowStatus, setProfilePicUrl, setProfiler, showUsersPopup,
 } from '../../actions/userActions';
 import { showNotification } from '../../actions/notificationsActions';
 import UsersPopup from '../UsersPopup/UsersPopup';
@@ -85,6 +84,7 @@ const ProfileBlock = memo((props) => {
       const res = await uploadFile('profiler', img, username);
       await changeProfiler({ url: res });
       dispatch(setProfilePicUrl(res));
+      dispatch(setProfiler(res));
       setLoading(false);
     }
   }, [dispatch, username]);
@@ -105,22 +105,12 @@ const ProfileBlock = memo((props) => {
       <div className={styles.topWrapper}>
         <div className={styles.imgBlock}>
           {loading ? <Spinner className={styles.spinner} /> : (
-            username === user.username
-              ? (
-                <Img
-                  onClick={handleCoverChange}
-                  className={styles.profilePicture}
-                  alt="Profiler"
-                  src={(user.profiler && user.profiler !== '') ? user.profiler : CloudQuestion}
-                />
-              )
-              : (
-                <Img
-                  className={styles.profilePicture}
-                  alt="Profiler"
-                  src={(user.profiler && user.profiler !== '') ? user.profiler : CloudQuestion}
-                />
-              )
+            <Img
+              onClick={username === user.username ? handleCoverChange : () => {}}
+              className={username === user.username ? `${styles.profilePicture} ${styles.filter}` : styles.profilePicture}
+              alt="Profiler"
+              src={[user.profiler, CloudQuestion]}
+            />
           )}
           {username === user.username ? <EditIcon /> : null}
         </div>
@@ -166,7 +156,7 @@ const ProfileBlock = memo((props) => {
           className={
               username !== user.username && user.follow_status !== 1
                 ? styles.followButton
-                : styles.hid
+                : styles.hide
           }
           onSubmit={follow}
         >
