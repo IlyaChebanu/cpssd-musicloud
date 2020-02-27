@@ -12,17 +12,17 @@ def gen_song_object(song_list):
     Dict - The input data structured in a standard dict.
     """
     res = {
-            "sid": song_list[0],
-            "username": song_list[1],
-            "title": song_list[2],
-            "duration": song_list[3],
-            "created": song_list[4],
-            "public": song_list[5],
-            "url": song_list[6],
-            "cover": song_list[7],
-            "likes": song_list[8],
-            "like_status": song_list[9],
-            "description": song_list[10],
+        "sid": song_list[0],
+        "username": song_list[1],
+        "title": song_list[2],
+        "duration": song_list[3],
+        "created": song_list[4],
+        "public": song_list[5],
+        "url": song_list[6],
+        "cover": song_list[7],
+        "likes": song_list[8],
+        "like_status": song_list[9],
+        "description": song_list[10],
     }
     if len(song_list) == 12:
         res["profiler"] = song_list[11]
