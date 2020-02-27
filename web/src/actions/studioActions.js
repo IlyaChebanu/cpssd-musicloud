@@ -1,3 +1,5 @@
+import { genId } from '../helpers/utils';
+
 export const play = (dispatch) => {
   dispatch({
     type: 'STUDIO_PLAY',
@@ -250,44 +252,183 @@ export const setCompleteTrackState = (track, index) => (dispatch) => {
   });
 };
 
-export const addTrack = () => {};
-
-export const removeTrack = () => {};
-
-export const setTrackVolume = () => {};
-
-export const setTrackPan = () => {};
-
-export const setTrackMute = () => {};
-
-export const setTrackSolo = () => {};
-
-export const setTrackName = () => {};
-
-export const setSampleTrackIndex = () => {};
-
-export const setSampleStartTime = () => {};
-
-export const setSampleFadeIn = () => {};
-
-export const setSampleFadeOut = () => {};
-
-export const setSampleName = (name, id) => (dispatch) => {
+export const addTrack = (track = {
+  id: genId(),
+  mute: false,
+  solo: false,
+  volume: 0.75,
+  pan: 0,
+  name: 'New Track',
+}) => (dispatch) => {
   dispatch({
-    type: 'SET_SAMPLE_NAME',
-    name,
-    id,
+    type: 'ADD_TRACK',
+    track,
   });
 };
 
-export const setSampleType = () => {};
+export const removeTrack = (trackId) => (dispatch) => {
+  dispatch({
+    type: 'REMOVE_TRACK',
+    trackId,
+  });
+};
 
-export const addPatternNote = () => {};
+export const setTrackVolume = (trackId, value) => (dispatch) => {
+  dispatch({
+    type: 'SET_TRACK_VOLUME',
+    trackId,
+    value: Math.min(1, Math.max(0, value)),
+  });
+};
 
-export const removePatternNote = () => {};
+export const setTrackPan = (trackId, value) => (dispatch) => {
+  dispatch({
+    type: 'SET_TRACK_PAN',
+    trackId,
+    value,
+  });
+};
 
-export const setPatternNoteNumber = () => {};
+export const setTrackMute = (trackId, value) => (dispatch) => {
+  dispatch({
+    type: 'SET_TRACK_MUTE',
+    trackId,
+    value,
+  });
+};
 
-export const setPatternNoteVelocity = () => {};
+export const setTrackSolo = (trackId, value) => (dispatch) => {
+  dispatch({
+    type: 'SET_TRACK_SOLO',
+    trackId,
+    value,
+  });
+};
 
-export const setPatternNoteDuration = () => {};
+export const setTrackName = (trackId, value) => (dispatch) => {
+  dispatch({
+    type: 'SET_TRACK_NAME',
+    trackId,
+    value,
+  });
+};
+
+export const addSample = (trackId, sample) => (dispatch) => {
+  dispatch({
+    type: 'ADD_SAMPLE',
+    trackId,
+    sampleId: genId(),
+    sample,
+  });
+};
+
+export const removeSample = (sampleId) => (dispatch) => {
+  dispatch({
+    type: 'REMOVE_SAMPLE',
+    sampleId,
+  });
+};
+
+export const setSampleBufferLoading = (sampleId, value) => (dispatch) => {
+  dispatch({
+    type: 'SET_SAMPLE_BUFFER_LOADING',
+    sampleId,
+    value,
+  });
+};
+
+export const setSampleTrackId = (sampleId, value) => (dispatch) => {
+  dispatch({
+    type: 'SET_SAMPLE_TRACK_ID',
+    sampleId,
+    value,
+  });
+};
+
+export const setSampleStartTime = (sampleId, value) => (dispatch) => {
+  dispatch({
+    type: 'SET_SAMPLE_START_TIME',
+    sampleId,
+    value: Math.max(0, value),
+  });
+};
+
+export const setSampleFadeIn = (sampleId, value) => (dispatch) => {
+  dispatch({
+    type: 'SET_SAMPLE_FADE_IN',
+    sampleId,
+    value: Math.min(1, Math.max(0, value)),
+  });
+};
+
+export const setSampleFadeOut = (sampleId, value) => (dispatch) => {
+  dispatch({
+    type: 'SET_SAMPLE_FADE_OUT',
+    sampleId,
+    value: Math.min(1, Math.max(0, value)),
+  });
+};
+
+export const setSampleName = (sampleId, value) => (dispatch) => {
+  dispatch({
+    type: 'SET_SAMPLE_NAME',
+    sampleId,
+    value,
+  });
+};
+
+export const setSampleType = (sampleId, value) => (dispatch) => {
+  dispatch({
+    type: 'SET_SAMPLE_TYPE',
+    sampleId,
+    value,
+  });
+};
+
+export const setSampleDuration = (sampleId, value) => (dispatch) => {
+  dispatch({
+    type: 'SET_SAMPLE_DURATION',
+    sampleId,
+    value: Math.max(0, value),
+  });
+};
+
+export const addPatternNote = (sampleId, value) => (dispatch) => {
+  dispatch({
+    type: 'ADD_PATTERN_NOTE',
+    sampleId,
+    noteId: genId(),
+    value,
+  });
+};
+
+export const removePatternNote = (noteId) => (dispatch) => {
+  dispatch({
+    type: 'REMOVE_PATTERN_NOTE',
+    noteId,
+  });
+};
+
+export const setPatternNoteNumber = (noteId, value) => (dispatch) => {
+  dispatch({
+    type: 'SET_PATTERN_NOTE_NUMBER',
+    noteId,
+    value: Math.min(88, Math.max(0, value)),
+  });
+};
+
+export const setPatternNoteVelocity = (noteId, value) => (dispatch) => {
+  dispatch({
+    type: 'SET_PATTERN_NOTE_VELOCITY',
+    noteId,
+    value: Math.min(127, Math.max(0, value)),
+  });
+};
+
+export const setPatternNoteDuration = (noteId, value) => (dispatch) => {
+  dispatch({
+    type: 'SET_PATTERN_NOTE_DURATION',
+    noteId,
+    value: Math.max(0, value),
+  });
+};
