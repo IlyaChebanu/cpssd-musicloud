@@ -186,7 +186,9 @@ def get_all_compiled_songs(start_index, songs_per_page, uid):
         "SELECT COUNT(*) FROM Song_Likes WHERE Songs.sid = Song_Likes.sid"
         ") as likes, (SELECT COUNT(*) FROM Song_Likes WHERE "
         "Song_Likes.sid=Songs.sid "
-        "AND Song_Likes.uid=%s), description FROM Songs WHERE public=1 "
+        "AND Song_Likes.uid=%s), description,"
+        "(SELECT profiler FROM Users WHERE Songs.uid=Users.uid) as profiler"
+        " FROM Songs WHERE public=1 "
         "LIMIT %s, %s;"
     )
     args = (
@@ -216,7 +218,9 @@ def get_all_compiled_songs_by_uid(uid, start_index, songs_per_page, my_uid):
         "SELECT COUNT(*) FROM Song_Likes WHERE Songs.sid = Song_Likes.sid"
         ") as likes, (SELECT COUNT(*) FROM Song_Likes WHERE "
         "Song_Likes.sid=Songs.sid "
-        "AND Song_Likes.uid=%s), description FROM Songs WHERE public=1 AND "
+        "AND Song_Likes.uid=%s), description,"
+        "(SELECT profiler FROM Users WHERE Songs.uid=Users.uid) as profiler"
+        " FROM Songs WHERE public=1 AND "
         "uid=%s LIMIT %s, %s;"
     )
     args = (

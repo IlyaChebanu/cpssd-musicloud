@@ -28,6 +28,7 @@ const Discover = () => {
             url={song.url}
             cover={song.cover}
             likes={song.likes}
+            profileImg={song.profiler}
           />
         )));
       }
