@@ -368,7 +368,7 @@ export default (store) => {
                   store.dispatch(setSampleLoading(false));
                 }
                 sample.buffer = bufferStore[sample.url];
-                sample.duration = sample.buffer.duration;
+                sample.duration = parseFloat(sample.buffer.duration.toFixed(16));
               }));
             }
           }));
@@ -401,7 +401,7 @@ export default (store) => {
             store.dispatch(setSampleLoading(false));
           }
           sample.buffer = bufferStore[sample.url];
-          sample.duration = sample.buffer.duration;
+          sample.duration = parseFloat(sample.buffer.duration.toFixed(16));
         }));
         // action.track.samples[action.track.samples.length - 1].type = 'pattern';
         // action.track.samples[action.track.samples.length - 1].notes = [

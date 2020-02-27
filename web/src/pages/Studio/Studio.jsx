@@ -50,7 +50,9 @@ import PianoRoll from '../../components/PianoRoll/PianoRoll';
 import FileExplorer from '../../components/FileExplorer/FileExplorer';
 
 const Studio = memo((props) => {
-  const { dispatch, tracks, studio } = props;
+  const {
+    dispatch, tracks, studio, songPickerHidden,
+  } = props;
 
   const [tracksLoading, setTracksLoading] = useState(false);
 
@@ -172,46 +174,51 @@ const Studio = memo((props) => {
   return (
     <div className={styles.wrapper}>
       <Header selected={0}>
+
         <Button className={styles.saveButton} onClick={handleSaveState}>
           Save
         </Button>
       </Header>
-      <div className={styles.contentWrapper}>
-        <SampleControls />
-        <SeekBar />
+      <div style={{ pointerEvents: songPickerHidden ? 'auto' : 'none' }}>
+        <div className={styles.contentWrapper}>
+          <SampleControls />
+          <SeekBar />
 
-        <Timeline />
+          <Timeline />
 
-        <div className={styles.scrollable}>
-          <div className={styles.content}>
-            <div className={styles.trackControls}>
-              {trackControls}
-              <div
-                className={`${styles.newTrack} ${
-                  tracks.length % 2 !== 1 ? styles.even : ''
-                }`}
-                onClick={handleAddNewTrack}
-                role="button"
-                tabIndex={0}
-              >
+          <div className={styles.scrollable}>
+            <div className={styles.content}>
+              <div className={styles.trackControls}>
+                {trackControls}
+                <div
+                  className={`${styles.newTrack} ${
+                    tracks.length % 2 !== 1 ? styles.even : ''
+                  }`}
+                  onClick={handleAddNewTrack}
+                  role="button"
+                  tabIndex={0}
+                >
                 Add new track
+                </div>
               </div>
-            </div>
-            <div
-              className={styles.tracks}
-              onScroll={handleScroll}
-              ref={tracksRef}
-            >
-              {tracksLoading ? <Spinner /> : renderableTracks}
+              <div
+                className={styles.tracks}
+                onScroll={handleScroll}
+                ref={tracksRef}
+              >
+                {tracksLoading ? <Spinner /> : renderableTracks}
+              </div>
             </div>
           </div>
         </div>
+        <PianoRoll />
+        <PlayBackControls style={{ 'pointer-events': 'none' }} />
+        <FileExplorer />
+        <PublishForm />
       </div>
-      <PianoRoll />
-      <PlayBackControls style={{ 'pointer-events': 'none' }} />
       <SongPicker songs={[]} />
-      <FileExplorer />
-      <PublishForm />
+
+
     </div>
   );
 });
@@ -220,10 +227,15 @@ Studio.propTypes = {
   dispatch: PropTypes.func.isRequired,
   tracks: PropTypes.arrayOf(PropTypes.object).isRequired,
   studio: PropTypes.object.isRequired,
+  songPickerHidden: PropTypes.bool.isRequired,
 };
 
 Studio.displayName = 'Studio';
 
-const mapStateToProps = ({ studio }) => ({ studio, tracks: studio.tracks });
+const mapStateToProps = ({ studio }) => ({
+  studio,
+  tracks: studio.tracks,
+  songPickerHidden: studio.songPickerHidden,
+});
 
 export default connect(mapStateToProps)(Studio);
