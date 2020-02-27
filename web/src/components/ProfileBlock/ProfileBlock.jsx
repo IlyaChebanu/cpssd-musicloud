@@ -105,12 +105,12 @@ const ProfileBlock = memo((props) => {
       <div className={styles.topWrapper}>
         <div className={styles.imgBlock}>
           {loading ? <Spinner className={styles.spinner} /> : (
-              <Img
-                onClick={username === user.username ? handleCoverChange : () => {}}
-                className={username === user.username ? `${styles.profilePicture} ${styles.filter}` : styles.profilePicture}
-                alt="Profiler"
-                src={[user.profiler, CloudQuestion]}
-              />
+            <Img
+              onClick={username === user.username ? handleCoverChange : () => {}}
+              className={username === user.username ? `${styles.profilePicture} ${styles.filter}` : styles.profilePicture}
+              alt="Profiler"
+              src={[user.profiler, CloudQuestion]}
+            />
           )}
           {username === user.username ? <EditIcon /> : null}
         </div>
