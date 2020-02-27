@@ -1,4 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
+/* eslint-disable no-nested-ternary */
 import React, { memo, useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
@@ -104,14 +105,24 @@ const ProfileBlock = memo((props) => {
       <div className={styles.topWrapper}>
         <div className={styles.imgBlock}>
           {loading ? <Spinner className={styles.spinner} /> : (
-            <Img
-              onClick={handleCoverChange}
-              className={styles.profilePicture}
-              alt="Profiler"
-              src={(user.profilePicUrl && user.profilePicUrl !== '') ? user.profilePicUrl : CloudQuestion}
-            />
+            username === user.username
+              ? (
+                <Img
+                  onClick={handleCoverChange}
+                  className={styles.profilePicture}
+                  alt="Profiler"
+                  src={(user.profiler && user.profiler !== '') ? user.profiler : CloudQuestion}
+                />
+              )
+              : (
+                <Img
+                  className={styles.profilePicture}
+                  alt="Profiler"
+                  src={(user.profiler && user.profiler !== '') ? user.profiler : CloudQuestion}
+                />
+              )
           )}
-          <EditIcon />
+          {username === user.username ? <EditIcon /> : null}
         </div>
         <div className={styles.stats}>
           <div className={styles.stat}>
