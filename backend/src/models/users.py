@@ -701,6 +701,7 @@ def get_timeline_length(uid):
         uid,
         uid,
         uid,
+        uid,
     )
     res = query(sql, args, True)
     if not res:
