@@ -36,7 +36,7 @@ axios.interceptors.response.use((res) => res, (err) => {
   return res;
 });
 
-const API_URL = 'https://dcumusicloud.com:5000/api';
+const API_URL = 'http://localhost:5000/api';
 
 const getAuth = () => ({
   Authorization: `Bearer ${store.getState().user.token}`,

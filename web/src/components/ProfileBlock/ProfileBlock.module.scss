@@ -97,9 +97,6 @@
         pointer-events: none;
         opacity: 1;
       }
-      .profilePicture {
-        filter: grayscale(30%);
-      }
     }
 }
 
@@ -108,4 +105,10 @@
   width: 300px;
   margin-left: auto;
   margin-right: auto;
+}
+
+.filter {
+  .profilePicture {
+        filter: grayscale(30%);
+      }
 }
