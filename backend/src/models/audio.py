@@ -252,7 +252,10 @@ def get_all_editable_songs_by_uid(uid, start_index, songs_per_page):
         "(SELECT COUNT(*) FROM Song_Likes WHERE "
         "Songs.sid = Song_Likes.sid ) as likes, "
         "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid "
-        "AND Song_Likes.uid=%s) AS like_status, description FROM Songs "
+        "AND Song_Likes.uid=%s) AS like_status, description, "
+        "(SELECT time_updated FROM Song_State WHERE sid=Songs.sid ORDER BY "
+        "time_updated DESC LIMIT 0, 1) as updated"
+        " FROM Songs "
         "WHERE uid = %s UNION SELECT "
         "Songs.sid, (SELECT username FROM Users "
         "WHERE Songs.uid=Users.uid) as usernanme,"
@@ -260,9 +263,12 @@ def get_all_editable_songs_by_uid(uid, start_index, songs_per_page):
         "(SELECT COUNT(*) FROM Song_Likes WHERE "
         "Songs.sid = Song_Likes.sid) as likes, "
         "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid "
-        "AND Song_Likes.uid=%s) AS like_status, description FROM Songs "
+        "AND Song_Likes.uid=%s) AS like_status, description, "
+        "(SELECT time_updated FROM Song_State WHERE sid=Songs.sid ORDER BY "
+        "time_updated DESC LIMIT 0, 1) as updated"
+        " FROM Songs "
         "INNER JOIN Song_Editors ON Song_Editors.sid = Songs.sid WHERE "
-        "Song_Editors.uid = %s ORDER BY created DESC LIMIT %s, %s;"
+        "Song_Editors.uid = %s ORDER BY updated DESC LIMIT %s, %s;"
     )
     args = (
         uid,
