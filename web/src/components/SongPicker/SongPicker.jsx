@@ -3,15 +3,17 @@ import React, {
 } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import styles from './SongPicker.module.scss';
 import OwnSongCard from '../OwnSongCard';
 import NewSong from '../NewSong/NewSong';
 import {
   setTracks, hideSongPicker, setTempo, setSongName, setSongDescription, setSongImageUrl,
 } from '../../actions/studioActions';
-import {getEditableSongs, createNewSong, getSongState, getNextEditableSongs} from '../../helpers/api';
+import {
+  getEditableSongs, createNewSong, getSongState, getNextEditableSongs,
+} from '../../helpers/api';
 import Spinner from '../Spinner/Spinner';
-import InfiniteScroll from "react-infinite-scroll-component";
 
 const SongPicker = memo((props) => {
   const { dispatch, songPickerHidden } = props;
@@ -87,17 +89,17 @@ const SongPicker = memo((props) => {
 
   return (
     <div
-        style={{ visibility: songPickerHidden || songId ? 'hidden' : 'visible' }}
-        className={styles.wrapper}
-        id={'picker'}
+      style={{ visibility: songPickerHidden || songId ? 'hidden' : 'visible' }}
+      className={styles.wrapper}
+      id="picker"
     >
       <InfiniteScroll
-          dataLength={gotSongs.length}
-          next={nextSongs}
-          hasMore={gotNextSongs}
-          loader={<Spinner />}
-          scrollableTarget={'picker'}
-          className={styles.noScrollBar}
+        dataLength={gotSongs.length}
+        next={nextSongs}
+        hasMore={gotNextSongs}
+        loader={<Spinner />}
+        scrollableTarget="picker"
+        className={styles.noScrollBar}
       >
         <div className={styles.songs}>
           <NewSong
