@@ -48,7 +48,7 @@ const Discover = () => {
       title={song.title}
       duration={song.duration}
       url={song.url}
-      cover={song.cover}
+      coverImage={song.cover}
       likes={song.likes}
       profileImg={song.profiler}
     />

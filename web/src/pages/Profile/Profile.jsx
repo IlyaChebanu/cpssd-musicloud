@@ -89,7 +89,7 @@ const Profile = memo((props) => {
       title={song.title}
       duration={song.duration}
       url={song.url}
-      cover={song.cover}
+      coverImage={song.cover}
       likes={song.likes}
       profileImg={user.profiler}
     />
