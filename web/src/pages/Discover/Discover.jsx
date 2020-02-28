@@ -50,6 +50,7 @@ const Discover = () => {
       url={song.url}
       cover={song.cover}
       likes={song.likes}
+      profileImg={song.profiler}
     />
   )), [songs]);
 
@@ -59,7 +60,6 @@ const Discover = () => {
       <div className={styles.contentWrapper}>
         <MusicSearch className={styles.musicSearch} />
         <InfiniteScroll
-          height={500}
           dataLength={songs.length}
           next={nextSongs}
           hasMore={gotNextSongs}

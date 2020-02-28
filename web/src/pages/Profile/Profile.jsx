@@ -114,7 +114,7 @@ const Profile = memo((props) => {
       <div className={styles.contentWrapper}>
         <title className={styles.sectionTitle}>Songs</title>
         <InfiniteScroll
-          height={500}
+          height={600}
           dataLength={gotSongs.length}
           next={nextSongs}
           hasMore={gotNextSongs}
@@ -136,7 +136,6 @@ const Profile = memo((props) => {
             : <div />
         }
         <InfiniteScroll
-          height={500}
           dataLength={gotPosts.length}
           next={nextPosts}
           hasMore={gotNextPosts}
