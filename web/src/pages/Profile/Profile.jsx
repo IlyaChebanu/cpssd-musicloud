@@ -42,7 +42,7 @@ const Profile = memo((props) => {
   }, [username]);
 
   const nextSongs = useCallback(async () => {
-    if (gotNextSongs){
+    if (gotNextSongs) {
       const res = await getNextCompiledSongs(gotNextSongs);
       if (res.status === 200) {
         setGotSongs([...gotSongs, ...res.data.songs]);
@@ -119,8 +119,8 @@ const Profile = memo((props) => {
           {ownSongCards}
         </div>
         <p
-            className={styles.seeMore}
-            onClick={gotNextSongs ? nextSongs : () => {}}
+          className={styles.seeMore}
+          onClick={gotNextSongs ? nextSongs : () => {}}
         >
           See more
         </p>
