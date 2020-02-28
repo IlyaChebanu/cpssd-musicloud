@@ -135,7 +135,14 @@ export const patchUserDetails = (reqData) => axios.patch(
 );
 
 export const getEditableSongs = () => axios.get(
-  `${API_URL}/v1/audio/editable_songs?songs_per_page=10000`,
+  `${API_URL}/v1/audio/editable_songs?songs_per_page=6`,
+  {
+    headers: getAuth(),
+  },
+);
+
+export const getNextEditableSongs = (next) => axios.get(
+  `${API_URL}/v1/audio/editable_songs?songs_per_page=6&next_page=${next}`,
   {
     headers: getAuth(),
   },

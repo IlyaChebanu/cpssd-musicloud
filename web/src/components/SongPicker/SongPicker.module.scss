@@ -27,3 +27,7 @@
         justify-items: center;
       }
   }
+
+.noScrollBar {
+    overflow-y: hidden !important;
+}
