@@ -29,6 +29,11 @@ const Profile = memo((props) => {
   const [gotNextPosts, setNextPosts] = useState('');
 
   useEffect(() => {
+    setNextSongs('');
+    setNextPosts('');
+  }, [setNextSongs, setNextPosts, username]);
+
+  useEffect(() => {
     const getSongs = async () => {
       const res = await getCompiledSongs(username);
       if (res.status === 200) {
@@ -119,7 +124,7 @@ const Profile = memo((props) => {
           {ownSongCards}
         </div>
         <p
-          className={styles.seeMore}
+          className={gotNextSongs ? styles.seeMore : styles.hide}
           onClick={gotNextSongs ? nextSongs : () => {}}
         >
           See more
