@@ -14,6 +14,7 @@ import styles from './PianoRoll.module.scss';
 import { ReactComponent as CloseIcon } from '../../assets/icons/x-icon-10px.svg';
 import { setShowPianoRoll, setTrackAtIndex, setSampleName } from '../../actions/studioActions';
 import PianoNote from '../PianoNote/PianoNote';
+import SeekBar from "../SeekBar";
 
 const pianoKeys = [];
 const pianoTracks = [];
@@ -151,6 +152,7 @@ const PianoRoll = memo(({
                 <CloseIcon onClick={handleClose} />
               </div>
               <div className={styles.lower}>
+                <SeekBar/>
                 <div className={styles.timelineWrapper} style={wrapperStyle}>
                   <svg className={styles.ticks} style={widthStyle}>
                     <rect
