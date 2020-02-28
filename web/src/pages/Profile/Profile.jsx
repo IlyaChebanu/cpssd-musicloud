@@ -42,13 +42,15 @@ const Profile = memo((props) => {
   }, [username]);
 
   const nextSongs = useCallback(async () => {
-    const res = await getNextCompiledSongs(gotNextSongs);
-    if (res.status === 200) {
-      setGotSongs([...gotSongs, ...res.data.songs]);
-      if (res.data.next_page) {
-        setNextSongs(res.data.next_page);
-      } else {
-        setNextSongs('');
+    if (gotNextSongs){
+      const res = await getNextCompiledSongs(gotNextSongs);
+      if (res.status === 200) {
+        setGotSongs([...gotSongs, ...res.data.songs]);
+        if (res.data.next_page) {
+          setNextSongs(res.data.next_page);
+        } else {
+          setNextSongs('');
+        }
       }
     }
   }, [gotNextSongs, gotSongs]);
@@ -113,17 +115,15 @@ const Profile = memo((props) => {
       </div>
       <div className={styles.contentWrapper}>
         <title className={styles.sectionTitle}>Songs</title>
-        <InfiniteScroll
-          height={600}
-          dataLength={gotSongs.length}
-          next={nextSongs}
-          hasMore={gotNextSongs}
-          loader={<Spinner />}
+        <div className={styles.songs}>
+          {ownSongCards}
+        </div>
+        <p
+            className={styles.seeMore}
+            onClick={gotNextSongs ? nextSongs : () => {}}
         >
-          <div className={styles.songs}>
-            {ownSongCards}
-          </div>
-        </InfiniteScroll>
+          See more
+        </p>
       </div>
 
       {/* Blogs section */}

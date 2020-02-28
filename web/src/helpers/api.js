@@ -233,14 +233,14 @@ export const setSongCompiledUrl = (reqData) => axios.patch(
 );
 
 export const getCompiledSongs = (username) => axios.get(
-  `${API_URL}/v1/audio/compiled_songs?songs_per_page=6&${username ? `username=${username}` : ''}`,
+  `${API_URL}/v1/audio/compiled_songs?songs_per_page=8&${username ? `username=${username}` : ''}`,
   {
     headers: getAuth(),
   },
 );
 
 export const getNextCompiledSongs = (next) => axios.get(
-  `${API_URL}/v1/audio/compiled_songs?songs_per_page=6&next_page=${next}`,
+  `${API_URL}/v1/audio/compiled_songs?songs_per_page=8&next_page=${next}`,
   {
     headers: getAuth(),
   },
