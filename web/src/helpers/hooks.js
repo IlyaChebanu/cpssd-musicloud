@@ -1,4 +1,5 @@
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useMouseEvents, useGlobalEvent } from 'beautiful-react-hooks';
 import store from '../store';
 import { getUserDetails } from './api';
 import {
@@ -6,7 +7,6 @@ import {
   setProfiler,
 } from '../actions/userActions';
 import { showNotification } from '../actions/notificationsActions';
-
 
 // eslint-disable-next-line import/prefer-default-export
 export const useUpdateUserDetails = () => {
@@ -53,4 +53,44 @@ export const useUpdateUserDetails = () => {
       }
     }
   }, [user.token, user.username, username]);
+};
+
+export const useGlobalDrag = (ref) => {
+  const startHandler = useRef();
+  const posHandler = useRef();
+  const [startCoords, setStartCoords] = useState({});
+  const [dragging, setDragging] = useState(false);
+  const [offset, setOffset] = useState({});
+  const { onMouseDown } = useMouseEvents(ref);
+  const onMouseMove = useGlobalEvent('mousemove');
+  const onMouseUp = useGlobalEvent('mouseup');
+
+  onMouseDown((e) => {
+    e.preventDefault();
+    const bb = e.target.getBoundingClientRect();
+    setDragging(true);
+    setStartCoords({ oldX: bb.x, oldY: bb.y });
+    setOffset({ x: e.clientX - bb.x, y: e.clientY - bb.y });
+    if (startHandler.current) startHandler.current();
+  });
+
+  onMouseMove((e) => {
+    if (!dragging) return;
+    e.preventDefault();
+    const newPos = { x: e.clientX - offset.x, y: e.clientY - offset.y };
+    if (posHandler.current) posHandler.current({ ...startCoords, ...newPos });
+  });
+
+  onMouseUp(() => {
+    setDragging(false);
+  });
+
+  return {
+    onDragStart: (cb) => {
+      startHandler.current = cb;
+    },
+    onDragging: (cb) => {
+      posHandler.current = cb;
+    },
+  };
 };

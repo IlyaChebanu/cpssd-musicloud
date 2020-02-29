@@ -76,7 +76,7 @@ export default (
         ...state,
         tempo: action.tempo,
       };
-    case 'SET_COMPLETE_TRACK_STATE':
+    case 'SET_COMPLETE_TRACKS_STATE':
       return {
         ...state,
         tracks: action.tracks,

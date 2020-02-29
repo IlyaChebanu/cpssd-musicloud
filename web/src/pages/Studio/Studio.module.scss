@@ -79,8 +79,7 @@
   width: calc(100vw - 220px);
   overflow-x: scroll;
   overflow-y: hidden;
-  // height: fit-content;
-  // overflow-y: scroll;
+  position: relative;
 }
 
 .track:last-child {

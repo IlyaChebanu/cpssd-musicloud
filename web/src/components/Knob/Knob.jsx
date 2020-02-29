@@ -31,8 +31,8 @@ const Knob = memo(({
   });
 
   onMouseMove((e) => {
-    e.preventDefault();
     if (moving) {
+      e.preventDefault();
       const newVal = clamp(
         min,
         max,

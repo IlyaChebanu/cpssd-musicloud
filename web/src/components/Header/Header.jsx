@@ -75,9 +75,13 @@ const Header = memo((props) => {
       );
       return;
     }
+    if (!studio.selectedTrack) {
+      dispatch(
+        showNotification({ message: 'Please select a track first', type: 'info' }),
+      );
+      return;
+    }
     const fileSelector = document.createElement('input');
-    // let sampleState = {};
-    // const track = { ...studio.tracks[studio.selectedTrack] };
     fileSelector.setAttribute('type', 'file');
     fileSelector.setAttribute('accept', 'audio/*');
     fileSelector.click();
@@ -94,12 +98,8 @@ const Header = memo((props) => {
           fadeOut: 0,
         },
       };
-      // track.samples.push(sampleState);
       dispatch(addSample(studio.selectedTrack, sampleState));
     };
-    // dispatch(setSampleTime(sampleState.time, sampleState.id));
-    dispatch(setSampleLoading(true));
-    // dispatch(setTracks(studio.tracks));
   }, [dispatch, studio]);
 
   const exportAction = useCallback(async () => {

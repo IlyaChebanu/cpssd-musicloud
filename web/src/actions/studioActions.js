@@ -356,7 +356,7 @@ export const setSampleStartTime = (sampleId, value) => (dispatch) => {
   dispatch({
     type: 'SET_SAMPLE_START_TIME',
     sampleId,
-    value: Math.max(0, value),
+    value: Math.max(1, value),
   });
 };
 
