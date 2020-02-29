@@ -66,7 +66,6 @@ export const useGlobalDrag = (ref) => {
   const onMouseUp = useGlobalEvent('mouseup');
 
   onMouseDown((e) => {
-    e.preventDefault();
     const bb = e.target.getBoundingClientRect();
     setDragging(true);
     setStartCoords({ oldX: bb.x, oldY: bb.y });

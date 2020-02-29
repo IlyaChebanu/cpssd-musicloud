@@ -6,6 +6,7 @@ import styles from './TrackControls.module.scss';
 import {
   // setTrackAtIndex,
   setSelectedTrack,
+  setSelectedSample,
   setTrackName,
   setTrackVolume,
   setTrackPan,
@@ -51,6 +52,7 @@ const TrackControls = memo((props) => {
 
   const handleSetSelected = useCallback(() => {
     dispatch(setSelectedTrack(track.id));
+    dispatch(setSelectedSample(''));
   }, [dispatch, track.id]);
 
 

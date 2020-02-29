@@ -92,7 +92,6 @@ const Header = memo((props) => {
         url,
         name: sampleFile.name,
         time: studio.currentBeat,
-        track: studio.selectedTrack,
         fade: {
           fadeIn: 0,
           fadeOut: 0,

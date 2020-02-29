@@ -9,6 +9,7 @@ import { genId } from '../../helpers/utils';
 // import Sample from '../Sample/Sample';
 import {
   setSelectedTrack,
+  setSelectedSample,
   // setTrackAtIndex,
 } from '../../actions/studioActions';
 
@@ -57,6 +58,7 @@ const Track = memo((props) => {
 
   const handleSetSelected = useCallback(() => {
     dispatch(setSelectedTrack(track.id));
+    dispatch(setSelectedSample(''));
   }, [dispatch, track.id]);
 
   const pasteSample = useCallback(() => {

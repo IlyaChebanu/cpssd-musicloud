@@ -16,6 +16,7 @@ import {
   setSampleTime,
   // setTrackAtIndex,
   setSelectedSample,
+  removeSample,
   setClipboard,
   hideSampleEffects,
   showSampleEffects,
@@ -23,6 +24,8 @@ import {
   setSampleBufferLoading,
   setSampleStartTime,
   setSampleTrackId,
+  setSampleBuffer,
+  setSelectedTrack,
 } from '../../actions/studioActions';
 
 import editIcon from '../../assets/icons/edit-sample.svg';
@@ -41,7 +44,7 @@ const Sample = memo((props) => {
     gridSize,
     tracks,
     sampleEffectsHidden,
-    // showPianoRoll,
+    showPianoRoll,
   } = props;
 
   const ref = useRef();
@@ -49,7 +52,9 @@ const Sample = memo((props) => {
   const { onDragStart, onDragging } = useGlobalDrag(ref);
 
   onDragStart(() => {
-    setDragStartData({ ...data, trackIndex: _.findIndex(tracks, (o) => o.id === data.track) });
+    setDragStartData({ ...data, trackIndex: _.findIndex(tracks, (o) => o.id === data.trackId) });
+    dispatch(setSelectedSample(id));
+    dispatch(setSelectedTrack(data.trackId));
   });
 
   onDragging(({
@@ -81,11 +86,13 @@ const Sample = memo((props) => {
       axios
         .get(data.url, { responseType: 'arraybuffer' })
         .then((res) => {
-          audioContext.decodeAudioData(res.data).then((buf) => {
-            bufferStore[data.url] = buf;
-            setBuffer(buf);
-            dispatch(setSampleBufferLoading(id, false));
-          });
+          audioContext
+            .decodeAudioData(res.data)
+            .then((buf) => {
+              bufferStore[data.url] = buf;
+              setBuffer(buf);
+              dispatch(setSampleBufferLoading(id, false));
+            });
         });
     }
   }, [buffer, data, data.url, dispatch, id]);
@@ -125,7 +132,7 @@ const Sample = memo((props) => {
 
   const wrapperStyle = useMemo(() => {
     const colourIdx = trackIndex % dColours.length;
-    const selected = sample.id === selectedSample;
+    const selected = id === selectedSample;
     const ppq = 1; // TODO: Unhardcode
     let width;
     if (sample.type === 'pattern') {
@@ -142,42 +149,15 @@ const Sample = memo((props) => {
       backgroundColor: selected ? colours[colourIdx] : dColours[colourIdx],
       zIndex: selected ? 2 : 1,
     };
-  }, [trackIndex, sample.id, sample.type, sample.notes, selectedSample, gridSize, data.time]);
+  }, [trackIndex, id, selectedSample, sample.type, sample.notes, gridSize, data.time]);
 
-  // const handleDragSample = useCallback((ev) => {
-  //   dispatch(setSelectedSample(props.sample.id || ''));
-  //   const initialMousePos = ev.screenX;
-  //   const initialTime = props.sample.time;
-  //   const handleMouseMove = (e) => {
-  //     e.preventDefault();
-  //     const start = (
-  //       initialTime + (e.screenX - initialMousePos) / (40 * gridSize) / window.devicePixelRatio
-  //     );
-  //     const numDecimalPlaces = Math.max(0, String(1 / gridSize).length - 2);
-  //     const time = gridSnapEnabled
-  //       ? Number((Math.round((start) * gridSize) / gridSize).toFixed(numDecimalPlaces))
-  //       : start;
+  const deleteSample = useCallback(() => {
+    dispatch(removeSample(id));
+  }, [dispatch, id]);
 
-  //     dispatch(setSampleTime(time, sample.id));
-  //   };
-  //   const handleDragStop = () => {
-  //     window.removeEventListener('mousemove', handleMouseMove);
-  //     window.removeEventListener('mouseup', handleDragStop);
-  //   };
-
-  //   window.addEventListener('mousemove', handleMouseMove);
-  //   window.addEventListener('mouseup', handleDragStop);
-  // }, [dispatch, gridSize, gridSnapEnabled, props.sample.id, props.sample.time, sample.id]);
-
-  // const deleteSample = useCallback(() => {
-  //   const track = tracks[sample.track];
-  //   track.samples = track.samples.filter((s) => s.id !== sample.id);
-  //   // dispatch(setTrackAtIndex(track, props.sample.track));
-  // }, [sample.id, sample.track, tracks]);
-
-  // const copySample = useCallback(() => {
-  //   dispatch(setClipboard(sample));
-  // }, [dispatch, sample]);
+  const copySample = useCallback(() => {
+    dispatch(setClipboard(sample));
+  }, [dispatch, sample]);
 
   const keyMap = {
     COPY_SAMPLE: 'ctrl+c',
@@ -185,21 +165,21 @@ const Sample = memo((props) => {
   };
 
   const handlers = {
-    // DELETE_SAMPLE: deleteSample,
-    // COPY_SAMPLE: copySample,
+    DELETE_SAMPLE: deleteSample,
+    COPY_SAMPLE: copySample,
   };
 
-  // const handleShowHideSampleEffects = useCallback(() => {
-  //   if (sampleEffectsHidden) {
-  //     dispatch(showSampleEffects());
-  //   } else {
-  //     dispatch(hideSampleEffects());
-  //   }
-  // }, [dispatch, sampleEffectsHidden]);
+  const handleShowHideSampleEffects = useCallback(() => {
+    if (sampleEffectsHidden) {
+      dispatch(showSampleEffects());
+    } else {
+      dispatch(hideSampleEffects());
+    }
+  }, [dispatch, sampleEffectsHidden]);
 
-  // const handleTogglePiano = useCallback(() => {
-  //   dispatch(setShowPianoRoll(!showPianoRoll));
-  // }, [dispatch, showPianoRoll]);
+  const handleTogglePiano = useCallback(() => {
+    dispatch(setShowPianoRoll(!showPianoRoll));
+  }, [dispatch, showPianoRoll]);
 
 
   return (
@@ -212,21 +192,21 @@ const Sample = memo((props) => {
       innerRef={ref}
       // onMouseDown={handleDragSample}
     >
-      <p>{sample.id === selectedSample ? props.sample.name : ''}</p>
-      {sample.id === selectedSample
+      <p>{id === selectedSample ? data.name : ''}</p>
+      {id === selectedSample
         ? (
           <img
-            // onClick={sample.type === 'pattern' ? handleTogglePiano : handleShowHideSampleEffects}
+            onClick={data.type === 'pattern' ? handleTogglePiano : handleShowHideSampleEffects}
             className={sampleEffectsHidden ? styles.edit : `${styles.editing} ${styles.edit}`}
             src={editIcon}
             alt="edit sample icon"
           />
         ) : ''}
-      {sample.type === 'pattern' ? '' : waveform}
+      {data.type === 'pattern' ? '' : waveform}
       <div className={styles.fadeWrapper}>
-        {sample.id === selectedSample && !!(sample.fade.fadeIn || sample.fade.fadeOut) && (
+        {id === selectedSample && !!(data.fade.fadeIn || data.fade.fadeOut) && (
           <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" fill="rgba(0, 0, 0, 0.3)">
-            <path d={`M 0 100 L ${sample.fade.fadeIn * 100} 0 L ${(1 - sample.fade.fadeOut) * 100} 0 L 100 100`} />
+            <path d={`M 0 100 L ${data.fade.fadeIn * 100} 0 L ${(1 - data.fade.fadeOut) * 100} 0 L 100 100`} />
           </svg>
         )}
       </div>
