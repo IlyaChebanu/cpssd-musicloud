@@ -7,7 +7,13 @@ import styles from './SongPicker.module.scss';
 import OwnSongCard from '../OwnSongCard';
 import NewSong from '../NewSong/NewSong';
 import {
-  setTracks, hideSongPicker, setTempo, setSongName, setSongDescription, setSongImageUrl,
+  // setTracks,
+  setCompleteTracksState,
+  hideSongPicker,
+  setTempo,
+  setSongName,
+  setSongDescription,
+  setSongImageUrl,
 } from '../../actions/studioActions';
 import { getEditableSongs, createNewSong, getSongState } from '../../helpers/api';
 import Spinner from '../Spinner/Spinner';
@@ -36,7 +42,7 @@ const SongPicker = memo((props) => {
     const res = await createNewSong('New Song');
     if (res.status === 200) {
       window.history.pushState(null, null, `/studio?sid=${res.data.sid}`);
-      dispatch(setTracks([]));
+      dispatch(setCompleteTracksState([]));
       dispatch(setTempo(140));
       dispatch(setSongName('New Song'));
       dispatch(hideSongPicker());
@@ -46,13 +52,13 @@ const SongPicker = memo((props) => {
   const ownSongCards = useMemo(() => gotSongs.map((song) => (
     <OwnSongCard
       key={song.sid}
-      songName={`${song.title}`}
+      songName={song.title}
       className={styles.songCard}
       onClick={async () => {
         const res = await getSongState(song.sid);
         if (res.status === 200) {
           const songState = res.data.song_state;
-          if (songState.tracks) dispatch(setTracks(songState.tracks));
+          // if (songState.tracks) dispatch(setTracks(songState.tracks));
           if (songState.tempo) dispatch(setTempo(songState.tempo));
         }
         dispatch(setSongImageUrl(song.cover));

@@ -12,7 +12,7 @@ import instrumentsIcon from '../../assets/icons/instruments.svg';
 import { generatePresigned } from '../../helpers/api';
 import store from '../../store';
 import {
-  setTrackAtIndex,
+  // setTrackAtIndex,
   setSampleLoading,
 } from '../../actions/studioActions';
 import { showNotification } from '../../actions/notificationsActions';
@@ -72,7 +72,7 @@ const FileExplorer = memo((props) => {
         },
       };
       track.samples.push(sampleState);
-      dispatch(setTrackAtIndex(track, studio.selectedTrack));
+      // dispatch(setTrackAtIndex(track, studio.selectedTrack));
       // dispatch(setSampleTime(sampleState.time, sampleState.id));
       dispatch(setSampleLoading(true));
       // dispatch(setTracks(studio.tracks));

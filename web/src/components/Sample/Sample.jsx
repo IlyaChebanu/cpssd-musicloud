@@ -8,8 +8,13 @@ import styles from './Sample.module.scss';
 import { dColours, colours } from '../../helpers/constants';
 import { lerp } from '../../helpers/utils';
 import {
-  setSampleTime, setTrackAtIndex, setSelectedSample, setClipboard,
-  hideSampleEffects, showSampleEffects, setShowPianoRoll,
+  setSampleTime,
+  // setTrackAtIndex,
+  setSelectedSample,
+  setClipboard,
+  hideSampleEffects,
+  showSampleEffects,
+  setShowPianoRoll,
 } from '../../actions/studioActions';
 
 import editIcon from '../../assets/icons/edit-sample.svg';
@@ -99,8 +104,8 @@ const Sample = memo((props) => {
   const deleteSample = useCallback(() => {
     const track = tracks[sample.track];
     track.samples = track.samples.filter((s) => s.id !== sample.id);
-    dispatch(setTrackAtIndex(track, props.sample.track));
-  }, [dispatch, props.sample.track, sample.id, sample.track, tracks]);
+    // dispatch(setTrackAtIndex(track, props.sample.track));
+  }, [sample.id, sample.track, tracks]);
 
   const copySample = useCallback(() => {
     dispatch(setClipboard(sample));

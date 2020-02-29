@@ -415,7 +415,7 @@ export default (
       const samples = { ...state.samples };
       samples[action.sampleId] = {
         ...samples[action.sampleId],
-        notes: [...samples[action.sampleId].notes, action.note],
+        notes: { ...samples[action.sampleId].notes, [action.noteId]: action.note },
       };
       return {
         ...state,
@@ -426,7 +426,7 @@ export default (
       const samples = { ...state.samples };
       samples[action.sampleId] = {
         ...samples[action.sampleId],
-        notes: samples[action.sampleId].notes.filter((n) => n.noteId !== action.noteId),
+        notes: _.omit(samples[action.sampleId].notes, action.noteId),
       };
       return {
         ...state,
@@ -435,11 +435,13 @@ export default (
     }
     case 'SET_PATTERN_NOTE_TICK': {
       const samples = { ...state.samples };
+      const { notes } = samples[action.sampleId];
       samples[action.sampleId] = {
         ...samples[action.sampleId],
-        notes: samples[action.sampleId].notes.map((n) => (
-          n.noteId === action.noteId ? { ...n, tick: action.value } : n
-        )),
+        notes: {
+          ...notes,
+          [action.noteId]: { ...notes[action.noteId], tick: action.value },
+        },
       };
       return {
         ...state,
@@ -448,11 +450,13 @@ export default (
     }
     case 'SET_PATTERN_NOTE_NUMBER': {
       const samples = { ...state.samples };
+      const { notes } = samples[action.sampleId];
       samples[action.sampleId] = {
         ...samples[action.sampleId],
-        notes: samples[action.sampleId].notes.map((n) => (
-          n.noteId === action.noteId ? { ...n, noteNumber: action.value } : n
-        )),
+        notes: {
+          ...notes,
+          [action.noteId]: { ...notes[action.noteId], noteNumber: action.value },
+        },
       };
       return {
         ...state,
@@ -461,11 +465,13 @@ export default (
     }
     case 'SET_PATTERN_NOTE_VELOCITY': {
       const samples = { ...state.samples };
+      const { notes } = samples[action.sampleId];
       samples[action.sampleId] = {
         ...samples[action.sampleId],
-        notes: samples[action.sampleId].notes.map((n) => (
-          n.noteId === action.noteId ? { ...n, velocity: action.value } : n
-        )),
+        notes: {
+          ...notes,
+          [action.noteId]: { ...notes[action.noteId], velocity: action.value },
+        },
       };
       return {
         ...state,
@@ -474,11 +480,13 @@ export default (
     }
     case 'SET_PATTERN_NOTE_DURATION': {
       const samples = { ...state.samples };
+      const { notes } = samples[action.sampleId];
       samples[action.sampleId] = {
         ...samples[action.sampleId],
-        notes: samples[action.sampleId].notes.map((n) => (
-          n.noteId === action.noteId ? { ...n, duration: action.value } : n
-        )),
+        notes: {
+          ...notes,
+          [action.noteId]: { ...notes[action.noteId], duration: action.value },
+        },
       };
       return {
         ...state,

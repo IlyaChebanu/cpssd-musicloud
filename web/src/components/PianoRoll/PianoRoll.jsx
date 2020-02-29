@@ -12,7 +12,11 @@ import { connect } from 'react-redux';
 import _ from 'lodash';
 import styles from './PianoRoll.module.scss';
 import { ReactComponent as CloseIcon } from '../../assets/icons/x-icon-10px.svg';
-import { setShowPianoRoll, setTrackAtIndex, setSampleName } from '../../actions/studioActions';
+import {
+  setShowPianoRoll,
+  // setTrackAtIndex,
+  setSampleName,
+} from '../../actions/studioActions';
 import PianoNote from '../PianoNote/PianoNote';
 
 const pianoKeys = [];
@@ -113,8 +117,8 @@ const PianoRoll = memo(({
     };
     const track = { ...tracks[selectedTrack] };
     track.samples[sampleIndex].notes.push(note);
-    dispatch(setTrackAtIndex(track, selectedTrack));
-  }, [dispatch, selectedSample, selectedTrack, tracks]);
+    // dispatch(setTrackAtIndex(track, selectedTrack));
+  }, [selectedSample, selectedTrack, tracks]);
 
   const [nameInput, setNameInput] = useState(selectedSampleObject.name || '');
 

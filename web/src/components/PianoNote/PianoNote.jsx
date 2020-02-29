@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
 import _ from 'lodash';
 import styles from './PianoNote.module.scss';
 import { colours } from '../../helpers/constants';
-import { setTrackAtIndex } from '../../actions/studioActions';
+// import { setTrackAtIndex } from '../../actions/studioActions';
 
 const ppq = 1;
 
@@ -52,7 +52,7 @@ const PianoNote = memo(({
         Math.max(1, newNoteNumber),
       );
       track.samples[sampleIndex].notes = [...track.samples[sampleIndex].notes];
-      dispatch(setTrackAtIndex(track, selectedTrack));
+      // dispatch(setTrackAtIndex(track, selectedTrack));
     };
     const handleDragStop = () => {
       window.removeEventListener('mousemove', handleMouseMove);
@@ -61,16 +61,7 @@ const PianoNote = memo(({
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleDragStop);
-  }, [
-    dispatch,
-    gridSnapEnabled,
-    noteData.idx,
-    noteData.noteNumber,
-    noteData.tick,
-    selectedSample,
-    selectedTrack,
-    tracks,
-  ]);
+  }, [gridSnapEnabled, noteData.idx, noteData.noteNumber, noteData.tick, selectedSample, selectedTrack, tracks]);
 
   const handleResize = useCallback((ev) => {
     ev.stopPropagation();
@@ -93,7 +84,7 @@ const PianoNote = memo(({
       notes[noteData.idx] = { ...notes[noteData.idx], duration: Math.max(0, time) };
       track.samples[sampleIndex].notes = notes;
       track.samples = [...track.samples];
-      dispatch(setTrackAtIndex(track, selectedTrack));
+      // dispatch(setTrackAtIndex(track, selectedTrack));
     };
     const handleDragStop = () => {
       window.removeEventListener('mousemove', handleMouseMove);
@@ -102,15 +93,7 @@ const PianoNote = memo(({
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleDragStop);
-  }, [
-    dispatch,
-    gridSnapEnabled,
-    noteData.duration,
-    noteData.idx,
-    selectedSample,
-    selectedTrack,
-    tracks,
-  ]);
+  }, [gridSnapEnabled, noteData.duration, noteData.idx, selectedSample, selectedTrack, tracks]);
 
   const handleDelete = useCallback((e) => {
     e.preventDefault();
@@ -118,8 +101,8 @@ const PianoNote = memo(({
     const sampleIndex = _.findIndex(track.samples, (s) => s.id === selectedSample);
     const notes = track.samples[sampleIndex].notes.filter((_, i) => i !== noteData.idx);
     track.samples[sampleIndex].notes = notes;
-    dispatch(setTrackAtIndex(track, selectedTrack));
-  }, [dispatch, noteData.idx, selectedSample, selectedTrack, tracks]);
+    // dispatch(setTrackAtIndex(track, selectedTrack));
+  }, [noteData.idx, selectedSample, selectedTrack, tracks]);
 
   return (
     <div

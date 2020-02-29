@@ -404,7 +404,8 @@ export const addPatternNote = (sampleId, note) => (dispatch) => {
   dispatch({
     type: 'ADD_PATTERN_NOTE',
     sampleId,
-    note: { noteId: genId(), ...note },
+    noteId: genId(),
+    note,
   });
 };
 

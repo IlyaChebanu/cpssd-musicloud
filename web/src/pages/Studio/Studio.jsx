@@ -13,7 +13,8 @@ import { connect } from 'react-redux';
 import styles from './Studio.module.scss';
 import Header from '../../components/Header';
 import {
-  setTracks,
+  // setTracks,
+  addTrack,
   setScroll,
   setGridWidth,
   setTempo,
@@ -68,7 +69,7 @@ const Studio = memo((props) => {
         setTracksLoading(false);
         if (res.status === 200) {
           const songState = res.data.song_state;
-          if (songState.tracks) dispatch(setTracks(songState.tracks));
+          // if (songState.tracks) dispatch(setTracks(songState.tracks));
           if (songState.tempo) dispatch(setTempo(songState.tempo));
           const res2 = await getSongInfo(songId);
           if (res2.status === 200) {
@@ -80,7 +81,7 @@ const Studio = memo((props) => {
         }
       })();
     } else {
-      dispatch(setTracks([]));
+      // dispatch(setTracks([]));
       dispatch(setTempo(140));
       dispatch(showSongPicker());
     }
@@ -121,20 +122,21 @@ const Studio = memo((props) => {
   );
 
   const handleAddNewTrack = useCallback(() => {
-    dispatch(
-      setTracks([
-        ...tracks,
-        {
-          volume: 1,
-          pan: 0,
-          mute: false,
-          solo: false,
-          name: 'New track',
-          samples: [],
-        },
-      ]),
-    );
-  }, [dispatch, tracks]);
+    dispatch(addTrack());
+    // dispatch(
+    //   setTracks([
+    //     ...tracks,
+    //     {
+    //       volume: 1,
+    //       pan: 0,
+    //       mute: false,
+    //       solo: false,
+    //       name: 'New track',
+    //       samples: [],
+    //     },
+    //   ]),
+    // );
+  }, [dispatch]);
 
   const handleSaveState = useCallback(async (e) => {
     e.preventDefault();
@@ -152,12 +154,12 @@ const Studio = memo((props) => {
   }, [studio.tempo, tracks, dispatch, songId]);
 
   const renderableTracks = useMemo(() => tracks.map((t, i) => (
-    <Track index={i} track={{ ...t }} key={i} className={styles.track} />
+    <Track track={t} index={i} key={t.id} className={styles.track} />
   )), [tracks]);
 
   const trackControls = useMemo(
     () => tracks.map((track, i) => (
-      <TrackControls key={i} track={track} index={i} />
+      <TrackControls index={i} key={track.id} track={track} />
     )),
     [tracks],
   );
