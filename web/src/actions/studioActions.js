@@ -244,11 +244,17 @@ export const setShowPianoRoll = (bool) => (dispatch) => {
   });
 };
 
-export const setCompleteTrackState = (track, index) => (dispatch) => {
+export const setCompleteTracksState = (tracks) => (dispatch) => {
   dispatch({
-    type: 'SET_COMPLETE_TRACK_STATE',
-    track,
-    index,
+    type: 'SET_COMPLETE_TRACKS_STATE',
+    tracks,
+  });
+};
+
+export const setCompleteSamplesState = (samples) => (dispatch) => {
+  dispatch({
+    type: 'SET_COMPLETE_SAMPLES_STATE',
+    samples,
   });
 };
 
@@ -316,9 +322,10 @@ export const setTrackName = (trackId, value) => (dispatch) => {
 export const addSample = (trackId, sample) => (dispatch) => {
   dispatch({
     type: 'ADD_SAMPLE',
-    trackId,
     sampleId: genId(),
-    sample,
+    sample: {
+      type: 'sample', notes: [], trackId, ...sample,
+    },
   });
 };
 
@@ -393,42 +400,54 @@ export const setSampleDuration = (sampleId, value) => (dispatch) => {
   });
 };
 
-export const addPatternNote = (sampleId, value) => (dispatch) => {
+export const addPatternNote = (sampleId, note) => (dispatch) => {
   dispatch({
     type: 'ADD_PATTERN_NOTE',
     sampleId,
-    noteId: genId(),
-    value,
+    note: { noteId: genId(), ...note },
   });
 };
 
-export const removePatternNote = (noteId) => (dispatch) => {
+export const removePatternNote = (sampleId, noteId) => (dispatch) => {
   dispatch({
     type: 'REMOVE_PATTERN_NOTE',
     noteId,
+    sampleId,
   });
 };
 
-export const setPatternNoteNumber = (noteId, value) => (dispatch) => {
+export const setPatternNoteTick = (sampleId, noteId, value) => (dispatch) => {
+  dispatch({
+    type: 'SET_PATTERN_NOTE_TICK',
+    noteId,
+    sampleId,
+    value: Math.max(0, value),
+  });
+};
+
+export const setPatternNoteNumber = (sampleId, noteId, value) => (dispatch) => {
   dispatch({
     type: 'SET_PATTERN_NOTE_NUMBER',
     noteId,
+    sampleId,
     value: Math.min(88, Math.max(0, value)),
   });
 };
 
-export const setPatternNoteVelocity = (noteId, value) => (dispatch) => {
+export const setPatternNoteVelocity = (sampleId, noteId, value) => (dispatch) => {
   dispatch({
     type: 'SET_PATTERN_NOTE_VELOCITY',
     noteId,
+    sampleId,
     value: Math.min(127, Math.max(0, value)),
   });
 };
 
-export const setPatternNoteDuration = (noteId, value) => (dispatch) => {
+export const setPatternNoteDuration = (sampleId, noteId, value) => (dispatch) => {
   dispatch({
     type: 'SET_PATTERN_NOTE_DURATION',
     noteId,
+    sampleId,
     value: Math.max(0, value),
   });
 };
