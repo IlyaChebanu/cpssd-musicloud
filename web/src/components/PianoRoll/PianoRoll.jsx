@@ -16,6 +16,7 @@ import {
   setShowPianoRoll,
   // setTrackAtIndex,
   setSampleName,
+  addPatternNote,
 } from '../../actions/studioActions';
 import PianoNote from '../PianoNote/PianoNote';
 
@@ -33,7 +34,7 @@ for (let i = 0; i < 88; i += 1) {
 
 
 const PianoRoll = memo(({
-  showPianoRoll, selectedSample, tracks, selectedTrack, dispatch,
+  showPianoRoll, selectedSample, tracks, selectedTrack, dispatch, samples,
 }) => {
   if (!showPianoRoll) return null;
 
@@ -51,22 +52,12 @@ const PianoRoll = memo(({
   const gridSize = 4;
   const gridSizePx = 40;
 
-  const selectedSampleObject = useMemo(() => {
-    let found;
-    if (selectedTrack !== -1 && selectedSample) {
-      found = _.find(tracks[selectedTrack].samples, (s) => s.id === selectedSample);
-    }
-    if (!found || (found && !found.notes)) {
-      handleClose();
-      return {};
-    }
-    return { ...found };
-  }, [handleClose, selectedSample, selectedTrack, tracks]);
+  const selectedSampleObject = useMemo(() => samples[selectedSample], [samples, selectedSample]);
 
   const numTicks = useMemo(() => {
     if (!tracksRef) return null;
     const bb = tracksRef.getBoundingClientRect();
-    const latest = _.maxBy(selectedSampleObject.notes, (n) => n.tick + n.duration);
+    const latest = selectedSampleObject && _.maxBy(selectedSampleObject.notes, (n) => n.tick + n.duration);
     return Math.ceil(Math.max(bb.width / gridSizePx, latest ? latest.tick + latest.duration : 0));
   }, [selectedSampleObject, tracksRef]);
 
@@ -102,8 +93,8 @@ const PianoRoll = memo(({
   const handleCreateNote = useCallback((e) => {
     if (e.button !== 0) return;
     e.preventDefault();
+    e.stopPropagation();
     const bb = e.target.getBoundingClientRect();
-    const sampleIndex = _.findIndex(tracks[selectedTrack].samples, (s) => s.id === selectedSample);
     const noteNumber = 88 - Math.floor(
       ((e.clientY - bb.top - 10 - (e.target.scrollTop / window.devicePixelRatio)) / 20),
     );
@@ -115,19 +106,10 @@ const PianoRoll = memo(({
       tick: Math.max(0, tick),
       velocity: 100,
     };
-    const track = { ...tracks[selectedTrack] };
-    track.samples[sampleIndex].notes.push(note);
-    // dispatch(setTrackAtIndex(track, selectedTrack));
-  }, [selectedSample, selectedTrack, tracks]);
-
-  const [nameInput, setNameInput] = useState(selectedSampleObject.name || '');
-
-  const handleSetSampleName = useCallback(async () => {
-    dispatch(setSampleName(nameInput));
-  }, [dispatch, nameInput]);
+    dispatch(addPatternNote(selectedSample, note));
+  }, [dispatch, selectedSample]);
 
   const handleChange = useCallback((e) => {
-    setNameInput(e.target.value);
     dispatch(setSampleName(e.target.value, selectedSample));
   }, [dispatch, selectedSample]);
 
@@ -146,8 +128,7 @@ const PianoRoll = memo(({
                 <div>
                   <span className={styles.sampleName}>
                     <input
-                      value={nameInput}
-                      onBlur={handleSetSampleName}
+                      value={selectedSampleObject && selectedSampleObject.name}
                       onChange={handleChange}
                     />
                   </span>
@@ -180,8 +161,8 @@ const PianoRoll = memo(({
               {tickDividers}
             </div>
             <div className={styles.notes}>
-              {selectedSampleObject.notes && selectedSampleObject.notes.map((note, i) => (
-                <PianoNote noteData={{ ...note, idx: i }} />
+              {selectedSampleObject && selectedSampleObject.notes && Object.entries(selectedSampleObject.notes).map(([id, note]) => (
+                <PianoNote noteData={{ ...note, id }} />
               ))}
             </div>
           </div>
@@ -197,6 +178,7 @@ PianoRoll.propTypes = {
   tracks: PropTypes.arrayOf(PropTypes.object),
   selectedTrack: PropTypes.number,
   dispatch: PropTypes.func.isRequired,
+  samples: PropTypes.object.isRequired,
 };
 
 PianoRoll.defaultProps = {
@@ -212,6 +194,7 @@ const mapStateToProps = ({ studio }) => ({
   selectedSample: studio.selectedSample,
   tracks: studio.tracks,
   selectedTrack: studio.selectedTrack,
+  samples: studio.samples,
 });
 
 export default connect(mapStateToProps)(PianoRoll);

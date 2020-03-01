@@ -12,6 +12,8 @@ import {
   setTrackPan,
   setTrackMute,
   setTrackSolo,
+  hideSampleEffects,
+  setShowPianoRoll,
 } from '../../actions/studioActions';
 import Knob from '../Knob';
 import { ReactComponent as Mute } from '../../assets/icons/volume-up-light.svg';
@@ -53,6 +55,8 @@ const TrackControls = memo((props) => {
   const handleSetSelected = useCallback(() => {
     dispatch(setSelectedTrack(track.id));
     dispatch(setSelectedSample(''));
+    dispatch(hideSampleEffects());
+    dispatch(setShowPianoRoll(false));
   }, [dispatch, track.id]);
 
 

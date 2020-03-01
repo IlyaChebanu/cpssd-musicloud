@@ -10,6 +10,8 @@ import { genId } from '../../helpers/utils';
 import {
   setSelectedTrack,
   setSelectedSample,
+  hideSampleEffects,
+  setShowPianoRoll,
   // setTrackAtIndex,
 } from '../../actions/studioActions';
 
@@ -59,6 +61,8 @@ const Track = memo((props) => {
   const handleSetSelected = useCallback(() => {
     dispatch(setSelectedTrack(track.id));
     dispatch(setSelectedSample(''));
+    dispatch(hideSampleEffects());
+    dispatch(setShowPianoRoll(false));
   }, [dispatch, track.id]);
 
   const pasteSample = useCallback(() => {

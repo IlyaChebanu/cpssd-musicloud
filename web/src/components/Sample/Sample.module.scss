@@ -5,6 +5,11 @@
   display: inline-block;
   position: relative;
   left: 0;
+  transition: background-color 200ms, width 200ms;
+
+  wave {
+    pointer-events: none;
+  }
 
   &:hover {
     cursor: pointer;
@@ -27,19 +32,33 @@
     text-overflow: ellipsis;
   }
 .edit {
-    padding: 0 auto;
-    margin: 0 auto;
-    overflow: hidden;
-    position: absolute;
-    right: 0;
+  position: absolute;
+  right: 5px;
+
+  svg {
+    fill: white;
+    color: white;
     height: 15px;
+    padding-left: 5px;
+
+
     &:hover {
-      filter: invert(100%);
+      filter: brightness(50%);
     }
   }
-  .editing {
-    filter: invert(100%);
+    // padding: 0 auto;
+    // margin: 0 auto;
+    // overflow: hidden;
+    // position: absolute;
+    // right: 0;
+    // height: 15px;
+    // &:hover {
+    //   filter: invert(100%);
+    // }
   }
+  // .editing {
+  //   filter: invert(100%);
+  // }
 }
 
 .waveform {

@@ -58,6 +58,7 @@ export const useUpdateUserDetails = () => {
 export const useGlobalDrag = (ref) => {
   const startHandler = useRef();
   const posHandler = useRef();
+  const endHandler = useRef();
   const [startCoords, setStartCoords] = useState({});
   const [dragging, setDragging] = useState(false);
   const [offset, setOffset] = useState({});
@@ -67,6 +68,7 @@ export const useGlobalDrag = (ref) => {
 
   onMouseDown((e) => {
     const bb = e.target.getBoundingClientRect();
+    e.stopPropagation();
     setDragging(true);
     setStartCoords({ oldX: bb.x, oldY: bb.y });
     setOffset({ x: e.clientX - bb.x, y: e.clientY - bb.y });
@@ -81,6 +83,7 @@ export const useGlobalDrag = (ref) => {
   });
 
   onMouseUp(() => {
+    if (dragging && endHandler.current) endHandler.current();
     setDragging(false);
   });
 
@@ -90,6 +93,9 @@ export const useGlobalDrag = (ref) => {
     },
     onDragging: (cb) => {
       posHandler.current = cb;
+    },
+    onDragEnd: (cb) => {
+      endHandler.current = cb;
     },
   };
 };

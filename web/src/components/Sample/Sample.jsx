@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 import _ from 'lodash';
 import { HotKeys } from 'react-hotkeys';
 import axios from 'axios';
+import WaveSurfer from 'wavesurfer.js';
 import styles from './Sample.module.scss';
 import {
   dColours, colours, bufferStore, audioContext,
@@ -26,12 +27,15 @@ import {
   setSampleTrackId,
   setSampleBuffer,
   setSelectedTrack,
+  setSampleDuration,
 } from '../../actions/studioActions';
 
-import editIcon from '../../assets/icons/edit-sample.svg';
+import { ReactComponent as EditIcon } from '../../assets/icons/edit-sample.svg';
+import { ReactComponent as PianoIcon } from '../../assets/icons/piano-keyboard-light.svg';
 import { showNotification } from '../../actions/notificationsActions';
 import Spinner from '../Spinner/Spinner';
 import { useGlobalDrag } from '../../helpers/hooks';
+
 
 const Sample = memo((props) => {
   const {
@@ -49,7 +53,8 @@ const Sample = memo((props) => {
 
   const ref = useRef();
   const [dragStartData, setDragStartData] = useState(data);
-  const { onDragStart, onDragging } = useGlobalDrag(ref);
+  const [samplePosition, setSamplePosition] = useState({ time: data.time, trackId: data.trackId });
+  const { onDragStart, onDragging, onDragEnd } = useGlobalDrag(ref);
 
   onDragStart(() => {
     setDragStartData({ ...data, trackIndex: _.findIndex(tracks, (o) => o.id === data.trackId) });
@@ -61,7 +66,7 @@ const Sample = memo((props) => {
     oldX, oldY, x, y,
   }) => {
     const gridSizePx = 40 * gridSize; // TODO: change hardcoded value to redux
-    const newStartTime = dragStartData.time + (x - oldX) / gridSizePx;
+    const newStartTime = Math.max(1, dragStartData.time + (x - oldX) / gridSizePx);
     const numDecimalPlaces = Math.max(0, String(1 / gridSize).length - 2);
     const time = gridSnapEnabled
       ? Number((Math.round((newStartTime) * gridSize) / gridSize).toFixed(numDecimalPlaces))
@@ -71,13 +76,18 @@ const Sample = memo((props) => {
     const trackIdx = Math.min(tracks.length - 1, Math.max(0, dragStartData.trackIndex + idxOffset));
     const trackId = tracks[trackIdx].id;
 
-    dispatch(setSampleStartTime(id, time));
-    dispatch(setSampleTrackId(id, trackId));
+    setSamplePosition({ time, trackId });
   });
 
-  const trackIndex = useMemo(() => (
-    _.findIndex(tracks, (t) => t.id === data.trackId)
-  ), [data.trackId, tracks]);
+  onDragEnd(() => {
+    dispatch(setSampleStartTime(id, samplePosition.time));
+    dispatch(setSampleTrackId(id, samplePosition.trackId));
+  });
+
+  const trackIndexLocal = useMemo(() => (
+    _.findIndex(tracks, (t) => t.id === samplePosition.trackId)
+  ), [samplePosition.trackId, tracks]);
+
 
   const [buffer, setBuffer] = useState(bufferStore[data.url]);
   useEffect(() => {
@@ -92,64 +102,68 @@ const Sample = memo((props) => {
               bufferStore[data.url] = buf;
               setBuffer(buf);
               dispatch(setSampleBufferLoading(id, false));
+              dispatch(setSampleDuration(id, buf.duration * (tempo / 60)));
             });
         });
     }
-  }, [buffer, data, data.url, dispatch, id]);
+  }, [buffer, data, data.url, dispatch, id, tempo]);
 
   const sample = data;
 
-  const waveform = useMemo(() => {
-    if (buffer) {
-      const channelData = buffer.getChannelData(0);
-      const beatsPerSecond = tempo / 60;
-      const width = buffer.duration * beatsPerSecond * (40 * gridSize);
-      const step = Math.ceil(width / 2);
-      const amp = 80;
-      const bars = [];
-      for (let i = 0; i < step; i += 1) {
-        const d = _.clamp(channelData[Math.floor(lerp(0, channelData.length, i / step))], -1, 1);
-        bars.push(Math.max(2, Math.abs(Math.floor(d * amp))));
-      }
-      return (
-        <svg className={styles.waveform}>
-          {bars.map((bar, i) => (
-            <rect
-              key={i}
-              x={(i + 1) * 2}
-              y={45 - bar / 2}
-              style={{ height: `${bar}px` }}
-              className={styles.bar}
-            />
-          ))}
-        </svg>
-      );
-    }
-    return (
-      <Spinner className={styles.spinner} />
-    );
-  }, [buffer, gridSize, tempo]);
-
   const wrapperStyle = useMemo(() => {
-    const colourIdx = trackIndex % dColours.length;
+    const colourIdx = trackIndexLocal % dColours.length;
     const selected = id === selectedSample;
     const ppq = 1; // TODO: Unhardcode
-    let width;
-    if (sample.type === 'pattern') {
-      const latest = _.maxBy(sample.notes, (n) => n.tick + n.duration);
-      width = (0.25 / ppq) * (latest ? latest.tick + latest.duration : 4 * ppq) * (40 * gridSize);
-    }
     const gridSizePx = 40 * gridSize; // TODO: change hardcoded value to redux
+    let width;
+    if (data.type === 'pattern') {
+      const latest = _.maxBy(data.notes, (n) => n.tick + n.duration);
+      width = (0.25 / ppq) * (latest ? latest.tick + latest.duration : 4 * ppq) * (40 * gridSize);
+    } else if (!buffer) {
+      width = 50;
+    } else {
+      width = data.duration * gridSizePx;
+    }
     return {
       width,
       position: 'absolute',
       top: 0,
       left: 0,
-      transform: `translateX(${(data.time - 1) * gridSizePx}px) translateY(${trackIndex * 100}px)`,
+      transform: `translateX(${(samplePosition.time - 1) * gridSizePx}px) translateY(${trackIndexLocal * 100}px)`,
       backgroundColor: selected ? colours[colourIdx] : dColours[colourIdx],
       zIndex: selected ? 2 : 1,
     };
-  }, [trackIndex, id, selectedSample, sample.type, sample.notes, gridSize, data.time]);
+  }, [
+    trackIndexLocal,
+    id,
+    selectedSample,
+    gridSize,
+    data.type,
+    data.notes,
+    data.duration,
+    samplePosition.time,
+    buffer,
+  ]);
+
+  const container = ref.current;
+  const wavesurfer = useRef();
+  useEffect(() => {
+    if (container && !wavesurfer.current) {
+      wavesurfer.current = WaveSurfer.create({
+        container,
+        waveColor: '#eee',
+        height: 90,
+        interact: false,
+        barWidth: 1,
+        barRadius: 0.5,
+        barGap: 2,
+        hideScrollbar: true,
+      });
+    }
+    if (buffer && data.duration) {
+      setTimeout(() => wavesurfer.current.loadDecodedBuffer(buffer), 300);
+    }
+  }, [buffer, container, data.duration]);
 
   const deleteSample = useCallback(() => {
     dispatch(removeSample(id));
@@ -161,7 +175,7 @@ const Sample = memo((props) => {
 
   const keyMap = {
     COPY_SAMPLE: 'ctrl+c',
-    DELETE_SAMPLE: 'del',
+    DELETE_SAMPLE: ['del', 'backspace'],
   };
 
   const handlers = {
@@ -190,19 +204,21 @@ const Sample = memo((props) => {
       className={styles.wrapper}
       style={{ ...wrapperStyle, ...props.style }}
       innerRef={ref}
-      // onMouseDown={handleDragSample}
     >
-      <p>{id === selectedSample ? data.name : ''}</p>
+      <p>{id === selectedSample && data.name}</p>
       {id === selectedSample
-        ? (
-          <img
-            onClick={data.type === 'pattern' ? handleTogglePiano : handleShowHideSampleEffects}
-            className={sampleEffectsHidden ? styles.edit : `${styles.editing} ${styles.edit}`}
-            src={editIcon}
-            alt="edit sample icon"
-          />
-        ) : ''}
-      {data.type === 'pattern' ? '' : waveform}
+        && (
+          <div className={styles.edit}>
+            <EditIcon
+              onClick={handleShowHideSampleEffects}
+            />
+            <PianoIcon
+              onClick={handleTogglePiano}
+            />
+          </div>
+        )}
+      {!buffer && <Spinner className={styles.spinner} />}
+      {/* {data.type === 'pattern' ? '' : waveform} */}
       <div className={styles.fadeWrapper}>
         {id === selectedSample && !!(data.fade.fadeIn || data.fade.fadeOut) && (
           <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" fill="rgba(0, 0, 0, 0.3)">
