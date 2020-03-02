@@ -16,18 +16,6 @@ const Discover = () => {
   const [songs, setSongs] = useState([]);
   const [gotNextSongs, setNextSongs] = useState('');
 
-  useEffect(() => {
-    (async () => {
-      const res = await getCompiledSongs();
-      if (res.status === 200) {
-        setSongs(res.data.songs);
-        if (res.data.next_page) {
-          setNextSongs(res.data.next_page);
-        }
-      }
-    })();
-  }, []);
-
   const nextSongs = useCallback(async () => {
     const res = await getNextCompiledSongs(gotNextSongs);
     if (res.status === 200) {
@@ -39,6 +27,22 @@ const Discover = () => {
       }
     }
   }, [songs, gotNextSongs]);
+
+  useEffect(() => {
+    (async () => {
+      const res = await getCompiledSongs();
+      if (res.status === 200) {
+        setSongs(res.data.songs);
+        if (res.data.next_page) {
+          setNextSongs(res.data.next_page);
+          while (window.scrollHeight < window.clientHeight) {
+            console.log('looping');
+            nextSongs();
+          }
+        }
+      }
+    })();
+  }, [nextSongs]);
 
   const ownSongCards = useMemo(() => songs.map((song) => (
     <SongCard
