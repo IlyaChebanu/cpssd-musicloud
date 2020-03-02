@@ -8,8 +8,10 @@ import { setCurrentBeat, play, pause } from '../../actions/studioActions';
 
 const SeekBar = memo((props) => {
   const {
-    currentBeat, scroll, playing, dispatch, gridSize,
+    scroll, playing, dispatch, gridSize, currentBeatStudio,
   } = props;
+
+  const currentBeat = props.currentBeat ? props.currentBeat : currentBeatStudio;
 
   const handleDragStart = useCallback((ev) => {
     dispatch(pause);
@@ -39,21 +41,22 @@ const SeekBar = memo((props) => {
     window.addEventListener('mouseup', handleDragStop);
   }, [currentBeat, dispatch, gridSize, playing]);
 
+  const offset = props.currentBeat ? 0 : 220;
   const iconStyle = useMemo(() => {
-    const pos = -7 + 220 + (currentBeat - 1) * (40 * gridSize) - scroll;
+    const pos = -7 + offset + (currentBeat - 1) * (40 * gridSize) - scroll;
     return {
       transform: `translate(${pos}px, -0px)`,
-      opacity: pos >= 213 ? 1 : 0,
+      opacity: pos >= offset - 7 ? 1 : 0,
     };
-  }, [currentBeat, gridSize, scroll]);
+  }, [currentBeat, gridSize, scroll, offset]);
 
   const barStyle = useMemo(() => {
-    const pos = 220 + (currentBeat - 1) * (40 * gridSize) - scroll;
+    const pos = offset + (currentBeat - 1) * (40 * gridSize) - scroll;
     return {
       transform: `translate(${pos}px, 60px)`,
-      opacity: pos >= 220 ? 1 : 0,
+      opacity: pos >= offset ? 1 : 0,
     };
-  }, [currentBeat, gridSize, scroll]);
+  }, [currentBeat, gridSize, scroll, offset]);
 
   return (
     <div className={styles.wrapper}>
@@ -65,6 +68,7 @@ const SeekBar = memo((props) => {
 
 SeekBar.propTypes = {
   currentBeat: PropTypes.number.isRequired,
+  currentBeatStudio: PropTypes.number.isRequired,
   scroll: PropTypes.number.isRequired,
   playing: PropTypes.bool.isRequired,
   dispatch: PropTypes.func.isRequired,
@@ -74,7 +78,7 @@ SeekBar.propTypes = {
 SeekBar.displayName = 'SeekBar';
 
 const mapStateToProps = ({ studio }) => ({
-  currentBeat: studio.currentBeat,
+  currentBeatStudio: studio.currentBeat,
   scroll: studio.scroll,
   playing: studio.playing,
   gridSize: studio.gridSize,

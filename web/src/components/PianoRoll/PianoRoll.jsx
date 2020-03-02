@@ -14,7 +14,7 @@ import styles from './PianoRoll.module.scss';
 import { ReactComponent as CloseIcon } from '../../assets/icons/x-icon-10px.svg';
 import { setShowPianoRoll, setTrackAtIndex, setSampleName } from '../../actions/studioActions';
 import PianoNote from '../PianoNote/PianoNote';
-import SeekBar from "../SeekBar";
+import SeekBar from '../SeekBar';
 
 const pianoKeys = [];
 const pianoTracks = [];
@@ -30,7 +30,7 @@ for (let i = 0; i < 88; i += 1) {
 
 
 const PianoRoll = memo(({
-  showPianoRoll, selectedSample, tracks, selectedTrack, dispatch,
+  showPianoRoll, selectedSample, tracks, selectedTrack, dispatch, currentBeat,
 }) => {
   if (!showPianoRoll) return null;
 
@@ -152,7 +152,7 @@ const PianoRoll = memo(({
                 <CloseIcon onClick={handleClose} />
               </div>
               <div className={styles.lower}>
-                <SeekBar/>
+                <SeekBar currentBeat={currentBeat - selectedSampleObject.time + 1} />
                 <div className={styles.timelineWrapper} style={wrapperStyle}>
                   <svg className={styles.ticks} style={widthStyle}>
                     <rect
@@ -190,6 +190,7 @@ const PianoRoll = memo(({
 });
 
 PianoRoll.propTypes = {
+  currentBeat: PropTypes.number.isRequired,
   showPianoRoll: PropTypes.bool.isRequired,
   selectedSample: PropTypes.string,
   tracks: PropTypes.arrayOf(PropTypes.object),
@@ -206,6 +207,7 @@ PianoRoll.defaultProps = {
 PianoRoll.displayName = 'PianoRoll';
 
 const mapStateToProps = ({ studio }) => ({
+  currentBeat: studio.currentBeat,
   showPianoRoll: studio.showPianoRoll,
   selectedSample: studio.selectedSample,
   tracks: studio.tracks,
