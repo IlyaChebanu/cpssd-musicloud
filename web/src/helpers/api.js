@@ -36,7 +36,7 @@ axios.interceptors.response.use((res) => res, (err) => {
   return res;
 });
 
-const API_URL = 'https://dcumusicloud.com:5000/api';
+const API_URL = 'http://localhost:5000/api';
 
 const getAuth = () => ({
   Authorization: `Bearer ${store.getState().user.token}`,
@@ -135,7 +135,14 @@ export const patchUserDetails = (reqData) => axios.patch(
 );
 
 export const getEditableSongs = () => axios.get(
-  `${API_URL}/v1/audio/editable_songs?songs_per_page=10000`,
+  `${API_URL}/v1/audio/editable_songs?songs_per_page=25`,
+  {
+    headers: getAuth(),
+  },
+);
+
+export const getNextEditableSongs = (next) => axios.get(
+  `${API_URL}/v1/audio/editable_songs?songs_per_page=25&next_page=${next}`,
   {
     headers: getAuth(),
   },
@@ -173,7 +180,14 @@ export const patchSongDescription = (sid, description) => axios.patch(
 );
 
 export const getTimeline = () => axios.get(
-  `${API_URL}/v1/users/timeline`,
+  `${API_URL}/v1/users/timeline?items_per_page=25`,
+  {
+    headers: getAuth(),
+  },
+);
+
+export const getNextTimeline = (next) => axios.get(
+  `${API_URL}/v1/users/timeline?next_page=${next}`,
   {
     headers: getAuth(),
   },
@@ -204,12 +218,18 @@ export const createPost = (message) => axios.post(
 );
 
 export const getUserPosts = (username) => axios.get(
-  `${API_URL}/v1/users/posts?posts_per_page=100&username=${username}`,
+  `${API_URL}/v1/users/posts?posts_per_page=25&username=${username}`,
   {
     headers: getAuth(),
   },
 );
 
+export const getNextUserPosts = (next) => axios.get(
+  `${API_URL}/v1/users/posts?posts_per_page=25&next_page=${next}`,
+  {
+    headers: getAuth(),
+  },
+);
 
 export const setSongCompiledUrl = (reqData) => axios.patch(
   `${API_URL}/v1/audio/compiled_url`,
@@ -220,12 +240,18 @@ export const setSongCompiledUrl = (reqData) => axios.patch(
 );
 
 export const getCompiledSongs = (username) => axios.get(
-  `${API_URL}/v1/audio/compiled_songs?${username ? `username=${username}` : ''}`,
+  `${API_URL}/v1/audio/compiled_songs?songs_per_page=25&${username ? `username=${username}` : ''}`,
   {
     headers: getAuth(),
   },
 );
 
+export const getNextCompiledSongs = (next) => axios.get(
+  `${API_URL}/v1/audio/compiled_songs?songs_per_page=25&next_page=${next}`,
+  {
+    headers: getAuth(),
+  },
+);
 
 export const publishSong = (sid) => axios.post(
   `${API_URL}/v1/audio/publish`,
