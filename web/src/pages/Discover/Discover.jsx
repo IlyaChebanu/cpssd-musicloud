@@ -35,14 +35,10 @@ const Discover = () => {
         setSongs(res.data.songs);
         if (res.data.next_page) {
           setNextSongs(res.data.next_page);
-          while (window.scrollHeight < window.clientHeight) {
-            console.log('looping');
-            nextSongs();
-          }
         }
       }
     })();
-  }, [nextSongs]);
+  }, []);
 
   const ownSongCards = useMemo(() => songs.map((song) => (
     <SongCard
