@@ -2,6 +2,7 @@ import React, { useCallback, memo } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
+import { GlobalHotKeys } from 'react-hotkeys';
 import styles from './PlaybackControls.module.scss';
 import { ReactComponent as Play } from '../../assets/icons/play-circle-light.svg';
 import { ReactComponent as Pause } from '../../assets/icons/pause-circle-light.svg';
@@ -16,30 +17,46 @@ import {
   showFileExplorer,
 } from '../../actions/studioActions';
 
-
 const PlaybackControls = memo((props) => {
-  const { dispatch, studio, fileExplorerHidden } = props;
+  const {
+    dispatch, studio, songPickerHidden, fileExplorerHidden,
+  } = props;
   const { currentBeat, tempo, playing } = studio;
-  const handlePlay = useCallback(() => {
-    dispatch(play);
-  }, [dispatch]);
+  const handlePlay = useCallback((e) => {
+    if (songPickerHidden) {
+      e.preventDefault();
+      dispatch(play);
+    }
+  }, [dispatch, songPickerHidden]);
 
-  const handlePause = useCallback(() => {
-    dispatch(pause);
-  }, [dispatch]);
+  const handlePause = useCallback((e) => {
+    if (songPickerHidden) {
+      e.preventDefault();
+      dispatch(pause);
+    }
+  }, [dispatch, songPickerHidden]);
 
-  const toStart = useCallback(() => {
-    dispatch(setCurrentBeat(1));
-    dispatch(stop);
-  }, [dispatch]);
+  const toStart = useCallback((e) => {
+    if (songPickerHidden) {
+      e.preventDefault();
+      dispatch(setCurrentBeat(1));
+      dispatch(stop);
+    }
+  }, [dispatch, songPickerHidden]);
 
-  const backward = useCallback(() => {
-    dispatch(setCurrentBeat(Math.max(1, Math.floor(currentBeat - 1))));
-  }, [dispatch, currentBeat]);
+  const backward = useCallback((e) => {
+    if (songPickerHidden) {
+      e.preventDefault();
+      dispatch(setCurrentBeat(Math.max(1, Math.floor(currentBeat - 1))));
+    }
+  }, [dispatch, currentBeat, songPickerHidden]);
 
-  const forward = useCallback(() => {
-    dispatch(setCurrentBeat(Math.max(1, Math.floor(currentBeat + 1))));
-  }, [currentBeat, dispatch]);
+  const forward = useCallback((e) => {
+    if (songPickerHidden) {
+      e.preventDefault();
+      dispatch(setCurrentBeat(Math.max(1, Math.floor(currentBeat + 1))));
+    }
+  }, [currentBeat, dispatch, songPickerHidden]);
 
   const showExplorer = useCallback(() => {
     dispatch(showFileExplorer());
@@ -55,36 +72,60 @@ const PlaybackControls = memo((props) => {
   date.setMilliseconds((curSecond * 1000) % 1000);
   const timeString = date.toISOString().substr(11, 11);
 
-  return (
-    <div className={styles.footer}>
-      <span>
-        <Slider />
-        <ToStart className={styles.controlButton} onClick={toStart} />
-        <Back className={styles.controlButton} onClick={backward} />
-        {playing ? (
-          <Pause className={styles.controlButton} onClick={handlePause} />
-        ) : (
-          <Play className={styles.controlButton} onClick={handlePlay} />
-        )}
-        <Forward className={styles.controlButton} onClick={forward} />
-        <p>{timeString}</p>
-      </span>
+  // Currently not supporting holding button for repeated action
+  const keyMap = {
+    PLAY_PAUSE: 'space',
+    BACKWARD: 'pagedown',
+    FORWARD: 'pageup',
+    TO_START: 'home',
+  };
 
-      <div className={styles.likeIconWrapper}>
-        <FileExplorer
-          className={
-            fileExplorerHidden ? styles.notSelectedIcon : styles.selectedIcon
-          }
-          onClick={fileExplorerHidden ? showExplorer : hideExplorer}
-        />
+  const handlers = {
+    PLAY_PAUSE: playing ? handlePause : handlePlay,
+    BACKWARD: backward,
+    FORWARD: forward,
+    TO_START: toStart,
+  };
+
+  return (
+    <GlobalHotKeys
+      ignoreRepeatedEventsWhenKeyHeldDown={false}
+      allowChanges
+      keyMap={keyMap}
+      handlers={handlers}
+    >
+      <div className={styles.footer}>
+
+        <span>
+          <Slider />
+          <ToStart className={styles.controlButton} onClick={toStart} />
+          <Back className={styles.controlButton} onClick={backward} />
+          {playing ? (
+            <Pause className={styles.controlButton} onClick={handlePause} />
+          ) : (
+            <Play className={styles.controlButton} onClick={handlePlay} />
+          )}
+          <Forward className={styles.controlButton} onClick={forward} />
+          <p>{timeString}</p>
+        </span>
+
+        <div className={styles.likeIconWrapper}>
+          <FileExplorer
+            className={
+              fileExplorerHidden ? styles.notSelectedIcon : styles.selectedIcon
+            }
+            onClick={fileExplorerHidden ? showExplorer : hideExplorer}
+          />
+        </div>
       </div>
-    </div>
+    </GlobalHotKeys>
   );
 });
 
 PlaybackControls.propTypes = {
   dispatch: PropTypes.func.isRequired,
   studio: PropTypes.object.isRequired,
+  songPickerHidden: PropTypes.bool.isRequired,
   fileExplorerHidden: PropTypes.bool.isRequired,
 };
 
@@ -92,6 +133,7 @@ PlaybackControls.displayName = 'PlaybackControls';
 
 const mapStateToProps = ({ studio }) => ({
   studio,
+  songPickerHidden: studio.songPickerHidden,
   fileExplorerHidden: studio.fileExplorerHidden,
 });
 
