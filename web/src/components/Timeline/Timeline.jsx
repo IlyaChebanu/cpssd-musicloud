@@ -12,7 +12,7 @@ const Timeline = memo(({
 }) => {
   const ticks = useMemo(() => (
     [...Array(Math.ceil(gridWidth * gridSize) + 1)].map(
-      (_, i) => <rect key={i} x={i * 40} y={24} className={styles.tick} />,
+      (_, i) => <rect style={{ pointerEvents: 'none' }} key={i} x={i * 40} y={24} className={styles.tick} />,
     )
   ), [gridSize, gridWidth]);
 
