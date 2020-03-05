@@ -3,12 +3,13 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 import styles from './TrackControls.module.scss';
-import { setTrackAtIndex, setSelectedTrack } from '../../actions/studioActions';
+import { setTrackAtIndex, setSelectedTrack, deleteTrackAtIndex } from '../../actions/studioActions';
 import { ReactComponent as Knob } from '../../assets/icons/Knob.svg';
 import { ReactComponent as Mute } from '../../assets/icons/volume-up-light.svg';
 import { ReactComponent as MuteActive } from '../../assets/icons/volume-slash-light.svg';
 import { ReactComponent as Solo } from '../../assets/icons/headphones-alt-light.svg';
 import { ReactComponent as SoloActive } from '../../assets/icons/headphones-alt-solid.svg';
+import { ReactComponent as Delete } from '../../assets/icons/close-24px.svg';
 import { clamp, lerp } from '../../helpers/utils';
 import { colours } from '../../helpers/constants';
 
@@ -106,6 +107,12 @@ const TrackControls = memo((props) => {
     };
   }, [index, selectedTrack]);
 
+  const handleDeleteTrack = useCallback((e) => {
+    // Stop propagation to void selecting track when deleting
+    e.stopPropagation();
+    dispatch(deleteTrackAtIndex(index));
+  }, [dispatch, index]);
+
   return (
     <div
       className={styles.outerWrap}
@@ -118,6 +125,7 @@ const TrackControls = memo((props) => {
         style={barStyle}
       />
       <div className={`${styles.wrapper} ${props.index % 2 ? styles.even : ''}`}>
+        <Delete onClick={handleDeleteTrack} className={styles.deleteTrack} />
         <div className={styles.title}>
           <input type="text" value={track.name} onChange={handleTrackNameChange} />
         </div>

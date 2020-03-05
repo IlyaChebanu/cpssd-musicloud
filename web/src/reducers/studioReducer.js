@@ -84,6 +84,14 @@ export default (
         tracks,
       };
     }
+    case 'DELETE_TRACK': {
+      let tracks = [...state.tracks];
+      tracks = tracks.filter((track) => track !== tracks[action.index]);
+      return {
+        ...state,
+        tracks,
+      };
+    }
     case 'SET_SAMPLE_TIME':
       return {
         ...state,
