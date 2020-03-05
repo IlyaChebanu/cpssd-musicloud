@@ -49,6 +49,3 @@ LOGGING = True
 
 # Pushy API key
 PUSHY_KEY = os.environ['MUSICLOUD_PUSHY_KEY']
-
-# JWT content encryption secret key
-ENCRYPTION_KEY = os.environ['MUSICLOUD_JWT_CONTENT_ENCRYPTION_KEY']
