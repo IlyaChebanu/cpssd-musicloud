@@ -69,12 +69,14 @@ const TrackControls = memo((props) => {
     });
   }, [dispatch, tracks]);
 
-  const handleTrackMute = useCallback(() => {
+  const handleTrackMute = useCallback((e) => {
+    e.preventDefault();
     track.mute = !track.mute;
     dispatch(setTrackAtIndex(track, props.index));
   }, [dispatch, props.index, track]);
 
-  const handleTrackSolo = useCallback(() => {
+  const handleTrackSolo = useCallback((e) => {
+    e.preventDefault();
     unSoloTracks();
     const newTrack = { ...track, solo: !track.solo };
     dispatch(setTrackAtIndex(newTrack, index));
@@ -95,7 +97,8 @@ const TrackControls = memo((props) => {
 
   const soloTrack = _.findIndex(tracks, 'solo');
 
-  const handleSetSelected = useCallback(() => {
+  const handleSetSelected = useCallback((e) => {
+    e.preventDefault();
     dispatch(setSelectedTrack(index));
   }, [dispatch, index]);
 

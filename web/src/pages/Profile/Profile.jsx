@@ -46,7 +46,8 @@ const Profile = memo((props) => {
     getSongs();
   }, [username]);
 
-  const nextSongs = useCallback(async () => {
+  const nextSongs = useCallback(async (e) => {
+    e.preventDefault();
     if (gotNextSongs) {
       const res = await getNextCompiledSongs(gotNextSongs);
       if (res.status === 200) {

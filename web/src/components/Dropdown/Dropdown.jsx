@@ -9,11 +9,13 @@ const Dropdown = memo((props) => {
   const { items, title } = props;
   const [displayMenu, setDisplayMenu] = useState(false);
 
-  const showDropdown = useCallback(() => {
+  const showDropdown = useCallback((e) => {
+    e.preventDefault();
     setDisplayMenu(true);
   }, [setDisplayMenu]);
 
-  const hideDropdown = useCallback(() => {
+  const hideDropdown = useCallback((e) => {
+    e.preventDefault();
     setDisplayMenu(false);
   }, [setDisplayMenu]);
 
