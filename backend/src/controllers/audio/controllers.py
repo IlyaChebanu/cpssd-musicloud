@@ -4,6 +4,7 @@
 """
 import datetime
 import json
+from math import ceil
 
 import jwt
 from flask import Blueprint
@@ -198,7 +199,7 @@ def get_compiled_songs(user_data):  # pylint: disable=R0912,R0915
             current_page = 1
         current_page = int(current_page)
 
-        total_pages = (total_songs // songs_per_page)
+        total_pages = ceil(total_songs / songs_per_page)
         if total_pages == 0:
             total_pages = 1
         if current_page > total_pages:
@@ -404,7 +405,7 @@ def get_editable_songs(user_data):
             current_page = 1
         current_page = int(current_page)
 
-        total_pages = (total_songs // songs_per_page)
+        total_pages = ceil(total_songs / songs_per_page)
         if total_pages == 0:
             total_pages = 1
         if current_page > total_pages:
@@ -511,7 +512,7 @@ def get_liked_songs(user_data):
             current_page = 1
         current_page = int(current_page)
 
-        total_pages = (total_songs // songs_per_page)
+        total_pages = ceil(total_songs / songs_per_page)
         if total_pages == 0:
             total_pages = 1
         if current_page > total_pages:
@@ -848,7 +849,7 @@ def get_my_playlists(user_data):
             current_page = 1
         current_page = int(current_page)
 
-        total_pages = (total_playlists // playlists_per_page)
+        total_pages = ceil(total_playlists / playlists_per_page)
         if total_pages == 0:
             total_pages = 1
         if current_page > total_pages:
@@ -1001,7 +1002,7 @@ def get_my_playlist_songs(user_data):  # pylint: disable=R0911
             current_page = 1
         current_page = int(current_page)
 
-        total_pages = (total_songs // songs_per_page)
+        total_pages = ceil(total_songs / songs_per_page)
         if total_pages == 0:
             total_pages = 1
         if current_page > total_pages:

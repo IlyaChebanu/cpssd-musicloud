@@ -6,6 +6,7 @@ import re
 import traceback
 import datetime
 import random
+from math import ceil
 
 import jwt
 import mysql.connector
@@ -455,8 +456,7 @@ def posts():
         current_page = int(current_page)
 
         total_posts = get_number_of_posts(uid)
-
-        total_pages = (total_posts // posts_per_page)
+        total_pages = ceil(total_posts / posts_per_page)
         if total_pages == 0:
             total_pages = 1
         if current_page > total_pages:
@@ -669,7 +669,7 @@ def followers():
         current_page = int(current_page)
 
         total_users = get_follower_count(uid)
-        total_pages = (total_users // users_per_page)
+        total_pages = ceil(total_users / users_per_page)
         if total_pages == 0:
             total_pages = 1
         if current_page > total_pages:
@@ -786,7 +786,7 @@ def following():
         current_page = int(current_page)
 
         total_users = get_following_count(uid)
-        total_pages = (total_users // users_per_page)
+        total_pages = ceil(total_users / users_per_page)
         if total_pages == 0:
             total_pages = 1
         if current_page > total_pages:
@@ -915,7 +915,7 @@ def timeline(user_data):  # pylint:disable=R0912, R0914, R0915
         else:
             total_items = get_timeline_length(uid)
 
-        total_pages = (total_items // items_per_page)
+        total_pages = ceil(total_items / items_per_page)
         if total_pages == 0:
             total_pages = 1
         if current_page > total_pages:

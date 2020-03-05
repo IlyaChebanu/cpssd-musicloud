@@ -13,6 +13,7 @@ import { deleteToken } from '../../actions/userActions';
 import {
   deleteToken as deleteTokenAPI,
   saveState,
+  getSongState,
   uploadFile,
   createNewSong,
   patchSongName,
@@ -56,10 +57,26 @@ const Header = memo((props) => {
   const urlParams = new URLSearchParams(window.location.search);
   const songId = Number(urlParams.get('sid'));
 
+  const cleanSongSampleBuffers = (state) => {
+    state.tracks.forEach((track) => {
+      track.samples.forEach((sample) => {
+        sample.buffer = {};
+      });
+    });
+    return state;
+  };
+
   const handleSaveState = useCallback(async () => {
     if (!songId) return true;
     const songState = { tempo, tracks };
-    const res = await saveState(songId, songState);
+    let res = await getSongState(songId);
+    if (res.status === 200) {
+      const prevState = res.data.song_state;
+      if (_.isEqual(cleanSongSampleBuffers(songState), prevState)) return true;
+    } else {
+      dispatch(showNotification({ message: 'Unknown error has occured.' }));
+    }
+    res = await saveState(songId, songState);
     if (res.status === 200) {
       dispatch(showNotification({ message: 'Song saved', type: 'info' }));
       return true;

@@ -20,6 +20,9 @@
   color: white;
   font-size: 14px;
   margin: 10px 0px 0px 0px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .details {
