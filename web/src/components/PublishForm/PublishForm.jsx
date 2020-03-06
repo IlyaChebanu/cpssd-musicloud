@@ -85,7 +85,8 @@ const PublishForm = memo((props) => {
     }
   }, [description, dispatch, nameInput, songImageUrl, studio.songImageUrl, songId]);
 
-  const handleCoverChange = useCallback(async () => {
+  const handleCoverChange = useCallback(async (e) => {
+    e.preventDefault();
     const fileSelector = document.createElement('input');
     fileSelector.setAttribute('type', 'file');
     fileSelector.setAttribute('accept', 'image/*');

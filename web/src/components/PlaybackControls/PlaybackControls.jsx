@@ -58,11 +58,13 @@ const PlaybackControls = memo((props) => {
     }
   }, [currentBeat, dispatch, songPickerHidden]);
 
-  const showExplorer = useCallback(() => {
+  const showExplorer = useCallback((e) => {
+    e.preventDefault();
     dispatch(showFileExplorer());
   }, [dispatch]);
 
-  const hideExplorer = useCallback(() => {
+  const hideExplorer = useCallback((e) => {
+    e.preventDefault();
     dispatch(hideFileExplorer());
   }, [dispatch]);
 

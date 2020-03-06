@@ -33,14 +33,16 @@ const ProfileBlock = memo((props) => {
     history.push('/settings');
   }, []);
 
-  const getMyFollowers = useCallback(async () => {
+  const getMyFollowers = useCallback(async (e) => {
+    e.preventDefault();
     const res = await getFollowers(username);
     setGotUsers(res.data.followers);
     setFollower(true);
     dispatch(showUsersPopup());
   }, [dispatch, username]);
 
-  const getMyFollowing = useCallback(async () => {
+  const getMyFollowing = useCallback(async (e) => {
+    e.preventDefault();
     const res = await getFollowing(username);
     setGotUsers(res.data.following);
     setFollower(false);
@@ -89,7 +91,8 @@ const ProfileBlock = memo((props) => {
     }
   }, [dispatch, username]);
 
-  const handleCoverChange = useCallback(async () => {
+  const handleCoverChange = useCallback(async (e) => {
+    e.preventDefault();
     const fileSelector = document.createElement('input');
     fileSelector.setAttribute('type', 'file');
     fileSelector.setAttribute('accept', 'image/*');

@@ -41,7 +41,8 @@ const PianoRoll = memo(({
     setScroll(e.target.scrollLeft);
   }, []);
 
-  const handleClose = useCallback(() => {
+  const handleClose = useCallback((e) => {
+    e.preventDefault();
     dispatch(setShowPianoRoll(false));
   }, [dispatch]);
 
