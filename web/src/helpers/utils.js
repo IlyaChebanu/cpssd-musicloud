@@ -6,6 +6,10 @@ export const clamp = (min, max, val) => Math.max(min, Math.min(max, val));
 
 export const lerp = (v0, v1, t) => v0 * (1 - t) + v1 * t;
 
+export const map = (x, inMin, inMax, outMin, outMax) => (
+  ((x - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin
+);
+
 export const toNormalRange = (min, max, v) => (v - min) / (max - min);
 
 export const genId = () => (Math.random() + 1).toString(36).substring(7);

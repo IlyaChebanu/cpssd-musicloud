@@ -324,7 +324,7 @@ export const addSample = (trackId, sample) => (dispatch) => {
     type: 'ADD_SAMPLE',
     sampleId: genId(),
     sample: {
-      type: 'sample', notes: [], trackId, ...sample,
+      type: 'sample', notes: {}, trackId, ...sample,
     },
   });
 };

@@ -5,7 +5,11 @@ export const audioContext = new (window.AudioContext || window.webkitAudioContex
 audioContext.globalGain = audioContext.createGain();
 audioContext.globalGain.connect(audioContext.destination);
 
+export const trackChannels = {};
+
 export const bufferStore = {};
+
+export const scheduledSamples = {};
 
 export const colours = [
   '#FD1F76',

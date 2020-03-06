@@ -8,6 +8,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styles from './Studio.module.scss';
@@ -91,18 +92,11 @@ const Studio = memo((props) => {
     }
   }, [dispatch, songId]);
 
-  // TODO: Re-do this
+
   useEffect(() => {
     const resizeGrid = () => {
-      const latest = tracks.reduce((m, track) => {
-        const sampleMax = track.samples
-          ? track.samples.reduce((sm, sample) => {
-            const endTime = sample.time + sample.duration * (studio.tempo / 60);
-            return Math.max(endTime, sm);
-          }, 1)
-          : 1;
-        return Math.max(sampleMax, m);
-      }, 1);
+      let latest = _.maxBy(samples, (s) => s.time + s.duration);
+      latest = latest ? (latest.time + latest.duration) * (studio.tempo / 60) : 0;
       const width = Math.max(
         latest,
         tracksRef.current
@@ -110,14 +104,14 @@ const Studio = memo((props) => {
             / (40 * studio.gridSize)
           : 0,
       );
-      dispatch(setGridWidth(width));
+      dispatch(setGridWidth(width + 10));
     };
     resizeGrid();
     window.addEventListener('resize', resizeGrid);
     return () => {
       window.removeEventListener('resize', resizeGrid);
     };
-  }, [dispatch, tracks, studio.gridSize, studio.tempo, tracksRef]);
+  }, [dispatch, tracks, studio.gridSize, studio.tempo, tracksRef, samples]);
 
   const handleScroll = useCallback(
     (e) => {

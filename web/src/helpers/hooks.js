@@ -99,3 +99,17 @@ export const useGlobalDrag = (ref) => {
     },
   };
 };
+
+export const useEffectAfterMount = (cb, deps) => {
+  const isFirstRun = useRef(true);
+
+  useEffect(() => {
+    if (isFirstRun.current) {
+      isFirstRun.current = false;
+    } else {
+      return cb();
+    }
+    return undefined;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, deps);
+};

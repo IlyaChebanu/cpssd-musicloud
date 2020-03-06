@@ -4,6 +4,7 @@ import _ from 'lodash';
 
 export default (
   state = {
+    ppq: 1,
     loop: {
       start: 1,
       stop: 17,

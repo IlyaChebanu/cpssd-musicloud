@@ -53,13 +53,14 @@ const PianoRoll = memo(({
   const gridSizePx = 40;
 
   const selectedSampleObject = useMemo(() => samples[selectedSample], [samples, selectedSample]);
+  const notes = useMemo(() => (selectedSampleObject ? selectedSampleObject.notes : {}), [selectedSampleObject]);
 
   const numTicks = useMemo(() => {
     if (!tracksRef) return null;
     const bb = tracksRef.getBoundingClientRect();
-    const latest = selectedSampleObject && _.maxBy(selectedSampleObject.notes, (n) => n.tick + n.duration);
-    return Math.ceil(Math.max(bb.width / gridSizePx, latest ? latest.tick + latest.duration : 0));
-  }, [selectedSampleObject, tracksRef]);
+    const latest = _.maxBy(Object.values(notes), (n) => n.tick + n.duration);
+    return Math.ceil(Math.max(bb.width / gridSizePx, latest ? latest.tick + latest.duration : 0)) + 20;
+  }, [notes, tracksRef]);
 
   const ticks = useMemo(() => (
     [...Array(numTicks)].map(

@@ -28,6 +28,7 @@ import {
   setSampleBuffer,
   setSelectedTrack,
   setSampleDuration,
+  setSampleType,
 } from '../../actions/studioActions';
 
 import { ReactComponent as EditIcon } from '../../assets/icons/edit-sample.svg';
@@ -35,6 +36,7 @@ import { ReactComponent as PianoIcon } from '../../assets/icons/piano-keyboard-l
 import { showNotification } from '../../actions/notificationsActions';
 import Spinner from '../Spinner/Spinner';
 import { useGlobalDrag } from '../../helpers/hooks';
+import store from '../../store';
 
 
 const Sample = memo((props) => {
@@ -91,8 +93,8 @@ const Sample = memo((props) => {
 
   const [buffer, setBuffer] = useState(bufferStore[data.url]);
   useEffect(() => {
-    if (!buffer) {
-      setSampleBufferLoading(id, true);
+    if (!buffer && data.url) {
+      dispatch(setSampleBufferLoading(id, true));
       axios
         .get(data.url, { responseType: 'arraybuffer' })
         .then((res) => {
@@ -102,25 +104,47 @@ const Sample = memo((props) => {
               bufferStore[data.url] = buf;
               setBuffer(buf);
               dispatch(setSampleBufferLoading(id, false));
-              dispatch(setSampleDuration(id, buf.duration * (tempo / 60)));
+              const currentTempo = store.getState().studio.tempo;
+              if (data.type === 'sample') {
+                dispatch(setSampleDuration(id, buf.duration * (currentTempo / 60)));
+              }
             });
         });
+    } else if (buffer && data.url && data.type === 'sample') {
+      dispatch(setSampleDuration(id, buffer.duration * (tempo / 60)));
     }
-  }, [buffer, data, data.url, dispatch, id, tempo]);
+  }, [buffer, data.type, data.url, dispatch, id, tempo]);
 
   const sample = data;
+
+  const gridSizePx = 40 * gridSize; // TODO: change hardcoded value to redux
+  const ppq = 1; // TODO: Unhardcode
+  useEffect(() => {
+    if (data.type === 'pattern') {
+      const latest = _.maxBy(Object.values(data.notes), (n) => n.tick + n.duration);
+      dispatch(setSampleDuration(
+        id,
+        (0.25 / ppq) * (latest ? latest.tick + latest.duration : 4 * ppq),
+      ));
+    }
+  }, [data.notes, data.type, dispatch, gridSize, id, tempo]);
+
+
+  const numNotes = Object.keys(data.notes).length;
+  useEffect(() => {
+    if (!numNotes && data.url && data.type === 'pattern') {
+      dispatch(setSampleType(id, 'sample'));
+    } else if (numNotes && data.type === 'sample') {
+      dispatch(setSampleType(id, 'pattern'));
+    }
+  }, [data.type, data.url, dispatch, id, numNotes]);
 
   const wrapperStyle = useMemo(() => {
     const colourIdx = trackIndexLocal % dColours.length;
     const selected = id === selectedSample;
-    const ppq = 1; // TODO: Unhardcode
-    const gridSizePx = 40 * gridSize; // TODO: change hardcoded value to redux
     let width;
-    if (data.type === 'pattern') {
-      const latest = _.maxBy(data.notes, (n) => n.tick + n.duration);
-      width = (0.25 / ppq) * (latest ? latest.tick + latest.duration : 4 * ppq) * (40 * gridSize);
-    } else if (!buffer) {
-      width = 50;
+    if (data.bufferLoading) {
+      width = 55;
     } else {
       width = data.duration * gridSizePx;
     }
@@ -133,37 +157,30 @@ const Sample = memo((props) => {
       backgroundColor: selected ? colours[colourIdx] : dColours[colourIdx],
       zIndex: selected ? 2 : 1,
     };
-  }, [
-    trackIndexLocal,
-    id,
-    selectedSample,
-    gridSize,
-    data.type,
-    data.notes,
-    data.duration,
-    samplePosition.time,
-    buffer,
-  ]);
+  // eslint-disable-next-line max-len
+  }, [trackIndexLocal, id, selectedSample, data.bufferLoading, data.duration, samplePosition.time, gridSizePx]);
 
   const container = ref.current;
   const wavesurfer = useRef();
   useEffect(() => {
-    if (container && !wavesurfer.current) {
-      wavesurfer.current = WaveSurfer.create({
-        container,
-        waveColor: '#eee',
-        height: 90,
-        interact: false,
-        barWidth: 1,
-        barRadius: 0.5,
-        barGap: 2,
-        hideScrollbar: true,
-      });
-    }
-    if (buffer && data.duration) {
+    if (container && buffer && data.duration && data.type === 'sample') {
+      if (!wavesurfer.current) {
+        wavesurfer.current = WaveSurfer.create({
+          container,
+          waveColor: '#eee',
+          height: 90,
+          interact: false,
+          barWidth: 1,
+          barRadius: 0.5,
+          barGap: 2,
+          hideScrollbar: true,
+        });
+      }
       setTimeout(() => wavesurfer.current.loadDecodedBuffer(buffer), 300);
+    } else if (wavesurfer.current && data.type === 'pattern') {
+      wavesurfer.current.destroy();
     }
-  }, [buffer, container, data.duration]);
+  }, [buffer, container, data.duration, data.type, gridSize, tempo]);
 
   const deleteSample = useCallback(() => {
     dispatch(removeSample(id));
@@ -217,7 +234,7 @@ const Sample = memo((props) => {
             />
           </div>
         )}
-      {!buffer && <Spinner className={styles.spinner} />}
+      {data.bufferLoading && <Spinner className={styles.spinner} />}
       {/* {data.type === 'pattern' ? '' : waveform} */}
       <div className={styles.fadeWrapper}>
         {id === selectedSample && !!(data.fade.fadeIn || data.fade.fadeOut) && (

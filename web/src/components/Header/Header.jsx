@@ -46,6 +46,10 @@ import {
   setSampleLoading,
   showPublishForm,
   addSample,
+  setShowPianoRoll,
+  hideSampleEffects,
+  setCompleteTracksState,
+  setCompleteSamplesState,
 } from '../../actions/studioActions';
 
 const Header = memo((props) => {
@@ -114,12 +118,15 @@ const Header = memo((props) => {
   const handleShowSongPicker = useCallback(async () => {
     if (await handleSaveState()) {
       dispatch(stop);
-      // dispatch(setTracks([]));
+      dispatch(setCompleteTracksState([]));
+      dispatch(setCompleteSamplesState({}));
       window.history.pushState(null, null, '/studio');
       dispatch(setSongName('New Song'));
       dispatch(setTempo(140));
       dispatch(showSongPicker());
     }
+    dispatch(setShowPianoRoll(false));
+    dispatch(hideSampleEffects());
   }, [dispatch, handleSaveState]);
 
   const handleHideSongPicker = useCallback(async () => {
