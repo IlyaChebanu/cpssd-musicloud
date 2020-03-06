@@ -25,6 +25,11 @@ export const SET_USER_DATA = 'set_user_data';
 export const SET_OTHER_USER_DATA = 'set_other_user_data';
 export const SET_FOLLOWING = 'set_following';
 export const SET_IS_PORTRAIT = 'set_is_portrait';
+export const SET_IS_NOTIFICATION = 'set_is_notification';
+export const SET_IS_NOTIFICATION_FOLLOW = 'set_is_notification_follow';
+export const SET_IS_NOTIFICATION_POST = 'set_is_notification_post';
+export const SET_IS_NOTIFICATION_SONG = 'set_is_notification_song';
+export const SET_IS_NOTIFICATION_LIKE = 'set_is_notification_like';
 
 //clear redux
 export const CLEAR_REDUX_STATE = 'clear_redux_state';
