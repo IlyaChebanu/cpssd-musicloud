@@ -11,11 +11,11 @@ import PasswordInput from "../../components/passwordInput/passwordInput";
 import MultiPurposeButton from "../../components/multiPurposeButton/multiPurposeButton";
 import HeaderComponent from "../../components/headerComponent/headerComponent";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { patchUserDetails } from "../../api/usersAPI";
+import { patchUserDetails, patchNotifications, patchNotificationsFollow, patchNotificationsPost, patchNotificationsSong, patchNotificationsLike } from "../../api/usersAPI";
 import { getInvalidUserSettingsDetails } from "../../utils/helpers";
 import ToggleSwitch from '../../components/toggleSwitch/toggleSwitch';
 import Orientation from 'react-native-orientation';
-import { writeDataToStorage, SETTINGS_PORTRAIT_DATA_KEY } from "../../utils/localStorage";
+import { writeDataToStorage, SETTINGS_PORTRAIT_DATA_KEY, SETTINGS_NOTIFICATION_DATA_KEY, SETTINGS_NOTIFICATION_FOLLOW_DATA_KEY, SETTINGS_NOTIFICATION_LIKE_DATA_KEY, SETTINGS_NOTIFICATION_POST_DATA_KEY, SETTINGS_NOTIFICATION_SONG_DATA_KEY } from "../../utils/localStorage";
 import CustomAlertComponent from "../../components/alertComponent/customAlert";
 
 class UserSettingsScreen extends React.Component {
@@ -103,6 +103,68 @@ class UserSettingsScreen extends React.Component {
         }
     }
 
+    toggleNotification(isOn) {
+        this.props.setIsNotification(isOn)
+        this.props.setIsNotificationFollow(isOn)
+        this.props.setIsNotificationPost(isOn)
+        this.props.setIsNotificationSong(isOn)
+        this.props.setIsNotificationLike(isOn)
+        writeDataToStorage(isOn, SETTINGS_NOTIFICATION_DATA_KEY)
+        writeDataToStorage(isOn, SETTINGS_NOTIFICATION_FOLLOW_DATA_KEY)
+        writeDataToStorage(isOn, SETTINGS_NOTIFICATION_POST_DATA_KEY)
+        writeDataToStorage(isOn, SETTINGS_NOTIFICATION_SONG_DATA_KEY)
+        writeDataToStorage(isOn, SETTINGS_NOTIFICATION_LIKE_DATA_KEY)
+        if (isOn) {
+            patchNotifications(this.props.token, 0)
+        } else if (!isOn) {
+            patchNotifications(this.props.token, 1)
+        }
+    }
+
+    toggleNotificationFollow(isOn) {
+        this.props.setIsNotificationFollow(isOn)
+        writeDataToStorage(isOn, SETTINGS_NOTIFICATION_FOLLOW_DATA_KEY)
+        if (isOn) {
+            patchNotificationsFollow(this.props.token, 0)
+        } else if (!isOn) {
+            patchNotificationsFollow(this.props.token, 1)
+            if (!this.props.isNotificationPost && !this.props.isNotificationSong && !this.props.isNotificationLike) {
+                console.warn('yes')
+                this.toggleNotification(false)
+            }
+        } 
+    }
+
+    async toggleNotificationPost(isOn) {
+        this.props.setIsNotificationPost(isOn)
+        writeDataToStorage(isOn, SETTINGS_NOTIFICATION_POST_DATA_KEY)
+        if (isOn) {
+            patchNotificationsPost(this.props.token, 0)
+        } else if (!isOn) {
+            patchNotificationsPost(this.props.token, 1)
+        }
+    }
+
+    async toggleNotificationSong(isOn) {
+        this.props.setIsNotificationSong(isOn)
+        writeDataToStorage(isOn, SETTINGS_NOTIFICATION_SONG_DATA_KEY)
+        if (isOn) {
+            patchNotificationsSong(this.props.token, 0)
+        } else if (!isOn) {
+            patchNotificationsSong(this.props.token, 1)
+        }
+    }
+
+    async toggleNotificationLike(isOn) {
+        this.props.setIsNotificationLike(isOn)
+        writeDataToStorage(isOn, SETTINGS_NOTIFICATION_LIKE_DATA_KEY)
+        if (isOn) {
+            patchNotificationsLike(this.props.token, 0)
+        } else if (!isOn) {
+            patchNotificationsLike(this.props.token, 1)
+        }
+    }
+
     onPressAlertPositiveButton = () => {
         this.setState({ showAlert: false })
     };
@@ -115,6 +177,7 @@ class UserSettingsScreen extends React.Component {
     };
 
     render() {
+        let notificationsOn = this.props.isNotification
         return (
             <SafeAreaView forceInset={{ bottom: 'never' }} style={{ 'backgroundColor': '#3D4044', 'flex': 1 }}>
                 <CustomAlertComponent
@@ -188,6 +251,48 @@ class UserSettingsScreen extends React.Component {
                                     onToggle={(isOn) => this.toggleOrientation(isOn)}
                                 />
                             </View>
+                            
+                            <View style={styles.notificationsContainer}>
+                                <Text style={styles.notificationText}>{'All Notifications'}</Text>
+                                <ToggleSwitch
+                                    isOn={this.props.isNotification}
+                                    onToggle={(isOn) => this.toggleNotification(isOn)}
+                                />
+                            </View>
+                        
+                            {/* <View style={!notificationsOn && styles.notificationsSettings} pointerEvents={notificationsOn ? 'auto' : 'none'}> */}
+                            <View style={styles.notificationsContainer}>
+                                <Text style={styles.notificationText}>{'Follow Notifications'}</Text>
+                                <ToggleSwitch
+                                    isOn={this.props.isNotificationFollow}
+                                    onToggle={(isOn) => this.toggleNotificationFollow(isOn)}
+                                />
+                            </View>
+
+                            <View style={styles.notificationsContainer}>
+                                <Text style={styles.notificationText}>{'Post Notifications'}</Text>
+                                <ToggleSwitch
+                                    isOn={this.props.isNotificationPost}
+                                    onToggle={(isOn) => this.toggleNotificationPost(isOn)}
+                                />
+                            </View>
+
+                            <View style={styles.notificationsContainer}>
+                                <Text style={styles.notificationText}>{'Song Notifications'}</Text>
+                                <ToggleSwitch
+                                    isOn={this.props.isNotificationSong}
+                                    onToggle={(isOn) => this.toggleNotificationSong(isOn)}
+                                />
+                            </View>
+
+                            <View style={styles.notificationsContainer}>
+                                <Text style={styles.notificationText}>{'Like Notifications'}</Text>
+                                <ToggleSwitch
+                                    isOn={this.props.isNotificationLike}
+                                    onToggle={(isOn) => this.toggleNotificationLike(isOn)}
+                                />
+                            </View>
+                            {/* </View> */}
                         </KeyboardAwareScrollView>
 
                     </View>
@@ -201,6 +306,11 @@ function mapStateToProps(state) {
     return {
         token: state.home.token,
         isPortrait: state.user.isPortrait,
+        isNotification: state.user.isNotification,
+        isNotificationFollow: state.user.isNotificationFollow,
+        isNotificationPost: state.user.isNotificationPost,
+        isNotificationSong: state.user.isNotificationSong,
+        isNotificationLike: state.user.isNotificationLike,
     };
 }
 
