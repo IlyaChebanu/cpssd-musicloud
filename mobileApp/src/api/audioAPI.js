@@ -50,7 +50,7 @@ export function getCompiledSongs(token, username, songs_per_page, next_page) {
         });
 }
 
-export function getLikedSongs(token, username, songs_per_page) {
+export function getLikedSongs(token, username, songs_per_page, next_page) {
 
     let url = `${API_URL}api/v1/audio/liked_songs`;
     if (songs_per_page) {
@@ -58,8 +58,14 @@ export function getLikedSongs(token, username, songs_per_page) {
         if (username) {
             url = url + `&username=${username}`
         }
+        if (next_page) {
+            url = url + `&next_page=${next_page}`
+        }
     } else if (username) {
         url = url + `?username=${username}`
+        if (next_page) {
+            url = url + `&next_page=${next_page}`
+        }
     }
     var request = new Request(url, {
         method: "GET",

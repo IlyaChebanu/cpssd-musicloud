@@ -33,6 +33,7 @@ class UserProfileScreen extends React.Component {
       activeFollowTab: 1,
       profileScreen: 1,
       likedSongsData: [],
+      nextPage: null,
     }
   }
 
@@ -57,9 +58,10 @@ class UserProfileScreen extends React.Component {
   }
 
   getLikedSongs() {
-    getLikedSongs(this.props.token, this.props.otherUserData.username).then(response => {
+    getLikedSongs(this.props.token, this.props.otherUserData.username, 10, this.state.nextPage).then(response => {
       if (response.status === 200) {
-        this.setState({ likedSongsData: response.data.songs })
+        var joined = this.state.likedSongsData.concat(response.data.songs)
+        this.setState({ likedSongsData: joined, nextPage: response.data.next_page })
       }
     })
   }
@@ -295,6 +297,12 @@ class UserProfileScreen extends React.Component {
     )
   }
 
+  _handleLoadMore() {
+    if (this.state.nextPage !== null){
+      this.getLikedSongs()
+    }
+  }
+
   renderLikedSongs() {
     const profilePosition = this.animatedLikedScreen.interpolate({
       inputRange: [0, 1],
@@ -309,6 +317,8 @@ class UserProfileScreen extends React.Component {
           renderItem={this.renderLikedSong.bind(this)}
           keyExtractor={item => String(item.sid)}
           extraData={this.state.likedSongsData}
+          onEndReached={this._handleLoadMore.bind(this)}
+          onEndReachedThreshold={0.5}
         />
       </Animated.View>
     )
