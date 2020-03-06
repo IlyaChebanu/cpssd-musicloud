@@ -586,3 +586,188 @@ export function getUserTimeline(token, posts_only, songs_only) {
             return error
         });
 }
+
+export function patchNotifications(token, status) {
+
+    let url = `${API_URL}api/v1/users/notifications`;
+    var request = new Request(url, {
+        method: "PATCH",
+        headers: new Headers({
+            "Content-Type": "application/json",
+            "Authorization": 'Bearer ' + token,
+        }),
+        body: JSON.stringify({
+            "status": status
+        })
+    });
+    if (__DEV__) {
+        console.log("patchNotifications : request " + JSON.stringify(request))
+    }
+
+    return fetch(request)
+        .then(response => {
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
+        })
+        .then(responseJson => {
+            if (__DEV__) {
+                console.log("patchNotifications : response " + JSON.stringify(responseJson))
+            }
+            return responseJson;
+        })
+        .catch(error => {
+            if (__DEV__) {
+                console.log("patchNotifications : error " + JSON.stringify(error))
+            }
+            return error
+        });
+}
+
+export function patchNotificationsFollow(token, status) {
+
+    let url = `${API_URL}api/v1/users/notifications/follows`;
+    var request = new Request(url, {
+        method: "PATCH",
+        headers: new Headers({
+            "Content-Type": "application/json",
+            "Authorization": 'Bearer ' + token,
+        }),
+        body: JSON.stringify({
+            "status": status
+        })
+    });
+    if (__DEV__) {
+        console.log("patchNotificationsFollow : request " + JSON.stringify(request))
+    }
+
+    return fetch(request)
+        .then(response => {
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
+        })
+        .then(responseJson => {
+            if (__DEV__) {
+                console.log("patchNotificationsFollow : response " + JSON.stringify(responseJson))
+            }
+            return responseJson;
+        })
+        .catch(error => {
+            if (__DEV__) {
+                console.log("patchNotificationsFollow : error " + JSON.stringify(error))
+            }
+            return error
+        });
+}
+
+export function patchNotificationsPost(token, status) {
+
+    let url = `${API_URL}api/v1/users/notifications/posts`;
+    var request = new Request(url, {
+        method: "PATCH",
+        headers: new Headers({
+            "Content-Type": "application/json",
+            "Authorization": 'Bearer ' + token,
+        }),
+        body: JSON.stringify({
+            "status": status
+        })
+    });
+    if (__DEV__) {
+        console.log("patchNotificationsPost : request " + JSON.stringify(request))
+    }
+
+    return fetch(request)
+        .then(response => {
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
+        })
+        .then(responseJson => {
+            if (__DEV__) {
+                console.log("patchNotificationsPost : response " + JSON.stringify(responseJson))
+            }
+            return responseJson;
+        })
+        .catch(error => {
+            if (__DEV__) {
+                console.log("patchNotificationsPost : error " + JSON.stringify(error))
+            }
+            return error
+        });
+}
+
+export function patchNotificationsSong(token, status) {
+
+    let url = `${API_URL}api/v1/users/notifications/songs`;
+    var request = new Request(url, {
+        method: "PATCH",
+        headers: new Headers({
+            "Content-Type": "application/json",
+            "Authorization": 'Bearer ' + token,
+        }),
+        body: JSON.stringify({
+            "status": status
+        })
+    });
+    if (__DEV__) {
+        console.log("patchNotificationsSong : request " + JSON.stringify(request))
+    }
+
+    return fetch(request)
+        .then(response => {
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
+        })
+        .then(responseJson => {
+            if (__DEV__) {
+                console.log("patchNotificationsSong : response " + JSON.stringify(responseJson))
+            }
+            return responseJson;
+        })
+        .catch(error => {
+            if (__DEV__) {
+                console.log("patchNotificationsSong : error " + JSON.stringify(error))
+            }
+            return error
+        });
+}
+
+export function patchNotificationsLike(token, status) {
+
+    let url = `${API_URL}api/v1/users/notifications/likes`;
+    var request = new Request(url, {
+        method: "PATCH",
+        headers: new Headers({
+            "Content-Type": "application/json",
+            "Authorization": 'Bearer ' + token,
+        }),
+        body: JSON.stringify({
+            "status": status
+        })
+    });
+    if (__DEV__) {
+        console.log("patchNotificationsLike : request " + JSON.stringify(request))
+    }
+
+    return fetch(request)
+        .then(response => {
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
+        })
+        .then(responseJson => {
+            if (__DEV__) {
+                console.log("patchNotificationsLike : response " + JSON.stringify(responseJson))
+            }
+            return responseJson;
+        })
+        .catch(error => {
+            if (__DEV__) {
+                console.log("patchNotificationsLike : error " + JSON.stringify(error))
+            }
+            return error
+        });
+}
