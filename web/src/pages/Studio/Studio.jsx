@@ -23,15 +23,6 @@ import {
   hideSongPicker, showSongPicker,
 } from '../../actions/studioActions';
 import { showNotification } from '../../actions/notificationsActions';
-import kick from '../../assets/basic_sounds/kick.wav';
-import clap from '../../assets/basic_sounds/clap.wav';
-import crash from '../../assets/basic_sounds/crash.wav';
-import hat from '../../assets/basic_sounds/hat.wav';
-import openhat from '../../assets/basic_sounds/openhat.wav';
-import percussion from '../../assets/basic_sounds/percussion.wav';
-import snare from '../../assets/basic_sounds/snare.wav';
-import triangle from '../../assets/basic_sounds/triangle.wav';
-import bass from '../../assets/samples/bass.wav';
 import Timeline from '../../components/Timeline';
 import SeekBar from '../../components/SeekBar';
 import TrackControls from '../../components/TrackControls';
