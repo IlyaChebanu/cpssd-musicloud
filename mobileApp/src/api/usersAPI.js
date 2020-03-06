@@ -216,9 +216,15 @@ export function passwordResetConfirm(email, code, password) {
         });
 }
 
-export function getUserPosts(username, token) {
+export function getUserPosts(username, token, next_page, posts_per_page) {
 
     let url = `${API_URL}api/v1/users/posts?username=${username}`;
+    if (next_page) {
+        url = url + `&next_page=${next_page}`
+    }
+    if (posts_per_page) {
+        url = url + `&posts_per_page=${posts_per_page}`
+    }
     var request = new Request(url, {
         method: "GET",
         headers: new Headers({
@@ -548,13 +554,25 @@ export function getFollowing(username, token) {
         });
 }
 
-export function getUserTimeline(token, posts_only, songs_only) {
+export function getUserTimeline(token, posts_only, songs_only, next_page, items_per_page) {
 
     let url = `${API_URL}api/v1/users/timeline`;
     if (posts_only) {
         url = url + `?posts_only=${posts_only}`
+        if (next_page) {
+            url = url + `&next_page=${next_page}`
+        }
+        if (items_per_page) {
+            url = url + `&items_per_page=${items_per_page}`
+        }
     } else if (songs_only) {
         url = url + `?songs_only=${songs_only}`
+        if (next_page) {
+            url = url + `&next_page=${next_page}`
+        }
+        if (items_per_page) {
+            url = url + `&items_per_page=${items_per_page}`
+        }
     }
     var request = new Request(url, {
         method: "GET",
