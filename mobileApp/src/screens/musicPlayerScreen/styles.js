@@ -30,6 +30,9 @@ export default StyleSheet.create({
     top: height * 0.3,
     width: width * 0.6,
   },
+  playlistFlatList: {
+    height: height * 0.6,
+  },
   addText: {
     color: '#FFF',
     textAlign: 'center',
