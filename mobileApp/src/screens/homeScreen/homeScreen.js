@@ -20,6 +20,7 @@ class HomeScreen extends React.Component {
       showAlert: false,
       alertTitle: 'Confirm exit',
       alertMessage: 'Do you want to quit the app?',
+      nextPage: null,
     };
   }
 
@@ -61,11 +62,10 @@ class HomeScreen extends React.Component {
   }
 
   getSongs() {
-    getCompiledSongs(this.props.token, '').then(response => {
+    getCompiledSongs(this.props.token, '', 5, this.state.nextPage).then(response => {
       if (response.status === 200) {
-        this.setState({ songsData: response.data.songs })
-      } else {
-
+        var joined = this.state.songsData.concat(response.data.songs)
+        this.setState({ songsData: joined, nextPage: response.data.next_page })
       }
     })
   }
@@ -116,6 +116,10 @@ class HomeScreen extends React.Component {
   onPressAlertNegativeButton = () => {
     this.setState({ showAlert: false })
   };
+  
+  _handleLoadMore() {
+    this.getSongs()
+  }
 
   render() {
     return (
@@ -140,6 +144,8 @@ class HomeScreen extends React.Component {
             renderItem={this.renderSong.bind(this)}
             keyExtractor={item => String(item.sid)}
             extraData={this.state.songsData}
+            onEndReached={this._handleLoadMore.bind(this)}
+            onEndReachedThreshold={0.5}
           />
         </View>
 

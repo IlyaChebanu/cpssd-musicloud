@@ -6,7 +6,6 @@ import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity } from "react
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import ProfileComponent from "../profileComponent/profileComponent";
-import { getCompiledSongs } from "../../api/audioAPI";
 import { getUserTimeline } from "../../api/usersAPI";
 
 class ProfileSongs extends React.Component {
