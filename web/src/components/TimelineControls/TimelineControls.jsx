@@ -45,11 +45,13 @@ const TimelineControls = memo((props) => {
     }
   }, [handleSetTempo]);
 
-  const handleGridSnapClick = useCallback(() => {
+  const handleGridSnapClick = useCallback((e) => {
+    e.preventDefault();
     dispatch(setGridSnapEnabled(!gridSnapEnabled));
   }, [dispatch, gridSnapEnabled]);
 
-  const handleLoopClick = useCallback(() => {
+  const handleLoopClick = useCallback((e) => {
+    e.preventDefault();
     dispatch(setLoopEnabled(!loopEnabled));
   }, [dispatch, loopEnabled]);
 

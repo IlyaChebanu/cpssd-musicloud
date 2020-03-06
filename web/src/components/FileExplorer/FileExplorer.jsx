@@ -95,7 +95,7 @@ const FileExplorer = memo((props) => {
         </li>
       </ul>
       {list.map((item) => (
-        <li onClick={() => addSample(item)} className={styles.li}>
+        <li onClick={(e) => { e.preventDefault(); addSample(item); }} className={styles.li}>
           {item.split('/').pop()}
         </li>
       ))}

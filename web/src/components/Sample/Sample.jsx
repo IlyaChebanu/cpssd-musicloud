@@ -116,7 +116,8 @@ const Sample = memo((props) => {
     COPY_SAMPLE: copySample,
   };
 
-  const handleShowHideSampleEffects = useCallback(() => {
+  const handleShowHideSampleEffects = useCallback((e) => {
+    e.preventDefault();
     if (sampleEffectsHidden) {
       dispatch(showSampleEffects());
     } else {
@@ -124,7 +125,8 @@ const Sample = memo((props) => {
     }
   }, [dispatch, sampleEffectsHidden]);
 
-  const handleTogglePiano = useCallback(() => {
+  const handleTogglePiano = useCallback((e) => {
+    e.preventDefault();
     dispatch(setShowPianoRoll(!showPianoRoll));
   }, [dispatch, showPianoRoll]);
 

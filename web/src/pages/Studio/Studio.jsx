@@ -123,7 +123,8 @@ const Studio = memo((props) => {
     [dispatch],
   );
 
-  const handleAddNewTrack = useCallback(() => {
+  const handleAddNewTrack = useCallback((e) => {
+    e.preventDefault();
     dispatch(
       setTracks([
         ...tracks,

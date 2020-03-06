@@ -40,7 +40,8 @@ const SongPicker = memo((props) => {
   const urlParams = new URLSearchParams(window.location.search);
   const songId = Number(urlParams.get('sid'));
 
-  const handleCreateNewSong = useCallback(async () => {
+  const handleCreateNewSong = useCallback(async (e) => {
+    e.preventDefault();
     const res = await createNewSong('New Song');
     if (res.status === 200) {
       window.history.pushState(null, null, `/studio?sid=${res.data.sid}`);
