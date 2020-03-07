@@ -9,7 +9,7 @@ import { ReactComponent as Pause } from '../../assets/icons/pause-circle-light.s
 import { ReactComponent as Back } from '../../assets/icons/go-back.svg';
 import { ReactComponent as Forward } from '../../assets/icons/go-forward.svg';
 import { ReactComponent as ToStart } from '../../assets/icons/to-start.svg';
-import { ReactComponent as FileExplorer } from '../../assets/icons/file-explorer.svg';
+import { ReactComponent as FileExplorerIcon } from '../../assets/icons/file-explorer.svg';
 import Slider from '../Slider/Slider';
 import {
   setCurrentBeat, stop, pause, play,
@@ -111,14 +111,15 @@ const PlaybackControls = memo((props) => {
           <p>{timeString}</p>
         </span>
 
-        <div className={styles.likeIconWrapper}>
-          <FileExplorer
-            className={
+
+        <FileExplorerIcon
+          id="explorer"
+          className={
               fileExplorerHidden ? styles.notSelectedIcon : styles.selectedIcon
             }
-            onClick={fileExplorerHidden ? showExplorer : hideExplorer}
-          />
-        </div>
+          onClick={fileExplorerHidden ? showExplorer : hideExplorer}
+        />
+
       </div>
     </GlobalHotKeys>
   );
