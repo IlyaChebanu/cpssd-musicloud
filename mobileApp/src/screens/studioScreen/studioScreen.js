@@ -64,7 +64,7 @@ class StudioScreen extends React.Component {
                 type: [DocumentPicker.types.audio],
             });
             let extension = res.type.split('/').slice(-1)[0]
-            let filename = `/${this.props.username}/${res.name}.${extension}`
+            let filename = `${res.name}`
             this.uploadSelectedAudio(filename, res.type, res.uri)
             console.log(
                 res.uri,
@@ -226,7 +226,7 @@ class StudioScreen extends React.Component {
     async uploadAudio() {
 
         let filetype = Platform.OS === 'android' ? 'mp4' : 'm4a'
-        let filename = `/${this.props.username}/` + this.state.filename + '.' + filetype
+        let filename = this.state.filename + '.' + filetype
         await postFile(this.props.token, 'audio', filename, `audio/x-${filetype}`).then(response => {
             if (isNaN(response)) {
                 if (response.signed_url.fields.key) {
