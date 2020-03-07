@@ -26,7 +26,7 @@ export default StyleSheet.create({
     alignItems: 'center',
   },
   titleTxt: {
-    marginTop: 100 * ratio,
+    marginTop: height > 600 ? 100 * ratio : 50 * ratio,
     color: 'white',
     fontSize: 28 * ratio,
   },
@@ -39,7 +39,7 @@ export default StyleSheet.create({
     flexDirection: 'row',
   },
   viewPlayer: {
-    marginTop: 60 * ratio,
+    marginTop: height > 600 ? 60 * ratio : 20 * ratio,
     alignSelf: 'stretch',
     alignItems: 'center',
   },

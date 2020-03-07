@@ -52,11 +52,9 @@ class PlaylistScreen extends React.Component {
     }
 
     getPlaylistSongs(pid) {
-        console.log('testt')
         getPlaylistSongs(this.props.token, pid, 10, this.state.nextPage).then(response => {
             if (response.status === 200) {
-                var joined = this.state.playlistSongData.concat(response.data.songs)
-                this.setState({ playlistSongData: joined, nextPage: response.data.next_page, screenState: 2 })
+                this.setState({ playlistSongData: response.data.songs, nextPage: response.data.next_page, screenState: 2 })
             }
         })
     }
@@ -153,7 +151,12 @@ class PlaylistScreen extends React.Component {
 
     _handleLoadMore() {
         if (this.state.nextPage !== null){
-          this.getPlaylistSongs(this.state.pid)
+          getPlaylistSongs(this.props.token, this.state.pid, 10, this.state.nextPage).then(response => {
+            if (response.status === 200) {
+                var joined = this.state.playlistSongData.concat(response.data.songs)
+                this.setState({ playlistSongData: joined, nextPage: response.data.next_page, screenState: 2 })
+            }
+        })
         }
     }
 
