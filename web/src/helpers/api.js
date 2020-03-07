@@ -6,32 +6,30 @@ import { deleteToken as deleteTokenAction } from '../actions/userActions';
 import history from '../history';
 
 axios.interceptors.response.use((res) => res, (err) => {
-  const state = store.getState();
+  // const state = store.getState();
   const res = err.response || { status: null };
   if ([500, 422].includes(res.status)) {
     store.dispatch(showNotification({
       message: 'An unknown error has occured. Please contact the site owners.',
     }));
   }
-  if (state.user.token) {
-    if (res.status === 401) {
-      store.dispatch(showNotification({
-        message: 'Session expired. Please log back in.',
-      }));
-      cookie.remove('token');
-      store.dispatch(deleteTokenAction);
-      history.push('/login');
-    }
-    if (res.status === 403) {
-      store.dispatch(showNotification({
-        message: 'Permission to perform action denied.',
-      }));
-    }
-    if (res.status === 404) {
-      store.dispatch(showNotification({
-        message: 'Object not found.',
-      }));
-    }
+  if (res.status === 401) {
+    store.dispatch(showNotification({
+      message: 'Session expired. Please log back in.',
+    }));
+    cookie.remove('token');
+    store.dispatch(deleteTokenAction);
+    history.push('/login');
+  }
+  if (res.status === 403) {
+    store.dispatch(showNotification({
+      message: 'Permission to perform action denied.',
+    }));
+  }
+  if (res.status === 404) {
+    store.dispatch(showNotification({
+      message: 'Object not found.',
+    }));
   }
   return res;
 });

@@ -71,9 +71,8 @@ export default (store) => {
     });
   };
 
-  const getTrackVolume = (track, volume) => {
-    const { studio } = store.getState();
-    const soloTrack = _.find(studio.tracks, 'solo');
+  const getTrackVolume = (track, volume, tracks = store.getState().studio.tracks) => {
+    const soloTrack = _.find(tracks, 'solo');
     return volume * (
       soloTrack ? soloTrack.id === track.id : !track.mute
     );
@@ -149,7 +148,7 @@ export default (store) => {
           const pan = audioContext.createStereoPanner();
           const muterGain = audioContext.createGain();
 
-          gain.gain.setValueAtTime(getTrackVolume(track, track.volume), 0);
+          gain.gain.setValueAtTime(getTrackVolume(track, track.volume, action.tracks), 0);
           pan.pan.setValueAtTime(track.pan, 0);
           muterGain.gain.setValueAtTime(track.mute ? 0 : 1, 0);
 
@@ -239,8 +238,10 @@ export default (store) => {
       case 'REMOVE_SAMPLE': {
         const sample = scheduledSamples[action.sampleId];
 
-        stopSample(sample);
-        delete scheduledSamples[action.sampleId];
+        if (sample) {
+          stopSample(sample);
+          delete scheduledSamples[action.sampleId];
+        }
         break;
       }
 
@@ -336,7 +337,7 @@ export default (store) => {
         if (sample) {
           const note = sample.notes[action.noteId];
 
-          if (note.source) {
+          if (note && note.source) {
             note.source.stop();
           }
         }
@@ -349,13 +350,61 @@ export default (store) => {
         if (sample) {
           const note = sample.notes[action.noteId];
 
-          if (note.source) {
-            note.source.stop();
-          }
+          if (note) {
+            if (note.source) {
+              note.source.stop();
+            }
 
-          // Reschedule note
-          const noteTime = sample.time + action.value * (0.25 / state.ppq);
-          const noteDuration = note.duration * (0.25 / state.ppq);
+            // Reschedule note
+            const noteTime = sample.time + action.value * (0.25 / state.ppq);
+            const noteDuration = note.duration * (0.25 / state.ppq);
+
+            const noteStartTime = audioContext.currentTime + beatsToSeconds(
+              noteTime - state.currentBeat, state.tempo,
+            );
+            const noteEndTime = audioContext.currentTime + beatsToSeconds(
+              noteTime + noteDuration - state.currentBeat,
+              state.tempo,
+            );
+            const noteOffset = Math.max(
+              0,
+              beatsToSeconds(state.currentBeat - noteTime, state.tempo),
+            );
+            note.source = playNote(
+              audioContext,
+              note,
+              sample.gain,
+              noteStartTime,
+              noteOffset,
+              noteEndTime,
+              sample.url,
+            );
+          }
+        }
+        break;
+      }
+
+      case 'SET_PATTERN_NOTE_NUMBER': {
+        const sample = scheduledSamples[action.sampleId];
+
+        if (sample) {
+          const note = sample.notes[action.noteId];
+
+          if (!sample.url) {
+            note.source.frequency.setValueAtTime(2 ** ((action.value - 49) / 12) * 440, 0);
+          }
+        }
+        break;
+      }
+
+      case 'SET_PATTERN_NOTE_DURATION': {
+        const sample = scheduledSamples[action.sampleId];
+
+        if (sample) {
+          const note = sample.notes[action.noteId];
+
+          const noteTime = sample.time + note.tick * (0.25 / state.ppq);
+          const noteDuration = action.value * (0.25 / state.ppq);
 
           const noteStartTime = audioContext.currentTime + beatsToSeconds(
             noteTime - state.currentBeat, state.tempo,
@@ -364,28 +413,74 @@ export default (store) => {
             noteTime + noteDuration - state.currentBeat,
             state.tempo,
           );
-          const noteOffset = Math.max(
-            0,
-            beatsToSeconds(state.currentBeat - noteTime, state.tempo),
-          );
-          note.source = playNote(
-            audioContext,
-            note,
-            sample.gain,
-            noteStartTime,
-            noteOffset,
-            noteEndTime,
-            sample.url,
-          );
+          const noteOffset = Math.max(0, beatsToSeconds(state.currentBeat - noteTime, state.tempo));
+
+          note.source.stop(noteEndTime);
+
+          if (
+            noteTime + noteDuration > state.currentBeat
+            && noteTime + note.duration * (0.25 / state.ppq) < state.currentBeat
+          ) {
+            // If the note was extended past the previous duration & not currently playing
+            // Recalculate pattern duration, popFilter and fade
+
+            const latest = _.maxBy(
+              Object.values({
+                ...sample.notes,
+                [action.noteId]: { ...note, duration: action.value },
+              }),
+              (n) => n.tick + n.duration,
+            );
+            const sampleDuration = (0.25 / state.ppq) * (
+              latest
+                ? latest.tick + latest.duration
+                : 0
+            );
+            const startTime = audioContext.currentTime + beatsToSeconds(
+              sample.time - state.currentBeat, state.tempo,
+            );
+            const endTime = audioContext.currentTime + beatsToSeconds(
+              sample.time + sampleDuration - state.currentBeat,
+              state.tempo,
+            );
+            const offset = Math.max(
+              0,
+              beatsToSeconds(state.currentBeat - sample.time, state.tempo),
+            );
+
+            sample.popFilter.gain.setValueAtTime(0.001, 0);
+            sample.popFilter.gain.exponentialRampToValueAtTime(1, startTime + offset + 0.01);
+            sample.popFilter.gain.setValueAtTime(1, endTime - 0.01);
+            sample.popFilter.gain.exponentialRampToValueAtTime(0.001, endTime);
+
+            const fadeInBeginTime = lerp(startTime, endTime, sample.fade.fadeIn);
+            sample.gain.gain.setValueAtTime(
+              Math.min(1, startTime / fadeInBeginTime),
+              startTime,
+            );
+            sample.gain.gain.linearRampToValueAtTime(
+              1,
+              fadeInBeginTime,
+            );
+
+            const fadeOutBeginTime = lerp(startTime, endTime, 1 - sample.fade.fadeOut);
+            sample.gain.gain.setValueAtTime(
+              Math.min(1, 1 - map(audioContext.currentTime, fadeOutBeginTime, endTime, 0, 1)),
+              fadeOutBeginTime,
+            );
+            sample.gain.gain.linearRampToValueAtTime(0, endTime);
+
+            note.source = playNote(
+              audioContext,
+              note,
+              sample.gain,
+              noteStartTime,
+              noteOffset,
+              noteEndTime,
+              sample.url,
+            );
+          }
         }
-        break;
-      }
-
-      case 'SET_PATTERN_NOTE_NUMBER': {
-        break;
-      }
-
-      case 'SET_PATTERN_NOTE_DURATION': {
         break;
       }
 

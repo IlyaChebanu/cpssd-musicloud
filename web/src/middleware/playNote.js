@@ -10,7 +10,7 @@ export default (
   url = null,
 ) => {
   if (url) {
-    return playSample(context, url, destination, startTime, offset);
+    return playSample(context, url, destination, startTime, offset, endTime);
   }
   const source = context.createOscillator();
   source.frequency.setValueAtTime(2 ** ((note.noteNumber - 49) / 12) * 440, 0);

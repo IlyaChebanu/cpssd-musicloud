@@ -1,6 +1,6 @@
 import { bufferStore } from '../helpers/constants';
 
-export default (context, url, destination, time, offset = 0) => {
+export default (context, url, destination, time, offset = 0, endTime = null) => {
   if (!bufferStore[url]) {
     return null;
   }
@@ -11,5 +11,9 @@ export default (context, url, destination, time, offset = 0) => {
   source.connect(destination);
 
   source.start(time, offset);
+
+  if (endTime) {
+    source.stop(endTime);
+  }
   return source;
 };
