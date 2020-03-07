@@ -19,6 +19,7 @@ import {
   addPatternNote,
 } from '../../actions/studioActions';
 import PianoNote from '../PianoNote/PianoNote';
+import SeekBar from '../SeekBar';
 
 const keyNames = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#'];
 const pianoKeys = [];
@@ -41,7 +42,7 @@ for (let i = 0; i < 88; i += 1) {
 
 
 const PianoRoll = memo(({
-  showPianoRoll, selectedSample, tracks, selectedTrack, dispatch, samples,
+  showPianoRoll, selectedSample, dispatch, samples, currentBeat,
 }) => {
   if (!showPianoRoll) return null;
 
@@ -52,7 +53,8 @@ const PianoRoll = memo(({
     setScroll(e.target.scrollLeft);
   }, []);
 
-  const handleClose = useCallback(() => {
+  const handleClose = useCallback((e) => {
+    e.preventDefault();
     dispatch(setShowPianoRoll(false));
   }, [dispatch]);
 
@@ -144,6 +146,7 @@ const PianoRoll = memo(({
                 <CloseIcon onClick={handleClose} />
               </div>
               <div className={styles.lower}>
+                <SeekBar currentBeat={currentBeat - selectedSampleObject.time + 1} />
                 <div className={styles.timelineWrapper} style={wrapperStyle}>
                   <svg className={styles.ticks} style={widthStyle}>
                     <rect
@@ -181,27 +184,23 @@ const PianoRoll = memo(({
 });
 
 PianoRoll.propTypes = {
+  currentBeat: PropTypes.number.isRequired,
   showPianoRoll: PropTypes.bool.isRequired,
   selectedSample: PropTypes.string,
-  tracks: PropTypes.arrayOf(PropTypes.object),
-  selectedTrack: PropTypes.number,
   dispatch: PropTypes.func.isRequired,
   samples: PropTypes.object.isRequired,
 };
 
 PianoRoll.defaultProps = {
   selectedSample: '',
-  tracks: [],
-  selectedTrack: -1,
 };
 
 PianoRoll.displayName = 'PianoRoll';
 
 const mapStateToProps = ({ studio }) => ({
+  currentBeat: studio.currentBeat,
   showPianoRoll: studio.showPianoRoll,
   selectedSample: studio.selectedSample,
-  tracks: studio.tracks,
-  selectedTrack: studio.selectedTrack,
   samples: studio.samples,
 });
 

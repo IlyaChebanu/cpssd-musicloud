@@ -127,6 +127,54 @@ export default (
     //       return track;
     //     }),
     //   };
+    case 'SET_TRACK': {
+      const tracks = [...state.tracks];
+      tracks[action.index] = { ...action.track };
+      return {
+        ...state,
+        tracks,
+      };
+    }
+    case 'DELETE_TRACK': {
+      let tracks = [...state.tracks];
+      tracks = tracks.filter((track) => track !== tracks[action.index]);
+      return {
+        ...state,
+        tracks,
+      };
+    }
+    // case 'SET_SAMPLE_TIME':
+    //   return {
+    //     ...state,
+    //     tracks: state.tracks.map((track) => {
+    //       track.samples = track.samples.map((sample) => {
+    //         if (sample.id === action.id) {
+    //           return {
+    //             ...sample,
+    //             time: action.time,
+    //           };
+    //         }
+    //         return sample;
+    //       });
+    //       return track;
+    //     }),
+    //   };
+    // case 'SET_SAMPLE_NAME':
+    //   return {
+    //     ...state,
+    //     tracks: state.tracks.map((track) => {
+    //       track.samples = track.samples.map((sample) => {
+    //         if (sample.id === action.id) {
+    //           return {
+    //             ...sample,
+    //             name: action.name,
+    //           };
+    //         }
+    //         return sample;
+    //       });
+    //       return track;
+    //     }),
+    //   };
     case 'SET_SAMPLE_LOADING':
       return {
         ...state,

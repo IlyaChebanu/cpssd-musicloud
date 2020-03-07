@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import _ from 'lodash';
 import styles from './TrackControls.module.scss';
 import {
-  // setTrackAtIndex,
   setSelectedTrack,
   setSelectedSample,
   setTrackName,
@@ -14,12 +13,14 @@ import {
   setTrackSolo,
   hideSampleEffects,
   setShowPianoRoll,
+  deleteTrackAtIndex,
 } from '../../actions/studioActions';
 import Knob from '../Knob';
 import { ReactComponent as Mute } from '../../assets/icons/volume-up-light.svg';
 import { ReactComponent as MuteActive } from '../../assets/icons/volume-slash-light.svg';
 import { ReactComponent as Solo } from '../../assets/icons/headphones-alt-light.svg';
 import { ReactComponent as SoloActive } from '../../assets/icons/headphones-alt-solid.svg';
+import { ReactComponent as Delete } from '../../assets/icons/close-24px.svg';
 import { clamp } from '../../helpers/utils';
 import { colours } from '../../helpers/constants';
 
@@ -31,7 +32,6 @@ const TrackControls = memo((props) => {
 
   const soloTrack = _.find(tracks, 'solo');
 
-
   const handleSetTrackVolume = useCallback((val) => {
     dispatch(setTrackVolume(track.id, clamp(0, 1, val)));
   }, [dispatch, track.id]);
@@ -41,18 +41,22 @@ const TrackControls = memo((props) => {
   }, [dispatch, track.id]);
 
   const handleTrackMute = useCallback((e) => {
+    e.preventDefault();
     dispatch(setTrackMute(track.id, !track.mute));
   }, [dispatch, track.id, track.mute]);
 
-  const handleTrackSolo = useCallback(() => {
+  const handleTrackSolo = useCallback((e) => {
+    e.preventDefault();
     dispatch(setTrackSolo(track.id, !track.solo));
   }, [dispatch, track.id, track.solo]);
 
   const handleTrackNameChange = useCallback((e) => {
+    e.preventDefault();
     dispatch(setTrackName(track.id, e.target.value));
   }, [dispatch, track.id]);
 
-  const handleSetSelected = useCallback(() => {
+  const handleSetSelected = useCallback((e) => {
+    e.preventDefault();
     dispatch(setSelectedTrack(track.id));
     dispatch(setSelectedSample(''));
     dispatch(hideSampleEffects());
@@ -67,6 +71,12 @@ const TrackControls = memo((props) => {
     };
   }, [index, selectedTrack, track.id]);
 
+  const handleDeleteTrack = useCallback((e) => {
+    // Stop propagation to void selecting track when deleting
+    e.stopPropagation();
+    dispatch(deleteTrackAtIndex(index));
+  }, [dispatch, index]);
+
   return (
     <div
       className={styles.outerWrap}
@@ -79,6 +89,7 @@ const TrackControls = memo((props) => {
         style={barStyle}
       />
       <div className={`${styles.wrapper} ${props.index % 2 ? styles.even : ''}`}>
+        <Delete onClick={handleDeleteTrack} className={styles.deleteTrack} />
         <div className={styles.title}>
           <input type="text" value={track.name} onChange={handleTrackNameChange} />
         </div>

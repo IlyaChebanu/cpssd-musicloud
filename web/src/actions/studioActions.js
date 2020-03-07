@@ -53,6 +53,13 @@ export const setTempo = (tempo) => (dispatch) => {
 //   });
 // };
 
+export const deleteTrackAtIndex = (index) => (dispatch) => {
+  dispatch({
+    type: 'DELETE_TRACK',
+    index,
+  });
+};
+
 export const setSampleLoading = (bool) => (dispatch) => {
   dispatch({
     type: 'SET_SAMPLE_LOADING',

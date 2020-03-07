@@ -15,22 +15,24 @@ const Looper = memo((props) => {
     const mouseStartPos = ev.screenX;
     const initialLoopStart = loopStart;
     const handleMouseMove = (e) => {
+      e.stopPropagation();
       e.preventDefault();
       const start = (
         initialLoopStart + (e.screenX - mouseStartPos) / (40 * gridSize) / window.devicePixelRatio
       );
       const numDecimalPlaces = Math.max(0, String(1 / gridSize).length - 2);
       dispatch(setLoop({
-        start: Math.min(
+        start: Math.max(1, Math.min(
           loopEnd - 1,
           gridSnapEnabled
             ? (Math.round((start) * gridSize) / gridSize).toFixed(numDecimalPlaces)
             : start,
-        ),
+        )),
         stop: loopEnd,
       }));
     };
-    const handleDragStop = () => {
+    const handleDragStop = (e) => {
+      e.stopPropagation();
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleDragStop);
     };
@@ -43,11 +45,11 @@ const Looper = memo((props) => {
     const mouseStartPos = ev.screenX;
     const initialLoopEnd = loopEnd;
     const handleMouseMove = (e) => {
-      e.preventDefault();
+      e.stopPropagation();
+      const numDecimalPlaces = Math.max(0, String(1 / gridSize).length - 2);
       const stop = (
         initialLoopEnd + (e.screenX - mouseStartPos) / (40 * gridSize) / window.devicePixelRatio
       );
-      const numDecimalPlaces = Math.max(0, String(1 / gridSize).length - 2);
       dispatch(setLoop({
         start: loopStart,
         stop: Math.max(
@@ -58,7 +60,9 @@ const Looper = memo((props) => {
         ),
       }));
     };
-    const handleDragStop = () => {
+
+    const handleDragStop = (e) => {
+      e.stopPropagation();
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleDragStop);
     };
@@ -73,9 +77,19 @@ const Looper = memo((props) => {
   }), [loopStart, gridSize, loopEnd]);
 
   return (
-    <div className={`${styles.wrapper} ${loopEnabled ? styles.loopEnabled : ''}`} style={wrapperStyle}>
-      <Arrow onMouseDown={handleDragLArrow} />
-      <Arrow onMouseDown={handleDragRArrow} />
+    <div
+      onClick={(e) => { e.stopPropagation(); }}
+      onMouseDown={(e) => { e.stopPropagation(); }}
+      role="none"
+      className={`${styles.wrapper} ${loopEnabled ? styles.loopEnabled : ''}`}
+      style={wrapperStyle}
+    >
+      <Arrow
+        onMouseDown={handleDragLArrow}
+      />
+      <Arrow
+        onMouseDown={handleDragRArrow}
+      />
     </div>
   );
 });

@@ -45,11 +45,13 @@ const TimelineControls = memo((props) => {
     }
   }, [handleSetTempo]);
 
-  const handleGridSnapClick = useCallback(() => {
+  const handleGridSnapClick = useCallback((e) => {
+    e.preventDefault();
     dispatch(setGridSnapEnabled(!gridSnapEnabled));
   }, [dispatch, gridSnapEnabled]);
 
-  const handleLoopClick = useCallback(() => {
+  const handleLoopClick = useCallback((e) => {
+    e.preventDefault();
     dispatch(setLoopEnabled(!loopEnabled));
   }, [dispatch, loopEnabled]);
 
@@ -99,12 +101,12 @@ const TimelineControls = memo((props) => {
         <p>BPM</p>
       </span>
       {gridSnapEnabled
-        ? <SnapActive onClick={handleGridSnapClick} />
-        : <Snap onClick={handleGridSnapClick} />}
+        ? <SnapActive onClick={handleGridSnapClick} className={styles.icon} />
+        : <Snap onClick={handleGridSnapClick} className={styles.icon} />}
       <Dropdown items={gridDropdownItems} title={<Grid />} />
       {loopEnabled
-        ? <LoopActive onClick={handleLoopClick} />
-        : <Loop onClick={handleLoopClick} />}
+        ? <LoopActive onClick={handleLoopClick} className={styles.icon} />
+        : <Loop onClick={handleLoopClick} className={styles.icon} />}
     </div>
   );
 });

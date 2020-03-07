@@ -12,10 +12,7 @@ import styles from './Sample.module.scss';
 import {
   dColours, colours, bufferStore, audioContext,
 } from '../../helpers/constants';
-import { lerp } from '../../helpers/utils';
 import {
-  setSampleTime,
-  // setTrackAtIndex,
   setSelectedSample,
   removeSample,
   setClipboard,
@@ -25,7 +22,6 @@ import {
   setSampleBufferLoading,
   setSampleStartTime,
   setSampleTrackId,
-  setSampleBuffer,
   setSelectedTrack,
   setSampleDuration,
   setSampleType,
@@ -33,7 +29,6 @@ import {
 
 import { ReactComponent as EditIcon } from '../../assets/icons/edit-sample.svg';
 import { ReactComponent as PianoIcon } from '../../assets/icons/piano-keyboard-light.svg';
-import { showNotification } from '../../actions/notificationsActions';
 import Spinner from '../Spinner/Spinner';
 import { useGlobalDrag } from '../../helpers/hooks';
 import store from '../../store';
@@ -106,12 +101,14 @@ const Sample = memo((props) => {
               dispatch(setSampleBufferLoading(id, false));
               const currentTempo = store.getState().studio.tempo;
               if (data.type === 'sample') {
-                dispatch(setSampleDuration(id, buf.duration * (currentTempo / 60)));
+                const duration = parseFloat((buf.duration * (currentTempo / 60)).toFixed(16));
+                dispatch(setSampleDuration(id, duration));
               }
             });
         });
     } else if (buffer && data.url && data.type === 'sample') {
-      dispatch(setSampleDuration(id, buffer.duration * (tempo / 60)));
+      const duration = parseFloat((buffer.duration * (tempo / 60)).toFixed(16));
+      dispatch(setSampleDuration(id, duration));
     }
   }, [buffer, data.type, data.url, dispatch, id, tempo]);
 
@@ -122,9 +119,12 @@ const Sample = memo((props) => {
   useEffect(() => {
     if (data.type === 'pattern') {
       const latest = _.maxBy(Object.values(data.notes), (n) => n.tick + n.duration);
+      const duration = parseFloat(
+        ((0.25 / ppq) * (latest ? latest.tick + latest.duration : 4 * ppq)).toFixed(16),
+      );
       dispatch(setSampleDuration(
         id,
-        (0.25 / ppq) * (latest ? latest.tick + latest.duration : 4 * ppq),
+        duration,
       ));
     }
   }, [data.notes, data.type, dispatch, gridSize, id, tempo]);
@@ -201,7 +201,8 @@ const Sample = memo((props) => {
     COPY_SAMPLE: copySample,
   };
 
-  const handleShowHideSampleEffects = useCallback(() => {
+  const handleShowHideSampleEffects = useCallback((e) => {
+    e.preventDefault();
     if (sampleEffectsHidden) {
       dispatch(showSampleEffects());
     } else {
@@ -209,7 +210,8 @@ const Sample = memo((props) => {
     }
   }, [dispatch, sampleEffectsHidden]);
 
-  const handleTogglePiano = useCallback(() => {
+  const handleTogglePiano = useCallback((e) => {
+    e.preventDefault();
     dispatch(setShowPianoRoll(!showPianoRoll));
   }, [dispatch, showPianoRoll]);
 
@@ -236,11 +238,11 @@ const Sample = memo((props) => {
           </div>
         )}
       {data.bufferLoading && <Spinner className={styles.spinner} />}
-      {/* {data.type === 'pattern' ? '' : waveform} */}
       <div className={styles.fadeWrapper}>
         {id === selectedSample && !!(data.fade.fadeIn || data.fade.fadeOut) && (
           <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" fill="rgba(0, 0, 0, 0.3)">
-            <path d={`M 0 100 L ${data.fade.fadeIn * 100} 0 L ${(1 - data.fade.fadeOut) * 100} 0 L 100 100`} />
+            <path d={`M 0 0 L ${data.fade.fadeIn * 100} 0 L 0 100`} />
+            <path d={`M ${(1 - data.fade.fadeOut) * 100} 0 L 100 0 L 100 100`} />
           </svg>
         )}
       </div>

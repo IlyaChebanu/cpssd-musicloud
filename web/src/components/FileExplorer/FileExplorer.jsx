@@ -1,5 +1,5 @@
 import React, {
-  useState, useCallback, useMemo, memo,
+  useState, useCallback, useMemo, memo, useRef, useEffect,
 } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
@@ -14,6 +14,7 @@ import store from '../../store';
 import {
   // setTrackAtIndex,
   setSampleLoading,
+  hideFileExplorer,
 } from '../../actions/studioActions';
 import { showNotification } from '../../actions/notificationsActions';
 
@@ -23,6 +24,7 @@ const FileExplorer = memo((props) => {
   const { studio, dispatch } = props;
   const [list, setList] = useState([]);
   const [url, setUrl] = useState('');
+  const node = useRef();
 
   async function getFiles() {
     const res = await generatePresigned('/');
@@ -95,7 +97,7 @@ const FileExplorer = memo((props) => {
         </li>
       </ul>
       {list.map((item) => (
-        <li onClick={() => addSample(item)} className={styles.li}>
+        <li onClick={(e) => { e.preventDefault(); addSample(item); }} className={styles.li}>
           {item.split('/').pop()}
         </li>
       ))}
@@ -127,8 +129,32 @@ const FileExplorer = memo((props) => {
     [instruments],
   );
 
+  const handleClick = useCallback((e) => {
+    try {
+      if (node.current.contains(e.target)
+      || (e.target.id === 'explorer')
+      || (e.toElement.viewportElement.id === 'explorer')) {
+      // inside click or click on file explorer button
+        return;
+      }
+    } catch (err) {
+      // outside click
+      if (!props.fileExplorerHidden) {
+        dispatch(hideFileExplorer());
+      }
+    }
+  }, [dispatch, props.fileExplorerHidden]);
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClick);
+    return () => {
+      document.removeEventListener('mousedown', handleClick);
+    };
+  }, [handleClick]);
+
   return (
     <div
+      ref={node}
       style={{ visibility: props.fileExplorerHidden ? 'hidden' : 'visible' }}
       className={styles.explorer}
     >

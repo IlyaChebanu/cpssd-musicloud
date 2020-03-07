@@ -6,7 +6,6 @@
   flex-direction: column;
   transition: height 1s;
   margin-bottom: 30px;
-
   &:last-child {
     margin-bottom: 0;
   }
@@ -35,6 +34,12 @@
     max-width: 150px;
     max-height: 150px;
     border-radius: 25px;
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version */
   }
 }
 
@@ -86,6 +91,9 @@
 
 .songInfo {
   flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   margin-left: 10px;
   display: flex;
   flex-direction: column;
@@ -95,6 +103,9 @@
 .title {
   margin: 0 10px 0 0;
   font-size: 18px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .description {

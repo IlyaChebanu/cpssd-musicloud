@@ -3,19 +3,23 @@ import React, { memo, useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import Img from 'react-image';
 import styles from './ProfileBlock.module.scss';
 import SubmitButton from '../SubmitButton';
 import history from '../../history';
 import CloudQuestion from '../../assets/cloud-question.jpg';
 import {
-  getUserDetails, postFollow, postUnfollow, getFollowers, getFollowing,
+  getUserDetails, postFollow, postUnfollow, getFollowers, getFollowing, uploadFile,
+  changeProfiler,
 } from '../../helpers/api';
 import store from '../../store';
 import {
-  setFollowers, setFollowStatus, showUsersPopup,
+  setFollowers, setFollowStatus, setProfilePicUrl, setProfiler, showUsersPopup,
 } from '../../actions/userActions';
 import { showNotification } from '../../actions/notificationsActions';
 import UsersPopup from '../UsersPopup/UsersPopup';
+import Spinner from '../Spinner';
+import { ReactComponent as EditIcon } from '../../assets/icons/edit-sample.svg';
 
 const ProfileBlock = memo((props) => {
   const { dispatch, className, user } = props;
@@ -23,19 +27,22 @@ const ProfileBlock = memo((props) => {
   const username = url.searchParams.get('username');
   const [gotUsers, setGotUsers] = useState([]);
   const [follower, setFollower] = useState(false);
+  const [loading, setLoading] = useState(false);
   const goToSettings = useCallback((e) => {
     e.preventDefault();
     history.push('/settings');
   }, []);
 
-  const getMyFollowers = useCallback(async () => {
+  const getMyFollowers = useCallback(async (e) => {
+    e.preventDefault();
     const res = await getFollowers(username);
     setGotUsers(res.data.followers);
     setFollower(true);
     dispatch(showUsersPopup());
   }, [dispatch, username]);
 
-  const getMyFollowing = useCallback(async () => {
+  const getMyFollowing = useCallback(async (e) => {
+    e.preventDefault();
     const res = await getFollowing(username);
     setGotUsers(res.data.following);
     setFollower(false);
@@ -73,17 +80,43 @@ const ProfileBlock = memo((props) => {
     return false;
   }, [refreshProfile, username]);
 
+  const uploadProfilerToS3 = useCallback(async (img) => {
+    if (username) {
+      setLoading(true);
+      const res = await uploadFile('profiler', img, username);
+      await changeProfiler({ url: res });
+      dispatch(setProfilePicUrl(res));
+      dispatch(setProfiler(res));
+      setLoading(false);
+    }
+  }, [dispatch, username]);
+
+  const handleCoverChange = useCallback(async (e) => {
+    e.preventDefault();
+    const fileSelector = document.createElement('input');
+    fileSelector.setAttribute('type', 'file');
+    fileSelector.setAttribute('accept', 'image/*');
+    fileSelector.click();
+    fileSelector.onchange = function onChange() {
+      const img = fileSelector.files[0];
+      uploadProfilerToS3(img);
+    };
+  }, [uploadProfilerToS3]);
 
   return (
     <div className={`${styles.wrapper} ${className}`}>
       <div className={styles.topWrapper}>
-        <img
-          alt="Profiler"
-          className={styles.profilePicture}
-          src={
-          (user.profiler && user.profiler !== '') ? user.profiler : CloudQuestion
-}
-        />
+        <div className={styles.imgBlock}>
+          {loading ? <Spinner className={styles.spinner} /> : (
+            <Img
+              onClick={username === user.username ? handleCoverChange : () => {}}
+              className={username === user.username ? `${styles.profilePicture} ${styles.filter}` : styles.profilePicture}
+              alt="Profiler"
+              src={[user.profiler, CloudQuestion]}
+            />
+          )}
+          {username === user.username ? <EditIcon /> : null}
+        </div>
         <div className={styles.stats}>
           <div className={styles.stat}>
             <p className={styles.num} style={{ cursor: 'pointer' }} onClick={getMyFollowers}>
@@ -126,7 +159,7 @@ const ProfileBlock = memo((props) => {
           className={
               username !== user.username && user.follow_status !== 1
                 ? styles.followButton
-                : styles.hid
+                : styles.hide
           }
           onSubmit={follow}
         >

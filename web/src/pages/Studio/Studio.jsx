@@ -25,15 +25,6 @@ import {
   hideSongPicker, showSongPicker, setCompleteTracksState, setCompleteSamplesState,
 } from '../../actions/studioActions';
 import { showNotification } from '../../actions/notificationsActions';
-import kick from '../../assets/basic_sounds/kick.wav';
-import clap from '../../assets/basic_sounds/clap.wav';
-import crash from '../../assets/basic_sounds/crash.wav';
-import hat from '../../assets/basic_sounds/hat.wav';
-import openhat from '../../assets/basic_sounds/openhat.wav';
-import percussion from '../../assets/basic_sounds/percussion.wav';
-import snare from '../../assets/basic_sounds/snare.wav';
-import triangle from '../../assets/basic_sounds/triangle.wav';
-import bass from '../../assets/samples/bass.wav';
 import Timeline from '../../components/Timeline';
 import SeekBar from '../../components/SeekBar';
 import TrackControls from '../../components/TrackControls';
@@ -53,7 +44,9 @@ import FileExplorer from '../../components/FileExplorer/FileExplorer';
 import Sample from '../../components/Sample/Sample';
 
 const Studio = memo((props) => {
-  const { dispatch, studio } = props;
+  const {
+    loopEnd, dispatch, studio, songPickerHidden,
+  } = props;
   const { samples, tracks } = studio;
 
   const [tracksLoading, setTracksLoading] = useState(false);
@@ -118,7 +111,8 @@ const Studio = memo((props) => {
     [dispatch],
   );
 
-  const handleAddNewTrack = useCallback(() => {
+  const handleAddNewTrack = useCallback((e) => {
+    e.preventDefault();
     dispatch(addTrack());
   }, [dispatch]);
 
@@ -152,61 +146,73 @@ const Studio = memo((props) => {
   return (
     <div className={styles.wrapper}>
       <Header selected={0}>
+
         <Button className={styles.saveButton} onClick={handleSaveState}>
           Save
         </Button>
       </Header>
-      <div className={styles.contentWrapper}>
-        <SampleControls />
-        <SeekBar />
+      <div style={{ pointerEvents: songPickerHidden ? 'auto' : 'none' }}>
+        <div className={styles.contentWrapper}>
+          <SampleControls />
+          <SeekBar />
 
-        <Timeline />
+          <Timeline />
 
-        <div className={styles.scrollable}>
-          <div className={styles.content}>
-            <div className={styles.trackControls}>
-              {trackControls}
-              <div
-                className={`${styles.newTrack} ${
-                  tracks.length % 2 !== 1 ? styles.even : ''
-                }`}
-                onClick={handleAddNewTrack}
-                role="button"
-                tabIndex={0}
-              >
+          <div className={styles.scrollable}>
+            <div className={styles.content}>
+              <div className={styles.trackControls}>
+                {trackControls}
+                <div
+                  className={`${styles.newTrack} ${
+                    tracks.length % 2 !== 1 ? styles.even : ''
+                  }`}
+                  onClick={handleAddNewTrack}
+                  role="button"
+                  tabIndex={0}
+                >
                 Add new track
+                </div>
               </div>
-            </div>
-            <div
-              className={styles.tracks}
-              onScroll={handleScroll}
-              ref={tracksRef}
-            >
-              {tracksLoading ? <Spinner /> : renderableTracks}
-              {Object.entries(samples).map(([id, sample]) => (
-                <Sample data={sample} id={id} key={id} />
-              ))}
+              <div
+                className={styles.tracks}
+                onScroll={handleScroll}
+                ref={tracksRef}
+              >
+                {tracksLoading ? <Spinner /> : renderableTracks}
+                {Object.entries(samples).map(([id, sample]) => (
+                  <Sample data={sample} id={id} key={id} />
+                ))}
+              </div>
             </div>
           </div>
         </div>
+        <PianoRoll />
+        <PlayBackControls style={{ 'pointer-events': 'none' }} />
+        <FileExplorer />
+        <PublishForm />
       </div>
-      <PianoRoll />
-      <PlayBackControls style={{ 'pointer-events': 'none' }} />
       <SongPicker songs={[]} />
-      <FileExplorer />
-      <PublishForm />
+
+
     </div>
   );
 });
 
 Studio.propTypes = {
+  loopEnd: PropTypes.number.isRequired,
   dispatch: PropTypes.func.isRequired,
   tracks: PropTypes.arrayOf(PropTypes.object).isRequired,
   studio: PropTypes.object.isRequired,
+  songPickerHidden: PropTypes.bool.isRequired,
 };
 
 Studio.displayName = 'Studio';
 
-const mapStateToProps = ({ studio }) => ({ studio, tracks: studio.tracks });
+const mapStateToProps = ({ studio }) => ({
+  loopEnd: studio.loop.stop,
+  studio,
+  tracks: studio.tracks,
+  songPickerHidden: studio.songPickerHidden,
+});
 
 export default connect(mapStateToProps)(Studio);

@@ -2,13 +2,14 @@ import React, { useCallback, memo } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
+import { GlobalHotKeys } from 'react-hotkeys';
 import styles from './PlaybackControls.module.scss';
 import { ReactComponent as Play } from '../../assets/icons/play-circle-light.svg';
 import { ReactComponent as Pause } from '../../assets/icons/pause-circle-light.svg';
 import { ReactComponent as Back } from '../../assets/icons/go-back.svg';
 import { ReactComponent as Forward } from '../../assets/icons/go-forward.svg';
 import { ReactComponent as ToStart } from '../../assets/icons/to-start.svg';
-import { ReactComponent as FileExplorer } from '../../assets/icons/file-explorer.svg';
+import { ReactComponent as FileExplorerIcon } from '../../assets/icons/file-explorer.svg';
 import Slider from '../Slider/Slider';
 import {
   setCurrentBeat, stop, pause, play,
@@ -16,48 +17,66 @@ import {
   showFileExplorer,
 } from '../../actions/studioActions';
 
-
 const PlaybackControls = memo((props) => {
-  const { dispatch, studio, fileExplorerHidden } = props;
+  const {
+    dispatch, studio, songPickerHidden, fileExplorerHidden,
+  } = props;
   const { currentBeat, tempo, playing } = studio;
-  const handlePlay = useCallback(() => {
-    dispatch(play);
-  }, [dispatch]);
-
-  const handlePause = useCallback(() => {
-    dispatch(pause);
-  }, [dispatch]);
-
-  const toStart = useCallback(() => {
-    dispatch(setCurrentBeat(1));
-    dispatch(stop);
-  }, [dispatch]);
-
-  const backward = useCallback(() => {
-    if (playing) {
-      dispatch(pause);
-      dispatch(setCurrentBeat(Math.max(1, Math.floor(currentBeat - 1))));
+  const handlePlay = useCallback((e) => {
+    if (songPickerHidden) {
+      e.preventDefault();
       dispatch(play);
-    } else {
-      dispatch(setCurrentBeat(Math.max(1, Math.floor(currentBeat - 1))));
     }
-  }, [playing, dispatch, currentBeat]);
+  }, [dispatch, songPickerHidden]);
 
-  const forward = useCallback(() => {
-    if (playing) {
+  const handlePause = useCallback((e) => {
+    if (songPickerHidden) {
+      e.preventDefault();
       dispatch(pause);
-      dispatch(setCurrentBeat(Math.max(1, Math.floor(currentBeat + 1))));
-      dispatch(play);
-    } else {
-      dispatch(setCurrentBeat(Math.max(1, Math.floor(currentBeat + 1))));
     }
-  }, [currentBeat, dispatch, playing]);
+  }, [dispatch, songPickerHidden]);
 
-  const showExplorer = useCallback(() => {
+  const toStart = useCallback((e) => {
+    if (songPickerHidden) {
+      e.preventDefault();
+      dispatch(setCurrentBeat(1));
+      dispatch(stop);
+    }
+  }, [dispatch, songPickerHidden]);
+
+  const backward = useCallback((e) => {
+    e.preventDefault();
+    if (songPickerHidden) {
+      if (playing) {
+        dispatch(pause);
+        dispatch(setCurrentBeat(Math.max(1, Math.floor(currentBeat - 1))));
+        dispatch(play);
+      } else {
+        dispatch(setCurrentBeat(Math.max(1, Math.floor(currentBeat - 1))));
+      }
+    }
+  }, [songPickerHidden, playing, dispatch, currentBeat]);
+
+  const forward = useCallback((e) => {
+    e.preventDefault();
+    if (songPickerHidden) {
+      if (playing) {
+        dispatch(pause);
+        dispatch(setCurrentBeat(Math.max(1, Math.floor(currentBeat + 1))));
+        dispatch(play);
+      } else {
+        dispatch(setCurrentBeat(Math.max(1, Math.floor(currentBeat + 1))));
+      }
+    }
+  }, [currentBeat, dispatch, playing, songPickerHidden]);
+
+  const showExplorer = useCallback((e) => {
+    e.preventDefault();
     dispatch(showFileExplorer());
   }, [dispatch]);
 
-  const hideExplorer = useCallback(() => {
+  const hideExplorer = useCallback((e) => {
+    e.preventDefault();
     dispatch(hideFileExplorer());
   }, [dispatch]);
 
@@ -67,36 +86,61 @@ const PlaybackControls = memo((props) => {
   date.setMilliseconds((curSecond * 1000) % 1000);
   const timeString = date.toISOString().substr(11, 11);
 
-  return (
-    <div className={styles.footer}>
-      <span>
-        <Slider />
-        <ToStart className={styles.controlButton} onClick={toStart} />
-        <Back className={styles.controlButton} onClick={backward} />
-        {playing ? (
-          <Pause className={styles.controlButton} onClick={handlePause} />
-        ) : (
-          <Play className={styles.controlButton} onClick={handlePlay} />
-        )}
-        <Forward className={styles.controlButton} onClick={forward} />
-        <p>{timeString}</p>
-      </span>
+  // Currently not supporting holding button for repeated action
+  const keyMap = {
+    PLAY_PAUSE: 'space',
+    BACKWARD: 'pagedown',
+    FORWARD: 'pageup',
+    TO_START: 'home',
+  };
 
-      <div className={styles.likeIconWrapper}>
-        <FileExplorer
+  const handlers = {
+    PLAY_PAUSE: playing ? handlePause : handlePlay,
+    BACKWARD: backward,
+    FORWARD: forward,
+    TO_START: toStart,
+  };
+
+  return (
+    <GlobalHotKeys
+      ignoreRepeatedEventsWhenKeyHeldDown={false}
+      allowChanges
+      keyMap={keyMap}
+      handlers={handlers}
+    >
+      <div className={styles.footer}>
+
+        <span>
+          <Slider />
+          <ToStart className={styles.controlButton} onClick={toStart} />
+          <Back className={styles.controlButton} onClick={backward} />
+          {playing ? (
+            <Pause className={styles.controlButton} onClick={handlePause} />
+          ) : (
+            <Play className={styles.controlButton} onClick={handlePlay} />
+          )}
+          <Forward className={styles.controlButton} onClick={forward} />
+          <p>{timeString}</p>
+        </span>
+
+
+        <FileExplorerIcon
+          id="explorer"
           className={
-            fileExplorerHidden ? styles.notSelectedIcon : styles.selectedIcon
-          }
+              fileExplorerHidden ? styles.notSelectedIcon : styles.selectedIcon
+            }
           onClick={fileExplorerHidden ? showExplorer : hideExplorer}
         />
+
       </div>
-    </div>
+    </GlobalHotKeys>
   );
 });
 
 PlaybackControls.propTypes = {
   dispatch: PropTypes.func.isRequired,
   studio: PropTypes.object.isRequired,
+  songPickerHidden: PropTypes.bool.isRequired,
   fileExplorerHidden: PropTypes.bool.isRequired,
 };
 
@@ -104,6 +148,7 @@ PlaybackControls.displayName = 'PlaybackControls';
 
 const mapStateToProps = ({ studio }) => ({
   studio,
+  songPickerHidden: studio.songPickerHidden,
   fileExplorerHidden: studio.fileExplorerHidden,
 });
 

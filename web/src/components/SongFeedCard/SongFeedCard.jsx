@@ -46,7 +46,8 @@ const SongFeedCard = memo(({
     />
   ), [url]);
 
-  const playAudio = useCallback(() => {
+  const playAudio = useCallback((e) => {
+    e.preventDefault();
     if (!playerRef.current) {
       setPlayerShowing(true);
       setLoading(true);
@@ -56,7 +57,8 @@ const SongFeedCard = memo(({
     }
   }, [playerRef]);
 
-  const pauseAudio = useCallback(() => {
+  const pauseAudio = useCallback((e) => {
+    e.preventDefault();
     setPlaying(false);
     playerRef.current.pause();
   }, [playerRef]);
@@ -110,7 +112,8 @@ const SongFeedCard = memo(({
     setCoverHover(false);
   }, []);
 
-  const handleLikeSong = useCallback(() => {
+  const handleLikeSong = useCallback((e) => {
+    e.preventDefault();
     (async () => {
       if (songLiked) {
         setSongLiked(false);

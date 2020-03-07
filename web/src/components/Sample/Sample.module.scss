@@ -11,8 +11,15 @@
     pointer-events: none;
   }
 
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version */
+
   &:hover {
-    cursor: pointer;
+    cursor: move;
   }
 
   &:focus {
@@ -31,34 +38,24 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-.edit {
-  position: absolute;
-  right: 5px;
 
-  svg {
-    fill: white;
-    color: white;
-    height: 15px;
-    padding-left: 5px;
+  .edit {
+    position: absolute;
+    right: 5px;
+
+    svg {
+      fill: white;
+      color: white;
+      height: 15px;
+      padding-left: 5px;
 
 
-    &:hover {
-      filter: brightness(50%);
+      &:hover {
+        filter: brightness(50%);
+        cursor: pointer;
+      }
     }
   }
-    // padding: 0 auto;
-    // margin: 0 auto;
-    // overflow: hidden;
-    // position: absolute;
-    // right: 0;
-    // height: 15px;
-    // &:hover {
-    //   filter: invert(100%);
-    // }
-  }
-  // .editing {
-  //   filter: invert(100%);
-  // }
 }
 
 .waveform {

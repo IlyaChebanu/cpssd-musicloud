@@ -97,7 +97,8 @@ const SongCard = memo((props) => {
     window.addEventListener('mouseup', handleDragStop);
   }, []);
 
-  const handleLikeSong = useCallback(() => {
+  const handleLikeSong = useCallback((e) => {
+    e.preventDefault();
     (async () => {
       if (songLiked) {
         setSongLiked(false);
@@ -119,7 +120,8 @@ const SongCard = memo((props) => {
     width: `${(currentTime / songDuration) * 100}%`,
   }), [currentTime, songDuration]);
 
-  const gotoProfile = useCallback(() => {
+  const gotoProfile = useCallback((e) => {
+    e.preventDefault();
     history.push(`/profile?username=${username}`);
   }, [username]);
 
