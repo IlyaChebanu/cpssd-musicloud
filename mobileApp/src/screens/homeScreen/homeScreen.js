@@ -11,6 +11,7 @@ import SearchComponent from "../../components/searchComponent/searchComponent";
 import { getCompiledSongs, postLikeSong, postUnlikeSong } from "../../api/audioAPI";
 import { getUserInfo } from "../../api/usersAPI";
 import CustomAlertComponent from "../../components/alertComponent/customAlert";
+import SongComponent from "../../components/songComponent/songComponent";
 
 class HomeScreen extends React.Component {
   constructor(props) {
@@ -52,15 +53,6 @@ class HomeScreen extends React.Component {
     })
   }
 
-  handleSongClick(item, index) {
-    this.props.setSongData(this.state.songsData)
-    this.props.setSongId(item.sid)
-    this.props.setSongIndex(index)
-    this.props.setSongUrl(item.url)
-    this.getOtherUserDetails(item.username)
-    this.props.navigateToMusicPlayerScreen()
-  }
-
   handleLikeClick(item, index) {
     if (item.like_status === 0) {
       postLikeSong(this.props.token, item.sid).then(response => {
@@ -96,34 +88,18 @@ class HomeScreen extends React.Component {
     )
   }
 
+  handleSongClick(item, index) {
+    this.props.setSongData(this.state.songsData)
+    this.props.setSongId(item.sid)
+    this.props.setSongIndex(index)
+    this.props.setSongUrl(item.url)
+    this.getOtherUserDetails(item.username)
+    this.props.navigateToMusicPlayerScreen()
+  }
+
   renderSong({ item, index }) {
-    let songName = item.title
-    let authorName = item.username
-    let songImage = item.cover
-    let likedSong = item.like_status
-    let playImage = require('../../assets/images/play.png')
-    let songLikes = item.likes
-    let likeImg = require('../../assets/images/like.png')
-    let likedImg = require('../../assets/images/like_color.png')
-    let placeholderImg = require('../../assets/images/cloud.png')
     return (
-      <TouchableOpacity style={styles.songContainer} onPress={() => this.handleSongClick(item, index)}>
-        {songImage ? <Image style={styles.songImage} source={{ uri: songImage }} /> : <Image style={styles.songImage} source={placeholderImg} />}
-        <Image style={styles.playImage} source={playImage} />
-        <View style={styles.songDetailsContainer}>
-          <Text style={styles.songNameText}>{songName}</Text>
-          <Text style={styles.authorNameText}>{authorName}</Text>
-          <TouchableOpacity onPress={() => this.handleLikeClick(item, index)}>
-            {likedSong ?
-              <View style={styles.likeContainer}>
-                <Text style={styles.likedText}>{songLikes}</Text><Image style={styles.likeImg} source={likedImg} />
-              </View> :
-              <View style={styles.likeContainer}>
-                <Text style={styles.likes}>{songLikes}</Text><Image style={styles.likeImg} source={likeImg} />
-              </View>}
-          </TouchableOpacity>
-        </View>
-      </TouchableOpacity>
+      <SongComponent item={item} index={index} handleSongClicked={this.handleSongClick.bind(this)} handleLikeClicked={this.handleLikeClick.bind(this)} />
     );
   }
 
