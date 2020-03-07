@@ -12,7 +12,7 @@ import ProfileSongs from "../../components/profileSongs/profileSongs";
 import ProfilePosts from "../../components/profilePosts/profilePosts";
 import FollowingComponent from "../../components/followingComponent/followingComponent";
 import FollowerComponent from "../../components/followerComponent/followerComponent";
-import { getLikedSongs } from "../../api/audioAPI";
+import { getLikedSongs, postUnlikeSong, postLikeSong } from "../../api/audioAPI";
 import { animateTimingNative, animateTimingPromiseNative } from "../../utils/animate";
 import CustomAlertComponent from "../../components/alertComponent/customAlert";
 
@@ -194,6 +194,24 @@ class ProfileScreen extends React.Component {
     })
   }
 
+  handleLikeClick(item, index) {
+    if (item.like_status === 0) {
+      postLikeSong(this.props.token, item.sid).then(response => {
+        let array = Object.assign({}, this.state.likedSongsData);
+        array[index].like_status = 1
+        array[index].likes++
+        this.setState({ array });
+      })
+    } else {
+      postUnlikeSong(this.props.token, item.sid).then(response => {
+        let array = Object.assign({}, this.state.likedSongsData);
+        array[index].like_status = 0
+        array[index].likes--
+        this.setState({ array });
+      })
+    }
+  }
+
   renderLikedSong({ item, index }) {
     let songName = item.title
     let authorName = item.username
@@ -211,12 +229,14 @@ class ProfileScreen extends React.Component {
         <View style={styles.songDetailsContainer}>
           <Text style={styles.songNameText}>{songName}</Text>
           <Text style={styles.authorNameText}>{authorName}</Text>
-          {likedSong ? <View style={styles.likeContainer}>
-            <Text style={styles.likedText}>{songLikes}</Text><Image style={styles.likeImg} source={likedImg} />
-          </View> :
-            <View style={styles.likeContainer}>
-              <Text style={styles.likes}>{songLikes}</Text><Image style={styles.likeImg} source={likeImg} />
-            </View>}
+          <TouchableOpacity onPress={() => this.handleLikeClick(item, index)}>
+            {likedSong ? <View style={styles.likeContainer}>
+              <Text style={styles.likedText}>{songLikes}</Text><Image style={styles.likeImg} source={likedImg} />
+            </View> :
+              <View style={styles.likeContainer}>
+                <Text style={styles.likes}>{songLikes}</Text><Image style={styles.likeImg} source={likeImg} />
+              </View>}
+          </TouchableOpacity>
         </View>
       </TouchableOpacity>
     )
@@ -231,7 +251,7 @@ class ProfileScreen extends React.Component {
   }
 
   _handleLoadMore() {
-    if (this.state.nextPage !== null){
+    if (this.state.nextPage !== null) {
       this.getLikedSongs()
     }
   }

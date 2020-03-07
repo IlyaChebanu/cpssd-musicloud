@@ -6,7 +6,7 @@ import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity } from "react
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import UserProfileComponent from "../profileComponent/userProfileComponent";
-import { getCompiledSongs } from "../../api/audioAPI";
+import { getCompiledSongs, postLikeSong, postUnlikeSong } from "../../api/audioAPI";
 
 class UserProfileSongs extends React.Component {
   constructor(props) {
@@ -56,6 +56,24 @@ class UserProfileSongs extends React.Component {
     this.props.handleLikedSongsClick()
   }
 
+  handleLikeClick(item, index) {
+    if (item.like_status === 0) {
+      postLikeSong(this.props.token, item.sid).then(response => {
+        let array = Object.assign({}, this.state.songsData);
+        array[index].like_status = 1
+        array[index].likes++
+        this.setState({ array });
+      })
+    } else {
+      postUnlikeSong(this.props.token, item.sid).then(response => {
+        let array = Object.assign({}, this.state.songsData);
+        array[index].like_status = 0
+        array[index].likes--
+        this.setState({ array });
+      })
+    }
+  }
+
   renderheader() {
     return (
       <View style={styles.container}>
@@ -95,19 +113,21 @@ class UserProfileSongs extends React.Component {
               <Image style={styles.profilePic} source={profilePic} />}
             <Text style={styles.authorNameText}>{authorName}</Text>
           </View>
-          {likedSong ? <View style={styles.likeContainer}>
+          <TouchableOpacity onPress={() => this.handleLikeClick(item, index)}>
+            {likedSong ? <View style={styles.likeContainer}>
               <Text style={styles.likedText}>{songLikes}</Text><Image style={styles.likeImg} source={likedImg} />
             </View> :
-          <View style={styles.likeContainer}>
-            <Text style={styles.likes}>{songLikes}</Text><Image style={styles.likeImg} source={likeImg} />
-          </View>}
+              <View style={styles.likeContainer}>
+                <Text style={styles.likes}>{songLikes}</Text><Image style={styles.likeImg} source={likeImg} />
+              </View>}
+          </TouchableOpacity>
         </View>
       </TouchableOpacity>
     );
   }
 
   _handleLoadMore() {
-    if (this.state.nextPage !== null){
+    if (this.state.nextPage !== null) {
       this.getSongs()
     }
   }

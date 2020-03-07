@@ -8,7 +8,7 @@ import styles from "./styles";
 import HeaderComponent from "../../components/headerComponent/headerComponent";
 import { SafeAreaView } from "react-navigation";
 import SearchComponent from "../../components/searchComponent/searchComponent";
-import { getCompiledSongs } from "../../api/audioAPI";
+import { getCompiledSongs, postLikeSong, postUnlikeSong } from "../../api/audioAPI";
 import { getUserInfo } from "../../api/usersAPI";
 import CustomAlertComponent from "../../components/alertComponent/customAlert";
 
@@ -61,6 +61,24 @@ class HomeScreen extends React.Component {
     this.props.navigateToMusicPlayerScreen()
   }
 
+  handleLikeClick(item, index) {
+    if (item.like_status === 0) {
+      postLikeSong(this.props.token, item.sid).then(response => {
+        let array = Object.assign({}, this.state.songsData);
+        array[index].like_status = 1
+        array[index].likes++
+        this.setState({ array });
+      })
+    } else {
+      postUnlikeSong(this.props.token, item.sid).then(response => {
+        let array = Object.assign({}, this.state.songsData);
+        array[index].like_status = 0
+        array[index].likes--
+        this.setState({ array });
+      })
+    }
+  }
+
   getSongs() {
     getCompiledSongs(this.props.token, '', 10, this.state.nextPage).then(response => {
       if (response.status === 200) {
@@ -96,13 +114,15 @@ class HomeScreen extends React.Component {
         <View style={styles.songDetailsContainer}>
           <Text style={styles.songNameText}>{songName}</Text>
           <Text style={styles.authorNameText}>{authorName}</Text>
-          {likedSong ?
-            <View style={styles.likeContainer}>
-              <Text style={styles.likedText}>{songLikes}</Text><Image style={styles.likeImg} source={likedImg} />
-            </View> :
-            <View style={styles.likeContainer}>
-              <Text style={styles.likes}>{songLikes}</Text><Image style={styles.likeImg} source={likeImg} />
-            </View>}
+          <TouchableOpacity onPress={() => this.handleLikeClick(item, index)}>
+            {likedSong ?
+              <View style={styles.likeContainer}>
+                <Text style={styles.likedText}>{songLikes}</Text><Image style={styles.likeImg} source={likedImg} />
+              </View> :
+              <View style={styles.likeContainer}>
+                <Text style={styles.likes}>{songLikes}</Text><Image style={styles.likeImg} source={likeImg} />
+              </View>}
+          </TouchableOpacity>
         </View>
       </TouchableOpacity>
     );
@@ -116,7 +136,7 @@ class HomeScreen extends React.Component {
   onPressAlertNegativeButton = () => {
     this.setState({ showAlert: false })
   };
-  
+
   _handleLoadMore() {
     if (this.state.nextPage !== null) {
       this.getSongs()

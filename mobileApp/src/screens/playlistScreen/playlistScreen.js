@@ -6,7 +6,7 @@ import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity, BackHandler 
 import styles from "./styles";
 import { SafeAreaView } from "react-navigation";
 import HeaderComponent from "../../components/headerComponent/headerComponent";
-import { getPlaylist, getPlaylistSongs } from "../../api/audioAPI";
+import { getPlaylist, getPlaylistSongs, postLikeSong, postUnlikeSong } from "../../api/audioAPI";
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { getUserInfo } from "../../api/usersAPI";
 import CustomAlertComponent from "../../components/alertComponent/customAlert";
@@ -94,6 +94,24 @@ class PlaylistScreen extends React.Component {
         this.props.navigateToMusicPlayerScreen()
     }
 
+    handleLikeClick(item, index) {
+        if (item.like_status === 0) {
+            postLikeSong(this.props.token, item.sid).then(response => {
+                let array = Object.assign({}, this.state.playlistSongData);
+                array[index].like_status = 1
+                array[index].likes++
+                this.setState({ array });
+            })
+        } else {
+            postUnlikeSong(this.props.token, item.sid).then(response => {
+                let array = Object.assign({}, this.state.playlistSongData);
+                array[index].like_status = 0
+                array[index].likes--
+                this.setState({ array });
+            })
+        }
+    }
+
     renderPlayItem({ item, index }) {
         return (
             <TouchableOpacity style={styles.playitemContainer} onPress={() => this.handlePlaylistClick(item)}>
@@ -129,13 +147,15 @@ class PlaylistScreen extends React.Component {
                 <View style={styles.songDetailsContainer}>
                     <Text style={styles.songNameText}>{songName}</Text>
                     <Text style={styles.authorNameText}>{authorName}</Text>
-                    {likedSong ?
-                        <View style={styles.likeContainer}>
-                            <Text style={styles.likedText}>{songLikes}</Text><Image style={styles.likeImg} source={likedImg} />
-                        </View> :
-                        <View style={styles.likeContainer}>
-                            <Text style={styles.likes}>{songLikes}</Text><Image style={styles.likeImg} source={likeImg} />
-                        </View>}
+                    <TouchableOpacity onPress={() => this.handleLikeClick(item, index)}>
+                        {likedSong ?
+                            <View style={styles.likeContainer}>
+                                <Text style={styles.likedText}>{songLikes}</Text><Image style={styles.likeImg} source={likedImg} />
+                            </View> :
+                            <View style={styles.likeContainer}>
+                                <Text style={styles.likes}>{songLikes}</Text><Image style={styles.likeImg} source={likeImg} />
+                            </View>}
+                    </TouchableOpacity>
                 </View>
             </TouchableOpacity>
         );
@@ -150,19 +170,19 @@ class PlaylistScreen extends React.Component {
     };
 
     _handleLoadMore() {
-        if (this.state.nextPage !== null){
-          getPlaylistSongs(this.props.token, this.state.pid, 10, this.state.nextPage).then(response => {
-            if (response.status === 200) {
-                var joined = this.state.playlistSongData.concat(response.data.songs)
-                this.setState({ playlistSongData: joined, nextPage: response.data.next_page, screenState: 2 })
-            }
-        })
+        if (this.state.nextPage !== null) {
+            getPlaylistSongs(this.props.token, this.state.pid, 10, this.state.nextPage).then(response => {
+                if (response.status === 200) {
+                    var joined = this.state.playlistSongData.concat(response.data.songs)
+                    this.setState({ playlistSongData: joined, nextPage: response.data.next_page, screenState: 2 })
+                }
+            })
         }
     }
 
     _handleLoadMorePlaylist() {
-        if (this.state.nextPagePlaylist !== null){
-          this.getPlaylist()
+        if (this.state.nextPagePlaylist !== null) {
+            this.getPlaylist()
         }
     }
 
