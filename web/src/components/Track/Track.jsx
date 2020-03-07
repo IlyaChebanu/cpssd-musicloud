@@ -5,15 +5,12 @@ import { connect } from 'react-redux';
 import _ from 'lodash';
 import { HotKeys, configure } from 'react-hotkeys';
 import styles from './Track.module.scss';
-import { genId } from '../../helpers/utils';
-// import Sample from '../Sample/Sample';
 import {
   setSelectedTrack,
   setSelectedSample,
   hideSampleEffects,
   setShowPianoRoll,
   addSample,
-  // setTrackAtIndex,
 } from '../../actions/studioActions';
 
 configure({
@@ -41,23 +38,8 @@ Ticks.displayName = 'Ticks';
 
 const Track = memo((props) => {
   const {
-    dispatch, clipboard, track, tempo, className, gridSize, gridWidth, index,
+    dispatch, clipboard, track, className, gridSize, gridWidth, index,
   } = props;
-
-  // const getSample = useCallback((sample) => (
-  //   <Sample
-  //     sample={{ ...sample, track: index }}
-  //     style={{
-  //       position: 'absolute',
-  //       transform: `translateX(${(sample.time - 1) * (40 * gridSize)}px)`,
-  //     }}
-  //     key={sample.id}
-  //   />
-  // ), [gridSize, index]);
-
-  // const samples = useMemo(() => (
-  //   track.samples && track.samples.map(getSample)
-  // ), [getSample, track]);
 
   const handleSetSelected = useCallback(() => {
     dispatch(setSelectedTrack(track.id));
@@ -97,7 +79,6 @@ const Track = memo((props) => {
       style={widthStyle}
     >
       <Ticks gridSize={gridSize} gridWidth={gridWidth} />
-      {/* {samples} */}
     </HotKeys>
   );
 });
@@ -107,7 +88,6 @@ Track.propTypes = {
   dispatch: PropTypes.func.isRequired,
   track: PropTypes.object.isRequired,
   clipboard: PropTypes.object.isRequired,
-  tempo: PropTypes.number.isRequired,
   className: PropTypes.string,
   gridSize: PropTypes.number.isRequired,
   gridWidth: PropTypes.number.isRequired,
@@ -124,7 +104,6 @@ const mapStateToProps = ({ studio }) => ({
   scroll: studio.scroll,
   selectedTrack: studio.selectedTrack,
   clipboard: studio.clipboard,
-  tempo: studio.tempo,
   test: studio.test,
   gridSize: studio.gridSize,
   gridWidth: studio.gridWidth,

@@ -34,12 +34,24 @@ const PlaybackControls = memo((props) => {
   }, [dispatch]);
 
   const backward = useCallback(() => {
-    dispatch(setCurrentBeat(Math.max(1, Math.floor(currentBeat - 1))));
-  }, [dispatch, currentBeat]);
+    if (playing) {
+      dispatch(pause);
+      dispatch(setCurrentBeat(Math.max(1, Math.floor(currentBeat - 1))));
+      dispatch(play);
+    } else {
+      dispatch(setCurrentBeat(Math.max(1, Math.floor(currentBeat - 1))));
+    }
+  }, [playing, dispatch, currentBeat]);
 
   const forward = useCallback(() => {
-    dispatch(setCurrentBeat(Math.max(1, Math.floor(currentBeat + 1))));
-  }, [currentBeat, dispatch]);
+    if (playing) {
+      dispatch(pause);
+      dispatch(setCurrentBeat(Math.max(1, Math.floor(currentBeat + 1))));
+      dispatch(play);
+    } else {
+      dispatch(setCurrentBeat(Math.max(1, Math.floor(currentBeat + 1))));
+    }
+  }, [currentBeat, dispatch, playing]);
 
   const showExplorer = useCallback(() => {
     dispatch(showFileExplorer());
