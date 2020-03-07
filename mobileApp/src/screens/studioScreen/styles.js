@@ -88,6 +88,19 @@ export default StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  stopRecContainer: {
+    height: 100,
+    width: 100,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  stopRecBtn: {
+    backgroundColor: '#777',
+    height: 75,
+    width: 75,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   playImgs: {
     height: 48,
     width: 48,
