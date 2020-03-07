@@ -20,14 +20,21 @@ import {
 } from '../../actions/studioActions';
 import PianoNote from '../PianoNote/PianoNote';
 
+const keyNames = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#'];
 const pianoKeys = [];
 const pianoTracks = [];
 for (let i = 0; i < 88; i += 1) {
   if ([0, 2, 3, 5, 7, 8, 10].includes(i % 12)) {
-    pianoKeys.push(<button className={`${styles.whiteKey} ${[0, 5, 10].includes(i % 12) ? styles.wide : ''}`} key={i} />);
+    pianoKeys.push(
+      <button className={`${styles.whiteKey} ${[0, 5, 10].includes(i % 12) ? styles.wide : ''}`} key={i}>
+        <span className={`${i % 12 === 3 ? styles.bold : styles.light}`}>{`${keyNames[i % 12]}${Math.floor(i / 12) + 1}`}</span>
+      </button>,
+    );
     pianoTracks.push(<div className={`${styles.track} ${styles.white}`} key={i} />);
   } else {
-    pianoKeys.push(<button className={styles.blackKey} key={i} />);
+    pianoKeys.push(
+      <button className={styles.blackKey} key={i} />,
+    );
     pianoTracks.push(<div className={`${styles.track} ${styles.black}`} key={i} />);
   }
 }

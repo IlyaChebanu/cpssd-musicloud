@@ -179,6 +179,7 @@ const Sample = memo((props) => {
       setTimeout(() => wavesurfer.current.loadDecodedBuffer(buffer), 300);
     } else if (wavesurfer.current && data.type === 'pattern') {
       wavesurfer.current.destroy();
+      wavesurfer.current = null;
     }
   }, [buffer, container, data.duration, data.type, gridSize, tempo]);
 

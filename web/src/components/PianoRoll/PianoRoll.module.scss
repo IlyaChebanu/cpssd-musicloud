@@ -82,9 +82,24 @@
       border-radius: 0 10px 10px 0;
       border: none;
       box-shadow: inset 0px 0px 2px rgba(0, 0, 0, 0.4);
+
+      span {
+        float: right;
+        transform: rotate(-90deg);
+        font-size: 14px;
+
+        &.light {
+          color: rgb(200, 200, 200);
+        }
+
+        &.bold {
+          font-weight: bold;
+        }
+      }
     }
 
     .blackKey {
+      color: white;
       width: 100px;
       height: 20px;
       background-color: black;
