@@ -11,7 +11,6 @@ import {
 import scheduleSample from './scheduleSample';
 import stopSample from './stopSample';
 import beatsToSeconds from './beatsToSeconds';
-import { lerp, map } from '../helpers/utils';
 import playNote from './playNote';
 import setFadeCurve from './setFadeCurve';
 

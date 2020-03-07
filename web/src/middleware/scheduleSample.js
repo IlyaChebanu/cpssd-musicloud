@@ -2,7 +2,6 @@
 import store from '../store';
 import { audioContext } from '../helpers/constants';
 import beatsToSeconds from './beatsToSeconds';
-import { lerp, map } from '../helpers/utils';
 import playSample from './playSample';
 import playNote from './playNote';
 import setFadeCurve from './setFadeCurve';

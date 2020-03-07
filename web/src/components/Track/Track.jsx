@@ -12,6 +12,7 @@ import {
   setSelectedSample,
   hideSampleEffects,
   setShowPianoRoll,
+  addSample,
   // setTrackAtIndex,
 } from '../../actions/studioActions';
 
@@ -70,11 +71,9 @@ const Track = memo((props) => {
     if (_.isEmpty(sample)) {
       return;
     }
-    sample.id = genId();
-    sample.time += sample.duration * (tempo / 60);
-    track.samples = [...track.samples, sample];
-    // dispatch(setTrackAtIndex(track, index));
-  }, [clipboard, tempo, track]);
+    sample.time += sample.duration;
+    dispatch(addSample(track.id, sample));
+  }, [clipboard, dispatch, track.id]);
 
   const keyMap = {
     PASTE_SAMPLE: 'ctrl+v',
