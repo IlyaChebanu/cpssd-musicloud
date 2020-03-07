@@ -1,14 +1,14 @@
-import _ from 'lodash';
 // eslint-disable-next-line import/no-cycle
 import store from '../store';
-import { showNotification } from '../actions/notificationsActions';
 import { audioContext } from '../helpers/constants';
 import beatsToSeconds from './beatsToSeconds';
 import { lerp, map } from '../helpers/utils';
 import playSample from './playSample';
 import playNote from './playNote';
+import setFadeCurve from './setFadeCurve';
 
 
+// eslint-disable-next-line consistent-return
 export default (sample, channel, context = audioContext, isOffline = false) => {
   const { studio } = store.getState();
 
@@ -30,23 +30,8 @@ export default (sample, channel, context = audioContext, isOffline = false) => {
   gain.connect(popFilter);
   popFilter.connect(channel);
 
-  // Fade / envelope section
-  const fadeInBeginTime = lerp(startTime, endTime, sample.fade.fadeIn);
-  gain.gain.setValueAtTime(
-    Math.min(1, startTime / fadeInBeginTime),
-    startTime,
-  );
-  gain.gain.linearRampToValueAtTime(
-    1,
-    fadeInBeginTime,
-  );
 
-  const fadeOutBeginTime = lerp(startTime, endTime, 1 - sample.fade.fadeOut);
-  gain.gain.setValueAtTime(
-    Math.min(1, 1 - map(audioContext.currentTime, fadeOutBeginTime, endTime, 0, 1)),
-    fadeOutBeginTime,
-  );
-  gain.gain.linearRampToValueAtTime(0, endTime);
+  setFadeCurve(gain, context, startTime, endTime, sample.fade.fadeIn, sample.fade.fadeOut);
 
 
   popFilter.gain.setValueAtTime(0.001, 0);

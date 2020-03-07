@@ -13,6 +13,7 @@ import stopSample from './stopSample';
 import beatsToSeconds from './beatsToSeconds';
 import { lerp, map } from '../helpers/utils';
 import playNote from './playNote';
+import setFadeCurve from './setFadeCurve';
 
 export const renderTracks = (studio) => {
   const samples = Object.values(studio.samples);
@@ -275,23 +276,14 @@ export default (store) => {
             state.tempo,
           );
 
-          const fadeInBeginTime = lerp(startTime, endTime, action.value);
-          sample.gain.gain.cancelScheduledValues(audioContext.currentTime);
-          sample.gain.gain.setValueAtTime(
-            Math.min(1, startTime / fadeInBeginTime),
+          setFadeCurve(
+            sample.gain,
+            audioContext,
             startTime,
+            endTime,
+            action.value,
+            stateSample.fade.fadeOut,
           );
-          sample.gain.gain.linearRampToValueAtTime(
-            1,
-            fadeInBeginTime,
-          );
-
-          const fadeOutBeginTime = lerp(startTime, endTime, 1 - stateSample.fade.fadeOut);
-          sample.gain.gain.setValueAtTime(
-            Math.min(1, 1 - map(audioContext.currentTime, fadeOutBeginTime, endTime, 0, 1)),
-            fadeOutBeginTime,
-          );
-          sample.gain.gain.linearRampToValueAtTime(0, endTime);
         }
         break;
       }
@@ -310,23 +302,14 @@ export default (store) => {
             state.tempo,
           );
 
-          const fadeInBeginTime = lerp(startTime, endTime, stateSample.fade.fadeIn);
-          sample.gain.gain.cancelScheduledValues(audioContext.currentTime);
-          sample.gain.gain.setValueAtTime(
-            Math.min(1, startTime / fadeInBeginTime),
+          setFadeCurve(
+            sample.gain,
+            audioContext,
             startTime,
+            endTime,
+            stateSample.fade.fadeIn,
+            action.value,
           );
-          sample.gain.gain.linearRampToValueAtTime(
-            1,
-            fadeInBeginTime,
-          );
-
-          const fadeOutBeginTime = lerp(startTime, endTime, 1 - action.value);
-          sample.gain.gain.setValueAtTime(
-            Math.min(1, 1 - map(audioContext.currentTime, fadeOutBeginTime, endTime, 0, 1)),
-            fadeOutBeginTime,
-          );
-          sample.gain.gain.linearRampToValueAtTime(0, endTime);
         }
         break;
       }
@@ -453,22 +436,14 @@ export default (store) => {
             sample.popFilter.gain.setValueAtTime(1, endTime - 0.01);
             sample.popFilter.gain.exponentialRampToValueAtTime(0.001, endTime);
 
-            const fadeInBeginTime = lerp(startTime, endTime, sample.fade.fadeIn);
-            sample.gain.gain.setValueAtTime(
-              Math.min(1, startTime / fadeInBeginTime),
+            setFadeCurve(
+              sample.gain,
+              audioContext,
               startTime,
+              endTime,
+              sample.fade.fadeIn,
+              sample.fade.fadeOut,
             );
-            sample.gain.gain.linearRampToValueAtTime(
-              1,
-              fadeInBeginTime,
-            );
-
-            const fadeOutBeginTime = lerp(startTime, endTime, 1 - sample.fade.fadeOut);
-            sample.gain.gain.setValueAtTime(
-              Math.min(1, 1 - map(audioContext.currentTime, fadeOutBeginTime, endTime, 0, 1)),
-              fadeOutBeginTime,
-            );
-            sample.gain.gain.linearRampToValueAtTime(0, endTime);
 
             note.source = playNote(
               audioContext,
