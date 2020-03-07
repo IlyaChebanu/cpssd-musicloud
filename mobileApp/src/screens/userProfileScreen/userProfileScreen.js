@@ -58,10 +58,9 @@ class UserProfileScreen extends React.Component {
   }
 
   getLikedSongs() {
-    getLikedSongs(this.props.token, this.props.otherUserData.username, 10, this.state.nextPage).then(response => {
+    getLikedSongs(this.props.token, this.props.otherUserData.username, 10, '').then(response => {
       if (response.status === 200) {
-        var joined = this.state.likedSongsData.concat(response.data.songs)
-        this.setState({ likedSongsData: joined, nextPage: response.data.next_page })
+        this.setState({ likedSongsData: response.data.songs, nextPage: response.data.next_page })
       }
     })
   }
@@ -319,7 +318,12 @@ class UserProfileScreen extends React.Component {
 
   _handleLoadMore() {
     if (this.state.nextPage !== null) {
-      this.getLikedSongs()
+      getLikedSongs(this.props.token, this.props.otherUserData.username, 10, this.state.nextPage).then(response => {
+        if (response.status === 200) {
+          var joined = this.state.likedSongsData.concat(response.data.songs)
+          this.setState({ likedSongsData: joined, nextPage: response.data.next_page })
+        }
+      })
     }
   }
 

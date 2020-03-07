@@ -29,10 +29,9 @@ class ProfileSongs extends React.Component {
   }
 
   getSongs() {
-    getUserTimeline(this.props.accessToken, false, true, this.state.nextPage, 10).then(response => {
+    getUserTimeline(this.props.accessToken, false, true, '', 10).then(response => {
       if (response.status === 200) {
-        var joined = this.state.songsData.concat(response.data.timeline)
-        this.setState({ songsData: joined, nextPage: response.data.next_page })
+        this.setState({ songsData: response.data.timeline, nextPage: response.data.next_page })
       }
     })
   }
@@ -129,7 +128,12 @@ class ProfileSongs extends React.Component {
 
   _handleLoadMore() {
     if (this.state.nextPage !== null) {
-      this.getSongs()
+      getUserTimeline(this.props.accessToken, false, true, '', 10).then(response => {
+        if (response.status === 200) {
+          var joined = this.state.songsData.concat(response.data.timeline)
+          this.setState({ songsData: joined, nextPage: response.data.next_page })
+        }
+      })
     }
   }
 

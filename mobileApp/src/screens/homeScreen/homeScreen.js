@@ -80,10 +80,9 @@ class HomeScreen extends React.Component {
   }
 
   getSongs() {
-    getCompiledSongs(this.props.token, '', 10, this.state.nextPage).then(response => {
+    getCompiledSongs(this.props.token, '', 10, '').then(response => {
       if (response.status === 200) {
-        var joined = this.state.songsData.concat(response.data.songs)
-        this.setState({ songsData: joined, nextPage: response.data.next_page })
+        this.setState({ songsData: response.data.songs, nextPage: response.data.next_page })
       }
     })
   }
@@ -139,7 +138,12 @@ class HomeScreen extends React.Component {
 
   _handleLoadMore() {
     if (this.state.nextPage !== null) {
-      this.getSongs()
+      getCompiledSongs(this.props.token, '', 10, this.state.nextPage).then(response => {
+        if (response.status === 200) {
+          var joined = this.state.songsData.concat(response.data.songs)
+          this.setState({ songsData: joined, nextPage: response.data.next_page })
+        }
+      })
     }
   }
 

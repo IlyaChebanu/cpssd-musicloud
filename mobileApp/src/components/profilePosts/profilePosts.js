@@ -22,10 +22,9 @@ export default class ProfilePosts extends React.Component {
   }
 
   getPosts() {
-    getUserTimeline(this.props.accessToken, true, false, this.state.nextPage, 10).then(response => {
+    getUserTimeline(this.props.accessToken, true, false, '', 10).then(response => {
       if (response.status === 200) {
-        var joined = this.state.posts.concat(response.data.timeline)
-        this.setState({ posts: joined, nextPage: response.data.next_page })
+        this.setState({ posts: response.data.timeline, nextPage: response.data.next_page })
       }
     })
   }
@@ -87,7 +86,12 @@ export default class ProfilePosts extends React.Component {
 
   _handleLoadMore() {
     if (this.state.nextPage !== null){
-      this.getPosts()
+      getUserTimeline(this.props.accessToken, true, false, this.state.nextPage, 10).then(response => {
+        if (response.status === 200) {
+          var joined = this.state.posts.concat(response.data.timeline)
+          this.setState({ posts: joined, nextPage: response.data.next_page })
+        }
+      })
     }
   }
 
