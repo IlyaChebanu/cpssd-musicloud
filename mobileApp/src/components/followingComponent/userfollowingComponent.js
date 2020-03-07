@@ -11,6 +11,7 @@ export default class UserFollowingComponent extends React.Component {
         this.state = {
             followingData: [],
             followingPairs: {},
+            nextPage: null,
         }
     }
 
@@ -19,14 +20,23 @@ export default class UserFollowingComponent extends React.Component {
     }
 
     getFollowing() {
-        getFollowing(this.props.username, this.props.accessToken).then(response => {
+        getFollowing(this.props.username, this.props.accessToken, 20, this.state.nextPage).then(response => {
             let followersData = response.data.following
             let obj = {}
             for (var i = 0; i < followersData.length; i++) {
                 obj[followersData[i].username] = 1
             }
-            this.setState({ followingData: followersData, followingPairs: obj })
+
+            let joinedObj = { ...this.state.followingPairs, ...obj}
+            var joined = this.state.followingData.concat(followersData)
+            this.setState({ followingData: joined, nextPage: response.data.next_page, followingPairs: joinedObj })
         })
+    }
+
+    _handleLoadMore() {
+        if (this.state.nextPage !== null){
+          this.getFollowing()
+        }
     }
 
     handleFollowClick(item) {
@@ -78,6 +88,8 @@ export default class UserFollowingComponent extends React.Component {
                     renderItem={this.renderFollowing.bind(this)}
                     keyExtractor={item => String(item.username)}
                     extraData={this.state.followingData}
+                    onEndReached={this._handleLoadMore.bind(this)}
+                    onEndReachedThreshold={0.5}
                 /> :
                     <Text style={styles.defaultText}>{'You are not following anyone'}</Text>}
             </View>

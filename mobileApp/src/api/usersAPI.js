@@ -486,9 +486,15 @@ export function unfollowUser(token, username) {
         });
 }
 
-export function getFollowers(username, token) {
+export function getFollowers(username, token, users_per_page, next_page) {
 
     let url = `${API_URL}api/v1/users/followers?username=${username}`;
+    if (users_per_page) {
+        url = url + `&users_per_page=${users_per_page}`
+        if (next_page) {
+            url = url + `&next_page=${next_page}`
+        }
+    }
     var request = new Request(url, {
         method: "GET",
         headers: new Headers({
@@ -520,9 +526,15 @@ export function getFollowers(username, token) {
         });
 }
 
-export function getFollowing(username, token) {
+export function getFollowing(username, token, users_per_page, next_page) {
 
     let url = `${API_URL}api/v1/users/following?username=${username}`;
+    if (users_per_page) {
+        url = url + `&users_per_page=${users_per_page}`
+        if (next_page) {
+            url = url + `&next_page=${next_page}`
+        }
+    }
     var request = new Request(url, {
         method: "GET",
         headers: new Headers({
