@@ -292,7 +292,7 @@ class StudioScreen extends React.Component {
                                 <Image style={styles.playImgs} source={playImg} />
                             </TouchableOpacity>
 
-                            <TouchableOpacity onPress={this.onPausePlay} style={styles.playerImgs}>
+                            <TouchableOpacity onPress={this.state.recording ? this.onStopRecord : this.onPausePlay} style={styles.playerImgs}>
                                 <Image style={styles.playImgs} source={pauseImg} />
                             </TouchableOpacity>
 
