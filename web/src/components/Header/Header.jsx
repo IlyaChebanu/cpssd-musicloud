@@ -59,10 +59,13 @@ const Header = memo((props) => {
 
   const cleanSongSampleBuffers = (state) => {
     state.tracks.forEach((track) => {
-      track.samples.forEach((sample) => {
-        sample.buffer = {};
-      });
+      if (track.samples !== undefined) {
+        track.samples.forEach((sample) => {
+          sample.buffer = {};
+        });
+      }
     });
+
     return state;
   };
 
