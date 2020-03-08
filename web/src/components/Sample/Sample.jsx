@@ -183,6 +183,36 @@ const Sample = memo((props) => {
     }
   }, [buffer, container, data.duration, data.type, gridSize, tempo]);
 
+  const patternPreview = useMemo(() => {
+    const highestNote = _.maxBy(Object.values(data.notes), (n) => n.noteNumber);
+    const lowestNote = _.minBy(Object.values(data.notes), (n) => n.noteNumber);
+    if (!highestNote || !lowestNote) {
+      return null;
+    }
+    const height = highestNote.noteNumber - lowestNote.noteNumber;
+    return (
+      <div className={styles.previewWrapper}>
+        <div
+          className={styles.previewNoteWrapper}
+          style={{ height: height ? height * (88 / height / 1.5) : 1 }}
+        >
+          {Object.entries(data.notes).map(([noteId, note]) => (
+            <div
+              className={styles.previewNote}
+              key={noteId}
+              style={{
+                height: '2px',
+                width: `${note.duration * (0.25 / ppq) * gridSizePx}px`,
+                top: `${(88 - note.noteNumber) * height ? (88 / height / 1.5) : 1}px`,
+                left: `${note.tick * (0.25 / ppq) * gridSizePx}px`,
+              }}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }, [data.notes, gridSizePx]);
+
   const deleteSample = useCallback(() => {
     dispatch(removeSample(id));
   }, [dispatch, id]);
@@ -246,6 +276,7 @@ const Sample = memo((props) => {
           </div>
         )}
       {data.bufferLoading && <Spinner className={styles.spinner} />}
+      {!data.bufferLoading && data.type === 'pattern' && patternPreview}
     </HotKeys>
   );
 });
