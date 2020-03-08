@@ -14,7 +14,6 @@ import { connect } from 'react-redux';
 import styles from './Studio.module.scss';
 import Header from '../../components/Header';
 import {
-  // setTracks,
   addTrack,
   setScroll,
   setGridWidth,
