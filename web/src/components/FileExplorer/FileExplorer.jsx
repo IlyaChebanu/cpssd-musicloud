@@ -12,13 +12,11 @@ import instrumentsIcon from '../../assets/icons/instruments.svg';
 import { generatePresigned } from '../../helpers/api';
 import store from '../../store';
 import {
-  // setTrackAtIndex,
-  setSampleLoading,
   hideFileExplorer,
+  addSample as addSampleAction,
 } from '../../actions/studioActions';
 import { showNotification } from '../../actions/notificationsActions';
 
-import { genId } from '../../helpers/utils';
 
 const FileExplorer = memo((props) => {
   const { studio, dispatch } = props;
@@ -55,29 +53,16 @@ const FileExplorer = memo((props) => {
         );
         return;
       }
-      const track = { ...studio.tracks[studio.selectedTrack] };
       const sampleState = {
         url: url + name,
         name,
-        id: genId(),
         time: studio.currentBeat,
-        track: studio.selectedTrack,
         fade: {
           fadeIn: 0,
           fadeOut: 0,
         },
-        reverb: {
-          wet: 1,
-          dry: 1,
-          cutoff: 0,
-          time: 0.3,
-        },
       };
-      track.samples.push(sampleState);
-      // dispatch(setTrackAtIndex(track, studio.selectedTrack));
-      // dispatch(setSampleTime(sampleState.time, sampleState.id));
-      dispatch(setSampleLoading(true));
-      // dispatch(setTracks(studio.tracks));
+      dispatch(addSampleAction(studio.selectedTrack, sampleState));
     },
     [studio.tracks, studio.selectedTrack, studio.currentBeat, url, dispatch],
   );

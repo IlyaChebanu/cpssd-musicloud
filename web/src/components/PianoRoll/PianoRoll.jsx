@@ -14,7 +14,6 @@ import styles from './PianoRoll.module.scss';
 import { ReactComponent as CloseIcon } from '../../assets/icons/x-icon-10px.svg';
 import {
   setShowPianoRoll,
-  // setTrackAtIndex,
   setSampleName,
   addPatternNote,
 } from '../../actions/studioActions';

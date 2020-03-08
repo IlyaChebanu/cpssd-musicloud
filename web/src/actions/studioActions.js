@@ -46,13 +46,6 @@ export const setTempo = (tempo) => (dispatch) => {
   });
 };
 
-// export const setTracks = (tracks) => (dispatch) => {
-//   dispatch({
-//     type: 'SET_TRACKS',
-//     tracks,
-//   });
-// };
-
 export const deleteTrackAtIndex = (index) => (dispatch) => {
   dispatch({
     type: 'DELETE_TRACK',

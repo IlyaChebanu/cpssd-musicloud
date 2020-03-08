@@ -6,14 +6,13 @@ import { deleteToken as deleteTokenAction } from '../actions/userActions';
 import history from '../history';
 
 axios.interceptors.response.use((res) => res, (err) => {
-  // const state = store.getState();
   const res = err.response || { status: null };
   if ([500, 422].includes(res.status)) {
     store.dispatch(showNotification({
       message: 'An unknown error has occured. Please contact the site owners.',
     }));
   }
-  if (res.status === 401) {
+  if (window.location.pathname !== '/login' && res.status === 401) {
     store.dispatch(showNotification({
       message: 'Session expired. Please log back in.',
     }));

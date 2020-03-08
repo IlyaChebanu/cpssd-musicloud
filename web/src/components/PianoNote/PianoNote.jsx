@@ -13,7 +13,6 @@ import { useGlobalDrag } from '../../helpers/hooks';
 import {
   setPatternNoteTick, setPatternNoteNumber, setPatternNoteDuration, removePatternNote,
 } from '../../actions/studioActions';
-// import { setTrackAtIndex } from '../../actions/studioActions';
 
 const ppq = 1;
 

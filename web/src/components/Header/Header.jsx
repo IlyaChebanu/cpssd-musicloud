@@ -150,7 +150,8 @@ const Header = memo((props) => {
       const res = await createNewSong('New Song');
       if (res.status === 200) {
         dispatch(stop);
-        // dispatch(setTracks([]));
+        dispatch(setCompleteTracksState([]));
+        dispatch(setCompleteSamplesState({}));
         window.history.pushState(null, null, `/studio?sid=${res.data.sid}`);
         dispatch(setTempo(140));
         dispatch(setSongName('New Song'));

@@ -8,13 +8,13 @@ import styles from './SongPicker.module.scss';
 import OwnSongCard from '../OwnSongCard';
 import NewSong from '../NewSong/NewSong';
 import {
-  // setTracks,
   setCompleteTracksState,
   hideSongPicker,
   setTempo,
   setSongName,
   setSongDescription,
   setSongImageUrl,
+  setCompleteSamplesState,
 } from '../../actions/studioActions';
 import {
   getEditableSongs, createNewSong, getSongState, getNextEditableSongs,
@@ -52,6 +52,7 @@ const SongPicker = memo((props) => {
     if (res.status === 200) {
       window.history.pushState(null, null, `/studio?sid=${res.data.sid}`);
       dispatch(setCompleteTracksState([]));
+      dispatch(setCompleteSamplesState({}));
       dispatch(setTempo(140));
       dispatch(setSongName('New Song'));
       dispatch(hideSongPicker());
@@ -67,7 +68,8 @@ const SongPicker = memo((props) => {
         const res = await getSongState(song.sid);
         if (res.status === 200) {
           const songState = res.data.song_state;
-          // if (songState.tracks) dispatch(setTracks(songState.tracks));
+          if (songState.tracks) dispatch(setCompleteTracksState(songState.tracks));
+          if (songState.samples) dispatch(setCompleteSamplesState(songState.samples));
           if (songState.tempo) dispatch(setTempo(songState.tempo));
         }
         dispatch(setSongImageUrl(song.cover));

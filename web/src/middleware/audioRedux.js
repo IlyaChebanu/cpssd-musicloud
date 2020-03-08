@@ -1,6 +1,5 @@
 /* eslint-disable no-param-reassign */
 import _ from 'lodash';
-// import Reverb from 'soundbank-reverb';
 import {
   playingStartTime, setCurrentBeat, playingStartBeat, stop,
 } from '../actions/studioActions';
