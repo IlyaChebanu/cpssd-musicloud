@@ -194,7 +194,7 @@ const Sample = memo((props) => {
       <div className={styles.previewWrapper}>
         <div
           className={styles.previewNoteWrapper}
-          style={{ height: height ? height * (88 / height / 1.5) : 1 }}
+          style={{ height }}
         >
           {Object.entries(data.notes).map(([noteId, note]) => (
             <div
@@ -203,7 +203,7 @@ const Sample = memo((props) => {
               style={{
                 height: '2px',
                 width: `${note.duration * (0.25 / ppq) * gridSizePx}px`,
-                top: `${(88 - note.noteNumber) * (height ? (88 / height / 1.5) : 1)}px`,
+                top: `${(88 - note.noteNumber)}px`,
                 left: `${note.tick * (0.25 / ppq) * gridSizePx}px`,
               }}
             />
