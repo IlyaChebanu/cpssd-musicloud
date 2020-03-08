@@ -13,7 +13,7 @@ import {
   setTrackSolo,
   hideSampleEffects,
   setShowPianoRoll,
-  deleteTrackAtIndex,
+  removeTrack,
 } from '../../actions/studioActions';
 import Knob from '../Knob';
 import { ReactComponent as Mute } from '../../assets/icons/volume-up-light.svg';
@@ -74,8 +74,8 @@ const TrackControls = memo((props) => {
   const handleDeleteTrack = useCallback((e) => {
     // Stop propagation to void selecting track when deleting
     e.stopPropagation();
-    dispatch(deleteTrackAtIndex(index));
-  }, [dispatch, index]);
+    dispatch(removeTrack(track.id));
+  }, [dispatch, track.id]);
 
   return (
     <div
