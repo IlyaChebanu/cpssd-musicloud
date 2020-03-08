@@ -1,4 +1,5 @@
 import { genId } from '../helpers/utils';
+import store from '../store';
 
 export const play = (dispatch) => {
   dispatch({
@@ -273,9 +274,18 @@ export const addTrack = (track = {
 };
 
 export const removeTrack = (trackId) => (dispatch) => {
+  const { samples } = store.getState().studio;
   dispatch({
     type: 'REMOVE_TRACK',
     trackId,
+  });
+  Object.entries(samples).forEach(([sampleId, sample]) => {
+    if (sample.trackId === trackId) {
+      dispatch({
+        type: 'REMOVE_SAMPLE',
+        sampleId,
+      });
+    }
   });
 };
 

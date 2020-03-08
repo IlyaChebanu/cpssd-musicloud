@@ -269,7 +269,6 @@ export default (
       return {
         ...state,
         tracks: state.tracks.filter((t) => t.id !== action.trackId),
-        samples: _.omitBy(state.samples, (s) => s.trackId === action.trackId),
       };
     case 'SET_TRACK_VOLUME':
       return {
