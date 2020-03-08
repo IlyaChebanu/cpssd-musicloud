@@ -1,5 +1,6 @@
 /* eslint-disable no-param-reassign */
 import _ from 'lodash';
+// eslint-disable-next-line import/no-cycle
 import {
   playingStartTime, setCurrentBeat, playingStartBeat, stop,
 } from '../actions/studioActions';
@@ -77,6 +78,9 @@ export default (store) => {
     );
   };
 
+
+  let animation;
+
   // Update currentBeat in redux to animate seek bar
   const beatUpdate = () => {
     const state = store.getState().studio;
@@ -84,7 +88,7 @@ export default (store) => {
       store.dispatch(stop);
     }
     if (state.playing && window.location.pathname === '/studio') {
-      requestAnimationFrame(beatUpdate);
+      animation = requestAnimationFrame(beatUpdate);
       const secondsPerBeat = 60 / state.tempo;
       let currentBeat = (
         state.playingStartBeat
@@ -111,19 +115,21 @@ export default (store) => {
         store.dispatch(playingStartTime(audioContext.currentTime));
         store.dispatch(playingStartBeat(state.currentBeat));
         state.playingStartBeat = state.currentBeat;
-        requestAnimationFrame(beatUpdate);
+        animation = requestAnimationFrame(beatUpdate);
         startPlayback();
         break;
       }
 
       case 'STUDIO_PAUSE':
         stopPlayback();
+        if (animation) cancelAnimationFrame(animation);
         break;
 
       case 'STUDIO_STOP':
         store.dispatch(playingStartBeat(state.loopEnabled ? state.loop.start : 1));
         store.dispatch(setCurrentBeat(state.loopEnabled ? state.loop.start : 1));
         stopPlayback();
+        if (animation) cancelAnimationFrame(animation);
         break;
 
       case 'SET_VOLUME':

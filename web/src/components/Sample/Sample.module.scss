@@ -9,6 +9,7 @@
 
   wave {
     pointer-events: none;
+    border: none !important;
   }
 
   -webkit-touch-callout: none; /* iOS Safari */
@@ -27,7 +28,7 @@
   }
 
   p {
-    margin-left: 3px;
+    margin-left: 5px;
     margin-top: 3px;
     position: absolute;
     font-size: 11px;
@@ -42,6 +43,7 @@
   .edit {
     position: absolute;
     right: 5px;
+    top: 3px;
 
     svg {
       fill: white;

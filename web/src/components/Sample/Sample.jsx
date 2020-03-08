@@ -225,6 +225,14 @@ const Sample = memo((props) => {
       style={{ ...wrapperStyle, ...props.style }}
       innerRef={ref}
     >
+      <div className={styles.fadeWrapper}>
+        {id === selectedSample && !!(data.fade.fadeIn || data.fade.fadeOut) && (
+          <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" fill="rgba(0, 0, 0, 0.3)">
+            <path d={`M 0 0 L ${data.fade.fadeIn * 100} 0 L 0 100`} />
+            <path d={`M ${(1 - data.fade.fadeOut) * 100} 0 L 100 0 L 100 100`} />
+          </svg>
+        )}
+      </div>
       <p>{id === selectedSample && data.name}</p>
       {id === selectedSample
         && (
@@ -238,14 +246,6 @@ const Sample = memo((props) => {
           </div>
         )}
       {data.bufferLoading && <Spinner className={styles.spinner} />}
-      <div className={styles.fadeWrapper}>
-        {id === selectedSample && !!(data.fade.fadeIn || data.fade.fadeOut) && (
-          <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" fill="rgba(0, 0, 0, 0.3)">
-            <path d={`M 0 0 L ${data.fade.fadeIn * 100} 0 L 0 100`} />
-            <path d={`M ${(1 - data.fade.fadeOut) * 100} 0 L 100 0 L 100 100`} />
-          </svg>
-        )}
-      </div>
     </HotKeys>
   );
 });
