@@ -145,7 +145,7 @@ const PianoRoll = memo(({
                 <CloseIcon onClick={handleClose} />
               </div>
               <div className={styles.lower}>
-                <SeekBar currentBeat={currentBeat - selectedSampleObject.time + 1} />
+                <SeekBar currentBeat={(currentBeat - selectedSampleObject.time + 1)} scaleFactor={gridSize} />
                 <div className={styles.timelineWrapper} style={wrapperStyle}>
                   <svg className={styles.ticks} style={widthStyle}>
                     <rect
