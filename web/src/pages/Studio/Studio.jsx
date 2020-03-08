@@ -142,6 +142,10 @@ const Studio = memo((props) => {
     [tracks],
   );
 
+  const seekBarPosition = useMemo(() => (
+    220 + (studio.currentBeat - 1) * (40 * studio.gridSize) - studio.scroll
+  ), [studio.currentBeat, studio.gridSize, studio.scroll]);
+
   return (
     <div className={styles.wrapper}>
       <Header selected={0}>
@@ -153,7 +157,7 @@ const Studio = memo((props) => {
       <div style={{ pointerEvents: songPickerHidden ? 'auto' : 'none' }}>
         <div className={styles.contentWrapper}>
           <SampleControls />
-          <SeekBar />
+          <SeekBar position={seekBarPosition} />
 
           <Timeline />
 

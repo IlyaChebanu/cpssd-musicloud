@@ -92,3 +92,25 @@
     pointer-events: none;
   }
 }
+
+.previewWrapper {
+  height: 90px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+  overflow: hidden;
+
+  .previewNoteWrapper {
+    position: relative;
+    pointer-events: none;
+    width: 100%;
+
+    .previewNote {
+      background-color: #eee;
+      pointer-events: none;
+      position: absolute;
+      border-radius: 2px;
+    }
+  }
+}

@@ -13,6 +13,8 @@ const SeekBar = memo((props) => {
 
   const currentBeat = props.currentBeat ? props.currentBeat : currentBeatStudio;
 
+  const scaleFactor = props.scaleFactor || gridSize;
+
   const handleDragStart = useCallback((ev) => {
     dispatch(pause);
     const mousePosOffset = ev.screenX;
@@ -23,7 +25,7 @@ const SeekBar = memo((props) => {
         setCurrentBeat(
           Math.max(
             1,
-            startBeat + (e.screenX - mousePosOffset) / (40 * gridSize) / window.devicePixelRatio,
+            startBeat + (e.screenX - mousePosOffset) / (40 * scaleFactor) / window.devicePixelRatio,
           ),
         ),
       );
@@ -39,24 +41,24 @@ const SeekBar = memo((props) => {
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleDragStop);
-  }, [currentBeat, dispatch, gridSize, playing]);
+  }, [currentBeat, dispatch, playing, scaleFactor]);
 
   const offset = props.currentBeat ? 0 : 220;
   const iconStyle = useMemo(() => {
-    const pos = -7 + offset + (currentBeat - 1) * (40 * gridSize) - scroll;
+    const pos = -7 + offset + (currentBeat - 1) * (40 * scaleFactor) - scroll;
     return {
       transform: `translate(${pos}px, -0px)`,
       opacity: pos >= offset - 7 ? 1 : 0,
     };
-  }, [currentBeat, gridSize, scroll, offset]);
+  }, [offset, currentBeat, scaleFactor, scroll]);
 
   const barStyle = useMemo(() => {
-    const pos = offset + (currentBeat - 1) * (40 * gridSize) - scroll;
+    const pos = offset + (currentBeat - 1) * (40 * scaleFactor) - scroll;
     return {
       transform: `translate(${pos}px, 60px)`,
       opacity: pos >= offset ? 1 : 0,
     };
-  }, [currentBeat, gridSize, scroll, offset]);
+  }, [offset, currentBeat, scaleFactor, scroll]);
 
   return (
     <div className={styles.wrapper}>
@@ -73,6 +75,11 @@ SeekBar.propTypes = {
   playing: PropTypes.bool.isRequired,
   dispatch: PropTypes.func.isRequired,
   gridSize: PropTypes.number.isRequired,
+  scaleFactor: PropTypes.number,
+};
+
+SeekBar.defaultProps = {
+  scaleFactor: null,
 };
 
 SeekBar.displayName = 'SeekBar';
