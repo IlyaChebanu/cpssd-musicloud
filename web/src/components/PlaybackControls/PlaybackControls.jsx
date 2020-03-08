@@ -45,18 +45,30 @@ const PlaybackControls = memo((props) => {
   }, [dispatch, songPickerHidden]);
 
   const backward = useCallback((e) => {
+    e.preventDefault();
     if (songPickerHidden) {
-      e.preventDefault();
-      dispatch(setCurrentBeat(Math.max(1, Math.floor(currentBeat - 1))));
+      if (playing) {
+        dispatch(pause);
+        dispatch(setCurrentBeat(Math.max(1, Math.floor(currentBeat - 1))));
+        dispatch(play);
+      } else {
+        dispatch(setCurrentBeat(Math.max(1, Math.floor(currentBeat - 1))));
+      }
     }
-  }, [dispatch, currentBeat, songPickerHidden]);
+  }, [songPickerHidden, playing, dispatch, currentBeat]);
 
   const forward = useCallback((e) => {
+    e.preventDefault();
     if (songPickerHidden) {
-      e.preventDefault();
-      dispatch(setCurrentBeat(Math.max(1, Math.floor(currentBeat + 1))));
+      if (playing) {
+        dispatch(pause);
+        dispatch(setCurrentBeat(Math.max(1, Math.floor(currentBeat + 1))));
+        dispatch(play);
+      } else {
+        dispatch(setCurrentBeat(Math.max(1, Math.floor(currentBeat + 1))));
+      }
     }
-  }, [currentBeat, dispatch, songPickerHidden]);
+  }, [currentBeat, dispatch, playing, songPickerHidden]);
 
   const showExplorer = useCallback((e) => {
     e.preventDefault();

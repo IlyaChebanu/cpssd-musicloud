@@ -1,137 +1,112 @@
 /* eslint-disable no-shadow */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable react/no-array-index-key */
-import React, { memo, useMemo, useCallback } from 'react';
+import React, {
+  memo, useMemo, useCallback, useRef, useState, useEffect,
+} from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 import styles from './PianoNote.module.scss';
 import { colours } from '../../helpers/constants';
-import { setTrackAtIndex } from '../../actions/studioActions';
+import { useGlobalDrag } from '../../helpers/hooks';
+import {
+  setPatternNoteTick, setPatternNoteNumber, setPatternNoteDuration, removePatternNote,
+} from '../../actions/studioActions';
 
 const ppq = 1;
 
 const PianoNote = memo(({
   noteData, selectedTrack, tracks, dispatch, selectedSample,
 }) => {
-  const wrapperStyle = useMemo(() => ({
-    backgroundColor: colours[selectedTrack],
-    width: noteData.duration * (1 / ppq) * 40 - 1,
-    left: noteData.tick * (1 / ppq) * 40 + 1,
-    top: (88 - noteData.noteNumber) * 20 + 10,
-  }), [noteData.duration, noteData.noteNumber, noteData.tick, selectedTrack]);
-
   const gridSize = 1;
   const gridSnapEnabled = true;
+  const gridSizePx = 40 * gridSize;
 
-  const handleDragNote = useCallback((ev) => {
-    ev.stopPropagation();
-    const initialMousePos = ev.screenX;
-    const initialPosY = ev.screenY;
-    const initialTime = noteData.tick;
-    const initialNote = noteData.noteNumber;
-    const handleMouseMove = (e) => {
-      e.preventDefault();
-      const start = (
-        initialTime + (e.screenX - initialMousePos) / (40 * gridSize) / window.devicePixelRatio
-      );
-      const numDecimalPlaces = Math.max(0, String(1 / gridSize).length - 2);
-      const time = gridSnapEnabled
-        ? Number((Math.round((start) * gridSize) / gridSize).toFixed(numDecimalPlaces))
-        : start;
+  const [noteDisplayData, setNoteDisplayData] = useState(noteData);
+  useEffect(() => {
+    setNoteDisplayData(noteData);
+  }, [noteData]);
 
-      const newNoteNumber = Math.round(
-        initialNote - (e.screenY - initialPosY) / 20 / window.devicePixelRatio,
-      );
+  const noteRef = useRef();
+  const resizeRef = useRef();
+  const move = useGlobalDrag(noteRef);
+  const resize = useGlobalDrag(resizeRef);
 
-      const track = { ...tracks[selectedTrack] };
-      const sampleIndex = _.findIndex(track.samples, (s) => s.id === selectedSample);
-      track.samples[sampleIndex].notes[noteData.idx].tick = Math.max(0, time);
-      track.samples[sampleIndex].notes[noteData.idx].noteNumber = Math.min(
-        88,
-        Math.max(1, newNoteNumber),
-      );
-      track.samples[sampleIndex].notes = [...track.samples[sampleIndex].notes];
-      dispatch(setTrackAtIndex(track, selectedTrack));
-    };
-    const handleDragStop = () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleDragStop);
-    };
+  const [dragStartData, setDragStartData] = useState(noteData);
 
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleDragStop);
-  }, [
-    dispatch,
-    gridSnapEnabled,
-    noteData.idx,
-    noteData.noteNumber,
-    noteData.tick,
-    selectedSample,
-    selectedTrack,
-    tracks,
-  ]);
+  const dragStart = () => {
+    setDragStartData(noteData);
+  };
+  move.onDragStart(dragStart);
+  resize.onDragStart(dragStart);
 
-  const handleResize = useCallback((ev) => {
-    ev.stopPropagation();
-    const initialMousePos = ev.screenX;
-    const initialDuration = noteData.duration;
-    const handleMouseMove = (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      const start = (
-        initialDuration + (e.screenX - initialMousePos) / (40 * gridSize) / window.devicePixelRatio
-      );
-      const numDecimalPlaces = Math.max(0, String(1 / gridSize).length - 2);
-      const time = gridSnapEnabled
-        ? Number((Math.round((start) * gridSize) / gridSize).toFixed(numDecimalPlaces))
-        : start;
+  move.onDragging(({
+    oldX, oldY, x, y,
+  }) => {
+    const newStartTime = dragStartData.tick + (x - oldX) / gridSizePx;
+    const numDecimalPlaces = Math.max(0, String(1 / gridSize).length - 2);
+    let tick = gridSnapEnabled
+      ? Number((Math.round((newStartTime) * gridSize) / gridSize).toFixed(numDecimalPlaces))
+      : newStartTime;
+    tick = Math.max(0, tick);
 
-      const track = { ...tracks[selectedTrack] };
-      const sampleIndex = _.findIndex(track.samples, (s) => s.id === selectedSample);
-      const notes = [...track.samples[sampleIndex].notes];
-      notes[noteData.idx] = { ...notes[noteData.idx], duration: Math.max(0, time) };
-      track.samples[sampleIndex].notes = notes;
-      track.samples = [...track.samples];
-      dispatch(setTrackAtIndex(track, selectedTrack));
-    };
-    const handleDragStop = () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleDragStop);
-    };
+    let noteNumber = Math.round(
+      dragStartData.noteNumber - (y - oldY) / 20,
+    );
+    noteNumber = Math.min(88, Math.max(1, noteNumber));
 
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleDragStop);
-  }, [
-    dispatch,
-    gridSnapEnabled,
-    noteData.duration,
-    noteData.idx,
-    selectedSample,
-    selectedTrack,
-    tracks,
-  ]);
+    setNoteDisplayData({ ...noteDisplayData, tick, noteNumber });
+  });
+
+  move.onDragEnd(() => {
+    dispatch(setPatternNoteTick(selectedSample, noteData.id, noteDisplayData.tick));
+    dispatch(setPatternNoteNumber(selectedSample, noteData.id, noteDisplayData.noteNumber));
+  });
+
+  resize.onDragging(({
+    oldX, x,
+  }) => {
+    const newDuration = dragStartData.duration + (x - oldX) / gridSizePx;
+    const numDecimalPlaces = Math.max(0, String(1 / gridSize).length - 2);
+    let duration = gridSnapEnabled
+      ? Number((Math.round((newDuration) * gridSize) / gridSize).toFixed(numDecimalPlaces))
+      : newDuration;
+    duration = Math.max(0.01, duration);
+
+    setNoteDisplayData({ ...noteDisplayData, duration });
+  });
+
+  resize.onDragEnd(() => {
+    dispatch(setPatternNoteDuration(selectedSample, noteData.id, noteDisplayData.duration));
+  });
 
   const handleDelete = useCallback((e) => {
     e.preventDefault();
-    const track = { ...tracks[selectedTrack] };
-    const sampleIndex = _.findIndex(track.samples, (s) => s.id === selectedSample);
-    const notes = track.samples[sampleIndex].notes.filter((_, i) => i !== noteData.idx);
-    track.samples[sampleIndex].notes = notes;
-    dispatch(setTrackAtIndex(track, selectedTrack));
-  }, [dispatch, noteData.idx, selectedSample, selectedTrack, tracks]);
+    dispatch(removePatternNote(selectedSample, noteData.id));
+  }, [dispatch, noteData.id, selectedSample]);
+
+  const trackIndex = useMemo(() => (
+    _.findIndex(tracks, (t) => t.id === selectedTrack)
+  ), [selectedTrack, tracks]);
+
+  const wrapperStyle = useMemo(() => ({
+    backgroundColor: colours[trackIndex],
+    width: Math.max(1, noteDisplayData.duration * (1 / ppq) * 40 - 1),
+    left: noteDisplayData.tick * (1 / ppq) * 40 + 1,
+    top: (88 - noteDisplayData.noteNumber) * 20 + 12,
+  }), [noteDisplayData.duration, noteDisplayData.noteNumber, noteDisplayData.tick, trackIndex]);
 
   return (
     <div
       className={styles.wrapper}
       style={wrapperStyle}
-      onMouseDown={handleDragNote}
+      ref={noteRef}
       onContextMenu={handleDelete}
     >
       <div
         className={styles.resizeHandle}
-        onMouseDown={handleResize}
-        onClick={(e) => e.stopPropagation()}
+        ref={resizeRef}
       />
     </div>
   );

@@ -3,14 +3,25 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 import styles from './TrackControls.module.scss';
-import { setTrackAtIndex, setSelectedTrack, deleteTrackAtIndex } from '../../actions/studioActions';
-import { ReactComponent as Knob } from '../../assets/icons/Knob.svg';
+import {
+  setSelectedTrack,
+  setSelectedSample,
+  setTrackName,
+  setTrackVolume,
+  setTrackPan,
+  setTrackMute,
+  setTrackSolo,
+  hideSampleEffects,
+  setShowPianoRoll,
+  removeTrack,
+} from '../../actions/studioActions';
+import Knob from '../Knob';
 import { ReactComponent as Mute } from '../../assets/icons/volume-up-light.svg';
 import { ReactComponent as MuteActive } from '../../assets/icons/volume-slash-light.svg';
 import { ReactComponent as Solo } from '../../assets/icons/headphones-alt-light.svg';
 import { ReactComponent as SoloActive } from '../../assets/icons/headphones-alt-solid.svg';
 import { ReactComponent as Delete } from '../../assets/icons/close-24px.svg';
-import { clamp, lerp } from '../../helpers/utils';
+import { clamp } from '../../helpers/utils';
 import { colours } from '../../helpers/constants';
 
 
@@ -19,102 +30,52 @@ const TrackControls = memo((props) => {
     track, tracks, dispatch, index, selectedTrack,
   } = props;
 
-  const handleTrackVolume = useCallback((ev) => {
-    ev.preventDefault();
-    const startPos = ev.screenY;
-    const startVolume = track.volume;
-    let lastVolume = startVolume;
-    const handleMouseMove = (e) => {
-      const pos = e.screenY;
-      const volume = clamp(0, 1, startVolume - (pos - startPos) / 200);
-      if (volume !== lastVolume) {
-        lastVolume = volume;
-        const newTrack = { ...track, volume };
-        dispatch(setTrackAtIndex(newTrack, index));
-      }
-    };
-    const handleDragStop = () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleDragStop);
-    };
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleDragStop);
-  }, [dispatch, index, track]);
+  const soloTrack = _.find(tracks, 'solo');
 
-  const handleTrackPan = useCallback((ev) => {
-    ev.preventDefault();
-    const startPos = ev.screenY;
-    const startPan = track.pan;
-    let lastPan = startPan;
-    const handleMouseMove = (e) => {
-      const pos = e.screenY;
-      const pan = clamp(-1, 1, startPan - (pos - startPos) / 200);
-      if (pan !== lastPan) {
-        lastPan = pan;
-        const newTrack = { ...track, pan };
-        dispatch(setTrackAtIndex(newTrack, index));
-      }
-    };
-    const handleDragStop = () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleDragStop);
-    };
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleDragStop);
-  }, [dispatch, index, track]);
+  const handleSetTrackVolume = useCallback((val) => {
+    dispatch(setTrackVolume(track.id, clamp(0, 1, val)));
+  }, [dispatch, track.id]);
 
-  const unSoloTracks = useCallback(() => {
-    tracks.forEach((t, i) => {
-      const newTrack = { ...t, solo: false };
-      dispatch(setTrackAtIndex(newTrack, i));
-    });
-  }, [dispatch, tracks]);
+  const handleSetTrackPan = useCallback((val) => {
+    dispatch(setTrackPan(track.id, clamp(-1, 1, val)));
+  }, [dispatch, track.id]);
 
   const handleTrackMute = useCallback((e) => {
     e.preventDefault();
-    track.mute = !track.mute;
-    dispatch(setTrackAtIndex(track, props.index));
-  }, [dispatch, props.index, track]);
+    dispatch(setTrackMute(track.id, !track.mute));
+  }, [dispatch, track.id, track.mute]);
 
   const handleTrackSolo = useCallback((e) => {
     e.preventDefault();
-    unSoloTracks();
-    const newTrack = { ...track, solo: !track.solo };
-    dispatch(setTrackAtIndex(newTrack, index));
-  }, [dispatch, index, track, unSoloTracks]);
-
-  const volumeStyle = useMemo(() => ({
-    transform: `rotate(${lerp(-140, 140, track.volume)}deg)`,
-  }), [track.volume]);
-
-  const panStyle = useMemo(() => ({
-    transform: `rotate(${lerp(-140, 140, (track.pan + 1) / 2)}deg)`,
-  }), [track.pan]);
+    dispatch(setTrackSolo(track.id, !track.solo));
+  }, [dispatch, track.id, track.solo]);
 
   const handleTrackNameChange = useCallback((e) => {
-    track.name = e.target.value;
-    dispatch(setTrackAtIndex(track, index));
-  }, [dispatch, index, track]);
-
-  const soloTrack = _.findIndex(tracks, 'solo');
+    e.preventDefault();
+    dispatch(setTrackName(track.id, e.target.value));
+  }, [dispatch, track.id]);
 
   const handleSetSelected = useCallback((e) => {
     e.preventDefault();
-    dispatch(setSelectedTrack(index));
-  }, [dispatch, index]);
+    dispatch(setSelectedTrack(track.id));
+    dispatch(setSelectedSample(''));
+    dispatch(hideSampleEffects());
+    dispatch(setShowPianoRoll(false));
+  }, [dispatch, track.id]);
+
 
   const barStyle = useMemo(() => {
     const colour = index % 2 ? '#303237' : '#36393D';
     return {
-      backgroundColor: selectedTrack === index ? colours[index % colours.length] : colour,
+      backgroundColor: selectedTrack === track.id ? colours[index % colours.length] : colour,
     };
-  }, [index, selectedTrack]);
+  }, [index, selectedTrack, track.id]);
 
   const handleDeleteTrack = useCallback((e) => {
     // Stop propagation to void selecting track when deleting
     e.stopPropagation();
-    dispatch(deleteTrackAtIndex(index));
-  }, [dispatch, index]);
+    dispatch(removeTrack(track.id));
+  }, [dispatch, track.id]);
 
   return (
     <div
@@ -133,16 +94,10 @@ const TrackControls = memo((props) => {
           <input type="text" value={track.name} onChange={handleTrackNameChange} />
         </div>
         <div className={styles.buttons}>
+          <Knob min={0} max={1} value={track.volume} onChange={handleSetTrackVolume} name="Vol" />
+          <Knob min={-1} max={1} value={track.pan} onChange={handleSetTrackPan} name="Pan" />
           <span>
-            <Knob onMouseDown={handleTrackVolume} style={volumeStyle} />
-            <p>Vol</p>
-          </span>
-          <span>
-            <Knob onMouseDown={handleTrackPan} style={panStyle} />
-            <p>Pan</p>
-          </span>
-          <span>
-            {track.mute || (soloTrack !== -1 && soloTrack !== index)
+            {track.mute || (soloTrack && soloTrack.id !== track.id)
               ? <MuteActive onClick={handleTrackMute} />
               : <Mute onClick={handleTrackMute} />}
             <p>Mute</p>

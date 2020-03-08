@@ -5,6 +5,13 @@
   display: inline-block;
   position: relative;
   left: 0;
+  transition: background-color 200ms, width 200ms;
+
+  wave {
+    pointer-events: none;
+    border: none !important;
+  }
+
   -webkit-touch-callout: none; /* iOS Safari */
   -webkit-user-select: none; /* Safari */
   -khtml-user-select: none; /* Konqueror HTML */
@@ -21,7 +28,7 @@
   }
 
   p {
-    margin-left: 3px;
+    margin-left: 5px;
     margin-top: 3px;
     position: absolute;
     font-size: 11px;
@@ -32,20 +39,24 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-.edit {
-    padding: 0 auto;
-    margin: 0 auto;
-    overflow: hidden;
+
+  .edit {
     position: absolute;
-    right: 0;
-    height: 15px;
-    &:hover {
-      cursor: pointer;
-      filter: invert(100%);
+    right: 5px;
+    top: 3px;
+
+    svg {
+      fill: white;
+      color: white;
+      height: 15px;
+      padding-left: 5px;
+
+
+      &:hover {
+        filter: brightness(50%);
+        cursor: pointer;
+      }
     }
-  }
-  .editing {
-    filter: invert(100%);
   }
 }
 
@@ -57,6 +68,14 @@
 
 .bar {
   width: 1px;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  margin-top: 20px;
+  padding-left: 2px;
+  padding-right: 5px;
 }
 
 .fadeWrapper {

@@ -34,25 +34,26 @@ import exportIcon from '../../assets/icons/file_dropdown/export.svg';
 import generateIcon from '../../assets/icons/file_dropdown/generate.svg';
 import exitIcon from '../../assets/icons/file_dropdown/exit.svg';
 import { renderTracks } from '../../middleware/audioRedux';
-import { forceDownload, genId } from '../../helpers/utils';
+import { forceDownload } from '../../helpers/utils';
 import {
-  setTrackAtIndex,
-  setTracks,
   hideSongPicker,
   showSongPicker,
   setTempo,
   setSongName,
   stop,
-  setSampleTime,
-  setSampleLoading,
   showPublishForm,
+  addSample,
+  setShowPianoRoll,
+  hideSampleEffects,
+  setCompleteTracksState,
+  setCompleteSamplesState,
 } from '../../actions/studioActions';
 
 const Header = memo((props) => {
   const {
     selected, studio, children, dispatch, history, user,
   } = props;
-  const { tempo, tracks } = studio;
+  const { tempo, tracks, samples } = studio;
   const [nameInput, setNameInput] = useState(studio.songName);
   const urlParams = new URLSearchParams(window.location.search);
   const songId = Number(urlParams.get('sid'));
@@ -71,7 +72,7 @@ const Header = memo((props) => {
 
   const handleSaveState = useCallback(async () => {
     if (!songId) return true;
-    const songState = { tempo, tracks };
+    const songState = { tempo, tracks, samples };
     let res = await getSongState(songId);
     if (res.status === 200) {
       const prevState = res.data.song_state;
@@ -85,7 +86,7 @@ const Header = memo((props) => {
       return true;
     }
     return false;
-  }, [tempo, tracks, dispatch, songId]);
+  }, [songId, tempo, tracks, samples, dispatch]);
 
   const handleSampleImport = useCallback(() => {
     if (studio.tracks.length === 0) {
@@ -94,41 +95,30 @@ const Header = memo((props) => {
       );
       return;
     }
+    if (!studio.selectedTrack) {
+      dispatch(
+        showNotification({ message: 'Please select a track first', type: 'info' }),
+      );
+      return;
+    }
     const fileSelector = document.createElement('input');
     fileSelector.setAttribute('type', 'file');
     fileSelector.setAttribute('accept', 'audio/*');
     fileSelector.click();
-    let sampleState = {};
-    const track = { ...studio.tracks[studio.selectedTrack] };
-    fileSelector.onchange = function onChange() {
+    fileSelector.onchange = async () => {
       const sampleFile = fileSelector.files[0];
-      const response = uploadFile('audio', sampleFile);
-      const cast = Promise.resolve(response);
-      cast.then((url) => {
-        sampleState = {
-          url,
-          name: sampleFile.name,
-          id: genId(),
-          time: studio.currentBeat,
-          track: studio.selectedTrack,
-          fade: {
-            fadeIn: 0,
-            fadeOut: 0,
-          },
-          reverb: {
-            wet: 1,
-            dry: 1,
-            cutoff: 0,
-            time: 0.3,
-          },
-        };
-        track.samples.push(sampleState);
-        dispatch(setTrackAtIndex(track, studio.selectedTrack));
-      });
+      const url = await uploadFile('audio', sampleFile);
+      const sampleState = {
+        url,
+        name: sampleFile.name,
+        time: studio.currentBeat,
+        fade: {
+          fadeIn: 0,
+          fadeOut: 0,
+        },
+      };
+      dispatch(addSample(studio.selectedTrack, sampleState));
     };
-    dispatch(setSampleTime(sampleState.time, sampleState.id));
-    dispatch(setSampleLoading(true));
-    dispatch(setTracks(studio.tracks));
   }, [dispatch, studio]);
 
   const exportAction = useCallback(async () => {
@@ -144,12 +134,15 @@ const Header = memo((props) => {
   const handleShowSongPicker = useCallback(async () => {
     if (await handleSaveState()) {
       dispatch(stop);
-      dispatch(setTracks([]));
+      dispatch(setCompleteTracksState([]));
+      dispatch(setCompleteSamplesState({}));
       window.history.pushState(null, null, '/studio');
       dispatch(setSongName('New Song'));
       dispatch(setTempo(140));
       dispatch(showSongPicker());
     }
+    dispatch(setShowPianoRoll(false));
+    dispatch(hideSampleEffects());
   }, [dispatch, handleSaveState]);
 
   const handleHideSongPicker = useCallback(async () => {
@@ -157,7 +150,8 @@ const Header = memo((props) => {
       const res = await createNewSong('New Song');
       if (res.status === 200) {
         dispatch(stop);
-        dispatch(setTracks([]));
+        dispatch(setCompleteTracksState([]));
+        dispatch(setCompleteSamplesState({}));
         window.history.pushState(null, null, `/studio?sid=${res.data.sid}`);
         dispatch(setTempo(140));
         dispatch(setSongName('New Song'));

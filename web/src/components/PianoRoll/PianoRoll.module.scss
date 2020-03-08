@@ -77,14 +77,37 @@
         height: 40px;
       }
 
+      &:hover {
+        cursor: pointer;
+      }
+
+      &:active {
+        background-color: rgb(255, 208, 0);
+      }
+
       height: 30px;
       background-color: white;
       border-radius: 0 10px 10px 0;
       border: none;
       box-shadow: inset 0px 0px 2px rgba(0, 0, 0, 0.4);
+
+      span {
+        float: right;
+        transform: rotate(-90deg);
+        font-size: 14px;
+
+        &.light {
+          color: rgb(200, 200, 200);
+        }
+
+        &.bold {
+          font-weight: bold;
+        }
+      }
     }
 
     .blackKey {
+      color: white;
       width: 100px;
       height: 20px;
       background-color: black;
@@ -94,6 +117,14 @@
       border: none;
       border-radius: 0 5px 5px 0;
       box-shadow: inset -10px 5px 10px rgba(255, 255, 255, 0.25);
+
+      &:hover {
+        cursor: pointer;
+      }
+
+      &:active {
+        background-color: rgb(255, 208, 0);
+      }
     }
   }
 
@@ -103,7 +134,7 @@
     flex-direction: column-reverse;
     background-color: #414448;
     overflow-x: auto;
-    cursor: url('../../assets/icons/mouse/edit.png'), auto;
+    cursor: url('../../assets/icons/pencil-alt-regular.svg'), auto;
 
     .track {
       width: 100%;

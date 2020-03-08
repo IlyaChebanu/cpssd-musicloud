@@ -12,25 +12,36 @@ import { connect } from 'react-redux';
 import _ from 'lodash';
 import styles from './PianoRoll.module.scss';
 import { ReactComponent as CloseIcon } from '../../assets/icons/x-icon-10px.svg';
-import { setShowPianoRoll, setTrackAtIndex, setSampleName } from '../../actions/studioActions';
+import {
+  setShowPianoRoll,
+  setSampleName,
+  addPatternNote,
+} from '../../actions/studioActions';
 import PianoNote from '../PianoNote/PianoNote';
 import SeekBar from '../SeekBar';
 
+const keyNames = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#'];
 const pianoKeys = [];
 const pianoTracks = [];
 for (let i = 0; i < 88; i += 1) {
   if ([0, 2, 3, 5, 7, 8, 10].includes(i % 12)) {
-    pianoKeys.push(<button className={`${styles.whiteKey} ${[0, 5, 10].includes(i % 12) ? styles.wide : ''}`} key={i} />);
+    pianoKeys.push(
+      <button className={`${styles.whiteKey} ${[0, 5, 10].includes(i % 12) ? styles.wide : ''}`} key={i}>
+        <span className={`${i % 12 === 3 ? styles.bold : styles.light}`}>{`${keyNames[i % 12]}${Math.floor(i / 12) + 1}`}</span>
+      </button>,
+    );
     pianoTracks.push(<div className={`${styles.track} ${styles.white}`} key={i} />);
   } else {
-    pianoKeys.push(<button className={styles.blackKey} key={i} />);
+    pianoKeys.push(
+      <button className={styles.blackKey} key={i} />,
+    );
     pianoTracks.push(<div className={`${styles.track} ${styles.black}`} key={i} />);
   }
 }
 
 
 const PianoRoll = memo(({
-  showPianoRoll, selectedSample, tracks, selectedTrack, dispatch, currentBeat,
+  showPianoRoll, selectedSample, dispatch, samples, currentBeat,
 }) => {
   if (!showPianoRoll) return null;
 
@@ -49,24 +60,15 @@ const PianoRoll = memo(({
   const gridSize = 4;
   const gridSizePx = 40;
 
-  const selectedSampleObject = useMemo(() => {
-    let found;
-    if (selectedTrack !== -1 && selectedSample) {
-      found = _.find(tracks[selectedTrack].samples, (s) => s.id === selectedSample);
-    }
-    if (!found || (found && !found.notes)) {
-      handleClose();
-      return {};
-    }
-    return { ...found };
-  }, [handleClose, selectedSample, selectedTrack, tracks]);
+  const selectedSampleObject = useMemo(() => samples[selectedSample], [samples, selectedSample]);
+  const notes = useMemo(() => (selectedSampleObject ? selectedSampleObject.notes : {}), [selectedSampleObject]);
 
   const numTicks = useMemo(() => {
     if (!tracksRef) return null;
     const bb = tracksRef.getBoundingClientRect();
-    const latest = _.maxBy(selectedSampleObject.notes, (n) => n.tick + n.duration);
-    return Math.ceil(Math.max(bb.width / gridSizePx, latest ? latest.tick + latest.duration : 0));
-  }, [selectedSampleObject, tracksRef]);
+    const latest = _.maxBy(Object.values(notes), (n) => n.tick + n.duration);
+    return Math.ceil(Math.max(bb.width / gridSizePx, latest ? latest.tick + latest.duration : 0)) + 20;
+  }, [notes, tracksRef]);
 
   const ticks = useMemo(() => (
     [...Array(numTicks)].map(
@@ -100,8 +102,8 @@ const PianoRoll = memo(({
   const handleCreateNote = useCallback((e) => {
     if (e.button !== 0) return;
     e.preventDefault();
+    e.stopPropagation();
     const bb = e.target.getBoundingClientRect();
-    const sampleIndex = _.findIndex(tracks[selectedTrack].samples, (s) => s.id === selectedSample);
     const noteNumber = 88 - Math.floor(
       ((e.clientY - bb.top - 10 - (e.target.scrollTop / window.devicePixelRatio)) / 20),
     );
@@ -113,19 +115,10 @@ const PianoRoll = memo(({
       tick: Math.max(0, tick),
       velocity: 100,
     };
-    const track = { ...tracks[selectedTrack] };
-    track.samples[sampleIndex].notes.push(note);
-    dispatch(setTrackAtIndex(track, selectedTrack));
-  }, [dispatch, selectedSample, selectedTrack, tracks]);
-
-  const [nameInput, setNameInput] = useState(selectedSampleObject.name || '');
-
-  const handleSetSampleName = useCallback(async () => {
-    dispatch(setSampleName(nameInput));
-  }, [dispatch, nameInput]);
+    dispatch(addPatternNote(selectedSample, note));
+  }, [dispatch, selectedSample]);
 
   const handleChange = useCallback((e) => {
-    setNameInput(e.target.value);
     dispatch(setSampleName(e.target.value, selectedSample));
   }, [dispatch, selectedSample]);
 
@@ -144,8 +137,7 @@ const PianoRoll = memo(({
                 <div>
                   <span className={styles.sampleName}>
                     <input
-                      value={nameInput}
-                      onBlur={handleSetSampleName}
+                      value={selectedSampleObject && selectedSampleObject.name}
                       onChange={handleChange}
                     />
                   </span>
@@ -179,8 +171,8 @@ const PianoRoll = memo(({
               {tickDividers}
             </div>
             <div className={styles.notes}>
-              {selectedSampleObject.notes && selectedSampleObject.notes.map((note, i) => (
-                <PianoNote noteData={{ ...note, idx: i }} />
+              {selectedSampleObject && selectedSampleObject.notes && Object.entries(selectedSampleObject.notes).map(([id, note]) => (
+                <PianoNote noteData={{ ...note, id }} />
               ))}
             </div>
           </div>
@@ -194,15 +186,12 @@ PianoRoll.propTypes = {
   currentBeat: PropTypes.number.isRequired,
   showPianoRoll: PropTypes.bool.isRequired,
   selectedSample: PropTypes.string,
-  tracks: PropTypes.arrayOf(PropTypes.object),
-  selectedTrack: PropTypes.number,
   dispatch: PropTypes.func.isRequired,
+  samples: PropTypes.object.isRequired,
 };
 
 PianoRoll.defaultProps = {
   selectedSample: '',
-  tracks: [],
-  selectedTrack: -1,
 };
 
 PianoRoll.displayName = 'PianoRoll';
@@ -211,8 +200,7 @@ const mapStateToProps = ({ studio }) => ({
   currentBeat: studio.currentBeat,
   showPianoRoll: studio.showPianoRoll,
   selectedSample: studio.selectedSample,
-  tracks: studio.tracks,
-  selectedTrack: studio.selectedTrack,
+  samples: studio.samples,
 });
 
 export default connect(mapStateToProps)(PianoRoll);

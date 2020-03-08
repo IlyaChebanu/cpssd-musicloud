@@ -8,19 +8,20 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styles from './Studio.module.scss';
 import Header from '../../components/Header';
 import {
-  setTracks,
+  addTrack,
   setScroll,
   setGridWidth,
   setTempo,
   setSongImageUrl,
   setSongName,
   setSongDescription,
-  hideSongPicker, showSongPicker,
+  hideSongPicker, showSongPicker, setCompleteTracksState, setCompleteSamplesState,
 } from '../../actions/studioActions';
 import { showNotification } from '../../actions/notificationsActions';
 import Timeline from '../../components/Timeline';
@@ -39,11 +40,13 @@ import PublishForm from '../../components/PublishForm/PublishForm';
 import PianoRoll from '../../components/PianoRoll/PianoRoll';
 
 import FileExplorer from '../../components/FileExplorer/FileExplorer';
+import Sample from '../../components/Sample/Sample';
 
 const Studio = memo((props) => {
   const {
-    loopEnd, dispatch, tracks, studio, songPickerHidden,
+    loopEnd, dispatch, studio, songPickerHidden,
   } = props;
+  const { samples, tracks } = studio;
 
   const [tracksLoading, setTracksLoading] = useState(false);
 
@@ -61,7 +64,8 @@ const Studio = memo((props) => {
         setTracksLoading(false);
         if (res.status === 200) {
           const songState = res.data.song_state;
-          if (songState.tracks) dispatch(setTracks(songState.tracks));
+          if (songState.tracks) dispatch(setCompleteTracksState(songState.tracks));
+          if (songState.samples) dispatch(setCompleteSamplesState(songState.samples));
           if (songState.tempo) dispatch(setTempo(songState.tempo));
           const res2 = await getSongInfo(songId);
           if (res2.status === 200) {
@@ -73,39 +77,31 @@ const Studio = memo((props) => {
         }
       })();
     } else {
-      dispatch(setTracks([]));
+      dispatch(setCompleteTracksState([]));
+      dispatch(setCompleteSamplesState([]));
       dispatch(setTempo(140));
       dispatch(showSongPicker());
     }
   }, [dispatch, songId]);
 
+
+  const resizeGrid = useCallback(() => {
+    let latest = _.maxBy(Object.values(samples), (s) => s.time + s.duration);
+    latest = latest ? (latest.time + latest.duration) * (studio.tempo / 60) : 0;
+    const width = Math.max(
+      latest,
+      tracksRef.current
+        ? tracksRef.current.getBoundingClientRect().width
+          / (40 * studio.gridSize)
+        : 0,
+    );
+    dispatch(setGridWidth(width + 10));
+  }, [dispatch, samples, studio.gridSize, studio.tempo]);
+
+  window.onresize = resizeGrid;
   useEffect(() => {
-    const resizeGrid = () => {
-      const latest = tracks.reduce((m, track) => {
-        const sampleMax = track.samples
-          ? track.samples.reduce((sm, sample) => {
-            const endTime = sample.time + sample.duration * (studio.tempo / 60);
-            return Math.max(endTime, sm);
-          }, 1)
-          : 1;
-        return Math.max(sampleMax, m);
-      }, 1);
-      const width = Math.max(
-        loopEnd,
-        latest,
-        tracksRef.current
-          ? tracksRef.current.getBoundingClientRect().width
-            / (40 * studio.gridSize)
-          : 0,
-      );
-      dispatch(setGridWidth(width));
-    };
     resizeGrid();
-    window.addEventListener('resize', resizeGrid);
-    return () => {
-      window.removeEventListener('resize', resizeGrid);
-    };
-  }, [dispatch, tracks, studio.gridSize, studio.tempo, tracksRef, loopEnd]);
+  }, [dispatch, studio.gridSize, studio.tempo, samples, resizeGrid]);
 
   const handleScroll = useCallback(
     (e) => {
@@ -116,26 +112,15 @@ const Studio = memo((props) => {
 
   const handleAddNewTrack = useCallback((e) => {
     e.preventDefault();
-    dispatch(
-      setTracks([
-        ...tracks,
-        {
-          volume: 1,
-          pan: 0,
-          mute: false,
-          solo: false,
-          name: 'New track',
-          samples: [],
-        },
-      ]),
-    );
-  }, [dispatch, tracks]);
+    dispatch(addTrack());
+  }, [dispatch]);
 
   const handleSaveState = useCallback(async (e) => {
     e.preventDefault();
     const songState = {
       tempo: studio.tempo,
       tracks,
+      samples,
     };
 
     if (songId) {
@@ -144,24 +129,17 @@ const Studio = memo((props) => {
         dispatch(showNotification({ message: 'Song saved', type: 'info' }));
       }
     }
-  }, [studio.tempo, tracks, dispatch, songId]);
+  }, [studio.tempo, tracks, samples, songId, dispatch]);
 
   const renderableTracks = useMemo(() => tracks.map((t, i) => (
-    <Track index={i} track={{ ...t }} key={i} className={styles.track} />
+    <Track track={t} index={i} key={t.id} className={styles.track} />
   )), [tracks]);
 
   const trackControls = useMemo(
     () => tracks.map((track, i) => (
-      <TrackControls key={i} track={track} index={i} />
+      <TrackControls index={i} key={track.id} track={track} />
     )),
     [tracks],
-  );
-
-  const trackControlsStyle = useMemo(
-    () => ({
-      transform: `translateY(${-studio.scrollY}px)`,
-    }),
-    [studio.scrollY],
   );
 
   return (
@@ -200,6 +178,9 @@ const Studio = memo((props) => {
                 ref={tracksRef}
               >
                 {tracksLoading ? <Spinner /> : renderableTracks}
+                {Object.entries(samples).map(([id, sample]) => (
+                  <Sample data={sample} id={id} key={id} />
+                ))}
               </div>
             </div>
           </div>

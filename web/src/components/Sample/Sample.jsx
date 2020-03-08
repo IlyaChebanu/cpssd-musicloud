@@ -1,106 +1,191 @@
 /* eslint-disable react/no-array-index-key */
-import React, { memo, useCallback, useMemo } from 'react';
+import React, {
+  memo, useCallback, useMemo, useEffect, useState, useRef,
+} from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 import { HotKeys } from 'react-hotkeys';
+import axios from 'axios';
+import WaveSurfer from 'wavesurfer.js';
 import styles from './Sample.module.scss';
-import { dColours, colours } from '../../helpers/constants';
-import { lerp } from '../../helpers/utils';
 import {
-  setSampleTime, setTrackAtIndex, setSelectedSample, setClipboard,
-  hideSampleEffects, showSampleEffects, setShowPianoRoll,
+  dColours, colours, bufferStore, audioContext,
+} from '../../helpers/constants';
+import {
+  setSelectedSample,
+  removeSample,
+  setClipboard,
+  hideSampleEffects,
+  showSampleEffects,
+  setShowPianoRoll,
+  setSampleBufferLoading,
+  setSampleStartTime,
+  setSampleTrackId,
+  setSelectedTrack,
+  setSampleDuration,
+  setSampleType,
 } from '../../actions/studioActions';
 
-import editIcon from '../../assets/icons/edit-sample.svg';
+import { ReactComponent as EditIcon } from '../../assets/icons/edit-sample.svg';
+import { ReactComponent as PianoIcon } from '../../assets/icons/piano-keyboard-light.svg';
+import Spinner from '../Spinner/Spinner';
+import { useGlobalDrag } from '../../helpers/hooks';
+import store from '../../store';
 
 
 const Sample = memo((props) => {
   const {
-    sample, tempo, selectedSample, dispatch, gridSnapEnabled, gridSize, tracks,
-    sampleEffectsHidden, showPianoRoll,
+    data,
+    id,
+    tempo,
+    selectedSample,
+    dispatch,
+    gridSnapEnabled,
+    gridSize,
+    tracks,
+    sampleEffectsHidden,
+    showPianoRoll,
   } = props;
 
-  const buffer = useMemo(() => sample.buffer, [sample.buffer]);
+  const ref = useRef();
+  const [dragStartData, setDragStartData] = useState(data);
+  const [samplePosition, setSamplePosition] = useState({ time: data.time, trackId: data.trackId });
+  const { onDragStart, onDragging, onDragEnd } = useGlobalDrag(ref);
 
-  const waveform = useMemo(() => {
-    if (buffer) {
-      const data = buffer.getChannelData(0);
-      const beatsPerSecond = tempo / 60;
-      const width = buffer.duration * beatsPerSecond * (40 * gridSize);
-      const step = Math.ceil(width / 2);
-      const amp = 80;
-      const bars = [];
-      for (let i = 0; i < step; i += 1) {
-        const d = _.clamp(data[Math.floor(lerp(0, data.length, i / step))], -1, 1);
-        bars.push(Math.max(2, Math.abs(Math.floor(d * amp))));
-      }
-      return (
-        <svg className={styles.waveform}>
-          {bars.map((bar, i) => (
-            <rect
-              key={i}
-              x={(i + 1) * 2}
-              y={45 - bar / 2}
-              style={{ height: `${bar}px` }}
-              className={styles.bar}
-            />
-          ))}
-        </svg>
-      );
+  onDragStart(() => {
+    setDragStartData({ ...data, trackIndex: _.findIndex(tracks, (o) => o.id === data.trackId) });
+    dispatch(setSelectedSample(id));
+    dispatch(setSelectedTrack(data.trackId));
+  });
+
+  onDragging(({
+    oldX, oldY, x, y,
+  }) => {
+    const gridSizePx = 40 * gridSize; // TODO: change hardcoded value to redux
+    const newStartTime = Math.max(1, dragStartData.time + (x - oldX) / gridSizePx);
+    const numDecimalPlaces = Math.max(0, String(1 / gridSize).length - 2);
+    const time = gridSnapEnabled
+      ? Number((Math.round((newStartTime) * gridSize) / gridSize).toFixed(numDecimalPlaces))
+      : newStartTime;
+
+    const idxOffset = Math.round((y - oldY) / 100);
+    const trackIdx = Math.min(tracks.length - 1, Math.max(0, dragStartData.trackIndex + idxOffset));
+    const trackId = tracks[trackIdx].id;
+
+    setSamplePosition({ time, trackId });
+  });
+
+  onDragEnd(() => {
+    dispatch(setSampleStartTime(id, samplePosition.time));
+    dispatch(setSampleTrackId(id, samplePosition.trackId));
+  });
+
+  const trackIndexLocal = useMemo(() => (
+    _.findIndex(tracks, (t) => t.id === samplePosition.trackId)
+  ), [samplePosition.trackId, tracks]);
+
+
+  const [buffer, setBuffer] = useState(bufferStore[data.url]);
+  useEffect(() => {
+    if (!buffer && data.url) {
+      dispatch(setSampleBufferLoading(id, true));
+      axios
+        .get(data.url, { responseType: 'arraybuffer' })
+        .then((res) => {
+          audioContext
+            .decodeAudioData(res.data)
+            .then((buf) => {
+              bufferStore[data.url] = buf;
+              setBuffer(buf);
+              dispatch(setSampleBufferLoading(id, false));
+              const currentTempo = store.getState().studio.tempo;
+              if (data.type === 'sample') {
+                const duration = parseFloat((buf.duration * (currentTempo / 60)).toFixed(16));
+                dispatch(setSampleDuration(id, duration));
+              }
+            });
+        });
+    } else if (buffer && data.url && data.type === 'sample') {
+      const duration = parseFloat((buffer.duration * (tempo / 60)).toFixed(16));
+      dispatch(setSampleDuration(id, duration));
     }
-    return null;
-  }, [buffer, gridSize, tempo]);
+  }, [buffer, data.type, data.url, dispatch, id, tempo]);
+
+  const sample = data;
+
+  const gridSizePx = 40 * gridSize; // TODO: change hardcoded value to redux
+  const ppq = 1; // TODO: Unhardcode
+  useEffect(() => {
+    if (data.type === 'pattern') {
+      const latest = _.maxBy(Object.values(data.notes), (n) => n.tick + n.duration);
+      const duration = parseFloat(
+        ((0.25 / ppq) * (latest ? latest.tick + latest.duration : 4 * ppq)).toFixed(16),
+      );
+      dispatch(setSampleDuration(
+        id,
+        duration,
+      ));
+    }
+  }, [data.notes, data.type, dispatch, gridSize, id, tempo]);
+
+
+  const numNotes = Object.keys(data.notes).length;
+  useEffect(() => {
+    if (!numNotes && data.url && data.type === 'pattern') {
+      dispatch(setSampleType(id, 'sample'));
+    } else if (numNotes && data.type === 'sample') {
+      dispatch(setSampleType(id, 'pattern'));
+    }
+  }, [data.type, data.url, dispatch, id, numNotes]);
 
   const wrapperStyle = useMemo(() => {
-    const beatsPerSecond = tempo / 60;
-    const colourIdx = sample.track % dColours.length;
-    const selected = sample.id === selectedSample;
-    const ppq = 1;
+    const colourIdx = trackIndexLocal % dColours.length;
+    const selected = id === selectedSample;
     let width;
-    if (sample.type === 'pattern') {
-      const latest = _.maxBy(sample.notes, (n) => n.tick + n.duration);
-      width = (0.25 / ppq) * (latest ? latest.tick + latest.duration : 4 * ppq) * (40 * gridSize);
+    if (data.bufferLoading) {
+      width = 55;
     } else {
-      width = buffer ? buffer.duration * beatsPerSecond * (40 * gridSize) : 20;
+      width = data.duration * gridSizePx;
     }
     return {
       width,
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      transform: `translateX(${(samplePosition.time - 1) * gridSizePx}px) translateY(${trackIndexLocal * 100}px)`,
       backgroundColor: selected ? colours[colourIdx] : dColours[colourIdx],
       zIndex: selected ? 2 : 1,
     };
-  }, [tempo, sample.track, sample.id, sample.type, sample.notes, selectedSample, gridSize, buffer]);
+  // eslint-disable-next-line max-len
+  }, [trackIndexLocal, id, selectedSample, data.bufferLoading, data.duration, samplePosition.time, gridSizePx]);
 
-  const handleDragSample = useCallback((ev) => {
-    dispatch(setSelectedSample(props.sample.id || ''));
-    const initialMousePos = ev.screenX;
-    const initialTime = props.sample.time;
-    const handleMouseMove = (e) => {
-      e.preventDefault();
-      const start = (
-        initialTime + (e.screenX - initialMousePos) / (40 * gridSize) / window.devicePixelRatio
-      );
-      const numDecimalPlaces = Math.max(0, String(1 / gridSize).length - 2);
-      const time = gridSnapEnabled
-        ? Number((Math.round((start) * gridSize) / gridSize).toFixed(numDecimalPlaces))
-        : start;
-
-      dispatch(setSampleTime(time, sample.id));
-    };
-    const handleDragStop = () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleDragStop);
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleDragStop);
-  }, [dispatch, gridSize, gridSnapEnabled, props.sample.id, props.sample.time, sample.id]);
+  const container = ref.current;
+  const wavesurfer = useRef();
+  useEffect(() => {
+    if (container && buffer && data.duration && data.type === 'sample') {
+      if (!wavesurfer.current) {
+        wavesurfer.current = WaveSurfer.create({
+          container,
+          waveColor: '#eee',
+          height: 90,
+          interact: false,
+          barWidth: 1,
+          barRadius: 0.5,
+          barGap: 2,
+          hideScrollbar: true,
+        });
+      }
+      setTimeout(() => wavesurfer.current.loadDecodedBuffer(buffer), 300);
+    } else if (wavesurfer.current && data.type === 'pattern') {
+      wavesurfer.current.destroy();
+      wavesurfer.current = null;
+    }
+  }, [buffer, container, data.duration, data.type, gridSize, tempo]);
 
   const deleteSample = useCallback(() => {
-    const track = tracks[sample.track];
-    track.samples = track.samples.filter((s) => s.id !== sample.id);
-    dispatch(setTrackAtIndex(track, props.sample.track));
-  }, [dispatch, props.sample.track, sample.id, sample.track, tracks]);
+    dispatch(removeSample(id));
+  }, [dispatch, id]);
 
   const copySample = useCallback(() => {
     dispatch(setClipboard(sample));
@@ -108,7 +193,7 @@ const Sample = memo((props) => {
 
   const keyMap = {
     COPY_SAMPLE: 'ctrl+c',
-    DELETE_SAMPLE: 'del',
+    DELETE_SAMPLE: ['del', 'backspace'],
   };
 
   const handlers = {
@@ -138,34 +223,37 @@ const Sample = memo((props) => {
       handlers={handlers}
       className={styles.wrapper}
       style={{ ...wrapperStyle, ...props.style }}
-      onMouseDown={handleDragSample}
+      innerRef={ref}
     >
-      <p>{sample.id === selectedSample ? props.sample.name : ''}</p>
-      {sample.id === selectedSample
-        ? (
-          <img
-            onClick={sample.type === 'pattern' ? handleTogglePiano : handleShowHideSampleEffects}
-            className={sampleEffectsHidden ? styles.edit : `${styles.editing} ${styles.edit}`}
-            src={editIcon}
-            alt="edit sample icon"
-          />
-        ) : ''}
-      {sample.type === 'pattern' ? '' : waveform}
       <div className={styles.fadeWrapper}>
-        {sample.id === selectedSample && !!(sample.fade.fadeIn || sample.fade.fadeOut) && (
+        {id === selectedSample && !!(data.fade.fadeIn || data.fade.fadeOut) && (
           <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" fill="rgba(0, 0, 0, 0.3)">
-            <path d={`M 0 0 L ${sample.fade.fadeIn * 100} 0 L 0 100`} />
-            <path d={`M ${(1 - sample.fade.fadeOut) * 100} 0 L 100 0 L 100 100`} />
+            <path d={`M 0 0 L ${data.fade.fadeIn * 100} 0 L 0 100`} />
+            <path d={`M ${(1 - data.fade.fadeOut) * 100} 0 L 100 0 L 100 100`} />
           </svg>
         )}
       </div>
+      <p>{id === selectedSample && data.name}</p>
+      {id === selectedSample
+        && (
+          <div className={styles.edit}>
+            <EditIcon
+              onClick={handleShowHideSampleEffects}
+            />
+            <PianoIcon
+              onClick={handleTogglePiano}
+            />
+          </div>
+        )}
+      {data.bufferLoading && <Spinner className={styles.spinner} />}
     </HotKeys>
   );
 });
 
 Sample.propTypes = {
   style: PropTypes.object,
-  sample: PropTypes.object.isRequired,
+  data: PropTypes.object.isRequired,
+  id: PropTypes.string.isRequired,
   tempo: PropTypes.number.isRequired,
   selectedSample: PropTypes.string.isRequired,
   dispatch: PropTypes.func.isRequired,
