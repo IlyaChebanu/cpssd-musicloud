@@ -351,8 +351,8 @@ def like_song(user_data):
         for did in notify_like_dids(request.json.get("sid")):
             dids += did
         message = (
-                user_data.get("username") + " just liked your song: \""
-                + title + "\""
+            user_data.get("username") + " just liked your song: \""
+            + title + "\""
         )
         notification_sender(message, dids, "New Like")
     except NoResults:
@@ -647,8 +647,8 @@ def publish_song(user_data):
         for did in notify_song_dids(user_data.get("uid")):
             dids += did
         message = (
-                user_data.get("username") + " just dropped a new song: \""
-                + title + "\""
+            user_data.get("username") + " just dropped a new song: \""
+            + title + "\""
         )
         notification_sender(message, dids, "New Song")
     except NoResults:
