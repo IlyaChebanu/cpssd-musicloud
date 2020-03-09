@@ -28,5 +28,23 @@ export default StyleSheet.create({
     marginLeft: 20,
     marginRight: 20,
     marginTop: 20,
+    marginBottom: 40,
+  },
+  notificationsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginLeft: 20,
+    marginRight: 20,
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  notificationText: {
+    color: '#FFF',
+    fontSize: 16,
+  },
+  notificationsSettings: {
+    backgroundColor: 'rgba(0,0,0,0.9)',
+    zIndex: 1,
   },
 })

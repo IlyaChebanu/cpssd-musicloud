@@ -35,3 +35,37 @@ export function setIsPortrait(isPortrait) {
     }
 }
 
+export function setIsNotification(isNotification) {
+    return {
+        type: actionsTypes.SET_IS_NOTIFICATION,
+        isNotification
+    }
+}
+
+export function setIsNotificationFollow(isNotificationFollow) {
+    return {
+        type: actionsTypes.SET_IS_NOTIFICATION_FOLLOW,
+        isNotificationFollow
+    }
+}
+
+export function setIsNotificationPost(isNotificationPost) {
+    return {
+        type: actionsTypes.SET_IS_NOTIFICATION_POST,
+        isNotificationPost
+    }
+}
+
+export function setIsNotificationSong(isNotificationSong) {
+    return {
+        type: actionsTypes.SET_IS_NOTIFICATION_SONG,
+        isNotificationSong
+    }
+}
+
+export function setIsNotificationLike(isNotificationLike) {
+    return {
+        type: actionsTypes.SET_IS_NOTIFICATION_LIKE,
+        isNotificationLike
+    }
+}

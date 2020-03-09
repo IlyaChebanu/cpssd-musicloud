@@ -6,7 +6,7 @@ import { StyleSheet, Text, View, Image, TouchableOpacity, Animated, Easing, Dime
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import MultiPurposeButton from "../../components/multiPurposeButton/multiPurposeButton";
-import { writeDataToStorage, readStorageData, TOKEN_DATA_KEY, USERNAME_DATA_KEY, SETTINGS_PORTRAIT_DATA_KEY } from "../../utils/localStorage";
+import { writeDataToStorage, readStorageData, TOKEN_DATA_KEY, USERNAME_DATA_KEY, SETTINGS_PORTRAIT_DATA_KEY, SETTINGS_NOTIFICATION_DATA_KEY, SETTINGS_NOTIFICATION_FOLLOW_DATA_KEY, SETTINGS_NOTIFICATION_POST_DATA_KEY, SETTINGS_NOTIFICATION_SONG_DATA_KEY, SETTINGS_NOTIFICATION_LIKE_DATA_KEY } from "../../utils/localStorage";
 import Orientation from 'react-native-orientation';
 import Pushy from 'pushy-react-native';
 import { animateTimingNative, animateCustomLoginNative, animateCustomRegisterNative, animateCustomForgotNative, animateTimingPromiseNative } from "../../utils/animate";
@@ -97,11 +97,31 @@ class StartScreen extends React.Component {
     let token = await readStorageData(TOKEN_DATA_KEY)
     let username = await readStorageData(USERNAME_DATA_KEY)
     let portraitMode = await readStorageData(SETTINGS_PORTRAIT_DATA_KEY)
+    let notification = await readStorageData(SETTINGS_NOTIFICATION_DATA_KEY)
+    let notificationFollow = await readStorageData(SETTINGS_NOTIFICATION_FOLLOW_DATA_KEY)
+    let notificationPost = await readStorageData(SETTINGS_NOTIFICATION_POST_DATA_KEY)
+    let notificationSong = await readStorageData(SETTINGS_NOTIFICATION_SONG_DATA_KEY)
+    let notificationLike = await readStorageData(SETTINGS_NOTIFICATION_LIKE_DATA_KEY)
     if (portraitMode === false) {
       this.props.setIsPortrait(portraitMode)
       Orientation.unlockAllOrientations();
     } else if (portraitMode === true) {
       this.props.setIsPortrait(portraitMode)
+    }
+    if (notification === false || notification === true) {
+      this.props.setIsNotification(notification)
+    }
+    if (notificationFollow === false || notificationFollow === true) {
+      this.props.setIsNotificationFollow(notificationFollow)
+    }
+    if (notificationPost === false || notificationPost === true) {
+      this.props.setIsNotificationPost(notificationPost)
+    }
+    if (notificationSong === false || notificationSong === true) {
+      this.props.setIsNotificationSong(notificationSong)
+    }
+    if (notificationLike === false || notificationLike === true) {
+      this.props.setIsNotificationLike(notificationLike)
     }
     if (token != null) {
       this.props.setAuthToken(token)
