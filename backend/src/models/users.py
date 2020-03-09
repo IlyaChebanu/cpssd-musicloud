@@ -270,7 +270,7 @@ def get_song_count(uid):
     """
     sql = (
         "SELECT COUNT(*) FROM Songs "
-        "WHERE uid = %s"
+        "WHERE uid = %s AND published = 1"
     )
     args = (
         uid,
