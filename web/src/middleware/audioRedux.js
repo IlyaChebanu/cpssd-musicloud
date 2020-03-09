@@ -169,6 +169,26 @@ export default (store) => {
         break;
       }
 
+      case 'ADD_TRACK': {
+        const soloTrack = _.find([...state.tracks, action.track], 'solo');
+        const gain = audioContext.createGain();
+        const pan = audioContext.createStereoPanner();
+        const muterGain = audioContext.createGain();
+
+        gain.gain.setValueAtTime(action.track.volume, 0);
+        pan.pan.setValueAtTime(action.track.pan, 0);
+        muterGain.gain.setValueAtTime(1 * (
+          soloTrack ? soloTrack.id === action.track.id : !action.track.mute
+        ), 0);
+
+        gain.connect(pan);
+        pan.connect(muterGain);
+        muterGain.connect(audioContext.globalGain);
+
+        trackChannels[action.track.id] = { gain, pan, muterGain };
+        break;
+      }
+
       case 'SET_TRACK_VOLUME': {
         const track = _.find(state.tracks, (o) => o.id === action.trackId);
         trackChannels[action.trackId].gain.gain.setValueAtTime(
@@ -205,7 +225,9 @@ export default (store) => {
       case 'SET_TRACK_SOLO': {
         Object.entries(trackChannels).forEach(([trackId, channel]) => {
           const track = _.find(state.tracks, (o) => o.id === trackId);
-
+          if (!track) {
+            return;
+          }
           if (trackId === action.trackId) {
             if (action.value && !channel.muterGain.gain.value) {
               // Unmute solo'd track
