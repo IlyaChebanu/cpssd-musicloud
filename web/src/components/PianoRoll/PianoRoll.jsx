@@ -97,7 +97,7 @@ const PianoRoll = memo(({
         selectedSampleObject.url,
       );
     }
-  }, [hoveredKey, isMouseDown, popFilter, selectedSampleObject.url]);
+  }, [hoveredKey, isMouseDown, popFilter, selectedSampleObject]);
 
   const { pianoKeys, pianoTracks } = useMemo(() => {
     const pianoKeys = [];
@@ -190,6 +190,15 @@ const PianoRoll = memo(({
     dispatch(setSampleName(e.target.value, selectedSample));
   }, [dispatch, selectedSample]);
 
+  const renderableNotes = useMemo(() => {
+    if (selectedSampleObject && selectedSampleObject.notes) {
+      return Object.entries(selectedSampleObject.notes).map(([id, note]) => (
+        <PianoNote noteData={{ ...note, id }} />
+      ));
+    }
+    return null;
+  }, [selectedSampleObject]);
+
   return (
     <div
       className={styles.background}
@@ -213,7 +222,7 @@ const PianoRoll = memo(({
                 <CloseIcon onClick={handleClose} />
               </div>
               <div className={styles.lower}>
-                <SeekBar currentBeat={(currentBeat - selectedSampleObject.time + 1)} scaleFactor={gridSize} />
+                <SeekBar currentBeat={selectedSampleObject ? (currentBeat - selectedSampleObject.time + 1) : 0} scaleFactor={gridSize} />
                 <div className={styles.timelineWrapper} style={wrapperStyle}>
                   <svg className={styles.ticks} style={widthStyle}>
                     <rect
@@ -239,9 +248,7 @@ const PianoRoll = memo(({
               {tickDividers}
             </div>
             <div className={styles.notes}>
-              {selectedSampleObject && selectedSampleObject.notes && Object.entries(selectedSampleObject.notes).map(([id, note]) => (
-                <PianoNote noteData={{ ...note, id }} />
-              ))}
+              {renderableNotes}
             </div>
           </div>
         </div>
