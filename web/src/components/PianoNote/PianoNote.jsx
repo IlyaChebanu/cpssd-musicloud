@@ -46,12 +46,13 @@ const PianoNote = memo(({
     return popFilter;
   }, []);
 
-  const dragStart = () => {
+  move.onDragStart(() => {
     setDragStartData(noteData);
     setIsDragging(true);
-  };
-  move.onDragStart(dragStart);
-  resize.onDragStart(dragStart);
+  });
+  resize.onDragStart(() => {
+    setDragStartData(noteData);
+  });
 
   move.onDragging(({
     oldX, oldY, x, y,
