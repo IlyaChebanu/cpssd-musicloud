@@ -14,4 +14,3 @@ requests
 flask-migrate
 flask-script
 flask-sqlalchemy
-mysqlclient
