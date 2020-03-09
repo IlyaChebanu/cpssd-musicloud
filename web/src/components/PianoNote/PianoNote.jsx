@@ -123,6 +123,7 @@ const PianoNote = memo(({
 
   const handleDelete = useCallback((e) => {
     e.preventDefault();
+    e.stopPropagation();
     dispatch(removePatternNote(selectedSample, noteData.id));
   }, [dispatch, noteData.id, selectedSample]);
 
