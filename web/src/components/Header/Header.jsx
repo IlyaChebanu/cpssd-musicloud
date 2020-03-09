@@ -247,7 +247,15 @@ const Header = memo((props) => {
       { name: 'Generate', icon: generateIcon },
       { name: 'Exit', icon: exitIcon },
     ],
-    [exportAction, handleAddSynth, handleHideSongPicker, handlePublishSong, handleSampleImport, handleSaveState, handleShowSongPicker],
+    [
+      exportAction,
+      handleAddSynth,
+      handleHideSongPicker,
+      handlePublishSong,
+      handleSampleImport,
+      handleSaveState,
+      handleShowSongPicker,
+    ],
   );
 
   const editDropdownItems = useMemo(
