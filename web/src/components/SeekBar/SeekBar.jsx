@@ -8,12 +8,13 @@ import { setCurrentBeat, play, pause } from '../../actions/studioActions';
 
 const SeekBar = memo((props) => {
   const {
-    scroll, playing, dispatch, gridSize, currentBeatStudio,
+    playing, dispatch, gridSize, currentBeatStudio,
   } = props;
 
   const currentBeat = props.currentBeat ? props.currentBeat : currentBeatStudio;
 
   const scaleFactor = props.scaleFactor || gridSize;
+  const scroll = props.scrollPosition !== null ? props.scrollPosition : props.scroll;
 
   const handleDragStart = useCallback((ev) => {
     dispatch(pause);
@@ -76,10 +77,12 @@ SeekBar.propTypes = {
   dispatch: PropTypes.func.isRequired,
   gridSize: PropTypes.number.isRequired,
   scaleFactor: PropTypes.number,
+  scrollPosition: PropTypes.number,
 };
 
 SeekBar.defaultProps = {
   scaleFactor: null,
+  scrollPosition: null,
 };
 
 SeekBar.displayName = 'SeekBar';
