@@ -1,4 +1,8 @@
+import Tone from 'tone';
 import playSample from './playSample';
+import { audioContext } from '../helpers/constants';
+
+Tone.setContext(audioContext);
 
 export default (
   context,
@@ -12,12 +16,23 @@ export default (
   if (url) {
     return playSample(context, url, destination, startTime, offset, endTime);
   }
-  const source = context.createOscillator();
-  source.frequency.setValueAtTime(2 ** ((note.noteNumber - 49) / 12) * 440, 0);
-  source.connect(destination);
-  source.start(startTime, offset);
+
+  const synth = new Tone.Synth({
+    envelope: {
+      attack: 0.005,
+      decay: 0.1,
+      sustain: 0.3,
+      release: 1,
+    },
+  });
+  const frequency = 2 ** ((note.noteNumber - 49) / 12) * 440;
+
+  synth.oscillator.frequency.value = frequency;
+
+  synth.connect(destination);
+  synth.triggerAttack(frequency, `+${startTime - context.currentTime}`);
   if (endTime) {
-    source.stop(endTime);
+    synth.triggerRelease(`+${endTime - context.currentTime}`);
   }
-  return source;
+  return synth;
 };

@@ -74,7 +74,11 @@ const PianoRoll = memo(({
     if (playingNote.current) {
       popFilter.gain.setValueAtTime(popFilter.gain.value, 0);
       popFilter.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.01);
-      playingNote.current.stop(audioContext.currentTime + 0.01);
+      if (selectedSampleObject.url) {
+        playingNote.current.stop(audioContext.currentTime + 0.01);
+      } else {
+        playingNote.current.triggerRelease('+0.01');
+      }
     }
   });
 
@@ -83,7 +87,11 @@ const PianoRoll = memo(({
       if (playingNote.current) {
         popFilter.gain.setValueAtTime(popFilter.gain.value, 0);
         popFilter.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.01);
-        playingNote.current.stop(audioContext.currentTime + 0.01);
+        if (selectedSampleObject.url) {
+          playingNote.current.stop(audioContext.currentTime + 0.01);
+        } else {
+          playingNote.current.triggerRelease('+0.01');
+        }
       }
       popFilter.gain.setValueAtTime(popFilter.gain.value, audioContext.currentTime + 0.01);
       popFilter.gain.exponentialRampToValueAtTime(1, audioContext.currentTime + 0.02);
@@ -91,7 +99,7 @@ const PianoRoll = memo(({
         audioContext,
         { noteNumber: hoveredKey },
         popFilter,
-        audioContext.currentTime + 0.01,
+        selectedSampleObject.url ? audioContext.currentTime + 0.01 : audioContext.currentTime,
         0,
         null,
         selectedSampleObject.url,
@@ -222,7 +230,7 @@ const PianoRoll = memo(({
                 <CloseIcon onClick={handleClose} />
               </div>
               <div className={styles.lower}>
-                <SeekBar currentBeat={selectedSampleObject ? (currentBeat - selectedSampleObject.time + 1) : 0} scaleFactor={gridSize} />
+                <SeekBar currentBeat={selectedSampleObject ? (currentBeat - selectedSampleObject.time + 1) : 0} scaleFactor={gridSize} scrollPosition={scroll} />
                 <div className={styles.timelineWrapper} style={wrapperStyle}>
                   <svg className={styles.ticks} style={widthStyle}>
                     <rect

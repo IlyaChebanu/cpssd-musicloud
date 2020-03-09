@@ -79,7 +79,11 @@ const PianoNote = memo(({
     if (playingNote.current) {
       popFilter.gain.setValueAtTime(popFilter.gain.value, 0);
       popFilter.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.01);
-      playingNote.current.stop(audioContext.currentTime + 0.01);
+      if (sample.url) {
+        playingNote.current.stop(audioContext.currentTime + 0.01);
+      } else {
+        playingNote.current.triggerRelease('+0.01');
+      }
     }
   });
 
@@ -105,7 +109,11 @@ const PianoNote = memo(({
       if (playingNote.current) {
         popFilter.gain.setValueAtTime(popFilter.gain.value, 0);
         popFilter.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.01);
-        playingNote.current.stop(audioContext.currentTime + 0.01);
+        if (sample.url) {
+          playingNote.current.stop(audioContext.currentTime + 0.01);
+        } else {
+          playingNote.current.triggerRelease('+0.01');
+        }
       }
       popFilter.gain.setValueAtTime(popFilter.gain.value, audioContext.currentTime + 0.01);
       popFilter.gain.exponentialRampToValueAtTime(1, audioContext.currentTime + 0.02);
@@ -113,7 +121,7 @@ const PianoNote = memo(({
         audioContext,
         { noteNumber: noteDisplayData.noteNumber },
         popFilter,
-        audioContext.currentTime + 0.01,
+        sample.url ? audioContext.currentTime + 0.01 : audioContext.currentTime,
         0,
         null,
         sample.url,

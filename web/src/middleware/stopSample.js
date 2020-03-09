@@ -11,7 +11,11 @@ export default (sample) => {
   if (sample.notes) {
     Object.values(sample.notes).forEach((note) => {
       if (note.source) {
-        note.source.stop(audioContext.currentTime + 0.01);
+        if (sample.url) {
+          note.source.stop(audioContext.currentTime + 0.01);
+        } else {
+          note.source.triggerRelease('+0.01');
+        }
       }
     });
   }

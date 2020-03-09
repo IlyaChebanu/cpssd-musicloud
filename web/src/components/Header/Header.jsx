@@ -121,6 +121,35 @@ const Header = memo((props) => {
     };
   }, [dispatch, studio]);
 
+  const handleAddSynth = useCallback(() => {
+    if (studio.tracks.length === 0) {
+      dispatch(
+        showNotification({ message: 'Please add a track first', type: 'info' }),
+      );
+      return;
+    }
+    if (!studio.selectedTrack) {
+      dispatch(
+        showNotification({ message: 'Please select a track first', type: 'info' }),
+      );
+      return;
+    }
+    dispatch(addSample(
+      studio.selectedTrack,
+      {
+        name: 'synth',
+        time: studio.currentBeat,
+        fade: {
+          fadeIn: 0,
+          fadeOut: 0,
+        },
+        type: 'pattern',
+        duration: 0,
+        notes: [],
+      },
+    ));
+  }, [dispatch, studio.currentBeat, studio.selectedTrack, studio.tracks.length]);
+
   const exportAction = useCallback(async () => {
     const renderedBuffer = await renderTracks(studio);
     const encoded = toWav(renderedBuffer);
@@ -213,12 +242,14 @@ const Header = memo((props) => {
       { name: 'Publish', action: handlePublishSong, icon: publishIcon },
       { name: 'Save', icon: saveIcon, action: handleSaveState },
       { name: 'Import', icon: importIcon, action: handleSampleImport },
+      { name: 'Add Synth', icon: importIcon, action: handleAddSynth },
       { name: 'Export', icon: exportIcon, action: exportAction },
       { name: 'Generate', icon: generateIcon },
       { name: 'Exit', icon: exitIcon },
     ],
     [
       exportAction,
+      handleAddSynth,
       handleHideSongPicker,
       handlePublishSong,
       handleSampleImport,
