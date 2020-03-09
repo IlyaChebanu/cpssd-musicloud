@@ -70,7 +70,7 @@ const SeekBar = memo((props) => {
 });
 
 SeekBar.propTypes = {
-  currentBeat: PropTypes.number.isRequired,
+  currentBeat: PropTypes.number,
   currentBeatStudio: PropTypes.number.isRequired,
   scroll: PropTypes.number.isRequired,
   playing: PropTypes.bool.isRequired,

@@ -270,7 +270,7 @@ def get_song_count(uid):
     """
     sql = (
         "SELECT COUNT(*) FROM Songs "
-        "WHERE uid = %s AND published = 1"
+        "WHERE uid = %s AND public = 1"
     )
     args = (
         uid,
@@ -401,7 +401,7 @@ def get_posts(uid, start_index, posts_per_page):
     List - Contains lists of post data.
     """
     sql = (
-        "SELECT message, time FROM Posts "
+        "SELECT message, time, post_id FROM Posts "
         "WHERE uid = %s "
         "ORDER BY time DESC "
         "LIMIT %s, %s"
