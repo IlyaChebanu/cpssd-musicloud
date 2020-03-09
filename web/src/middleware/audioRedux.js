@@ -148,14 +148,17 @@ export default (store) => {
       }
 
       case 'SET_COMPLETE_TRACKS_STATE': {
+        const soloTrack = _.find(action.tracks, 'solo');
         action.tracks.forEach((track) => {
           const gain = audioContext.createGain();
           const pan = audioContext.createStereoPanner();
           const muterGain = audioContext.createGain();
 
-          gain.gain.setValueAtTime(getTrackVolume(track, track.volume, action.tracks), 0);
+          gain.gain.setValueAtTime(track.volume, 0);
           pan.pan.setValueAtTime(track.pan, 0);
-          muterGain.gain.setValueAtTime(track.mute ? 0 : 1, 0);
+          muterGain.gain.setValueAtTime(1 * (
+            soloTrack ? soloTrack.id === track.id : !track.mute
+          ), 0);
 
           gain.connect(pan);
           pan.connect(muterGain);

@@ -1,6 +1,6 @@
 import Tone from 'tone';
-import playSample from './playSample';
 import { audioContext, bufferStore } from '../helpers/constants';
+import { sliceBuffer } from '../helpers/utils';
 
 Tone.setContext(audioContext);
 
@@ -18,8 +18,13 @@ export default (
 
   if (url) {
     const buffer = bufferStore[url];
+    const offsetScaled = offset * ((39 - note.noteNumber) / 12) ** 2;
+    if (offsetScaled > buffer.duration) {
+      return null;
+    }
+    const slice = sliceBuffer(buffer, offsetScaled);
     synth = new Tone.Sampler({
-      C4: buffer,
+      C4: slice,
     });
     synth.attack = 0.005;
     synth.release = 0.005;
