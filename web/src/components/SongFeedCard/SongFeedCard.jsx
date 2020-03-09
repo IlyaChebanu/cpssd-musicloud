@@ -190,6 +190,8 @@ SongFeedCard.defaultProps = {
   className: '',
   isLiked: false,
   profileImg: '',
+  description: '',
+  coverImage: ''
 };
 
 SongFeedCard.displayName = 'SongFeedCard';

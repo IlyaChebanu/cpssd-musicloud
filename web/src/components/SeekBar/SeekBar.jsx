@@ -81,6 +81,7 @@ SeekBar.propTypes = {
 };
 
 SeekBar.defaultProps = {
+  currentBeat: 0,
   scaleFactor: null,
   scrollPosition: null,
 };
