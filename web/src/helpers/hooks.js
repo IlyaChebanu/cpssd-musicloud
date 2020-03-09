@@ -67,12 +67,14 @@ export const useGlobalDrag = (ref) => {
   const onMouseUp = useGlobalEvent('mouseup');
 
   onMouseDown((e) => {
-    const bb = e.target.getBoundingClientRect();
-    e.stopPropagation();
-    setDragging(true);
-    setStartCoords({ oldX: bb.x, oldY: bb.y });
-    setOffset({ x: e.clientX - bb.x, y: e.clientY - bb.y });
-    if (startHandler.current) startHandler.current();
+    if (e.button === 0) {
+      const bb = e.target.getBoundingClientRect();
+      e.stopPropagation();
+      setDragging(true);
+      setStartCoords({ oldX: bb.x, oldY: bb.y });
+      setOffset({ x: e.clientX - bb.x, y: e.clientY - bb.y });
+      if (startHandler.current) startHandler.current();
+    }
   });
 
   onMouseMove((e) => {

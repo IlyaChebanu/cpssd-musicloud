@@ -8,20 +8,23 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 import styles from './PianoNote.module.scss';
-import { colours } from '../../helpers/constants';
+import { colours, audioContext } from '../../helpers/constants';
 import { useGlobalDrag } from '../../helpers/hooks';
 import {
   setPatternNoteTick, setPatternNoteNumber, setPatternNoteDuration, removePatternNote,
 } from '../../actions/studioActions';
+import playNote from '../../middleware/playNote';
 
 const ppq = 1;
 
 const PianoNote = memo(({
-  noteData, selectedTrack, tracks, dispatch, selectedSample,
+  noteData, selectedTrack, tracks, dispatch, selectedSample, samples,
 }) => {
   const gridSize = 1;
   const gridSnapEnabled = true;
   const gridSizePx = 40 * gridSize;
+
+  const sample = useMemo(() => samples[selectedSample], [samples, selectedSample]);
 
   const [noteDisplayData, setNoteDisplayData] = useState(noteData);
   useEffect(() => {
@@ -34,12 +37,22 @@ const PianoNote = memo(({
   const resize = useGlobalDrag(resizeRef);
 
   const [dragStartData, setDragStartData] = useState(noteData);
+  const [isDragging, setIsDragging] = useState(false);
+  const playingNote = useRef();
+  const popFilter = useMemo(() => {
+    const popFilter = audioContext.createGain();
+    popFilter.connect(audioContext.globalGain);
+    popFilter.gain.setValueAtTime(0, 0);
+    return popFilter;
+  }, []);
 
-  const dragStart = () => {
+  move.onDragStart(() => {
     setDragStartData(noteData);
-  };
-  move.onDragStart(dragStart);
-  resize.onDragStart(dragStart);
+    setIsDragging(true);
+  });
+  resize.onDragStart(() => {
+    setDragStartData(noteData);
+  });
 
   move.onDragging(({
     oldX, oldY, x, y,
@@ -62,6 +75,12 @@ const PianoNote = memo(({
   move.onDragEnd(() => {
     dispatch(setPatternNoteTick(selectedSample, noteData.id, noteDisplayData.tick));
     dispatch(setPatternNoteNumber(selectedSample, noteData.id, noteDisplayData.noteNumber));
+    setIsDragging(false);
+    if (playingNote.current) {
+      popFilter.gain.setValueAtTime(popFilter.gain.value, 0);
+      popFilter.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.01);
+      playingNote.current.stop(audioContext.currentTime + 0.01);
+    }
   });
 
   resize.onDragging(({
@@ -81,8 +100,30 @@ const PianoNote = memo(({
     dispatch(setPatternNoteDuration(selectedSample, noteData.id, noteDisplayData.duration));
   });
 
+  useEffect(() => {
+    if (isDragging) {
+      if (playingNote.current) {
+        popFilter.gain.setValueAtTime(popFilter.gain.value, 0);
+        popFilter.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.01);
+        playingNote.current.stop(audioContext.currentTime + 0.01);
+      }
+      popFilter.gain.setValueAtTime(popFilter.gain.value, audioContext.currentTime + 0.01);
+      popFilter.gain.exponentialRampToValueAtTime(1, audioContext.currentTime + 0.02);
+      playingNote.current = playNote(
+        audioContext,
+        { noteNumber: noteDisplayData.noteNumber },
+        popFilter,
+        audioContext.currentTime + 0.01,
+        0,
+        null,
+        sample.url,
+      );
+    }
+  }, [isDragging, noteData.url, noteDisplayData.noteNumber, popFilter, sample.url]);
+
   const handleDelete = useCallback((e) => {
     e.preventDefault();
+    e.stopPropagation();
     dispatch(removePatternNote(selectedSample, noteData.id));
   }, [dispatch, noteData.id, selectedSample]);
 
@@ -118,6 +159,7 @@ PianoNote.propTypes = {
   selectedSample: PropTypes.string,
   tracks: PropTypes.arrayOf(PropTypes.object),
   dispatch: PropTypes.func.isRequired,
+  samples: PropTypes.object.isRequired,
 };
 
 PianoNote.defaultProps = {
@@ -131,6 +173,7 @@ const mapStateToProps = ({ studio }) => ({
   selectedTrack: studio.selectedTrack,
   selectedSample: studio.selectedSample,
   tracks: studio.tracks,
+  samples: studio.samples,
 });
 
 export default connect(mapStateToProps)(PianoNote);

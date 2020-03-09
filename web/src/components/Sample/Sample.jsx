@@ -203,7 +203,7 @@ const Sample = memo((props) => {
               style={{
                 height: '2px',
                 width: `${note.duration * (0.25 / ppq) * gridSizePx}px`,
-                top: `${(88 - note.noteNumber)}px`,
+                top: `${(88 - note.noteNumber - (88 - highestNote.noteNumber))}px`,
                 left: `${note.tick * (0.25 / ppq) * gridSizePx}px`,
               }}
             />

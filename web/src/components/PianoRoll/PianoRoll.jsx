@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/mouse-events-have-key-events */
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable no-shadow */
 /* eslint-disable max-len */
@@ -5,11 +6,12 @@
 /* eslint-disable react/button-has-type */
 /* eslint-disable jsx-a11y/control-has-associated-label */
 import React, {
-  memo, useCallback, useMemo, useState,
+  memo, useCallback, useMemo, useState, useEffect, useRef,
 } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import _ from 'lodash';
+import { useMouseEvents, useGlobalEvent } from 'beautiful-react-hooks';
 import styles from './PianoRoll.module.scss';
 import { ReactComponent as CloseIcon } from '../../assets/icons/x-icon-10px.svg';
 import {
@@ -19,26 +21,10 @@ import {
 } from '../../actions/studioActions';
 import PianoNote from '../PianoNote/PianoNote';
 import SeekBar from '../SeekBar';
+import { audioContext } from '../../helpers/constants';
+import playNote from '../../middleware/playNote';
 
 const keyNames = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#'];
-const pianoKeys = [];
-const pianoTracks = [];
-for (let i = 0; i < 88; i += 1) {
-  if ([0, 2, 3, 5, 7, 8, 10].includes(i % 12)) {
-    pianoKeys.push(
-      <button className={`${styles.whiteKey} ${[0, 5, 10].includes(i % 12) ? styles.wide : ''}`} key={i}>
-        <span className={`${i % 12 === 3 ? styles.bold : styles.light}`}>{`${keyNames[i % 12]}${Math.floor(i / 12) + 1}`}</span>
-      </button>,
-    );
-    pianoTracks.push(<div className={`${styles.track} ${styles.white}`} key={i} />);
-  } else {
-    pianoKeys.push(
-      <button className={styles.blackKey} key={i} />,
-    );
-    pianoTracks.push(<div className={`${styles.track} ${styles.black}`} key={i} />);
-  }
-}
-
 
 const PianoRoll = memo(({
   showPianoRoll, selectedSample, dispatch, samples, currentBeat,
@@ -62,6 +48,88 @@ const PianoRoll = memo(({
 
   const selectedSampleObject = useMemo(() => samples[selectedSample], [samples, selectedSample]);
   const notes = useMemo(() => (selectedSampleObject ? selectedSampleObject.notes : {}), [selectedSampleObject]);
+
+
+  const keysRef = useRef();
+  const playingNote = useRef();
+  const popFilter = useMemo(() => {
+    const popFilter = audioContext.createGain();
+    popFilter.connect(audioContext.globalGain);
+    popFilter.gain.setValueAtTime(0, 0);
+    return popFilter;
+  }, []);
+  const [hoveredKey, setHoveredKey] = useState();
+  const [isMouseDown, setIsMouseDown] = useState(false);
+
+  const { onMouseDown } = useMouseEvents(keysRef);
+  const onMouseUp = useGlobalEvent('mouseup');
+
+  onMouseDown((e) => {
+    e.stopPropagation();
+    setIsMouseDown(true);
+  });
+
+  onMouseUp(() => {
+    setIsMouseDown(false);
+    if (playingNote.current) {
+      popFilter.gain.setValueAtTime(popFilter.gain.value, 0);
+      popFilter.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.01);
+      playingNote.current.stop(audioContext.currentTime + 0.01);
+    }
+  });
+
+  useEffect(() => {
+    if (isMouseDown) {
+      if (playingNote.current) {
+        popFilter.gain.setValueAtTime(popFilter.gain.value, 0);
+        popFilter.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.01);
+        playingNote.current.stop(audioContext.currentTime + 0.01);
+      }
+      popFilter.gain.setValueAtTime(popFilter.gain.value, audioContext.currentTime + 0.01);
+      popFilter.gain.exponentialRampToValueAtTime(1, audioContext.currentTime + 0.02);
+      playingNote.current = playNote(
+        audioContext,
+        { noteNumber: hoveredKey },
+        popFilter,
+        audioContext.currentTime + 0.01,
+        0,
+        null,
+        selectedSampleObject.url,
+      );
+    }
+  }, [hoveredKey, isMouseDown, popFilter, selectedSampleObject]);
+
+  const { pianoKeys, pianoTracks } = useMemo(() => {
+    const pianoKeys = [];
+    const pianoTracks = [];
+    for (let i = 0; i < 88; i += 1) {
+      if ([0, 2, 3, 5, 7, 8, 10].includes(i % 12)) {
+        pianoKeys.push(
+          <button
+            className={`${styles.whiteKey} ${isMouseDown && hoveredKey === i + 1 ? styles.active : ''} ${[0, 5, 10].includes(i % 12) ? styles.wide : ''}`}
+            key={i}
+            onMouseOver={() => setHoveredKey(i + 1)}
+          >
+            <span className={`${i % 12 === 3 ? styles.bold : styles.light}`}>
+              {`${keyNames[i % 12]}${Math.floor(i / 12) + 1}`}
+            </span>
+          </button>,
+        );
+        pianoTracks.push(<div className={`${styles.track} ${styles.white}`} key={i} />);
+      } else {
+        pianoKeys.push(
+          <button
+            className={`${styles.blackKey} ${isMouseDown && hoveredKey === i + 1 ? styles.active : ''}`}
+            key={i}
+            onMouseOver={() => setHoveredKey(i + 1)}
+          />,
+        );
+        pianoTracks.push(<div className={`${styles.track} ${styles.black}`} key={i} />);
+      }
+    }
+    return { pianoKeys, pianoTracks };
+  }, [hoveredKey, isMouseDown]);
+
 
   const numTicks = useMemo(() => {
     if (!tracksRef) return null;
@@ -122,6 +190,15 @@ const PianoRoll = memo(({
     dispatch(setSampleName(e.target.value, selectedSample));
   }, [dispatch, selectedSample]);
 
+  const renderableNotes = useMemo(() => {
+    if (selectedSampleObject && selectedSampleObject.notes) {
+      return Object.entries(selectedSampleObject.notes).map(([id, note]) => (
+        <PianoNote noteData={{ ...note, id }} />
+      ));
+    }
+    return null;
+  }, [selectedSampleObject]);
+
   return (
     <div
       className={styles.background}
@@ -145,7 +222,7 @@ const PianoRoll = memo(({
                 <CloseIcon onClick={handleClose} />
               </div>
               <div className={styles.lower}>
-                <SeekBar currentBeat={(currentBeat - selectedSampleObject.time + 1)} scaleFactor={gridSize} />
+                <SeekBar currentBeat={selectedSampleObject ? (currentBeat - selectedSampleObject.time + 1) : 0} scaleFactor={gridSize} />
                 <div className={styles.timelineWrapper} style={wrapperStyle}>
                   <svg className={styles.ticks} style={widthStyle}>
                     <rect
@@ -162,7 +239,7 @@ const PianoRoll = memo(({
           </div>
         </div>
         <div className={styles.keyboard}>
-          <div className={styles.keys}>
+          <div className={styles.keys} ref={keysRef}>
             {pianoKeys}
           </div>
           <div className={styles.keyTracks} onMouseDown={handleCreateNote} ref={(ref) => setTracksRef(ref)} onScroll={handleScrollX}>
@@ -171,9 +248,7 @@ const PianoRoll = memo(({
               {tickDividers}
             </div>
             <div className={styles.notes}>
-              {selectedSampleObject && selectedSampleObject.notes && Object.entries(selectedSampleObject.notes).map(([id, note]) => (
-                <PianoNote noteData={{ ...note, id }} />
-              ))}
+              {renderableNotes}
             </div>
           </div>
         </div>
