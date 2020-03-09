@@ -325,7 +325,11 @@ export default (store) => {
           const note = sample.notes[action.noteId];
 
           if (note && note.source) {
-            note.source.stop();
+            if (note.url) {
+              note.source.stop();
+            } else {
+              note.source.triggerRelease();
+            }
           }
         }
         break;
@@ -339,7 +343,11 @@ export default (store) => {
 
           if (note) {
             if (note.source) {
-              note.source.stop();
+              if (note.url) {
+                note.source.stop();
+              } else {
+                note.source.triggerRelease();
+              }
             }
 
             // Reschedule note
@@ -402,7 +410,11 @@ export default (store) => {
           );
           const noteOffset = Math.max(0, beatsToSeconds(state.currentBeat - noteTime, state.tempo));
 
-          note.source.stop(noteEndTime);
+          if (note.url) {
+            note.source.stop(noteEndTime);
+          } else {
+            note.source.triggerRelease(`+${noteEndTime - audioContext.currentTime}`);
+          }
 
           if (
             noteTime + noteDuration > state.currentBeat

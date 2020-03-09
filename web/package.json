@@ -29,6 +29,7 @@
     "redux-thunk": "^2.3.0",
     "s3-ls": "^3.0.0",
     "soundbank-reverb": "^1.1.2",
+    "tone": "^13.8.25",
     "typescript": "^3.7.2",
     "wavesurfer.js": "^3.3.1",
     "zxcvbn": "^4.4.2"

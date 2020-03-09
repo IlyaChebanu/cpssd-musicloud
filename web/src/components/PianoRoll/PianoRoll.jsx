@@ -72,26 +72,39 @@ const PianoRoll = memo(({
   onMouseUp(() => {
     setIsMouseDown(false);
     if (playingNote.current) {
-      popFilter.gain.setValueAtTime(popFilter.gain.value, 0);
-      popFilter.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.01);
-      playingNote.current.stop(audioContext.currentTime + 0.01);
+      if (selectedSampleObject.url) {
+        popFilter.gain.setValueAtTime(popFilter.gain.value, 0);
+        popFilter.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.01);
+        playingNote.current.stop(audioContext.currentTime + 0.01);
+      } else {
+        playingNote.current.triggerRelease('+0.01');
+      }
     }
   });
 
   useEffect(() => {
     if (isMouseDown) {
       if (playingNote.current) {
-        popFilter.gain.setValueAtTime(popFilter.gain.value, 0);
-        popFilter.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.01);
-        playingNote.current.stop(audioContext.currentTime + 0.01);
+        if (selectedSampleObject.url) {
+          popFilter.gain.setValueAtTime(popFilter.gain.value, 0);
+          popFilter.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.01);
+          playingNote.current.stop(audioContext.currentTime + 0.01);
+        } else {
+          playingNote.current.triggerRelease('+0.01');
+        }
       }
-      popFilter.gain.setValueAtTime(popFilter.gain.value, audioContext.currentTime + 0.01);
-      popFilter.gain.exponentialRampToValueAtTime(1, audioContext.currentTime + 0.02);
+      if (selectedSampleObject.url) {
+        popFilter.gain.setValueAtTime(popFilter.gain.value, audioContext.currentTime + 0.01);
+        popFilter.gain.exponentialRampToValueAtTime(1, audioContext.currentTime + 0.02);
+      } else {
+        popFilter.gain.setValueAtTime(1, 0);
+      }
+      // console.log(hoveredKey);
       playingNote.current = playNote(
         audioContext,
         { noteNumber: hoveredKey },
         popFilter,
-        audioContext.currentTime + 0.01,
+        selectedSampleObject.url ? audioContext.currentTime + 0.01 : audioContext.currentTime,
         0,
         null,
         selectedSampleObject.url,
