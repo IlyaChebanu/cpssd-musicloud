@@ -39,12 +39,6 @@ const PianoNote = memo(({
   const [dragStartData, setDragStartData] = useState(noteData);
   const [isDragging, setIsDragging] = useState(false);
   const playingNote = useRef();
-  const popFilter = useMemo(() => {
-    const popFilter = audioContext.createGain();
-    popFilter.connect(audioContext.globalGain);
-    popFilter.gain.setValueAtTime(0, 0);
-    return popFilter;
-  }, []);
 
   move.onDragStart(() => {
     setDragStartData(noteData);
@@ -77,12 +71,10 @@ const PianoNote = memo(({
     dispatch(setPatternNoteNumber(selectedSample, noteData.id, noteDisplayData.noteNumber));
     setIsDragging(false);
     if (playingNote.current) {
-      popFilter.gain.setValueAtTime(popFilter.gain.value, 0);
-      popFilter.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.01);
-      if (sample.url) {
-        playingNote.current.stop(audioContext.currentTime + 0.01);
+      if (playingNote.current.releaseAll) {
+        playingNote.current.releaseAll();
       } else {
-        playingNote.current.triggerRelease('+0.01');
+        playingNote.current.triggerRelease();
       }
     }
   });
@@ -107,27 +99,23 @@ const PianoNote = memo(({
   useEffect(() => {
     if (isDragging) {
       if (playingNote.current) {
-        popFilter.gain.setValueAtTime(popFilter.gain.value, 0);
-        popFilter.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.01);
-        if (sample.url) {
-          playingNote.current.stop(audioContext.currentTime + 0.01);
+        if (playingNote.current.releaseAll) {
+          playingNote.current.releaseAll();
         } else {
-          playingNote.current.triggerRelease('+0.01');
+          playingNote.current.triggerRelease();
         }
       }
-      popFilter.gain.setValueAtTime(popFilter.gain.value, audioContext.currentTime + 0.01);
-      popFilter.gain.exponentialRampToValueAtTime(1, audioContext.currentTime + 0.02);
       playingNote.current = playNote(
         audioContext,
         { noteNumber: noteDisplayData.noteNumber },
-        popFilter,
-        sample.url ? audioContext.currentTime + 0.01 : audioContext.currentTime,
+        audioContext.globalGain,
+        audioContext.currentTime,
         0,
         null,
         sample.url,
       );
     }
-  }, [isDragging, noteData.url, noteDisplayData.noteNumber, popFilter, sample.url]);
+  }, [isDragging, noteData.url, noteDisplayData.noteNumber, sample.url]);
 
   const handleDelete = useCallback((e) => {
     e.preventDefault();
