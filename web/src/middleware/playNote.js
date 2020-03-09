@@ -12,6 +12,29 @@ export default (
   offset = 0,
   endTime = null,
   url = null,
+  synthControls = {
+    waveType: 'triangle',
+    envelope: {
+      attack: 0.005,
+      decay: 0.1,
+      sustain: 0.9,
+      release: 1,
+    },
+    filter: {
+      Q: 6,
+      type: 'lowpass',
+      rolloff: -24,
+    },
+    filterEnvelope: {
+      attack: 0.06,
+      decay: 0.2,
+      sustain: 0.5,
+      release: 2,
+      baseFrequency: 200,
+      octaves: 7,
+      exponent: 2,
+    },
+  },
 ) => {
   let synth;
   const frequency = 2 ** ((note.noteNumber - 49) / 12) * 440;
@@ -26,19 +49,17 @@ export default (
     synth = new Tone.Sampler({
       C4: slice,
     });
-    synth.attack = 0.005;
-    synth.release = 0.005;
+    synth.attack = synthControls.envelope.attack;
+    synth.release = synthControls.envelope.release;
   } else {
-    synth = new Tone.Synth({
-      envelope: {
-        attack: 0.005,
-        decay: 0.1,
-        sustain: 0.3,
-        release: 1,
+    synth = new Tone.MonoSynth({
+      oscillator: {
+        type: synthControls.waveType,
       },
+      envelope: synthControls.envelope,
+      filter: synthControls.filter,
+      filterEnvelope: synthControls.filterEnvelope,
     });
-
-    synth.oscillator.frequency.value = frequency;
   }
 
   synth.connect(destination);

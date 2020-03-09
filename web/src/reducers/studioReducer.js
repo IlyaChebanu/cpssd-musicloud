@@ -387,6 +387,17 @@ export default (
         samples,
       };
     }
+    case 'SET_SAMPLE_SYNTH_PATCH': {
+      const samples = { ...state.samples };
+      samples[action.sampleId] = {
+        ...samples[action.sampleId],
+        synthControls: action.value,
+      };
+      return {
+        ...state,
+        samples,
+      };
+    }
     case 'ADD_PATTERN_NOTE': {
       const samples = { ...state.samples };
       samples[action.sampleId] = {

@@ -335,7 +335,16 @@ export const addSample = (trackId, sample) => (dispatch) => {
     type: 'ADD_SAMPLE',
     sampleId: genId(),
     sample: {
-      type: 'sample', notes: {}, trackId, ...sample,
+      synthControls: {
+        envelope: {
+          attack: 0.005,
+          release: 1,
+        },
+      },
+      type: 'sample',
+      notes: {},
+      trackId,
+      ...sample,
     },
   });
 };
@@ -461,5 +470,13 @@ export const setPatternNoteDuration = (sampleId, noteId, value) => (dispatch) =>
     noteId,
     sampleId,
     value: Math.max(0, value),
+  });
+};
+
+export const setSampleSynthPatch = (sampleId, value) => (dispatch) => {
+  dispatch({
+    type: 'SET_SAMPLE_SYNTH_PATCH',
+    sampleId,
+    value,
   });
 };

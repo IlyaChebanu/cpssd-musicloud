@@ -71,6 +71,7 @@ export default (sample, channel, context = audioContext, isOffline = false) => {
         noteOffset,
         noteEndTime,
         sample.url,
+        sample.synthControls,
       );
       notes[noteId] = {
         ...note,
