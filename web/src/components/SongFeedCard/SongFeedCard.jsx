@@ -177,10 +177,10 @@ SongFeedCard.propTypes = {
   username: PropTypes.string.isRequired,
   time: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
-  description: PropTypes.string.isRequired,
+  description: PropTypes.string,
   url: PropTypes.string.isRequired,
   likes: PropTypes.number.isRequired,
-  coverImage: PropTypes.string.isRequired,
+  coverImage: PropTypes.string,
   isLiked: PropTypes.bool,
   id: PropTypes.number.isRequired,
   profileImg: PropTypes.string,
@@ -190,6 +190,8 @@ SongFeedCard.defaultProps = {
   className: '',
   isLiked: false,
   profileImg: '',
+  description: '',
+  coverImage: '',
 };
 
 SongFeedCard.displayName = 'SongFeedCard';

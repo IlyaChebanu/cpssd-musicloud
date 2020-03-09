@@ -763,7 +763,7 @@ paths:
       tags:
       - "users"
       summary: "Mute/Unmute all a user's notifications"
-      description: "Changes the user's notification status (for all types of notification) between muted(0) & unmuted(1).\n\nThe status sent may only be 1 or 0."
+      description: "Changes the user's notification status (for all types of notification) between unmuted(0) & muted(1).\n\nThe status sent may only be 1 or 0."
       consumes:
       - "application/json"
       produces:
@@ -830,7 +830,7 @@ paths:
       tags:
       - "users"
       summary: "Mute/Unmute all a user's follow notifications"
-      description: "Changes the user's notification status (for 'follow' types of notification) between muted(0) & unmuted(1).\n\nThe status sent may only be 1 or 0."
+      description: "Changes the user's notification status (for 'follow' types of notification) between unmuted(0) & muted(1).\n\nThe status sent may only be 1 or 0."
       consumes:
       - "application/json"
       produces:
@@ -897,7 +897,7 @@ paths:
       tags:
       - "users"
       summary: "Mute/Unmute all a user's post notifications"
-      description: "Changes the user's notification status (for 'post' types of notification) between muted(0) & unmuted(1).\n\nThe status sent may only be 1 or 0."
+      description: "Changes the user's notification status (for 'post' types of notification) between unmuted(0) & muted(1).\n\nThe status sent may only be 1 or 0."
       consumes:
       - "application/json"
       produces:
@@ -964,7 +964,7 @@ paths:
       tags:
       - "users"
       summary: "Mute/Unmute all a user's song notifications"
-      description: "Changes the user's notification status (for 'song' types of notification) between muted(0) & unmuted(1).\n\nThe status sent may only be 1 or 0."
+      description: "Changes the user's notification status (for 'song' types of notification) between unmuted(0) & muted(1).\n\nThe status sent may only be 1 or 0."
       consumes:
       - "application/json"
       produces:
@@ -1031,7 +1031,7 @@ paths:
       tags:
       - "users"
       summary: "Mute/Unmute all a user's like notifications"
-      description: "Changes the user's notification status (for 'like' types of notification) between muted(0) & unmuted(1).\n\nThe status sent may only be 1 or 0."
+      description: "Changes the user's notification status (for 'like' types of notification) between unmuted(0) & muted(1).\n\nThe status sent may only be 1 or 0."
       consumes:
       - "application/json"
       produces:

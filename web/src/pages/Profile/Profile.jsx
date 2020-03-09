@@ -31,7 +31,22 @@ const Profile = memo((props) => {
   useEffect(() => {
     setNextSongs('');
     setNextPosts('');
+    setGotSongs([]);
+    setGotPosts([]);
   }, [setNextSongs, setNextPosts, username]);
+
+  useEffect(() => {
+    const getPosts = async () => {
+      const res = await getUserPosts(username);
+      if (res.status === 200) {
+        setGotPosts(res.data.posts);
+        if (res.data.next_page) {
+          setNextPosts(res.data.next_page);
+        }
+      }
+    };
+    getPosts();
+  }, [username]);
 
   useEffect(() => {
     const getSongs = async () => {
@@ -83,10 +98,6 @@ const Profile = memo((props) => {
     }
   }, [username]);
 
-  useEffect(() => {
-    refreshPosts();
-  }, [refreshPosts]);
-
   const ownSongCards = useMemo(() => gotSongs.map((song) => (
     <SongCard
       key={song.sid}
@@ -103,7 +114,7 @@ const Profile = memo((props) => {
 
   const ownPostCards = useMemo(() => gotPosts.map((post) => (
     <PostCard
-      key={username + post[1]}
+      key={post[2]}
       className={styles.blogCard}
       message={post[0]}
       time={post[1]}
