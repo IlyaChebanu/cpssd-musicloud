@@ -52,12 +52,6 @@ const PianoRoll = memo(({
 
   const keysRef = useRef();
   const playingNote = useRef();
-  const popFilter = useMemo(() => {
-    const popFilter = audioContext.createGain();
-    popFilter.connect(audioContext.globalGain);
-    popFilter.gain.setValueAtTime(0, 0);
-    return popFilter;
-  }, []);
   const [hoveredKey, setHoveredKey] = useState();
   const [isMouseDown, setIsMouseDown] = useState(false);
 
@@ -72,12 +66,10 @@ const PianoRoll = memo(({
   onMouseUp(() => {
     setIsMouseDown(false);
     if (playingNote.current) {
-      popFilter.gain.setValueAtTime(popFilter.gain.value, 0);
-      popFilter.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.01);
-      if (selectedSampleObject.url) {
-        playingNote.current.stop(audioContext.currentTime + 0.01);
+      if (playingNote.current.releaseAll) {
+        playingNote.current.releaseAll();
       } else {
-        playingNote.current.triggerRelease('+0.01');
+        playingNote.current.triggerRelease();
       }
     }
   });
@@ -85,27 +77,23 @@ const PianoRoll = memo(({
   useEffect(() => {
     if (isMouseDown) {
       if (playingNote.current) {
-        popFilter.gain.setValueAtTime(popFilter.gain.value, 0);
-        popFilter.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.01);
-        if (selectedSampleObject.url) {
-          playingNote.current.stop(audioContext.currentTime + 0.01);
+        if (playingNote.current.releaseAll) {
+          playingNote.current.releaseAll();
         } else {
-          playingNote.current.triggerRelease('+0.01');
+          playingNote.current.triggerRelease();
         }
       }
-      popFilter.gain.setValueAtTime(popFilter.gain.value, audioContext.currentTime + 0.01);
-      popFilter.gain.exponentialRampToValueAtTime(1, audioContext.currentTime + 0.02);
       playingNote.current = playNote(
         audioContext,
         { noteNumber: hoveredKey },
-        popFilter,
-        selectedSampleObject.url ? audioContext.currentTime + 0.01 : audioContext.currentTime,
+        audioContext.globalGain,
+        audioContext.currentTime,
         0,
         null,
         selectedSampleObject.url,
       );
     }
-  }, [hoveredKey, isMouseDown, popFilter, selectedSampleObject]);
+  }, [hoveredKey, isMouseDown, selectedSampleObject]);
 
   const { pianoKeys, pianoTracks } = useMemo(() => {
     const pianoKeys = [];
