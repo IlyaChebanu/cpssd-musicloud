@@ -1,8 +1,6 @@
 import Tone from 'tone';
-import { audioContext, bufferStore } from '../helpers/constants';
+import { bufferStore } from '../helpers/constants';
 import { sliceBuffer } from '../helpers/utils';
-
-Tone.setContext(audioContext);
 
 export default (
   context,
@@ -13,6 +11,7 @@ export default (
   endTime = null,
   url = null,
 ) => {
+  Tone.setContext(context);
   let synth;
   const frequency = 2 ** ((note.noteNumber - 49) / 12) * 440;
 

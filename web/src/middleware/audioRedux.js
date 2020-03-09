@@ -27,20 +27,29 @@ export const renderTracks = (studio) => {
   offlineAudioContext.globalGain = offlineAudioContext.createGain();
   offlineAudioContext.globalGain.connect(offlineAudioContext.destination);
 
+  const soloTrack = _.find(studio.tracks, 'solo');
   const trackChannels = {};
   studio.tracks.forEach((track) => {
-    const gain = audioContext.createGain();
-    const pan = audioContext.createStereoPanner();
+    const gain = offlineAudioContext.createGain();
+    const pan = offlineAudioContext.createStereoPanner();
+    const muterGain = offlineAudioContext.createGain();
 
     gain.gain.setValueAtTime(track.volume, 0);
     pan.pan.setValueAtTime(track.pan, 0);
+    muterGain.gain.setValueAtTime(1 * (
+      soloTrack ? soloTrack.id === track.id : !track.mute
+    ), 0);
 
-    trackChannels[track.id] = { gain, pan };
+    gain.connect(pan);
+    pan.connect(muterGain);
+    muterGain.connect(offlineAudioContext.globalGain);
+
+    trackChannels[track.id] = { gain, pan, muterGain };
   });
 
   samples.forEach((sample) => {
     const channel = trackChannels[sample.trackId];
-    scheduleSample(sample, channel, offlineAudioContext, true);
+    scheduleSample(sample, channel.gain, offlineAudioContext, true);
   });
 
   return offlineAudioContext.startRendering();

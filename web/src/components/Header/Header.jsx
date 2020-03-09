@@ -28,11 +28,8 @@ import Dropdown from '../Dropdown';
 import newIcon from '../../assets/icons/file_dropdown/new.svg';
 import openIcon from '../../assets/icons/file_dropdown/open.svg';
 import publishIcon from '../../assets/icons/file_dropdown/publish.svg';
-import saveIcon from '../../assets/icons/file_dropdown/save.svg';
 import importIcon from '../../assets/icons/file_dropdown/import.svg';
 import exportIcon from '../../assets/icons/file_dropdown/export.svg';
-import generateIcon from '../../assets/icons/file_dropdown/generate.svg';
-import exitIcon from '../../assets/icons/file_dropdown/exit.svg';
 import { renderTracks } from '../../middleware/audioRedux';
 import { forceDownload } from '../../helpers/utils';
 import {
@@ -197,20 +194,14 @@ const Header = memo((props) => {
       return false;
     }
 
-    let hasSamples = false;
-    studio.tracks.forEach((track) => {
-      if (!_.isEmpty(track.samples)) {
-        hasSamples = true;
-      }
-    });
-    if (!hasSamples) {
+    if (_.isEmpty(studio.samples)) {
       dispatch(
         showNotification({ message: 'Please add a sample first', type: 'info' }),
       );
       return false;
     }
     return true;
-  }, [dispatch, studio.tracks]);
+  }, [dispatch, studio.samples, studio.tracks]);
 
   const handlePublishSong = useCallback(async () => {
     if (songId) {
@@ -240,12 +231,9 @@ const Header = memo((props) => {
       { name: 'New', action: handleHideSongPicker, icon: newIcon },
       { name: 'Open', action: handleShowSongPicker, icon: openIcon },
       { name: 'Publish', action: handlePublishSong, icon: publishIcon },
-      { name: 'Save', icon: saveIcon, action: handleSaveState },
       { name: 'Import', icon: importIcon, action: handleSampleImport },
       { name: 'Add Synth', icon: importIcon, action: handleAddSynth },
       { name: 'Export', icon: exportIcon, action: exportAction },
-      { name: 'Generate', icon: generateIcon },
-      { name: 'Exit', icon: exitIcon },
     ],
     [
       exportAction,
@@ -253,7 +241,6 @@ const Header = memo((props) => {
       handleHideSongPicker,
       handlePublishSong,
       handleSampleImport,
-      handleSaveState,
       handleShowSongPicker,
     ],
   );
