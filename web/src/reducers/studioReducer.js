@@ -40,7 +40,6 @@ export default (
   },
   action,
 ) => {
-  // let tracks;
   switch (action.type) {
     case 'STUDIO_PLAY':
       return {
