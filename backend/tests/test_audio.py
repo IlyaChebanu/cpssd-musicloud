@@ -1464,28 +1464,29 @@ class AudioTests(unittest.TestCase):
             )
             self.assertEqual(422, res.status_code)
 
+    @mock.patch("backend.src.controllers.audio.controllers.get_song_data")
     @mock.patch('backend.src.controllers.audio.controllers.get_like_pair')
-    def test_like_success(self, mocked_likes):
+    def test_like_success(self, mocked_likes, mocked_song):
         """
         Ensure liking is successful.
         """
         mocked_likes.return_value = []
+        mocked_song.return_value = [[None, None, "A Cool Tune"]]
         test_req_data = {
             "sid": 1,
         }
-        with mock.patch("backend.src.controllers.audio.controllers.get_song_data"):
-            with mock.patch("backend.src.controllers.audio.controllers.post_like"):
-                with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-                    mock_token.return_value = MOCKED_TOKEN
-                    res = self.test_client.post(
-                        "/api/v1/audio/like",
-                        json=test_req_data,
-                        headers={'Authorization': 'Bearer ' + TEST_TOKEN},
-                        follow_redirects=True
-                    )
-                    self.assertEqual(200, res.status_code)
-                    expected_body = {"message": "Song liked"}
-                    self.assertEqual(expected_body, json.loads(res.data))
+        with mock.patch("backend.src.controllers.audio.controllers.post_like"):
+            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+                mock_token.return_value = MOCKED_TOKEN
+                res = self.test_client.post(
+                    "/api/v1/audio/like",
+                    json=test_req_data,
+                    headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                    follow_redirects=True
+                )
+                self.assertEqual(200, res.status_code)
+                expected_body = {"message": "Song liked"}
+                self.assertEqual(expected_body, json.loads(res.data))
 
     def test_like_fail_missing_access_token(self):
         """

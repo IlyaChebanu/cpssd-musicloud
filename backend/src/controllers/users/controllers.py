@@ -422,7 +422,10 @@ def post(user_data):
         dids = []
         for did in notify_post_dids(user_data.get("uid")):
             dids += did
-        message = user_data.get("username") + " just posted."
+        message = (
+            user_data.get("username") + " just posted: \""
+            + request.json.get("message") + "\""
+        )
         notification_sender(message, dids, "New Post")
     except NoResults:
         pass

@@ -335,7 +335,9 @@ def like_song(user_data):
         return {"message": str(exc)}, 422
 
     try:
-        get_song_data(request.json.get("sid"), user_data.get("uid"))
+        title = get_song_data(
+            request.json.get("sid"), user_data.get("uid")
+        )[0][2]
     except NoResults:
         return {"message": "Song does not exist!"}, 400
 
@@ -348,7 +350,10 @@ def like_song(user_data):
         dids = []
         for did in notify_like_dids(request.json.get("sid")):
             dids += did
-        message = user_data.get("username") + " just liked your song!"
+        message = (
+            user_data.get("username") + " just liked your song: \""
+            + title + "\""
+        )
         notification_sender(message, dids, "New Like")
     except NoResults:
         pass
@@ -631,10 +636,20 @@ def publish_song(user_data):
     )
 
     try:
+        title = get_song_data(
+            request.json.get("sid"), user_data.get("uid")
+        )[0][2]
+    except NoResults:
+        return {"message": "Song does not exist!"}, 400
+
+    try:
         dids = []
         for did in notify_song_dids(user_data.get("uid")):
             dids += did
-        message = user_data.get("username") + " just dropped a new song!"
+        message = (
+            user_data.get("username") + " just dropped a new song: \""
+            + title + "\""
+        )
         notification_sender(message, dids, "New Song")
     except NoResults:
         pass
