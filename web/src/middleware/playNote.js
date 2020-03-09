@@ -17,7 +17,14 @@ export default (
     return playSample(context, url, destination, startTime, offset, endTime);
   }
 
-  const synth = new Tone.Synth();
+  const synth = new Tone.Synth({
+    envelope: {
+      attack: 0.005,
+      decay: 0.1,
+      sustain: 0.3,
+      release: 1,
+    },
+  });
   const frequency = 2 ** ((note.noteNumber - 49) / 12) * 440;
 
   synth.oscillator.frequency.value = frequency;
