@@ -64,7 +64,7 @@ class StudioScreen extends React.Component {
                 type: [DocumentPicker.types.audio],
             });
             let extension = res.type.split('/').slice(-1)[0]
-            let filename = `${res.name}.${extension}`
+            let filename = `${res.name}`
             this.uploadSelectedAudio(filename, res.type, res.uri)
             console.log(
                 res.uri,
@@ -292,7 +292,7 @@ class StudioScreen extends React.Component {
                                 <Image style={styles.playImgs} source={playImg} />
                             </TouchableOpacity>
 
-                            <TouchableOpacity onPress={this.onPausePlay} style={styles.playerImgs}>
+                            <TouchableOpacity onPress={this.state.recording ? this.onStopRecord : this.onPausePlay} style={styles.playerImgs}>
                                 <Image style={styles.playImgs} source={pauseImg} />
                             </TouchableOpacity>
 
