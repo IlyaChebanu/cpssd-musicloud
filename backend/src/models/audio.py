@@ -79,7 +79,8 @@ def get_song_data(sid, uid):
         "SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=%s"
         ") as likes, ("
         "SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=%s AND "
-        "Song_Likes.uid=%s) as like_status FROM Songs WHERE sid=%s"
+        "Song_Likes.uid=%s) as like_status, description FROM Songs "
+        "WHERE sid=%s"
     )
     args = (
         sid,
@@ -185,7 +186,10 @@ def get_all_compiled_songs(start_index, songs_per_page, uid):
         "SELECT COUNT(*) FROM Song_Likes WHERE Songs.sid = Song_Likes.sid"
         ") as likes, (SELECT COUNT(*) FROM Song_Likes WHERE "
         "Song_Likes.sid=Songs.sid "
-        "AND Song_Likes.uid=%s) FROM Songs WHERE public=1 LIMIT %s, %s;"
+        "AND Song_Likes.uid=%s), description,"
+        "(SELECT profiler FROM Users WHERE Songs.uid=Users.uid) as profiler"
+        " FROM Songs WHERE public=1 "
+        "LIMIT %s, %s;"
     )
     args = (
         uid,
@@ -214,8 +218,10 @@ def get_all_compiled_songs_by_uid(uid, start_index, songs_per_page, my_uid):
         "SELECT COUNT(*) FROM Song_Likes WHERE Songs.sid = Song_Likes.sid"
         ") as likes, (SELECT COUNT(*) FROM Song_Likes WHERE "
         "Song_Likes.sid=Songs.sid "
-        "AND Song_Likes.uid=%s) FROM Songs WHERE public=1 AND uid=%s "
-        "LIMIT %s, %s;"
+        "AND Song_Likes.uid=%s), description,"
+        "(SELECT profiler FROM Users WHERE Songs.uid=Users.uid) as profiler"
+        " FROM Songs WHERE public=1 AND "
+        "uid=%s LIMIT %s, %s;"
     )
     args = (
         my_uid,
@@ -246,7 +252,10 @@ def get_all_editable_songs_by_uid(uid, start_index, songs_per_page):
         "(SELECT COUNT(*) FROM Song_Likes WHERE "
         "Songs.sid = Song_Likes.sid ) as likes, "
         "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid "
-        "AND Song_Likes.uid=%s) AS like_status FROM Songs "
+        "AND Song_Likes.uid=%s) AS like_status, description, "
+        "(SELECT time_updated FROM Song_State WHERE sid=Songs.sid ORDER BY "
+        "time_updated DESC LIMIT 0, 1) as updated"
+        " FROM Songs "
         "WHERE uid = %s UNION SELECT "
         "Songs.sid, (SELECT username FROM Users "
         "WHERE Songs.uid=Users.uid) as usernanme,"
@@ -254,9 +263,12 @@ def get_all_editable_songs_by_uid(uid, start_index, songs_per_page):
         "(SELECT COUNT(*) FROM Song_Likes WHERE "
         "Songs.sid = Song_Likes.sid) as likes, "
         "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid "
-        "AND Song_Likes.uid=%s) AS like_status FROM Songs INNER JOIN "
-        "Song_Editors ON Song_Editors.sid = Songs.sid WHERE "
-        "Song_Editors.uid = %s ORDER BY created DESC LIMIT %s, %s;"
+        "AND Song_Likes.uid=%s) AS like_status, description, "
+        "(SELECT time_updated FROM Song_State WHERE sid=Songs.sid ORDER BY "
+        "time_updated DESC LIMIT 0, 1) as updated"
+        " FROM Songs "
+        "INNER JOIN Song_Editors ON Song_Editors.sid = Songs.sid WHERE "
+        "Song_Editors.uid = %s ORDER BY updated DESC LIMIT %s, %s;"
     )
     args = (
         uid,
@@ -489,7 +501,7 @@ def get_all_liked_songs_by_uid(uid, start_index, songs_per_page, my_uid):
         "(SELECT COUNT(*) FROM Song_Likes WHERE "
         "Songs.sid = Song_Likes.sid) as likes, "
         "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid "
-        "AND Song_Likes.uid=%s) as like_status FROM Songs "
+        "AND Song_Likes.uid=%s) as like_status, description FROM Songs "
         "INNER JOIN Song_Likes ON "
         "Song_Likes.sid = Songs.sid WHERE Song_Likes.uid = %s LIMIT %s, %s;"
     )
@@ -715,9 +727,9 @@ def get_playlist_data(pid, start_index, songs_per_page, uid):
         "title, duration, created, public, url, cover, "
         "(SELECT COUNT(*) FROM Song_Likes WHERE "
         "Songs.sid = Song_Likes.sid) as likes, "
-        "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid "
-        "AND Song_Likes.uid=%s) FROM Songs "
-        "INNER JOIN Playlist_State ON "
+        "(SELECT COUNT(*) FROM Song_Likes WHERE "
+        "Song_Likes.sid=Songs.sid AND Song_Likes.uid=%s) , description FROM "
+        "Songs INNER JOIN Playlist_State ON "
         "Playlist_State.sid = Songs.sid WHERE Playlist_State.pid = %s "
         "AND Songs.public = 1 LIMIT %s, %s;"
     )
@@ -950,6 +962,28 @@ def update_song_name(title, sid):
     )
     args = (
         title,
+        sid,
+    )
+    query(sql, args)
+
+
+def update_description(sid, description):
+    """
+    Updates a song's description in the DB.
+    :param sid:
+    Int - ID of the song who's description we are changing.
+    :param description:
+    Str - New song description
+    :return:
+    None - Updated the description in the DB and returns None.
+    """
+    sql = (
+        "UPDATE Songs "
+        "SET description = %s "
+        "WHERE sid = %s"
+    )
+    args = (
+        description,
         sid,
     )
     query(sql, args)

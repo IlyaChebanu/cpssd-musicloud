@@ -16,19 +16,22 @@ const AddPost = (props) => {
     }
   }, [current, placeholder]);
 
-  const submitPost = useCallback(async () => {
+  const submitPost = useCallback(async (e) => {
+    e.preventDefault();
     await createPost(textField.current.textContent);
     textField.current.textContent = placeholder;
     onSubmit();
   }, [onSubmit, placeholder]);
 
-  const handleFocus = useCallback(() => {
+  const handleFocus = useCallback((e) => {
+    e.preventDefault();
     if (textField.current.textContent === placeholder) {
       textField.current.textContent = '';
     }
   }, [placeholder]);
 
-  const handleBlur = useCallback(() => {
+  const handleBlur = useCallback((e) => {
+    e.preventDefault();
     if (textField.current.textContent === '') {
       textField.current.textContent = placeholder;
     }

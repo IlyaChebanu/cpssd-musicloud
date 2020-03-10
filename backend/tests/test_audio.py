@@ -416,7 +416,7 @@ class AudioTests(unittest.TestCase):
         Ensure getting all compiled songs is successful without scroll tokens.
         """
         test_songs = [
-            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0]
+            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0, "a description"]
         ]
         mocked_num_songs.return_value = 2
         mocked_songs.return_value = test_songs
@@ -439,7 +439,8 @@ class AudioTests(unittest.TestCase):
                     "url": None,
                     "cover": None,
                     "likes": 8,
-                    "like_status": 0
+                    "like_status": 0,
+                    "description": "a description"
                 }
             ]
             expected_body = {
@@ -458,7 +459,7 @@ class AudioTests(unittest.TestCase):
         Ensure getting songs is successful with a next page scroll token and no username encoded.
         """
         test_song = [
-            [2, "username2", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0]
+            [2, "username2", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0, "a description"]
         ]
         mocked_songs.return_value = test_song
         test_req_data = {
@@ -488,7 +489,8 @@ class AudioTests(unittest.TestCase):
                     "url": None,
                     "cover": None,
                     "likes": 8,
-                    "like_status": 0
+                    "like_status": 0,
+                    "description": "a description"
                 }
             ]
             expected_body = {
@@ -508,7 +510,7 @@ class AudioTests(unittest.TestCase):
         Ensure getting songs is successful with a back page scroll token and no username encoded.
         """
         test_song = [
-            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0]
+            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0, "a description"]
         ]
         mocked_songs.return_value = test_song
         test_req_data = {
@@ -539,7 +541,8 @@ class AudioTests(unittest.TestCase):
                     "url": None,
                     "cover": None,
                     "likes": 8,
-                    "like_status": 0
+                    "like_status": 0,
+                    "description": "a description"
                 }
             ]
             expected_body = {
@@ -560,8 +563,8 @@ class AudioTests(unittest.TestCase):
         Ensure getting all compiled songs for a specified username is successful without scroll tokens.
         """
         test_songs = [
-            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0],
-            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0]
+            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0, "a description"],
+            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0, "a description"]
         ]
         mocked_num_songs.return_value = 2
         mocked_songs.return_value = test_songs
@@ -589,7 +592,8 @@ class AudioTests(unittest.TestCase):
                     "url": None,
                     "cover": None,
                     "likes": 8,
-                    "like_status": 0
+                    "like_status": 0,
+                    "description": "a description"
                 },
                 {
                     "sid": 2,
@@ -601,7 +605,8 @@ class AudioTests(unittest.TestCase):
                     "url": None,
                     "cover": None,
                     "likes": 8,
-                    "like_status": 0
+                    "like_status": 0,
+                    "description": "a description"
                 }
             ]
             expected_body = {
@@ -620,7 +625,7 @@ class AudioTests(unittest.TestCase):
         Ensure getting songs using a next page scroll token works with username also being defined.
         """
         test_song = [
-            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0]
+            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0, "a description"]
         ]
         mocked_songs.return_value = test_song
         test_req_data = {
@@ -651,7 +656,8 @@ class AudioTests(unittest.TestCase):
                     "url": None,
                     "cover": None,
                     "likes": 8,
-                    "like_status": 0
+                    "like_status": 0,
+                    "description": "a description"
                 }
             ]
             expected_body = {
@@ -670,7 +676,7 @@ class AudioTests(unittest.TestCase):
         Ensure getting songs using a back page scroll token works with username also being defined.
         """
         test_song = [
-            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0]
+            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0, "a description"]
         ]
         mocked_songs.return_value = test_song
         test_req_data = {
@@ -701,7 +707,8 @@ class AudioTests(unittest.TestCase):
                     "url": None,
                     "cover": None,
                     "likes": 8,
-                    "like_status": 0
+                    "like_status": 0,
+                    "description": "a description"
                 }
             ]
             expected_body = {
@@ -818,7 +825,7 @@ class AudioTests(unittest.TestCase):
         """
         Ensure user's can get a song's info successfully.
         """
-        test_song = [[1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0]]
+        test_song = [[1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0, "a description"]]
         mocked_song.return_value = test_song
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
             mock_token.return_value = ALT_MOCKED_TOKEN
@@ -832,7 +839,7 @@ class AudioTests(unittest.TestCase):
                 follow_redirects=True
             )
             self.assertEqual(200, res.status_code)
-            expected_body = {'song': {'sid': 1, 'username': 'username', 'like_status': 0, 'title': 'A test song', 'duration': 0, 'created': 'Wed, 13 Nov 2019 17:07:39 GMT', 'public': 1, 'url': None, 'cover': None, 'likes': 8}}
+            expected_body = {'song': {'sid': 1, 'username': 'username', 'like_status': 0, 'title': 'A test song', 'duration': 0, 'created': 'Wed, 13 Nov 2019 17:07:39 GMT', 'public': 1, 'url': None, 'cover': None, 'likes': 8, 'description': 'a description'}}
             self.assertEqual(expected_body, json.loads(res.data))
 
     def test_get_song_data_fail_missing_sid(self):
@@ -937,8 +944,8 @@ class AudioTests(unittest.TestCase):
         Ensure getting all editable songs for the current user is successful without scroll tokens.
         """
         test_songs = [
-            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0],
-            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0]
+            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0, "a description"],
+            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0, "a description"]
         ]
         mocked_num_songs.return_value = 2
         mocked_songs.return_value = test_songs
@@ -961,7 +968,8 @@ class AudioTests(unittest.TestCase):
                     "url": None,
                     "cover": None,
                     "likes": 8,
-                    "like_status": 0
+                    "like_status": 0,
+                    "description": "a description"
                 },
                 {
                     "sid": 2,
@@ -973,7 +981,8 @@ class AudioTests(unittest.TestCase):
                     "url": None,
                     "cover": None,
                     "likes": 8,
-                    "like_status": 0
+                    "like_status": 0,
+                    "description": "a description"
                 }
             ]
             expected_body = {
@@ -992,7 +1001,7 @@ class AudioTests(unittest.TestCase):
         Ensure getting editable songs for the current user is successful with a next page scroll token.
         """
         test_song = [
-            [2, "username2", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0]
+            [2, "username2", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0, "a description"]
         ]
         mocked_songs.return_value = test_song
         test_req_data = {
@@ -1022,7 +1031,8 @@ class AudioTests(unittest.TestCase):
                     "url": None,
                     "cover": None,
                     "likes": 8,
-                    "like_status": 0
+                    "like_status": 0,
+                    "description": "a description"
                 }
             ]
             expected_body = {
@@ -1041,7 +1051,7 @@ class AudioTests(unittest.TestCase):
         Ensure getting editable songs for the current user is successful with a back page scroll token.
         """
         test_song = [
-            [1, "username2", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0]
+            [1, "username2", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0, "a description"]
         ]
         mocked_songs.return_value = test_song
         test_req_data = {
@@ -1071,7 +1081,8 @@ class AudioTests(unittest.TestCase):
                     "url": None,
                     "cover": None,
                     "likes": 8,
-                    "like_status": 0
+                    "like_status": 0,
+                    "description": "a description"
                 }
             ]
             expected_body = {
@@ -1192,8 +1203,8 @@ class AudioTests(unittest.TestCase):
         Ensure getting all liked songs for a specified username is successful without scroll tokens.
         """
         test_songs = [
-            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0],
-            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0]
+            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0, "a description"],
+            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0, "a description"]
         ]
         mocked_num_songs.return_value = 2
         mocked_songs.return_value = test_songs
@@ -1221,7 +1232,8 @@ class AudioTests(unittest.TestCase):
                     "url": None,
                     "cover": None,
                     "likes": 8,
-                    "like_status": 0
+                    "like_status": 0,
+                    "description": "a description"
                 },
                 {
                     "sid": 2,
@@ -1233,7 +1245,8 @@ class AudioTests(unittest.TestCase):
                     "url": None,
                     "cover": None,
                     "likes": 8,
-                    "like_status": 0
+                    "like_status": 0,
+                    "description": "a description"
                 }
             ]
             expected_body = {
@@ -1253,7 +1266,7 @@ class AudioTests(unittest.TestCase):
         Ensure getting liked songs using a next page scroll token works with username also being defined.
         """
         test_song = [
-            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0]
+            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0, "a description"]
         ]
         mocked_songs.return_value = test_song
         mocked_user.return_value = [[1]]
@@ -1285,7 +1298,8 @@ class AudioTests(unittest.TestCase):
                     "url": None,
                     "cover": None,
                     "likes": 8,
-                    "like_status": 0
+                    "like_status": 0,
+                    "description": "a description"
                 }
             ]
             expected_body = {
@@ -1305,7 +1319,7 @@ class AudioTests(unittest.TestCase):
         Ensure getting liked songs using a back page scroll token works with username also being defined.
         """
         test_song = [
-            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0]
+            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0, "a description"]
         ]
         mocked_user.return_value = [[1]]
         mocked_songs.return_value = test_song
@@ -1337,7 +1351,8 @@ class AudioTests(unittest.TestCase):
                     "url": None,
                     "cover": None,
                     "likes": 8,
-                    "like_status": 0
+                    "like_status": 0,
+                    "description": "a description"
                 }
             ]
             expected_body = {
@@ -1449,28 +1464,29 @@ class AudioTests(unittest.TestCase):
             )
             self.assertEqual(422, res.status_code)
 
+    @mock.patch("backend.src.controllers.audio.controllers.get_song_data")
     @mock.patch('backend.src.controllers.audio.controllers.get_like_pair')
-    def test_like_success(self, mocked_likes):
+    def test_like_success(self, mocked_likes, mocked_song):
         """
         Ensure liking is successful.
         """
         mocked_likes.return_value = []
+        mocked_song.return_value = [[None, None, "A Cool Tune"]]
         test_req_data = {
             "sid": 1,
         }
-        with mock.patch("backend.src.controllers.audio.controllers.get_song_data"):
-            with mock.patch("backend.src.controllers.audio.controllers.post_like"):
-                with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-                    mock_token.return_value = MOCKED_TOKEN
-                    res = self.test_client.post(
-                        "/api/v1/audio/like",
-                        json=test_req_data,
-                        headers={'Authorization': 'Bearer ' + TEST_TOKEN},
-                        follow_redirects=True
-                    )
-                    self.assertEqual(200, res.status_code)
-                    expected_body = {"message": "Song liked"}
-                    self.assertEqual(expected_body, json.loads(res.data))
+        with mock.patch("backend.src.controllers.audio.controllers.post_like"):
+            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+                mock_token.return_value = MOCKED_TOKEN
+                res = self.test_client.post(
+                    "/api/v1/audio/like",
+                    json=test_req_data,
+                    headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                    follow_redirects=True
+                )
+                self.assertEqual(200, res.status_code)
+                expected_body = {"message": "Song liked"}
+                self.assertEqual(expected_body, json.loads(res.data))
 
     def test_like_fail_missing_access_token(self):
         """
@@ -3014,8 +3030,8 @@ class AudioTests(unittest.TestCase):
         tokens.
         """
         test_songs = [
-            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0],
-            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0]
+            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0, "a description"],
+            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0, "a description"]
         ]
         mocked_num_songs.return_value = 2
         mocked_songs.return_value = test_songs
@@ -3043,7 +3059,8 @@ class AudioTests(unittest.TestCase):
                     "url": None,
                     "cover": None,
                     "likes": 8,
-                    "like_status": 0
+                    "like_status": 0,
+                    "description": "a description"
                 },
                 {
                     "sid": 2,
@@ -3055,7 +3072,8 @@ class AudioTests(unittest.TestCase):
                     "url": None,
                     "cover": None,
                     "likes": 8,
-                    "like_status": 0
+                    "like_status": 0,
+                    "description": "a description"
                 }
             ]
             expected_body = {
@@ -3074,7 +3092,7 @@ class AudioTests(unittest.TestCase):
         Ensure getting all the songs in a playlist is successful with a next page scroll token.
         """
         test_songs = [
-            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0]
+            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0, "a description"]
         ]
         mocked_songs.return_value = test_songs
         test_req_data = {
@@ -3104,7 +3122,8 @@ class AudioTests(unittest.TestCase):
                     "url": None,
                     "cover": None,
                     "likes": 8,
-                    "like_status": 0
+                    "like_status": 0,
+                    "description": "a description"
                 }
             ]
             expected_body = {
@@ -3123,7 +3142,7 @@ class AudioTests(unittest.TestCase):
         Ensure getting all the songs in a playlist is successful with a back page scroll token.
         """
         test_songs = [
-            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0]
+            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0, "a description"]
         ]
         mocked_songs.return_value = test_songs
         test_req_data = {
@@ -3153,7 +3172,8 @@ class AudioTests(unittest.TestCase):
                     "url": None,
                     "cover": None,
                     "likes": 8,
-                    "like_status": 0
+                    "like_status": 0,
+                    "description": "a description"
                 }
             ]
             expected_body = {
@@ -3963,3 +3983,173 @@ class AudioTests(unittest.TestCase):
                 follow_redirects=True
             )
             self.assertEqual(401, res.status_code)
+
+    @mock.patch("backend.src.controllers.audio.controllers.permitted_to_edit")
+    def test_patch_description_success(self, mocked_editor_check):
+        """
+        Ensure editing a description for a song works.
+        """
+        test_req_data = {
+            "description": "a description",
+            "sid": 1,
+        }
+        mocked_editor_check.return_value = True
+        with mock.patch('backend.src.controllers.audio.controllers.update_description'):
+            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+                mock_token.return_value = ALT_MOCKED_TOKEN
+                res = self.test_client.patch(
+                    "/api/v1/audio/description",
+                    json=test_req_data,
+                    headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                    follow_redirects=True
+                )
+                self.assertEqual(200, res.status_code)
+                expected_body = {'message': 'Description updated.'}
+                self.assertEqual(expected_body, json.loads(res.data))
+
+    def test_patch_description_fail_missing_access_token(self):
+        """
+        Ensure patching a description for a song fails if no access_token is sent.
+        """
+        res = self.test_client.patch(
+            "/api/v1/audio/description",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_patch_description_fail_access_token_expired(self):
+        """
+        Ensure patching the description for a song fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
+            res = self.test_client.patch(
+                "/api/v1/audio/description",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_patch_description_fail_bad_access_token_signature(self):
+        """
+        Ensure patching the description for a song fails if the access_token signature does not match
+        the one configured on the server.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
+            res = self.test_client.patch(
+                "/api/v1/audio/description",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_patch_description_fail_unknown_access_token_issue(self):
+        """
+        Ensure patching the description for a song fails if some unknown error relating to the access_token
+        occurs.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
+            res = self.test_client.patch(
+                "/api/v1/audio/description",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_patch_description_fail_missing_description(self):
+        """
+        Ensure patching the description for a song fails if the user doesn't send a description.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = ALT_MOCKED_TOKEN
+            test_req_data = {
+                "sid": 1,
+            }
+            res = self.test_client.patch(
+                "/api/v1/audio/description",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+            test_req_data = {
+                "description": "",
+                "sid": 1,
+            }
+            res = self.test_client.patch(
+                "/api/v1/audio/description",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    def test_patch_description_fail_missing_sid(self):
+        """
+        Ensure patching the description for a song fails if the user doesn't send a sid.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = ALT_MOCKED_TOKEN
+            test_req_data = {
+                "description": "a description"
+            }
+            res = self.test_client.patch(
+                "/api/v1/audio/description",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+            test_req_data = {
+                "description": "a description",
+                "sid": None
+            }
+            res = self.test_client.patch(
+                "/api/v1/audio/description",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    def test_patch_description_fail_bad_sid(self):
+        """
+        Ensure patching the description for a song fails if the user doesn't send a valid sid.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = ALT_MOCKED_TOKEN
+            test_req_data = {
+                "sid": -1,
+                "description": "a description"
+            }
+            res = self.test_client.patch(
+                "/api/v1/audio/description",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    @mock.patch("backend.src.controllers.audio.controllers.permitted_to_edit")
+    def test_patch_description_fail_not_permitted_to_edit(self, mocked_editor_check):
+        """
+        Ensure patching the description for a song fails if you don't have permission to edit the song.
+        """
+        test_req_data = {
+            "sid": 1,
+            "description": "a description"
+        }
+        mocked_editor_check.return_value = False
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = MOCKED_TOKEN
+            res = self.test_client.patch(
+                "/api/v1/audio/description",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+            expected_body = {"message": "You can't update that song!"}
+            self.assertEqual(expected_body, json.loads(res.data))

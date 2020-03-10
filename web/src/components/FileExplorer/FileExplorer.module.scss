@@ -1,0 +1,70 @@
+.explorer {
+  border-radius: 5px;
+  width: 20%;
+  height: calc(100vh - 140px);
+  position: absolute;
+  background-color: #414448;
+  top: 80px;
+  right: 0;
+  z-index: 13;
+  border-radius: 5px 0px 0px 5px;
+  overflow-y: scroll;
+
+  ul {
+    border-radius: 5px 0px 0px 5px;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    z-index: 13;
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version */
+  }
+
+  img {
+    width: 20px;
+    height: 20px;
+    padding: 0 10px 0 0;
+    display: flex;
+  }
+
+  li {
+    border-radius: 5px 0px 0px 5px;
+    padding: 10px;
+    flex-direction: row;
+    color: #fff;
+    text-decoration: none;
+    display: flex;
+    text-align: left;
+    p {
+      font-size: 18px;
+      margin: 0;
+      white-space: nowrap;
+    }
+  }
+
+  .child {
+    width: calc(100%-20px);
+  }
+
+  li:last-child {
+    border-bottom: none;
+  }
+  li:hover {
+    box-shadow: 0px 2px 2px 0px rgba(0, 0, 0, 0.1);
+    background-color: #5f6065;
+    cursor: pointer;
+    color: white;
+  }
+
+  .button {
+    cursor: pointer;
+    height: 18px;
+    border-radius: 5px;
+
+    color: white;
+  }
+}

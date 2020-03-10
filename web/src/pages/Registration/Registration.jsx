@@ -58,7 +58,7 @@ const Registration = memo((props) => {
         if (res.status === 200) {
           history.push('/login');
         } else if (res.status === 409) {
-          setErrorText('User already exists');
+          setErrorText('Username or email address already taken!');
         } else {
           setErrorText('Unknown error has occurred');
           console.error(res);

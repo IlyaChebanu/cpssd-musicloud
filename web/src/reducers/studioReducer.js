@@ -1,12 +1,16 @@
 /* eslint-disable no-param-reassign */
+
+import _ from 'lodash';
+
 export default (
   state = {
+    ppq: 1,
     loop: {
       start: 1,
       stop: 17,
     },
-    songId: null,
     songName: 'New Song',
+    songDescription: '',
     gridSize: 1,
     gridWidth: 1,
     gridSnapEnabled: true,
@@ -21,15 +25,21 @@ export default (
     volume: 1,
     sampleLoading: false,
     tracks: [],
+    samples: {},
+    channels: [],
     selectedTrack: 0,
-    selectedSample: -1,
+    selectedSample: '',
     clipboard: {},
     title: 'Untitled',
     songPickerHidden: false,
+    fileExplorerHidden: true,
+    sampleEffectsHidden: true,
+    publishFormHidden: true,
+    songImageUrl: null,
+    showPianoRoll: false,
   },
   action,
 ) => {
-  let tracks;
   switch (action.type) {
     case 'STUDIO_PLAY':
       return {
@@ -66,34 +76,32 @@ export default (
         ...state,
         tempo: action.tempo,
       };
-    case 'SET_TRACKS':
+    case 'SET_COMPLETE_TRACKS_STATE':
       return {
         ...state,
         tracks: action.tracks,
       };
-    case 'SET_TRACK':
-      tracks = [...state.tracks];
-      tracks[action.index] = action.track;
+    case 'SET_COMPLETE_SAMPLES_STATE':
+      return {
+        ...state,
+        samples: action.samples,
+      };
+    case 'SET_TRACK': {
+      const tracks = [...state.tracks];
+      tracks[action.index] = { ...action.track };
       return {
         ...state,
         tracks,
       };
-    case 'SET_SAMPLE_TIME':
+    }
+    case 'DELETE_TRACK': {
+      let tracks = [...state.tracks];
+      tracks = tracks.filter((track) => track !== tracks[action.index]);
       return {
         ...state,
-        tracks: state.tracks.map((track) => {
-          track.samples = track.samples.map((sample) => {
-            if (sample.id === action.id) {
-              return {
-                ...sample,
-                time: action.time,
-              };
-            }
-            return sample;
-          });
-          return track;
-        }),
+        tracks,
       };
+    }
     case 'SET_SAMPLE_LOADING':
       return {
         ...state,
@@ -169,16 +177,298 @@ export default (
         ...state,
         songPickerHidden: false,
       };
+    case 'SAMPLE_EFFECTS_HIDE':
+      return {
+        ...state,
+        sampleEffectsHidden: true,
+      };
+    case 'SAMPLE_EFFECTS_SHOW':
+      return {
+        ...state,
+        sampleEffectsHidden: false,
+      };
+    case 'PUBLISH_FORM_HIDE':
+      return {
+        ...state,
+        publishFormHidden: true,
+      };
+    case 'PUBLISH_FORM_SHOW':
+      return {
+        ...state,
+        publishFormHidden: false,
+      };
+    case 'FILE_EXPLORER_HIDE':
+      return {
+        ...state,
+        fileExplorerHidden: true,
+      };
+    case 'FILE_EXPLORER_SHOW':
+      return {
+        ...state,
+        fileExplorerHidden: false,
+      };
     case 'SET_SONG_NAME':
       return {
         ...state,
         songName: action.songName,
       };
-    case 'SET_SONG_ID':
+    case 'SET_SONG_DESCRIPTION':
       return {
         ...state,
-        songId: action.songId,
+        songDescription: action.description,
       };
+    case 'SET_SAMPLE_FADE':
+      return {
+        ...state,
+        tracks: state.tracks.map((track) => {
+          track.samples = track.samples.map((sample) => {
+            if (sample.id === action.id) {
+              return {
+                ...sample,
+                fade: action.fade,
+              };
+            }
+            return sample;
+          });
+          return track;
+        }),
+      };
+    case 'SET_SAMPLE_REVERB':
+      return {
+        ...state,
+        tracks: state.tracks.map((track) => {
+          track.samples = track.samples.map((sample) => {
+            if (sample.id === action.id) {
+              return {
+                ...sample,
+                reverb: action.reverb,
+              };
+            }
+            return sample;
+          });
+          return track;
+        }),
+      };
+    case 'SET_SONG_IMAGE_URL':
+      return {
+        ...state,
+        songImageUrl: action.songImageUrl,
+      };
+    case 'SET_SHOW_PIANO_ROLL':
+      return {
+        ...state,
+        showPianoRoll: action.bool,
+      };
+    case 'ADD_TRACK':
+      return {
+        ...state,
+        tracks: [...state.tracks, action.track],
+      };
+    case 'REMOVE_TRACK':
+      return {
+        ...state,
+        tracks: state.tracks.filter((t) => t.id !== action.trackId),
+      };
+    case 'SET_TRACK_VOLUME':
+      return {
+        ...state,
+        tracks: state.tracks.map((t) => (
+          t.id === action.trackId ? { ...t, volume: action.value } : t
+        )),
+      };
+    case 'SET_TRACK_PAN':
+      return {
+        ...state,
+        tracks: state.tracks.map((t) => (
+          t.id === action.trackId ? { ...t, pan: action.value } : t
+        )),
+      };
+    case 'SET_TRACK_MUTE':
+      return {
+        ...state,
+        tracks: state.tracks.map((t) => (
+          t.id === action.trackId ? { ...t, mute: t.solo ? t.mute : action.value } : t
+        )),
+      };
+    case 'SET_TRACK_SOLO':
+      return {
+        ...state,
+        tracks: state.tracks.map((t) => {
+          if (t.id === action.trackId) {
+            return { ...t, solo: action.value };
+          }
+          return t.solo ? { ...t, solo: false } : t;
+        }),
+      };
+    case 'SET_TRACK_NAME':
+      return {
+        ...state,
+        tracks: state.tracks.map((t) => (
+          t.id === action.trackId ? { ...t, name: action.value } : t
+        )),
+      };
+    case 'ADD_SAMPLE':
+      return {
+        ...state,
+        samples: { ...state.samples, [action.sampleId]: action.sample },
+      };
+    case 'REMOVE_SAMPLE':
+      return {
+        ...state,
+        samples: _.omit(state.samples, action.sampleId),
+      };
+    case 'SET_SAMPLE_BUFFER_LOADING': {
+      const samples = { ...state.samples };
+      samples[action.sampleId] = { ...samples[action.sampleId], bufferLoading: action.value };
+      return {
+        ...state,
+        samples,
+      };
+    }
+    case 'SET_SAMPLE_TRACK_ID': {
+      const samples = { ...state.samples };
+      samples[action.sampleId] = { ...samples[action.sampleId], trackId: action.value };
+      return {
+        ...state,
+        samples,
+      };
+    }
+    case 'SET_SAMPLE_START_TIME': {
+      const samples = { ...state.samples };
+      samples[action.sampleId] = { ...samples[action.sampleId], time: action.value };
+      return {
+        ...state,
+        samples,
+      };
+    }
+    case 'SET_SAMPLE_FADE_IN': {
+      const samples = { ...state.samples };
+      samples[action.sampleId] = {
+        ...samples[action.sampleId],
+        fade: { ...samples[action.sampleId].fade, fadeIn: action.value },
+      };
+      return {
+        ...state,
+        samples,
+      };
+    }
+    case 'SET_SAMPLE_FADE_OUT': {
+      const samples = { ...state.samples };
+      samples[action.sampleId] = {
+        ...samples[action.sampleId],
+        fade: { ...samples[action.sampleId].fade, fadeOut: action.value },
+      };
+      return {
+        ...state,
+        samples,
+      };
+    }
+    case 'SET_SAMPLE_NAME': {
+      const samples = { ...state.samples };
+      samples[action.sampleId] = { ...samples[action.sampleId], name: action.value };
+      return {
+        ...state,
+        samples,
+      };
+    }
+    case 'SET_SAMPLE_TYPE': {
+      const samples = { ...state.samples };
+      samples[action.sampleId] = { ...samples[action.sampleId], type: action.value };
+      return {
+        ...state,
+        samples,
+      };
+    }
+    case 'SET_SAMPLE_DURATION': {
+      const samples = { ...state.samples };
+      samples[action.sampleId] = { ...samples[action.sampleId], duration: action.value };
+      return {
+        ...state,
+        samples,
+      };
+    }
+    case 'ADD_PATTERN_NOTE': {
+      const samples = { ...state.samples };
+      samples[action.sampleId] = {
+        ...samples[action.sampleId],
+        notes: { ...samples[action.sampleId].notes, [action.noteId]: action.note },
+      };
+      return {
+        ...state,
+        samples,
+      };
+    }
+    case 'REMOVE_PATTERN_NOTE': {
+      const samples = { ...state.samples };
+      samples[action.sampleId] = {
+        ...samples[action.sampleId],
+        notes: _.omit(samples[action.sampleId].notes, action.noteId),
+      };
+      return {
+        ...state,
+        samples,
+      };
+    }
+    case 'SET_PATTERN_NOTE_TICK': {
+      const samples = { ...state.samples };
+      const { notes } = samples[action.sampleId];
+      samples[action.sampleId] = {
+        ...samples[action.sampleId],
+        notes: {
+          ...notes,
+          [action.noteId]: { ...notes[action.noteId], tick: action.value },
+        },
+      };
+      return {
+        ...state,
+        samples,
+      };
+    }
+    case 'SET_PATTERN_NOTE_NUMBER': {
+      const samples = { ...state.samples };
+      const { notes } = samples[action.sampleId];
+      samples[action.sampleId] = {
+        ...samples[action.sampleId],
+        notes: {
+          ...notes,
+          [action.noteId]: { ...notes[action.noteId], noteNumber: action.value },
+        },
+      };
+      return {
+        ...state,
+        samples,
+      };
+    }
+    case 'SET_PATTERN_NOTE_VELOCITY': {
+      const samples = { ...state.samples };
+      const { notes } = samples[action.sampleId];
+      samples[action.sampleId] = {
+        ...samples[action.sampleId],
+        notes: {
+          ...notes,
+          [action.noteId]: { ...notes[action.noteId], velocity: action.value },
+        },
+      };
+      return {
+        ...state,
+        samples,
+      };
+    }
+    case 'SET_PATTERN_NOTE_DURATION': {
+      const samples = { ...state.samples };
+      const { notes } = samples[action.sampleId];
+      samples[action.sampleId] = {
+        ...samples[action.sampleId],
+        notes: {
+          ...notes,
+          [action.noteId]: { ...notes[action.noteId], duration: action.value },
+        },
+      };
+      return {
+        ...state,
+        samples,
+      };
+    }
     default:
       return state;
   }
