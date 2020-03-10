@@ -76,7 +76,7 @@ const File = memo((props) => {
 
   const onInputBlur = async (e, key) => {
     if (key === 13) {
-      uploadToS3(oldName.current, newName);
+      // uploadToS3(oldName.current, newName);
       oldName.current = newName;
       setNewName(e.target.value);
       e.target.blur();
