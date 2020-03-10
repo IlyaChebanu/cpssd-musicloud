@@ -9,7 +9,8 @@ import { ReactComponent as Pause } from '../../assets/icons/pause-circle-light.s
 import { ReactComponent as Back } from '../../assets/icons/go-back.svg';
 import { ReactComponent as Forward } from '../../assets/icons/go-forward.svg';
 import { ReactComponent as ToStart } from '../../assets/icons/to-start.svg';
-import { ReactComponent as FileExplorerIcon } from '../../assets/icons/file-explorer.svg';
+import { ReactComponent as FileExplorerClosed } from '../../assets/icons/file-explorer.svg';
+import { ReactComponent as FileExplorerOpened } from '../../assets/icons/folder-24px.svg';
 import Slider from '../Slider/Slider';
 import {
   setCurrentBeat, stop, pause, play,
@@ -123,14 +124,24 @@ const PlaybackControls = memo((props) => {
           <p>{timeString}</p>
         </span>
 
+        { fileExplorerHidden
+          ? (
+            <FileExplorerClosed
+              id="explorer"
+              className={styles.selectedIcon}
 
-        <FileExplorerIcon
-          id="explorer"
-          className={
-              fileExplorerHidden ? styles.notSelectedIcon : styles.selectedIcon
-            }
-          onClick={fileExplorerHidden ? showExplorer : hideExplorer}
-        />
+              onClick={fileExplorerHidden ? showExplorer : hideExplorer}
+            />
+          )
+          : (
+            <FileExplorerOpened
+
+              className={styles.selectedIcon}
+              style={{ height: '60px' }}
+              id="explorer"
+              onClick={fileExplorerHidden ? showExplorer : hideExplorer}
+            />
+          )}
 
       </div>
     </GlobalHotKeys>

@@ -1,0 +1,67 @@
+li {
+    transition-property: all;
+    transition: max-width 0.2s;
+    border-radius: 5px 0px 0px 5px;
+    padding: 5px 10px 5px 10px;
+    margin: 0px 0px 8px 0px;
+    flex-direction: row;
+    color: #fff;
+    text-decoration: none;
+    display: flex;
+    text-align: left;
+    p {
+      font-size: 18px;
+      margin: 0;
+      white-space: nowrap;
+    }
+    input {
+      margin: 0;
+      color: white;
+      font-size: 18px;
+      background: none;
+      border: none;
+      width: 100%;
+
+      &:focus {
+        outline: none;
+      }
+    }
+  }
+
+  .selected {    
+      box-shadow: 0px 2px 2px 0px rgba(0, 0, 0, 0.1);
+      background-color: #727272;
+      cursor: pointer;
+      color: white;
+      fill: white;
+  }
+
+  .expanded {
+    box-shadow: 0px 2px 2px 0px rgba(0, 0, 0, 0.1);
+    background-color: #5f6065;
+    cursor: pointer;
+    color: white;
+  }
+
+  .deleteFolder {
+      width: 24px;
+      height: 24px;
+      transition: fill 200ms;
+      fill: #3A3A3A;
+      &:hover {
+        transition: fill 200ms;
+        fill: white;
+      }
+  }
+  .newFolder {
+    
+    height: 16px;
+    text-align: center;
+    transition: fill 200ms;
+    
+    fill: #3A3A3A;
+    &:hover {
+      transition: fill 200ms;
+      fill: white;
+    }
+  }

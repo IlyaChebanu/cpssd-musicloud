@@ -9,6 +9,8 @@ export default (
       start: 1,
       stop: 17,
     },
+    selectedFile: '',
+    selectedFolder: '',
     songName: 'New Song',
     songDescription: '',
     gridSize: 1,
@@ -206,6 +208,16 @@ export default (
       return {
         ...state,
         fileExplorerHidden: false,
+      };
+    case 'SET_SELECTED_FILE':
+      return {
+        ...state,
+        selectedFile: action.selectedFile,
+      };
+    case 'SET_SELECTED_FOLDER':
+      return {
+        ...state,
+        selectedFolder: action.selectedFolder,
       };
     case 'SET_SONG_NAME':
       return {
