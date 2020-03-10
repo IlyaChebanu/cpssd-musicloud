@@ -19,23 +19,27 @@ export default class FollowingComponent extends React.Component {
         this.getFollowing()
     }
 
-    getFollowing() {
-        getFollowers(this.props.username, this.props.accessToken, 20, this.state.nextPage).then(response => {
+    getFollowing(reload) {
+        let nextPage = reload ? this.state.nextPage : ''
+        getFollowers(this.props.username, this.props.accessToken, 20, nextPage).then(response => {
             let followersData = response.data.followers
             let obj = {}
             for (var i = 0; i < followersData.length; i++) {
                 obj[followersData[i].username] = followersData[i].follow_back
             }
-
-            let joinedObj = { ...this.state.followingPairs, ...obj}
-            var joined = this.state.followerData.concat(followersData)
-            this.setState({ followerData: joined, nextPage: response.data.next_page, followingPairs: joinedObj })
+            if (reload) {
+                let joinedObj = { ...this.state.followingPairs, ...obj}
+                var joined = this.state.followerData.concat(followersData)
+                this.setState({ followerData: joined, nextPage: response.data.next_page, followingPairs: joinedObj })
+            } else {
+                this.setState({ followerData: followersData, nextPage: response.data.next_page, followingPairs: obj })
+            }
         })
     }
 
     _handleLoadMore() {
         if (this.state.nextPage !== null){
-          this.getFollowing()
+          this.getFollowing(true)
         }
     }
 

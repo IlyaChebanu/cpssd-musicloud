@@ -22,11 +22,10 @@ export default class UserProfilePosts extends React.Component {
   }
 
   getPosts() {
-    getUserPosts(this.props.username, this.props.accessToken, this.state.nextPage, 10).then(response => {
+    getUserPosts(this.props.username, this.props.accessToken, '', 10).then(response => {
       if (response.status === 200) {
-        var joined = this.state.posts.concat(response.data.posts)
         this.setState({
-          posts: joined,
+          posts: response.data.posts,
           nextPage: response.data.next_page
         })
       }
@@ -90,7 +89,15 @@ export default class UserProfilePosts extends React.Component {
 
   _handleLoadMore() {
     if (this.state.nextPage !== null){
-      this.getPosts()
+      getUserPosts(this.props.username, this.props.accessToken, this.state.nextPage, 10).then(response => {
+        if (response.status === 200) {
+          var joined = this.state.posts.concat(response.data.posts)
+          this.setState({
+            posts: joined,
+            nextPage: response.data.next_page
+          })
+        }
+      })
     }
   }
 

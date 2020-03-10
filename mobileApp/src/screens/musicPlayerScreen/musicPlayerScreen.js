@@ -44,17 +44,21 @@ class MusicPlayerScreen extends React.Component {
     }
 
     getPlaylist() {
-        getPlaylist(this.props.token, 15, this.state.nextPage).then(response => {
+        getPlaylist(this.props.token, 15, '').then(response => {
             if (response.status === 200) {
-                var joined = this.state.playlistsData.concat(response.data.playlists)
-                this.setState({ playlistsData: joined, nextPage: response.data.next_page })
+                this.setState({ playlistsData: response.data.playlists, nextPage: response.data.next_page })
             }
         })
     }
 
     _handleLoadMore() {
         if (this.state.nextPage !== null){
-          this.getPlaylist()
+            getPlaylist(this.props.token, 15, this.state.nextPage).then(response => {
+                if (response.status === 200) {
+                    var joined = this.state.playlistsData.concat(response.data.playlists)
+                    this.setState({ playlistsData: joined, nextPage: response.data.next_page })
+                }
+            })
         }
       }
 

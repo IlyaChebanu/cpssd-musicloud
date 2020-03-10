@@ -10,7 +10,7 @@ import { SafeAreaView } from "react-navigation";
 import UserProfileSongs from "../../components/profileSongs/userProfileSongs";
 import UserProfilePosts from "../../components/profilePosts/userProfilePosts";
 import { animateTimingNative, animateTimingPromiseNative } from "../../utils/animate";
-import { getLikedSongs } from "../../api/audioAPI";
+import { getLikedSongs, postLikeSong, postUnlikeSong } from "../../api/audioAPI";
 import UserFollowingComponent from "../../components/followingComponent/userfollowingComponent";
 import UserFollowerComponent from "../../components/followerComponent/userfollowerComponent";
 
@@ -58,10 +58,9 @@ class UserProfileScreen extends React.Component {
   }
 
   getLikedSongs() {
-    getLikedSongs(this.props.token, this.props.otherUserData.username, 10, this.state.nextPage).then(response => {
+    getLikedSongs(this.props.token, this.props.otherUserData.username, 10, '').then(response => {
       if (response.status === 200) {
-        var joined = this.state.likedSongsData.concat(response.data.songs)
-        this.setState({ likedSongsData: joined, nextPage: response.data.next_page })
+        this.setState({ likedSongsData: response.data.songs, nextPage: response.data.next_page })
       }
     })
   }
@@ -269,6 +268,24 @@ class UserProfileScreen extends React.Component {
     )
   }
 
+  handleLikeClick(item, index) {
+    if (item.like_status === 0) {
+      postLikeSong(this.props.token, item.sid).then(response => {
+        let array = Object.assign({}, this.state.likedSongsData);
+        array[index].like_status = 1
+        array[index].likes++
+        this.setState({ array });
+      })
+    } else {
+      postUnlikeSong(this.props.token, item.sid).then(response => {
+        let array = Object.assign({}, this.state.likedSongsData);
+        array[index].like_status = 0
+        array[index].likes--
+        this.setState({ array });
+      })
+    }
+  }
+
   renderLikedSong({ item, index }) {
     let songName = item.title
     let authorName = item.username
@@ -286,20 +303,27 @@ class UserProfileScreen extends React.Component {
         <View style={styles.songDetailsContainer}>
           <Text style={styles.songNameText}>{songName}</Text>
           <Text style={styles.authorNameText}>{authorName}</Text>
-          {likedSong ? <View style={styles.likeContainer}>
-            <Text style={styles.likedText}>{songLikes}</Text><Image style={styles.likeImg} source={likedImg} />
-          </View> :
-            <View style={styles.likeContainer}>
-              <Text style={styles.likes}>{songLikes}</Text><Image style={styles.likeImg} source={likeImg} />
-            </View>}
+          <TouchableOpacity onPress={() => this.handleLikeClick(item, index)}>
+            {likedSong ? <View style={styles.likeContainer}>
+              <Text style={styles.likedText}>{songLikes}</Text><Image style={styles.likeImg} source={likedImg} />
+            </View> :
+              <View style={styles.likeContainer}>
+                <Text style={styles.likes}>{songLikes}</Text><Image style={styles.likeImg} source={likeImg} />
+              </View>}
+          </TouchableOpacity>
         </View>
       </TouchableOpacity>
     )
   }
 
   _handleLoadMore() {
-    if (this.state.nextPage !== null){
-      this.getLikedSongs()
+    if (this.state.nextPage !== null) {
+      getLikedSongs(this.props.token, this.props.otherUserData.username, 10, this.state.nextPage).then(response => {
+        if (response.status === 200) {
+          var joined = this.state.likedSongsData.concat(response.data.songs)
+          this.setState({ likedSongsData: joined, nextPage: response.data.next_page })
+        }
+      })
     }
   }
 

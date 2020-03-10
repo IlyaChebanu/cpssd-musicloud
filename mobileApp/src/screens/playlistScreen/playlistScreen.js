@@ -6,7 +6,7 @@ import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity, BackHandler 
 import styles from "./styles";
 import { SafeAreaView } from "react-navigation";
 import HeaderComponent from "../../components/headerComponent/headerComponent";
-import { getPlaylist, getPlaylistSongs } from "../../api/audioAPI";
+import { getPlaylist, getPlaylistSongs, postLikeSong, postUnlikeSong } from "../../api/audioAPI";
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { getUserInfo } from "../../api/usersAPI";
 import CustomAlertComponent from "../../components/alertComponent/customAlert";
@@ -52,7 +52,7 @@ class PlaylistScreen extends React.Component {
     }
 
     getPlaylistSongs(pid) {
-        getPlaylistSongs(this.props.token, pid, 10, this.state.nextPage).then(response => {
+        getPlaylistSongs(this.props.token, pid, 10, '').then(response => {
             if (response.status === 200) {
                 this.setState({ playlistSongData: response.data.songs, nextPage: response.data.next_page, screenState: 2 })
             }
@@ -60,10 +60,9 @@ class PlaylistScreen extends React.Component {
     }
 
     getPlaylist() {
-        getPlaylist(this.props.token, 30, this.state.nextPagePlaylist).then(response => {
+        getPlaylist(this.props.token, 30, '').then(response => {
             if (response.status === 200) {
-                var joined = this.state.playlistData.concat(response.data.playlists)
-                this.setState({ playlistData: joined, nextPagePlaylist: response.data.next_page })
+                this.setState({ playlistData: response.data.playlists, nextPagePlaylist: response.data.next_page })
             }
         })
     }
@@ -92,6 +91,24 @@ class PlaylistScreen extends React.Component {
         this.props.setSongUrl(item.url)
         this.getOtherUserDetails(item.username)
         this.props.navigateToMusicPlayerScreen()
+    }
+
+    handleLikeClick(item, index) {
+        if (item.like_status === 0) {
+            postLikeSong(this.props.token, item.sid).then(response => {
+                let array = Object.assign({}, this.state.playlistSongData);
+                array[index].like_status = 1
+                array[index].likes++
+                this.setState({ array });
+            })
+        } else {
+            postUnlikeSong(this.props.token, item.sid).then(response => {
+                let array = Object.assign({}, this.state.playlistSongData);
+                array[index].like_status = 0
+                array[index].likes--
+                this.setState({ array });
+            })
+        }
     }
 
     renderPlayItem({ item, index }) {
@@ -129,13 +146,15 @@ class PlaylistScreen extends React.Component {
                 <View style={styles.songDetailsContainer}>
                     <Text style={styles.songNameText}>{songName}</Text>
                     <Text style={styles.authorNameText}>{authorName}</Text>
-                    {likedSong ?
-                        <View style={styles.likeContainer}>
-                            <Text style={styles.likedText}>{songLikes}</Text><Image style={styles.likeImg} source={likedImg} />
-                        </View> :
-                        <View style={styles.likeContainer}>
-                            <Text style={styles.likes}>{songLikes}</Text><Image style={styles.likeImg} source={likeImg} />
-                        </View>}
+                    <TouchableOpacity onPress={() => this.handleLikeClick(item, index)}>
+                        {likedSong ?
+                            <View style={styles.likeContainer}>
+                                <Text style={styles.likedText}>{songLikes}</Text><Image style={styles.likeImg} source={likedImg} />
+                            </View> :
+                            <View style={styles.likeContainer}>
+                                <Text style={styles.likes}>{songLikes}</Text><Image style={styles.likeImg} source={likeImg} />
+                            </View>}
+                    </TouchableOpacity>
                 </View>
             </TouchableOpacity>
         );
@@ -150,19 +169,24 @@ class PlaylistScreen extends React.Component {
     };
 
     _handleLoadMore() {
-        if (this.state.nextPage !== null){
-          getPlaylistSongs(this.props.token, this.state.pid, 10, this.state.nextPage).then(response => {
-            if (response.status === 200) {
-                var joined = this.state.playlistSongData.concat(response.data.songs)
-                this.setState({ playlistSongData: joined, nextPage: response.data.next_page, screenState: 2 })
-            }
-        })
+        if (this.state.nextPage !== null) {
+            getPlaylistSongs(this.props.token, this.state.pid, 10, this.state.nextPage).then(response => {
+                if (response.status === 200) {
+                    var joined = this.state.playlistSongData.concat(response.data.songs)
+                    this.setState({ playlistSongData: joined, nextPage: response.data.next_page, screenState: 2 })
+                }
+            })
         }
     }
 
     _handleLoadMorePlaylist() {
-        if (this.state.nextPagePlaylist !== null){
-          this.getPlaylist()
+        if (this.state.nextPagePlaylist !== null) {
+            getPlaylist(this.props.token, 30, this.state.nextPagePlaylist).then(response => {
+                if (response.status === 200) {
+                    var joined = this.state.playlistData.concat(response.data.playlists)
+                    this.setState({ playlistData: joined, nextPagePlaylist: response.data.next_page })
+                }
+            })
         }
     }
 

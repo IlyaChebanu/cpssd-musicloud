@@ -7,6 +7,7 @@ import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import ProfileComponent from "../profileComponent/profileComponent";
 import { getUserTimeline } from "../../api/usersAPI";
+import { postLikeSong, postUnlikeSong } from "../../api/audioAPI";
 
 class ProfileSongs extends React.Component {
   constructor(props) {
@@ -28,10 +29,9 @@ class ProfileSongs extends React.Component {
   }
 
   getSongs() {
-    getUserTimeline(this.props.accessToken, false, true, this.state.nextPage, 10).then(response => {
+    getUserTimeline(this.props.accessToken, false, true, '', 10).then(response => {
       if (response.status === 200) {
-        var joined = this.state.songsData.concat(response.data.timeline)
-        this.setState({ songsData: joined, nextPage: response.data.next_page })
+        this.setState({ songsData: response.data.timeline, nextPage: response.data.next_page })
       }
     })
   }
@@ -54,6 +54,24 @@ class ProfileSongs extends React.Component {
 
   handleLikedSongClick() {
     this.props.handleLikedSongsClick()
+  }
+
+  handleLikeClick(item, index) {
+    if (item.like_status === 0) {
+      postLikeSong(this.props.token, item.sid).then(response => {
+        let array = Object.assign({}, this.state.songsData);
+        array[index].like_status = 1
+        array[index].likes++
+        this.setState({ array });
+      })
+    } else {
+      postUnlikeSong(this.props.token, item.sid).then(response => {
+        let array = Object.assign({}, this.state.songsData);
+        array[index].like_status = 0
+        array[index].likes--
+        this.setState({ array });
+      })
+    }
   }
 
   renderheader() {
@@ -95,20 +113,27 @@ class ProfileSongs extends React.Component {
               <Image style={styles.profilePic} source={profilePic} />}
             <Text style={styles.authorNameText}>{authorName}</Text>
           </View>
-          {likedSong ? <View style={styles.likeContainer}>
+          <TouchableOpacity onPress={() => this.handleLikeClick(item, index)}>
+            {likedSong ? <View style={styles.likeContainer}>
               <Text style={styles.likedText}>{songLikes}</Text><Image style={styles.likeImg} source={likedImg} />
             </View> :
-          <View style={styles.likeContainer}>
-            <Text style={styles.likes}>{songLikes}</Text><Image style={styles.likeImg} source={likeImg} />
-          </View>}
+              <View style={styles.likeContainer}>
+                <Text style={styles.likes}>{songLikes}</Text><Image style={styles.likeImg} source={likeImg} />
+              </View>}
+          </TouchableOpacity>
         </View>
       </TouchableOpacity>
     );
   }
 
   _handleLoadMore() {
-    if (this.state.nextPage !== null){
-      this.getSongs()
+    if (this.state.nextPage !== null) {
+      getUserTimeline(this.props.accessToken, false, true, '', 10).then(response => {
+        if (response.status === 200) {
+          var joined = this.state.songsData.concat(response.data.timeline)
+          this.setState({ songsData: joined, nextPage: response.data.next_page })
+        }
+      })
     }
   }
 
