@@ -1,6 +1,6 @@
 const API_URL = 'https://dcumusicloud.com:5000/'
 
-export function getCompiledSongs(token, username, songs_per_page) {
+export function getCompiledSongs(token, username, songs_per_page, next_page) {
 
     let url = `${API_URL}api/v1/audio/compiled_songs`;
     if (songs_per_page) {
@@ -8,8 +8,16 @@ export function getCompiledSongs(token, username, songs_per_page) {
         if (username) {
             url = url + `&username=${username}`
         }
+        if (next_page) {
+            url = url + `&next_page=${next_page}`
+        }
     } else if (username) {
         url = url + `?username=${username}`
+        if (next_page) {
+            url = url + `&next_page=${next_page}`
+        }
+    } else if (next_page) {
+        url = url + `?next_page=${next_page}`
     }
     var request = new Request(url, {
         method: "GET",
@@ -42,7 +50,7 @@ export function getCompiledSongs(token, username, songs_per_page) {
         });
 }
 
-export function getLikedSongs(token, username, songs_per_page) {
+export function getLikedSongs(token, username, songs_per_page, next_page) {
 
     let url = `${API_URL}api/v1/audio/liked_songs`;
     if (songs_per_page) {
@@ -50,8 +58,14 @@ export function getLikedSongs(token, username, songs_per_page) {
         if (username) {
             url = url + `&username=${username}`
         }
+        if (next_page) {
+            url = url + `&next_page=${next_page}`
+        }
     } else if (username) {
         url = url + `?username=${username}`
+        if (next_page) {
+            url = url + `&next_page=${next_page}`
+        }
     }
     var request = new Request(url, {
         method: "GET",
@@ -158,9 +172,15 @@ export function postUnlikeSong(token, sid) {
         });
 }
 
-export function getPlaylist(token) {
+export function getPlaylist(token, playlists_per_page, next_page) {
 
     let url = `${API_URL}api/v1/audio/playlist`;
+    if (playlists_per_page) {
+        url = url + `?playlists_per_page=${playlists_per_page}`
+        if (next_page) {
+            url = url + `&next_page=${next_page}`
+        }
+    }
     var request = new Request(url, {
         method: "GET",
         headers: new Headers({
@@ -229,9 +249,15 @@ export function postPlaylist(token, title) {
         });
 }
 
-export function getPlaylistSongs(token, pid) {
+export function getPlaylistSongs(token, pid, songs_per_page, next_page) {
 
     let url = `${API_URL}api/v1/audio/playlist_songs?pid=${pid}`;
+    if (songs_per_page) {
+        url = url + `&songs_per_page=${songs_per_page}`
+        if (next_page) {
+            url = url + `&next_page=${next_page}`
+        }
+    }
     var request = new Request(url, {
         method: "GET",
         headers: new Headers({

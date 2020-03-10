@@ -220,9 +220,15 @@ export function passwordResetConfirm(email, code, password) {
         });
 }
 
-export function getUserPosts(username, token) {
+export function getUserPosts(username, token, next_page, posts_per_page) {
 
     let url = `${API_URL}api/v1/users/posts?username=${username}`;
+    if (next_page) {
+        url = url + `&next_page=${next_page}`
+    }
+    if (posts_per_page) {
+        url = url + `&posts_per_page=${posts_per_page}`
+    }
     var request = new Request(url, {
         method: "GET",
         headers: new Headers({
@@ -484,9 +490,15 @@ export function unfollowUser(token, username) {
         });
 }
 
-export function getFollowers(username, token) {
+export function getFollowers(username, token, users_per_page, next_page) {
 
     let url = `${API_URL}api/v1/users/followers?username=${username}`;
+    if (users_per_page) {
+        url = url + `&users_per_page=${users_per_page}`
+        if (next_page) {
+            url = url + `&next_page=${next_page}`
+        }
+    }
     var request = new Request(url, {
         method: "GET",
         headers: new Headers({
@@ -518,9 +530,15 @@ export function getFollowers(username, token) {
         });
 }
 
-export function getFollowing(username, token) {
+export function getFollowing(username, token, users_per_page, next_page) {
 
     let url = `${API_URL}api/v1/users/following?username=${username}`;
+    if (users_per_page) {
+        url = url + `&users_per_page=${users_per_page}`
+        if (next_page) {
+            url = url + `&next_page=${next_page}`
+        }
+    }
     var request = new Request(url, {
         method: "GET",
         headers: new Headers({
@@ -552,13 +570,25 @@ export function getFollowing(username, token) {
         });
 }
 
-export function getUserTimeline(token, posts_only, songs_only) {
+export function getUserTimeline(token, posts_only, songs_only, next_page, items_per_page) {
 
     let url = `${API_URL}api/v1/users/timeline`;
     if (posts_only) {
         url = url + `?posts_only=${posts_only}`
+        if (next_page) {
+            url = url + `&next_page=${next_page}`
+        }
+        if (items_per_page) {
+            url = url + `&items_per_page=${items_per_page}`
+        }
     } else if (songs_only) {
         url = url + `?songs_only=${songs_only}`
+        if (next_page) {
+            url = url + `&next_page=${next_page}`
+        }
+        if (items_per_page) {
+            url = url + `&items_per_page=${items_per_page}`
+        }
     }
     var request = new Request(url, {
         method: "GET",

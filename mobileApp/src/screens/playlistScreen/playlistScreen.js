@@ -21,6 +21,8 @@ class PlaylistScreen extends React.Component {
             playlistTitle: '',
             pid: null,
             showExitAlert: false,
+            nextPage: null,
+            nextPagePlaylist: null,
         };
     }
 
@@ -50,18 +52,20 @@ class PlaylistScreen extends React.Component {
     }
 
     getPlaylistSongs(pid) {
-        getPlaylistSongs(this.props.token, pid).then(response => {
+        console.log('testt')
+        getPlaylistSongs(this.props.token, pid, 10, this.state.nextPage).then(response => {
             if (response.status === 200) {
-                this.setState({ playlistSongData: response.data.songs })
-                this.setState({ screenState: 2 })
+                var joined = this.state.playlistSongData.concat(response.data.songs)
+                this.setState({ playlistSongData: joined, nextPage: response.data.next_page, screenState: 2 })
             }
         })
     }
 
     getPlaylist() {
-        getPlaylist(this.props.token).then(response => {
+        getPlaylist(this.props.token, 30, this.state.nextPagePlaylist).then(response => {
             if (response.status === 200) {
-                this.setState({ playlistData: response.data.playlists })
+                var joined = this.state.playlistData.concat(response.data.playlists)
+                this.setState({ playlistData: joined, nextPagePlaylist: response.data.next_page })
             }
         })
     }
@@ -72,7 +76,7 @@ class PlaylistScreen extends React.Component {
     }
 
     goBack() {
-        this.setState({ screenState: 1 })
+        this.setState({ screenState: 1, playlistSongData: [] })
     }
 
     getOtherUserDetails(username) {
@@ -147,6 +151,18 @@ class PlaylistScreen extends React.Component {
         this.setState({ showExitAlert: false })
     };
 
+    _handleLoadMore() {
+        if (this.state.nextPage !== null){
+          this.getPlaylistSongs(this.state.pid)
+        }
+    }
+
+    _handleLoadMorePlaylist() {
+        if (this.state.nextPagePlaylist !== null){
+          this.getPlaylist()
+        }
+    }
+
     render() {
         return (
             <SafeAreaView forceInset={{ bottom: 'never' }} style={{ 'backgroundColor': '#3D4044', 'flex': 1 }}>
@@ -169,6 +185,8 @@ class PlaylistScreen extends React.Component {
                         renderItem={this.renderPlayItem.bind(this)}
                         keyExtractor={item => String(item.pid)}
                         extraData={this.state.playlistData}
+                        onEndReached={this._handleLoadMorePlaylist.bind(this)}
+                        onEndReachedThreshold={0.5}
                     />
                         :
                         this.state.screenState === 2 ?
@@ -179,6 +197,8 @@ class PlaylistScreen extends React.Component {
                                 renderItem={this.renderSong.bind(this)}
                                 keyExtractor={item => String(item.sid)}
                                 extraData={this.state.playlistSongData}
+                                onEndReached={this._handleLoadMore.bind(this)}
+                                onEndReachedThreshold={0.5}
                             />
                             : null
                     }

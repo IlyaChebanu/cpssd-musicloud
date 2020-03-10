@@ -4,7 +4,7 @@ import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import ProfileComponent from "../profileComponent/profileComponent";
 import CreatePostComponent from "../createPostComponent/createPostComponent";
-import { getUserPosts, getUserTimeline } from "../../api/usersAPI";
+import { getUserTimeline } from "../../api/usersAPI";
 
 var moment = require('moment');
 
@@ -13,6 +13,7 @@ export default class ProfilePosts extends React.Component {
     super(props);
     this.state = {
       posts: [],
+      nextPage: null,
     };
   }
 
@@ -21,11 +22,10 @@ export default class ProfilePosts extends React.Component {
   }
 
   getPosts() {
-    getUserTimeline(this.props.accessToken, true, false).then(response => {
+    getUserTimeline(this.props.accessToken, true, false, this.state.nextPage, 10).then(response => {
       if (response.status === 200) {
-        this.setState({ posts: response.data.timeline })
-      } else {
-
+        var joined = this.state.posts.concat(response.data.timeline)
+        this.setState({ posts: joined, nextPage: response.data.next_page })
       }
     })
   }
@@ -85,6 +85,12 @@ export default class ProfilePosts extends React.Component {
     );
   }
 
+  _handleLoadMore() {
+    if (this.state.nextPage !== null){
+      this.getPosts()
+    }
+  }
+
   render() {
     return (
       <View style={styles.container}>
@@ -95,6 +101,8 @@ export default class ProfilePosts extends React.Component {
           renderItem={this.renderPost.bind(this)}
           keyExtractor={item => String(item.created)}
           extraData={this.state.posts}
+          onEndReached={this._handleLoadMore.bind(this)}
+          onEndReachedThreshold={0.5}
         />
       </View>
     )

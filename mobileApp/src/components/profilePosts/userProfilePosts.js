@@ -13,6 +13,7 @@ export default class UserProfilePosts extends React.Component {
     super(props);
     this.state = {
       posts: [],
+      nextPage: null,
     };
   }
 
@@ -21,10 +22,12 @@ export default class UserProfilePosts extends React.Component {
   }
 
   getPosts() {
-    getUserPosts(this.props.username, this.props.accessToken).then(response => {
+    getUserPosts(this.props.username, this.props.accessToken, this.state.nextPage, 10).then(response => {
       if (response.status === 200) {
+        var joined = this.state.posts.concat(response.data.posts)
         this.setState({
-          posts: response.data.posts
+          posts: joined,
+          nextPage: response.data.next_page
         })
       }
     })
@@ -85,6 +88,12 @@ export default class UserProfilePosts extends React.Component {
     );
   }
 
+  _handleLoadMore() {
+    if (this.state.nextPage !== null){
+      this.getPosts()
+    }
+  }
+
   render() {
     return (
       <View style={styles.container}>
@@ -95,6 +104,8 @@ export default class UserProfilePosts extends React.Component {
           renderItem={this.renderPost.bind(this)}
           keyExtractor={item => String(item)}
           extraData={this.state.posts}
+          onEndReached={this._handleLoadMore.bind(this)}
+          onEndReachedThreshold={0.5}
         />
       </View>
     )

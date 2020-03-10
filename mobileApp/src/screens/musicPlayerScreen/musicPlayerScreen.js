@@ -25,6 +25,7 @@ class MusicPlayerScreen extends React.Component {
             showAlert: false,
             alertTitle: '',
             alertMessage: '',
+            nextPage: null,
         };
     }
 
@@ -43,12 +44,19 @@ class MusicPlayerScreen extends React.Component {
     }
 
     getPlaylist() {
-        getPlaylist(this.props.token).then(response => {
+        getPlaylist(this.props.token, 15, this.state.nextPage).then(response => {
             if (response.status === 200) {
-                this.setState({ playlistsData: response.data.playlists })
+                var joined = this.state.playlistsData.concat(response.data.playlists)
+                this.setState({ playlistsData: joined, nextPage: response.data.next_page })
             }
         })
     }
+
+    _handleLoadMore() {
+        if (this.state.nextPage !== null){
+          this.getPlaylist()
+        }
+      }
 
     handleAuthorClick() {
         this.props.navigateBack()
@@ -144,6 +152,8 @@ class MusicPlayerScreen extends React.Component {
                     renderItem={this.renderPlayItem.bind(this)}
                     keyExtractor={item => String(item.pid)}
                     extraData={this.state.playlistsData}
+                    onEndReached={this._handleLoadMore.bind(this)}
+                    onEndReachedThreshold={0.5}
                 />
             </View>
         )

@@ -6,7 +6,6 @@ import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity } from "react
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import ProfileComponent from "../profileComponent/profileComponent";
-import { getCompiledSongs } from "../../api/audioAPI";
 import { getUserTimeline } from "../../api/usersAPI";
 
 class ProfileSongs extends React.Component {
@@ -14,6 +13,7 @@ class ProfileSongs extends React.Component {
     super(props);
     this.state = {
       songsData: [],
+      nextPage: null,
     };
   }
 
@@ -28,11 +28,10 @@ class ProfileSongs extends React.Component {
   }
 
   getSongs() {
-    getUserTimeline(this.props.accessToken, false, true).then(response => {
+    getUserTimeline(this.props.accessToken, false, true, this.state.nextPage, 10).then(response => {
       if (response.status === 200) {
-        this.setState({ songsData: response.data.timeline })
-      } else {
-
+        var joined = this.state.songsData.concat(response.data.timeline)
+        this.setState({ songsData: joined, nextPage: response.data.next_page })
       }
     })
   }
@@ -107,6 +106,12 @@ class ProfileSongs extends React.Component {
     );
   }
 
+  _handleLoadMore() {
+    if (this.state.nextPage !== null){
+      this.getSongs()
+    }
+  }
+
   render() {
 
     return (
@@ -118,6 +123,8 @@ class ProfileSongs extends React.Component {
           renderItem={this.renderSong.bind(this)}
           keyExtractor={item => String(item.sid)}
           extraData={this.state.songsData}
+          onEndReached={this._handleLoadMore.bind(this)}
+          onEndReachedThreshold={0.5}
         />
       </View>
     )

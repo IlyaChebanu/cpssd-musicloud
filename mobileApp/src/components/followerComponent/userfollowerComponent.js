@@ -11,6 +11,7 @@ export default class UserFollowingComponent extends React.Component {
         this.state = {
             followerData: [],
             followingPairs: {},
+            nextPage: null,
         }
     }
 
@@ -19,14 +20,23 @@ export default class UserFollowingComponent extends React.Component {
     }
 
     getFollowing() {
-        getFollowers(this.props.username, this.props.accessToken).then(response => {
+        getFollowers(this.props.username, this.props.accessToken, 20, this.state.nextPage).then(response => {
             let followersData = response.data.followers
             let obj = {}
             for (var i = 0; i < followersData.length; i++) {
                 obj[followersData[i].username] = followersData[i].follow_back
             }
-            this.setState({ followerData: followersData, followingPairs: obj })
+
+            let joinedObj = { ...this.state.followingPairs, ...obj}
+            var joined = this.state.followerData.concat(followersData)
+            this.setState({ followerData: joined, nextPage: response.data.next_page, followingPairs: joinedObj })
         })
+    }
+
+    _handleLoadMore() {
+        if (this.state.nextPage !== null){
+          this.getFollowing()
+        }
     }
 
     handleFollowClick(item) {
@@ -78,6 +88,8 @@ export default class UserFollowingComponent extends React.Component {
                     renderItem={this.renderFollowing.bind(this)}
                     keyExtractor={item => String(item.username)}
                     extraData={this.state.followerData}
+                    onEndReached={this._handleLoadMore.bind(this)}
+                    onEndReachedThreshold={0.5}
                 /> :
                     <Text style={styles.defaultText}>{'You do not have any followers'}</Text>}
             </View>
