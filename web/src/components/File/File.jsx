@@ -17,7 +17,7 @@ import { showNotification } from '../../actions/notificationsActions';
 
 const File = memo((props) => {
   const {
-    dir, selectedFile, dispatch, studio,
+    dir, selectedFile, dispatch, studio, selectedTrack,
   } = props;
   const [deleted, setDeleted] = useState(false);
   const level = dir.split('/').length - 2;
@@ -97,6 +97,15 @@ const File = memo((props) => {
         );
         return;
       }
+      if (selectedTrack === 0) {
+        dispatch(
+          showNotification({
+            message: 'Please select a track first',
+            type: 'info',
+          }),
+        );
+        return;
+      }
       const sampleState = {
         url: url + name,
         name,
@@ -108,7 +117,7 @@ const File = memo((props) => {
       };
       dispatch(addSampleAction(studio.selectedTrack, sampleState));
     },
-    [dispatch, studio.currentBeat, studio.selectedTrack, studio.tracks.length, url],
+    [dispatch, selectedTrack, studio.currentBeat, studio.selectedTrack, studio.tracks.length],
   );
 
 
@@ -165,9 +174,11 @@ File.propTypes = {
   dir: PropTypes.string.isRequired,
   selectedFile: PropTypes.string.isRequired,
   dispatch: PropTypes.func.isRequired,
+  selectedTrack: PropTypes.string.isRequired,
 };
 
 const mapStateToProps = ({ studio }) => ({
+  selectedTrack: studio.selectedTrack,
   selectedFile: studio.selectedFile,
   studio,
 
