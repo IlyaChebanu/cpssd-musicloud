@@ -91,6 +91,7 @@ class StartScreen extends React.Component {
     }).catch((err) => {
       console.error(err);
     });
+    BackHandler.addEventListener('hardwareBackPress', this.handleAndroidBackPress);
   }
 
   async loadCorrectFlow() {
@@ -131,10 +132,6 @@ class StartScreen extends React.Component {
     } else {
       animateTimingNative(this.animatedStartButtons, 0, 500, Easing.ease)
     }
-  }
-
-  componentDidMount() {
-    BackHandler.addEventListener('hardwareBackPress', this.handleAndroidBackPress);
   }
 
   componentWillUnmount() {
