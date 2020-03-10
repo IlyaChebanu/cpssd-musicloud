@@ -3,7 +3,7 @@ import React, {
 } from 'react';
 import AWS from 'aws-sdk';
 import * as s3ls from 's3-ls';
-import { deleteFile } from 'react-s3';
+import {deleteFile, uploadFile} from 'react-s3';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -18,6 +18,7 @@ import { showNotification } from '../../actions/notificationsActions';
 import styles from './Folder.module.scss';
 // eslint-disable-next-line import/no-cycle
 import FolderContents from '../FolderContents/FolderContents';
+import {ReactComponent as NewFolder} from "../../assets/icons/newFolder.svg";
 
 const Folder = memo((props) => {
   const { dir, dispatch, selectedFolder } = props;
@@ -124,7 +125,7 @@ const Folder = memo((props) => {
 
     files.forEach((file) => {
       deleteFile(file.split('/').pop(), config)
-        .then(() => { setFiles([]); })
+        .then((res) => { console.log(res);setFiles([]); })
         .catch((err) => console.error(err));
     });
     dirs.forEach(async (newDirectory) => {
@@ -155,6 +156,18 @@ const Folder = memo((props) => {
     }
   };
 
+  const uploadToS3 = useCallback(async (path) => {
+    await awsConfig(path);
+    uploadFile(path, config)
+      .then()
+      .catch();
+  }, [awsConfig, config]);
+
+  const handleNewFolder = useCallback(() => {
+    const path = selectedFolder + '/New Folder/';
+    setFolders([...d, path]);
+    uploadToS3(path)
+  }, [setFolders, d, selectedFolder, uploadToS3]);
 
   return (
     <div>
@@ -193,6 +206,11 @@ const Folder = memo((props) => {
               style={{ visibility: expanded ? 'visible' : 'hidden' }}
               className={styles.deleteFolder}
               onClick={(e) => { e.stopPropagation(); deleteFromS3(`${dir.substring(0, dir.length - 1)}`, f, d); }}
+            />
+            <NewFolder
+                style={{ visibility: expanded ? 'visible' : 'hidden' }}
+                className={styles.newFolder}
+                onClick={(e) => {e.stopPropagation(); handleNewFolder()}}
             />
           </li>
         )

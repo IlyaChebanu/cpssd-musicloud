@@ -1,28 +1,31 @@
-import React, {
-  useState, useCallback, useMemo, memo, useRef, useEffect,
-} from 'react';
-import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
+import React, {memo, useCallback, useEffect, useMemo, useRef, useState,} from 'react';
+import {connect} from 'react-redux';
+import {withRouter} from 'react-router-dom';
 import PropTypes from 'prop-types';
 import AWS from 'aws-sdk';
 import * as s3ls from 's3-ls';
 import styles from './FileExplorer.module.scss';
 import samplesIcon from '../../assets/icons/samples.svg';
 import instrumentsIcon from '../../assets/icons/instruments.svg';
-import { ReactComponent as NewFolder } from '../../assets/icons/newFolder.svg';
-import { generatePresigned } from '../../helpers/api';
+import {ReactComponent as NewFolder} from '../../assets/icons/newFolder.svg';
+import {generatePresigned} from '../../helpers/api';
 import store from '../../store';
 import FolderContents from '../FolderContents/FolderContents';
-import {
-  hideFileExplorer,
-} from '../../actions/studioActions';
-import { showNotification } from '../../actions/notificationsActions';
+import {hideFileExplorer,} from '../../actions/studioActions';
+import {showNotification} from '../../actions/notificationsActions';
+import {uploadFile} from "react-s3";
 
 
 const FileExplorer = memo((props) => {
   const { dispatch } = props;
   const [fileList, setFileList] = useState([]);
   const [folderList, setFolderList] = useState([]);
+
+  const [config, setConfig] = useState({
+    bucketName: 'dcumusicloudbucket',
+    secretAccessKey: 'XVdgFyhjyhnqicDxxXZa9rLouFv5WQdXzXwxrP0u',
+    region: 'eu-west-1',
+  });
 
   const [sampleTreeSelected, setSampleTreeSelected] = useState(false);
   const node = useRef();
@@ -105,12 +108,36 @@ const FileExplorer = memo((props) => {
     }
   }, [collapseSampleTree, dispatch, props.fileExplorerHidden]);
 
+  const awsConfig = useCallback(async (directory) => {
+    const res = await generatePresigned('/');
+    if (res.status === 200) {
+      config.accessKeyId = res.data.signed_url.fields.AWSAccessKeyId;
+      config.dirName = directory;
+      setConfig(config);
+    }
+  }, [config]);
+
+  const uploadToS3 = useCallback(async (path) => {
+    await awsConfig(path);
+    uploadFile(path, config)
+      .then()
+      .catch();
+  }, [awsConfig, config]);
+
+  const handleNewFolder = useCallback(() => {
+    const { user } = store.getState();
+    const path = 'audio/' + user.username + '/New Folder/';
+    setFolderList([...folderList, path]);
+    uploadToS3(path);
+  }, [setFolderList, folderList, uploadToS3]);
+
   useEffect(() => {
     document.addEventListener('mousedown', handleClick);
     return () => {
       document.removeEventListener('mousedown', handleClick);
     };
   }, [handleClick]);
+
   return (
     <div
       ref={node}
@@ -133,7 +160,7 @@ const FileExplorer = memo((props) => {
           )}
           <p>Samples</p>
           { sampleTreeSelected
-            ? <NewFolder className={styles.newFolder} />
+            ? <NewFolder className={styles.newFolder} onClick={(e) => {e.stopPropagation(); handleNewFolder()}}/>
             : null }
 
         </li>
