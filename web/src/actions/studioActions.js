@@ -202,6 +202,20 @@ export const showFileExplorer = () => (dispatch) => {
   });
 };
 
+export const setSelectedFile = (selectedFile) => (dispatch) => {
+  dispatch({
+    type: 'SET_SELECTED_FILE',
+    selectedFile,
+  });
+};
+
+export const setSelectedFolder = (selectedFolder) => (dispatch) => {
+  dispatch({
+    type: 'SET_SELECTED_FOLDER',
+    selectedFolder,
+  });
+};
+
 export const setSongName = (songName) => (dispatch) => {
   dispatch({
     type: 'SET_SONG_NAME',

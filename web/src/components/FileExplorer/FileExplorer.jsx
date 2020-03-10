@@ -9,91 +9,62 @@ import * as s3ls from 's3-ls';
 import styles from './FileExplorer.module.scss';
 import samplesIcon from '../../assets/icons/samples.svg';
 import instrumentsIcon from '../../assets/icons/instruments.svg';
+import { ReactComponent as NewFolder } from '../../assets/icons/newFolder.svg';
 import { generatePresigned } from '../../helpers/api';
 import store from '../../store';
+import FolderContents from '../FolderContents/FolderContents';
 import {
   hideFileExplorer,
-  addSample as addSampleAction,
 } from '../../actions/studioActions';
 import { showNotification } from '../../actions/notificationsActions';
 
 
 const FileExplorer = memo((props) => {
-  const { studio, dispatch } = props;
-  const [list, setList] = useState([]);
-  const [url, setUrl] = useState('');
+  const { dispatch } = props;
+  const [fileList, setFileList] = useState([]);
+  const [folderList, setFolderList] = useState([]);
+
+  const [sampleTreeSelected, setSampleTreeSelected] = useState(false);
   const node = useRef();
-
-  async function getFiles() {
+  const getFiles = useCallback(async () => {
     const res = await generatePresigned('/');
-    const accessKey = res.data.signed_url.fields.AWSAccessKeyId;
-    AWS.config.update({
-      accessKeyId: accessKey,
-      secretAccessKey: 'XVdgFyhjyhnqicDxxXZa9rLouFv5WQdXzXwxrP0u',
-      region: 'eu-west-1',
-    });
-    setUrl('https://dcumusicloudbucket.s3-eu-west-1.amazonaws.com/');
-    const { user } = store.getState();
-    const lister = s3ls({
-      bucket: 'dcumusicloudbucket',
-    });
+    if (res.status === 200) {
+      const accessKey = res.data.signed_url.fields.AWSAccessKeyId;
+      AWS.config.update({
+        accessKeyId: accessKey,
+        secretAccessKey: 'XVdgFyhjyhnqicDxxXZa9rLouFv5WQdXzXwxrP0u',
+        region: 'eu-west-1',
+      });
 
-    const { files } = await lister.ls(`/audio/${user.username}`);
-    setList(files);
-  }
+      setSampleTreeSelected(true);
+      const { user } = store.getState();
+      const lister = s3ls({
+        bucket: 'dcumusicloudbucket',
+      });
+      const { files, folders } = await lister.ls(`/audio/${user.username}`);
+      const moreFolders = folders.filter((folder) => folder.split('/').slice(folder.split('/').length - 2, folder.split('/').length - 1).pop() !== '');
+      setFileList(files);
+      setFolderList(moreFolders);
+      return;
+    }
+    dispatch(showNotification({
+      message: res,
 
-  const addSample = useCallback(
-    (name) => {
-      if (studio.tracks.length === 0) {
-        dispatch(
-          showNotification({
-            message: 'Please add a track first',
-            type: 'info',
-          }),
-        );
-        return;
-      }
-      const sampleState = {
-        url: url + name,
-        name,
-        time: studio.currentBeat,
-        fade: {
-          fadeIn: 0,
-          fadeOut: 0,
-        },
-      };
-      dispatch(addSampleAction(studio.selectedTrack, sampleState));
-    },
-    [studio.tracks, studio.selectedTrack, studio.currentBeat, url, dispatch],
-  );
+    }));
+  }, [dispatch]);
 
-  const Files = () => (
-    <div>
-      <ul>
-        <li key="Samples" onClick={getFiles}>
-          {samplesIcon && (
-          <img
-            className={styles.icon}
-            src={samplesIcon}
-            alt="Samples icon"
-          />
-          )}
-          <p>Samples</p>
-        </li>
-      </ul>
-      {list.map((item) => (
-        <li onClick={(e) => { e.preventDefault(); addSample(item); }} className={styles.li}>
-          {item.split('/').pop()}
-        </li>
-      ))}
-    </div>
-  );
+  const collapseSampleTree = useCallback(() => {
+    setSampleTreeSelected(false);
+    setFileList([]);
+    setFolderList([]);
+  }, []);
+
 
   const instruments = [
     { name: 'Instruments', action: null, icon: instrumentsIcon },
   ];
 
-  const explorerItems = useMemo(
+  const instrumentsMap = useMemo(
     () => instruments.map((item) => (
       <li
         key={item.name}
@@ -116,19 +87,23 @@ const FileExplorer = memo((props) => {
 
   const handleClick = useCallback((e) => {
     try {
-      if (node.current.contains(e.target)
-      || (e.target.id === 'explorer')
+      if (node.current.contains(e.target)) {
+        // inside click
+        return;
+      } if ((e.target.id === 'explorer')
       || (e.toElement.viewportElement.id === 'explorer')) {
-      // inside click or click on file explorer button
+      // or click on file explorer button
+        collapseSampleTree();
         return;
       }
     } catch (err) {
       // outside click
       if (!props.fileExplorerHidden) {
         dispatch(hideFileExplorer());
+        setFileList([]);
       }
     }
-  }, [dispatch, props.fileExplorerHidden]);
+  }, [collapseSampleTree, dispatch, props.fileExplorerHidden]);
 
   useEffect(() => {
     document.addEventListener('mousedown', handleClick);
@@ -136,24 +111,48 @@ const FileExplorer = memo((props) => {
       document.removeEventListener('mousedown', handleClick);
     };
   }, [handleClick]);
-
   return (
     <div
       ref={node}
-      style={{ visibility: props.fileExplorerHidden ? 'hidden' : 'visible' }}
+      style={{ maxWidth: props.fileExplorerHidden ? '0%' : '30%' }}
       className={styles.explorer}
     >
       <ul>
-        <Files />
-        {explorerItems}
+        <li
+          key="Samples"
+          onClick={sampleTreeSelected ? collapseSampleTree : getFiles}
+          className={sampleTreeSelected ? styles.selected : ''}
+
+        >
+          {samplesIcon && (
+          <img
+            className={styles.icon}
+            src={samplesIcon}
+            alt="Samples icon"
+          />
+          )}
+          <p>Samples</p>
+          { sampleTreeSelected
+            ? <NewFolder className={styles.newFolder} />
+            : null }
+
+        </li>
+        <FolderContents
+
+          files={fileList}
+          folders={folderList}
+          level={1}
+        />
+        {instrumentsMap}
+
       </ul>
+
     </div>
   );
 });
 
 FileExplorer.propTypes = {
   dispatch: PropTypes.func.isRequired,
-  studio: PropTypes.object.isRequired,
   fileExplorerHidden: PropTypes.bool.isRequired,
 };
 

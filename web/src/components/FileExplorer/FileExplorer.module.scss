@@ -1,6 +1,6 @@
 .explorer {
   border-radius: 5px;
-  width: 20%;
+  max-width: 30%;
   height: calc(100vh - 140px);
   position: absolute;
   background-color: #414448;
@@ -8,7 +8,9 @@
   right: 0;
   z-index: 13;
   border-radius: 5px 0px 0px 5px;
-  overflow-y: scroll;
+  overflow-y: auto;
+  transition-property: all;
+  transition: max-width 0.2s;
 
   ul {
     border-radius: 5px 0px 0px 5px;
@@ -32,8 +34,11 @@
   }
 
   li {
+    transition-property: all;
+    transition: max-width 0.2s;
     border-radius: 5px 0px 0px 5px;
-    padding: 10px;
+    padding: 5px 10px 5px 10px;
+    margin: 0px 0px 8px 0px;
     flex-direction: row;
     color: #fff;
     text-decoration: none;
@@ -44,6 +49,38 @@
       margin: 0;
       white-space: nowrap;
     }
+    input {
+      margin: 0;
+      color: white;
+      font-size: 18px;
+      background: none;
+      border: none;
+      width: 100%;
+
+      &:focus {
+        outline: none;
+      }
+    }
+    .newFolder {
+      right: 0;
+      height: 20px;
+      margin: 0px auto;
+      padding-right: 10px;
+      transition: fill 200ms;
+      position: absolute;
+      fill: #3A3A3A;
+      &:hover {
+        transition: fill 200ms;
+        fill: white;
+      }
+    }
+  }
+
+  .selected {    
+      box-shadow: 0px 2px 2px 0px rgba(0, 0, 0, 0.1);
+      background-color: #5f6065;
+      cursor: pointer;
+      color: white;
   }
 
   .child {
@@ -53,7 +90,21 @@
   li:last-child {
     border-bottom: none;
   }
+  
   li:hover {
+    box-shadow: 0px 2px 2px 0px rgba(0, 0, 0, 0.1);
+    background-color: #5f6065;
+    cursor: pointer;
+    color: white;
+  }
+
+  li:active {
+    box-shadow: 0px 2px 2px 0px rgba(0, 0, 0, 0.1);
+    background-color: #5f6065;
+    cursor: pointer;
+    color: white;
+  }
+  li:focus {
     box-shadow: 0px 2px 2px 0px rgba(0, 0, 0, 0.1);
     background-color: #5f6065;
     cursor: pointer;
