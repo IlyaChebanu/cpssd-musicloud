@@ -264,9 +264,14 @@ class StudioScreen extends React.Component {
                     <Text style={styles.txtRecordCounter}>{this.state.recordTime}</Text>
                     <View style={styles.viewRecorder}>
                         <View style={styles.recordBtnWrapper}>
-                            <TouchableOpacity style={styles.recordBtn} onPress={this.state.recording ? this.onStopRecord : this.onStartRecord}>
+                            {!this.state.recording ? 
+                            <TouchableOpacity style={styles.recordBtn} onPress={this.onStartRecord}>
                                 <Image style={styles.microphoneImage} source={microphoneImage} />
-                            </TouchableOpacity>
+                            </TouchableOpacity> :
+                            <View style={styles.stopRecContainer}>
+                                <TouchableOpacity style={styles.stopRecBtn} onPress={this.onStopRecord} />
+                            </View>
+                            }
                         </View>
                     </View>
 
