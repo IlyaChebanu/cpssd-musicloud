@@ -342,7 +342,7 @@ def like_song(user_data):
         return {"message": "Song does not exist!"}, 400
 
     if user_data.get("username") == song[0][1]:
-        return {"message": "You cannot like your own song"}, 403
+        return {"message": "You cannot like your own song"}, 422
 
     like_pair = get_like_pair(user_data.get("uid"), request.json.get("sid"))
 
@@ -395,7 +395,7 @@ def unlike_song(user_data):
         return {"message": "Song does not exist!"}, 400
 
     if user_data.get("username") == song[0][1]:
-        return {"message": "You cannot unlike your own song"}, 403
+        return {"message": "You cannot unlike your own song"}, 422
 
     post_unlike(user_data.get("uid"), request.json.get("sid"))
     return {"message": "Song unliked"}, 200
