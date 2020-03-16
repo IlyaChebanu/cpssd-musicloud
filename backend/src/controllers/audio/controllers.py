@@ -1228,3 +1228,121 @@ def description(user_data):
         request.json.get("sid"), request.json.get("description")
     )
     return {"message": "Description updated."}, 200
+
+@AUDIO.route("/search", methods=["GET"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def search_songs(user_data):  # pylint: disable=R0911
+    """
+    Endpoint for getting all the songs in a playlist.
+    """
+    next_page = request.args.get('next_page')
+    back_page = request.args.get('back_page')
+    if not next_page and not back_page:
+        sid = request.args.get('pid')
+        if not pid:
+            return {"message": "No PID sent"}, 422
+        pid = int(pid)
+
+        total_songs = get_number_of_songs_in_playlist(pid)
+
+        try:
+            ownder_uid = get_playlist(pid)[0][1]
+        except IndexError:
+            return {"message": "Invalid pid"}, 422
+        if ownder_uid != user_data.get("uid"):
+            return {"message": "Not permitted see that playlist"}, 401
+
+        songs_per_page = request.args.get('songs_per_page')
+        if not songs_per_page:
+            songs_per_page = 50
+        songs_per_page = int(songs_per_page)
+
+        current_page = request.args.get('current_page')
+        if not current_page:
+            current_page = 1
+        current_page = int(current_page)
+
+        total_pages = ceil(total_songs / songs_per_page)
+        if total_pages == 0:
+            total_pages = 1
+        if current_page > total_pages:
+            return {
+                "message": (
+                    "current_page exceeds the total number of pages available("
+                    + str(total_pages) + ")."
+                )
+            }, 422
+
+        start_index = (current_page * songs_per_page) - songs_per_page
+
+        songs = get_playlist_data(
+            pid, start_index, songs_per_page, user_data.get("uid")
+        )
+
+        res = []
+        for song in songs:
+            res.append(gen_song_object(song))
+
+        jwt_payload = {
+            "pid": pid,
+            "total_pages": total_pages,
+            "songs_per_page": songs_per_page,
+        }
+
+        back_page, next_page = gen_scroll_tokens(
+            current_page, total_pages, jwt_payload
+        )
+
+        return {
+            "current_page": current_page,
+            "total_pages": total_pages,
+            "songs_per_page": songs_per_page,
+            "next_page": next_page,
+            "back_page": back_page,
+            "songs": res,
+        }, 200
+    if next_page and back_page:
+        return {
+            "message": (
+                "You can't send both a 'next_page' token and a 'back_page' "
+                "token."
+            )
+        }, 422
+    token = next_page
+    if not token:
+        token = back_page
+    token = jwt.decode(token, JWT_SECRET, algorithms=['HS256'])
+
+    pid = token.get("pid")
+    current_page = token.get("current_page")
+    songs_per_page = token.get("songs_per_page")
+    total_pages = token.get("total_pages")
+    start_index = (current_page * songs_per_page) - songs_per_page
+
+    songs = get_playlist_data(
+        pid, start_index, songs_per_page, user_data.get("uid")
+    )
+
+    res = []
+    for song in songs:
+        res.append(gen_song_object(song))
+
+    jwt_payload = {
+        "pid": pid,
+        "total_pages": total_pages,
+        "songs_per_page": songs_per_page,
+    }
+
+    back_page, next_page = gen_scroll_tokens(
+        current_page, total_pages, jwt_payload
+    )
+
+    return {
+        "current_page": current_page,
+        "total_pages": total_pages,
+        "songs_per_page": songs_per_page,
+        "next_page": next_page,
+        "back_page": back_page,
+        "songs": res
+    }, 200
