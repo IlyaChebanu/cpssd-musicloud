@@ -4,7 +4,7 @@ import React, {
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { uploadFile, deleteFile } from 'react-s3';
+import { deleteFile } from 'react-s3';
 import {
   setSelectedFile,
   addSample as addSampleAction,
@@ -64,15 +64,6 @@ const File = memo((props) => {
       .then(() => { setDeleted(true); })
       .catch();
   }, [awsConfig, config]);
-
-
-  const uploadToS3 = useCallback(async (oldFileName, newFileName) => {
-    await awsConfig(path);
-    await deleteFromS3(path, extension === '' ? oldFileName : `${oldFileName}.${extension}`);
-    uploadFile(newFileName, config)
-      .then()
-      .catch();
-  }, [awsConfig, config, deleteFromS3, extension, path]);
 
   const onInputBlur = async (e, key) => {
     if (key === 13) {

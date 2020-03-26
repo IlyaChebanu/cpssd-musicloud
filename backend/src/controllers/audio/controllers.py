@@ -336,11 +336,14 @@ def like_song(user_data):
         return {"message": str(exc)}, 422
 
     try:
-        title = get_song_data(
+        song = get_song_data(
             request.json.get("sid"), user_data.get("uid")
-        )[0][2]
+        )
     except NoResults:
         return {"message": "Song does not exist!"}, 400
+
+    if user_data.get("username") == song[0][1]:
+        return {"message": "You cannot like your own song"}, 422
 
     like_pair = get_like_pair(user_data.get("uid"), request.json.get("sid"))
 
@@ -353,7 +356,7 @@ def like_song(user_data):
             dids += did
         message = (
             user_data.get("username") + " just liked your song: \""
-            + title + "\""
+            + song[0][2] + "\""
         )
         notification_sender(message, dids, "New Like")
     except NoResults:
@@ -384,6 +387,16 @@ def unlike_song(user_data):
     except ValidationError as exc:
         log("warning", "Request validation failed.", str(exc))
         return {"message": str(exc)}, 422
+
+    try:
+        song = get_song_data(
+            request.json.get("sid"), user_data.get("uid")
+        )
+    except NoResults:
+        return {"message": "Song does not exist!"}, 400
+
+    if user_data.get("username") == song[0][1]:
+        return {"message": "You cannot unlike your own song"}, 422
 
     post_unlike(user_data.get("uid"), request.json.get("sid"))
     return {"message": "Song unliked"}, 200
