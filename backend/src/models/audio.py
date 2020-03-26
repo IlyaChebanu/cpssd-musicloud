@@ -1,3 +1,4 @@
+# pylint: disable=C0302
 """
 Query models for interfacing with the DB for audio related transactions.
 """
@@ -74,7 +75,7 @@ def get_song_data(sid, uid):
     """
     sql = (
         "SELECT Songs.sid,"
-        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as usernanme,"
+        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as username,"
         "title, duration, created, public, url, cover, ("
         "SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=%s"
         ") as likes, ("
@@ -176,12 +177,14 @@ def get_all_compiled_songs(start_index, songs_per_page, uid):
     Int - Represents the start index of a new page.
     :param songs_per_page:
     Int - Represents the number of items on the new page.
+    :param uid:
+    Int - Your user ID.
     :return:
     List - Containing lists of song data.
     """
     sql = (
         "SELECT Songs.sid,"
-        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as usernanme,"
+        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as username,"
         "title, duration, created, public, url, cover, ("
         "SELECT COUNT(*) FROM Song_Likes WHERE Songs.sid = Song_Likes.sid"
         ") as likes, (SELECT COUNT(*) FROM Song_Likes WHERE "
@@ -199,6 +202,56 @@ def get_all_compiled_songs(start_index, songs_per_page, uid):
     return query(sql, args, True)
 
 
+def get_all_search_results(
+        start_index, songs_per_page, uid, search_term, sort_sql):
+    """
+    Get all search results.
+    :param start_index:
+    Int - Represents the start index of a new page.
+    :param songs_per_page:
+    Int - Represents the number of items on the new page.
+    :param uid:
+    Int - Your user ID.
+    :param search_term:
+    Str - The artist username or song title we are searching for.
+    :param sort_sql:
+    Str|None - If not none, is an ORDER statement to be added to the SQL.
+    :return:
+    List - Containing all song results from your search.
+    """
+    search_term = "%" + search_term + "%"
+
+    sql = (
+        "SELECT Songs.sid,"
+        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as username,"
+        "title, duration, created, public, url, cover, ("
+        "SELECT COUNT(*) FROM Song_Likes WHERE Songs.sid = Song_Likes.sid"
+        ") as likes, (SELECT COUNT(*) FROM Song_Likes WHERE "
+        "Song_Likes.sid=Songs.sid "
+        "AND Song_Likes.uid=%s), description,"
+        "(SELECT profiler FROM Users WHERE Songs.uid=Users.uid) as profiler"
+        " FROM Songs WHERE public=1 AND (title LIKE %s OR "
+        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) LIKE %s) "
+    )
+
+    if sort_sql:
+        sql += sort_sql + "LIMIT %s, %s;"
+    else:
+        sql += "LIMIT %s, %s;"
+
+    args = (
+        uid,
+        search_term,
+        search_term,
+        start_index,
+        songs_per_page
+    )
+    res = query(sql, args, True)
+    if not res:
+        raise NoResults
+    return res
+
+
 def get_all_compiled_songs_by_uid(uid, start_index, songs_per_page, my_uid):
     """
     Get any publicly available song for a specific user.
@@ -208,12 +261,14 @@ def get_all_compiled_songs_by_uid(uid, start_index, songs_per_page, my_uid):
     Int - Represents the start index of a new page.
     :param songs_per_page:
     Int - Represents the number of items on the new page.
+    :param my_uid:
+    Int - Your user ID.
     :return:
     List - Containing lists of song data.
     """
     sql = (
         "SELECT Songs.sid,"
-        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as usernanme,"
+        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as username,"
         "title, duration, created, public, url, cover, ("
         "SELECT COUNT(*) FROM Song_Likes WHERE Songs.sid = Song_Likes.sid"
         ") as likes, (SELECT COUNT(*) FROM Song_Likes WHERE "
@@ -247,7 +302,7 @@ def get_all_editable_songs_by_uid(uid, start_index, songs_per_page):
     """
     sql = (
         "SELECT Songs.sid, "
-        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as usernanme,"
+        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as username,"
         "title, duration, created, public, url, cover,"
         "(SELECT COUNT(*) FROM Song_Likes WHERE "
         "Songs.sid = Song_Likes.sid ) as likes, "
@@ -258,7 +313,7 @@ def get_all_editable_songs_by_uid(uid, start_index, songs_per_page):
         " FROM Songs "
         "WHERE uid = %s UNION SELECT "
         "Songs.sid, (SELECT username FROM Users "
-        "WHERE Songs.uid=Users.uid) as usernanme,"
+        "WHERE Songs.uid=Users.uid) as username,"
         "title, duration, created, public, url, cover,"
         "(SELECT COUNT(*) FROM Song_Likes WHERE "
         "Songs.sid = Song_Likes.sid) as likes, "
@@ -292,6 +347,27 @@ def get_number_of_compiled_songs():
         "WHERE public = 1"
     )
     return query(sql, (), True)[0][0]
+
+
+def get_number_of_searchable_songs(search_term):
+    """
+    Return the number of all searchable songs within the search constraints.
+    :return:
+    Int - Number of searchable songs in DB within the search constraints.
+    """
+    search_term = "%" + search_term + "%"
+
+    sql = (
+        "SELECT COUNT(*) FROM Songs "
+        "WHERE public = 1 AND (title LIKE %s OR "
+        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) LIKE %s);"
+    )
+    args = (
+        search_term,
+        search_term
+    )
+
+    return query(sql, args, True)[0][0]
 
 
 def get_number_of_compiled_songs_by_uid(uid):
@@ -496,7 +572,7 @@ def get_all_liked_songs_by_uid(uid, start_index, songs_per_page, my_uid):
     """
     sql = (
         "SELECT Songs.sid, "
-        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as usernanme,"
+        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as username,"
         "title, duration, created, public, url, cover, "
         "(SELECT COUNT(*) FROM Song_Likes WHERE "
         "Songs.sid = Song_Likes.sid) as likes, "
@@ -698,7 +774,7 @@ def get_playlists(uid, start_index, playlists_per_page):
     sql = (
         "SELECT pid,"
         "(SELECT username FROM Users WHERE Playlists.uid=Users.uid)"
-        "as usernanme, title, created, updated FROM Playlists "
+        "as username, title, created, updated FROM Playlists "
         "WHERE uid = %s LIMIT %s, %s;"
     )
     args = (
@@ -723,7 +799,7 @@ def get_playlist_data(pid, start_index, songs_per_page, uid):
     """
     sql = (
         "SELECT Songs.sid, "
-        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as usernanme,"
+        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as username,"
         "title, duration, created, public, url, cover, "
         "(SELECT COUNT(*) FROM Song_Likes WHERE "
         "Songs.sid = Song_Likes.sid) as likes, "
