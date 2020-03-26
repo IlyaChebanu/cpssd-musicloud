@@ -4153,3 +4153,261 @@ class AudioTests(unittest.TestCase):
             self.assertEqual(401, res.status_code)
             expected_body = {"message": "You can't update that song!"}
             self.assertEqual(expected_body, json.loads(res.data))
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_all_search_results')
+    @mock.patch('backend.src.controllers.audio.controllers.get_number_of_searchable_songs')
+    def test_get_search_success_no_scroll_token(self, mocked_num_songs, mocked_songs):
+        """
+        Ensure searching for songs is successful without scroll tokens.
+        """
+        test_songs = [
+            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT",
+             1, None, None, 8, 0, "a description"]
+        ]
+        mocked_num_songs.return_value = 2
+        mocked_songs.return_value = test_songs
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = ALT_MOCKED_TOKEN
+            res = self.test_client.get(
+                "/api/v1/audio/search?search_term=fakeSearch",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(200, res.status_code)
+            expected_songs = [
+                {
+                    "sid": 1,
+                    "username": "username",
+                    "title": "A test song",
+                    "duration": 0,
+                    "created": "Wed, 13 Nov 2019 17:07:39 GMT",
+                    "public": 1,
+                    "url": None,
+                    "cover": None,
+                    "likes": 8,
+                    "like_status": 0,
+                    "description": "a description"
+                }
+            ]
+            expected_body = {
+                'back_page': None,
+                'songs': expected_songs,
+                'current_page': 1,
+                'next_page': None,
+                'songs_per_page': 50,
+                'total_pages': 1
+            }
+            self.assertEqual(expected_body, json.loads(res.data))
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_all_search_results')
+    @mock.patch('backend.src.controllers.audio.controllers.get_number_of_searchable_songs')
+    def test_get_search_success_next_scroll_token_and_no_username(self, mocked_num_songs, mocked_songs):
+        """
+        Ensure searching for songs is successful with a next page scroll token.
+        """
+        test_song = [
+            [2, "username2", "A very test song", 0,
+             "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0,
+             "a description"]
+        ]
+        mocked_num_songs.return_value = 2
+        mocked_songs.return_value = test_song
+        test_req_data = {
+            "next_page": (
+                "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZWFyY2hfdGVybSI6InRl"
+                "c3QiLCJzb3J0X3NxbCI6IiBPUkRFUiBCWSBkdXJhdGlvbiBBU0MgIiwidG90Y"
+                "WxfcGFnZXMiOjIxLCJzb25nc19wZXJfcGFnZSI6NTAsImN1cnJlbnRfcGFnZS"
+                "I6M30.OBCFnHwAZRjhwZEkJAPvaRqAA7GxMP76ZlcpCGcazBI"
+            ),
+            "search_term": "fakeSearch"
+        }
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = ALT_MOCKED_TOKEN
+            res = self.test_client.get(
+                "/api/v1/audio/search",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(200, res.status_code)
+            expected_songs = [
+                {
+                    "sid": 2,
+                    "username": "username2",
+                    "title": "A very test song",
+                    "duration": 0,
+                    "created": "Wed, 13 Nov 2019 17:07:40 GMT",
+                    "public": 1,
+                    "url": None,
+                    "cover": None,
+                    "likes": 8,
+                    "like_status": 0,
+                    "description": "a description"
+                }
+            ]
+            expected_body = {
+                'back_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZWFyY2hfdGVybSI6InRlc3QiLCJzb3J0X3NxbCI6IiBPUkRFUiBCWSBkdXJhdGlvbiBBU0MgIiwidG90YWxfcGFnZXMiOjIxLCJzb25nc19wZXJfcGFnZSI6NTAsImN1cnJlbnRfcGFnZSI6Mn0.iILstA3UP8PZ_DkAjWoDqE8YJfiElEhCCNhm9rg7wR0',
+                'current_page': 3,
+                'next_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZWFyY2hfdGVybSI6InRlc3QiLCJzb3J0X3NxbCI6IiBPUkRFUiBCWSBkdXJhdGlvbiBBU0MgIiwidG90YWxfcGFnZXMiOjIxLCJzb25nc19wZXJfcGFnZSI6NTAsImN1cnJlbnRfcGFnZSI6NH0.KfhyMGH1U_QMzhTGwb6KAUDLva9COdedGk2wP6zFECs',
+                'songs': expected_songs,
+                'songs_per_page': 50,
+                'total_pages': 21
+            }
+            self.assertEqual(expected_body, json.loads(res.data))
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_all_search_results')
+    @mock.patch('backend.src.controllers.audio.controllers.get_number_of_searchable_songs')
+    def test_get_search_success_back_scroll_token_and_no_username(self, mocked_num_songs, mocked_songs):
+        """
+        Ensure searching for songs is successful with a back page scroll token.
+        """
+        test_song = [
+            [2, "username2", "A very test song", 0,
+             "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0,
+             "a description"]
+        ]
+        mocked_songs.return_value = test_song
+        mocked_num_songs.return_value = 2
+        test_req_data = {
+            "back_page": (
+                "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZWFyY2hfdGVybSI6InRl"
+                "c3QiLCJzb3J0X3NxbCI6IiBPUkRFUiBCWSBkdXJhdGlvbiBBU0MgIiwidG90Y"
+                "WxfcGFnZXMiOjIxLCJzb25nc19wZXJfcGFnZSI6NTAsImN1cnJlbnRfcGFnZS"
+                "I6Mn0.iILstA3UP8PZ_DkAjWoDqE8YJfiElEhCCNhm9rg7wR0"
+            ),
+            "search_term": "fakeSearch"
+        }
+        with mock.patch(
+                'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = ALT_MOCKED_TOKEN
+            res = self.test_client.get(
+                "/api/v1/audio/search",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(200, res.status_code)
+            expected_songs = [
+                {
+                    "sid": 2,
+                    "username": "username2",
+                    "title": "A very test song",
+                    "duration": 0,
+                    "created": "Wed, 13 Nov 2019 17:07:40 GMT",
+                    "public": 1,
+                    "url": None,
+                    "cover": None,
+                    "likes": 8,
+                    "like_status": 0,
+                    "description": "a description"
+                }
+            ]
+            expected_body = {
+                'back_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZWFyY2hfdGVybSI6InRlc3QiLCJzb3J0X3NxbCI6IiBPUkRFUiBCWSBkdXJhdGlvbiBBU0MgIiwidG90YWxfcGFnZXMiOjIxLCJzb25nc19wZXJfcGFnZSI6NTAsImN1cnJlbnRfcGFnZSI6MX0.bLQpyCkGwMWEJgEhd8zr0zgTR0M0BLKQq5AuwimacaE',
+                'current_page': 2,
+                'next_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZWFyY2hfdGVybSI6InRlc3QiLCJzb3J0X3NxbCI6IiBPUkRFUiBCWSBkdXJhdGlvbiBBU0MgIiwidG90YWxfcGFnZXMiOjIxLCJzb25nc19wZXJfcGFnZSI6NTAsImN1cnJlbnRfcGFnZSI6M30.OBCFnHwAZRjhwZEkJAPvaRqAA7GxMP76ZlcpCGcazBI',
+                'songs': expected_songs,
+                'songs_per_page': 50,
+                'total_pages': 21
+            }
+            self.assertEqual(expected_body, json.loads(res.data))
+
+    def test_get_search_fail_missing_access_token(self):
+        """
+        Ensure searching for songs fails if no access_token is sent.
+        """
+        res = self.test_client.get(
+            "/api/v1/audio/search?search_term=fakeSearch",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_get_search_fail_access_token_expired(self):
+        """
+        Ensure searching for songs fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
+            res = self.test_client.get(
+                "/api/v1/audio/search?search_term=fakeSearch",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_get_search_fail_bad_access_token_signature(self):
+        """
+        Ensure searching for songs fails if the access_token signature does not match
+        the one configured on the server.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
+            res = self.test_client.get(
+                "/api/v1/audio/search?search_term=fakeSearch",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_get_search_fail_unknown_access_token_issue(self):
+        """
+        Ensure searching for songs fails if some unknown error relating to the access_token
+        occurs.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
+            res = self.test_client.get(
+                "/api/v1/audio/search?search_term=fakeSearch",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_number_of_searchable_songs')
+    def test_get_search_fail_no_scroll_token_exceeded_last_page(self, mocked_num_songs):
+        """
+        Ensure searching for songs fails if the user tries to access a page that doesn't exist.
+        """
+        mocked_num_songs.return_value = 2
+        test_req_data = {
+            "current_page": 12,
+            "posts_per_page": 1,
+            "search_term": "fakeSearch"
+        }
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = ALT_MOCKED_TOKEN
+            res = self.test_client.get(
+                "/api/v1/audio/search",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    def test_get_search_fail_sent_both_tokens(self):
+        """
+        Ensure searching for songs fails if the user tries to send a next_page & back_page token.
+        """
+        test_req_data = {
+            "next_page": (
+                "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0xLCJ0b"
+                "3RhbF9wYWdlcyI6MiwicG9zdHNfcGVyX3BhZ2UiOjEsImN1cnJlbnR"
+                "fcGFnZSI6Mn0.rOexY_eF1nUjFJvpDbbbTTgpoVjxIh9ZbVs0Q6ggR"
+                "uQ"
+            ),
+            "back_page": (
+                "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0x"
+                "LCJ0b3RhbF9wYWdlcyI6MiwicG9zdHNfcGVyX3BhZ2UiOjEsI"
+                "mN1cnJlbnRfcGFnZSI6MX0.pkQCRbBgvwuozzSG6LK-kFGuxT"
+                "8YYsYN3m9g-AzquyM"
+            )
+        }
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = ALT_MOCKED_TOKEN
+            res = self.test_client.get(
+                "/api/v1/audio/search",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
