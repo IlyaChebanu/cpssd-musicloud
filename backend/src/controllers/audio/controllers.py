@@ -31,7 +31,7 @@ from ...models.audio import (
     get_number_of_songs_in_playlist, get_playlist_data, add_to_playlist,
     remove_from_playlist, get_from_playlist, update_playlist_timestamp,
     update_playlist_name, update_publised_timestamp, notify_like_dids,
-    notify_song_dids, update_song_name, update_description
+    notify_song_dids, update_song_name, update_description, delete_song_data
 )
 from ...models.users import get_user_via_username
 from ...models.errors import NoResults
@@ -1241,3 +1241,39 @@ def description(user_data):
         request.json.get("sid"), request.json.get("description")
     )
     return {"message": "Description updated."}, 200
+
+
+@AUDIO.route("", methods=["DELETE"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def delete_song(user_data):
+    """
+    Endpoint for deleting a song.
+    """
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "sid": {
+                "type": "integer",
+                "minimum": 1
+            }
+        },
+        "required": ["sid"]
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    try:
+        get_song_data(request.json.get("sid"), user_data.get("uid"))
+    except NoResults:
+        return {"message": "Song does not exist!"}, 400
+
+    if not permitted_to_edit(request.json.get("sid"), user_data.get("uid")):
+        return {"message": "You can't delete that song!"}, 401
+
+    delete_song_data(request.json.get('sid'))
+
+    return {"message": "Song deleted"}, 200

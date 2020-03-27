@@ -1564,13 +1564,15 @@ class AudioTests(unittest.TestCase):
             )
             self.assertEqual(422, res.status_code)
 
-    def test_unlike_success(self):
+    @mock.patch('backend.src.controllers.audio.controllers.get_song_data')
+    def test_unlike_success(self, mocked_song):
         """
         Ensure unliking is successful.
         """
         test_req_data = {
             "sid": 1,
         }
+        mocked_song.return_value = [[None, None, "A Cool Tune"]]
         with mock.patch("backend.src.controllers.audio.controllers.post_unlike"):
             with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
                 mock_token.return_value = MOCKED_TOKEN
@@ -1660,13 +1662,15 @@ class AudioTests(unittest.TestCase):
             )
             self.assertEqual(422, res.status_code)
 
-    def test_publish_success(self):
+    @mock.patch('backend.src.controllers.audio.controllers.get_song_data')
+    def test_publish_success(self, mocked_song):
         """
         Ensure publish is successful.
         """
         test_req_data = {
             "sid": 1,
         }
+        mocked_song.return_value = [[None, None, "A Cool Tune"]]
         with mock.patch("backend.src.controllers.audio.controllers.permitted_to_edit"):
             with mock.patch("backend.src.controllers.audio.controllers.update_published_status"):
                 with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
@@ -4153,3 +4157,141 @@ class AudioTests(unittest.TestCase):
             self.assertEqual(401, res.status_code)
             expected_body = {"message": "You can't update that song!"}
             self.assertEqual(expected_body, json.loads(res.data))
+
+    @mock.patch("backend.src.controllers.audio.controllers.permitted_to_edit")
+    def test_delete_song_success(self, mocked_editor_check):
+        """
+        Ensure deleting a song works.
+        """
+        test_req_data = {
+            "sid": 1
+        }
+        mocked_editor_check.return_value = True
+        with mock.patch('backend.src.controllers.audio.controllers.delete_song_data'):
+            with mock.patch('backend.src.controllers.audio.controllers.get_song_data'):
+                with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+                    mock_token.return_value = ALT_MOCKED_TOKEN
+                    res = self.test_client.delete(
+                        "/api/v1/audio",
+                        json=test_req_data,
+                        headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                        follow_redirects=True
+                    )
+                    self.assertEqual(200, res.status_code)
+                    expected_body = {'message': 'Song deleted'}
+                    self.assertEqual(expected_body, json.loads(res.data))
+
+    def test_delete_song_fail_missing_access_token(self):
+        """
+        Ensure deleting a song fails if no access_token is sent.
+        """
+        res = self.test_client.delete(
+            "/api/v1/audio",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_delete_song_fail_access_token_expired(self):
+        """
+        Ensure deleting a song fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
+            res = self.test_client.delete(
+                "/api/v1/audio",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_delete_song_fail_bad_access_token_signature(self):
+        """
+        Ensure deleting a song fails if the access_token signature does
+        not match the one configured on the server.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
+            res = self.test_client.delete(
+                "/api/v1/audio",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_delete_song_fail_unknown_access_token_issue(self):
+        """
+        Ensure deleting a song fails if some unknown error relating to the
+        access_token occurs.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
+            res = self.test_client.delete(
+                "/api/v1/audio",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_delete_song_fail_missing_sid(self):
+        """
+        Ensure deleting a song fails if a sid is not sent.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = ALT_MOCKED_TOKEN
+            res = self.test_client.delete(
+                "/api/v1/audio",
+                json={},
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+            test_req_data = {
+                "sid": None
+            }
+            res = self.test_client.delete(
+                "/api/v1/audio",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_song_data')
+    def test_delete_song_fail_invalid_sid(self, mock_raise):
+        """
+        Ensure deleting a song fails if the sid sent is invalid.
+        """
+        test_req_data = {
+            "sid": 1
+        }
+        mock_raise.side_effect = NoResults
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = ALT_MOCKED_TOKEN
+            res = self.test_client.delete(
+                "/api/v1/audio",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(400, res.status_code)
+
+    @mock.patch('backend.src.controllers.audio.controllers.permitted_to_edit')
+    def test_delete_song_fail_not_permitted(self, mock_uid):
+        """
+        Ensure deleting a playlist fails if the user is not permitted to edit
+        the playlist.
+        """
+        test_req_data = {
+            "sid": 1
+        }
+        mock_uid.return_value = False
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            with mock.patch('backend.src.controllers.audio.controllers.get_song_data'):
+                mock_token.return_value = ALT_MOCKED_TOKEN
+                res = self.test_client.delete(
+                    "/api/v1/audio",
+                    json=test_req_data,
+                    headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                    follow_redirects=True
+                )
+                self.assertEqual(401, res.status_code)
