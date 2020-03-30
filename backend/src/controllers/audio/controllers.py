@@ -1255,10 +1255,10 @@ def search_songs(user_data):  # pylint: disable=R0911,R0912,R0914,R0915
     back_page = request.args.get('back_page')
     if not next_page and not back_page:
         search_term = request.args.get('search_term')
-        if not search_term:
-            return {"message": "No search_term sent."}, 400
-
-        total_songs = get_number_of_searchable_songs(search_term)
+        if search_term:
+            total_songs = get_number_of_searchable_songs(search_term)
+        else:
+            total_songs = get_number_of_compiled_songs()
 
         publish_sort = request.args.get('publish_sort')
         title_sort = request.args.get('title_sort')
@@ -1339,10 +1339,15 @@ def search_songs(user_data):  # pylint: disable=R0911,R0912,R0914,R0915
 
         start_index = (current_page * songs_per_page) - songs_per_page
 
-        search_results = get_all_search_results(
-            start_index, songs_per_page, user_data.get("uid"), search_term,
-            sort_sql
-        )
+        if search_term:
+            search_results = get_all_search_results(
+                start_index, songs_per_page, user_data.get("uid"), search_term,
+                sort_sql
+            )
+        else:
+            search_results = get_all_compiled_songs(
+                start_index, songs_per_page, user_data.get("uid"), sort_sql
+            )
 
         res = []
         for song in search_results:
@@ -1387,10 +1392,15 @@ def search_songs(user_data):  # pylint: disable=R0911,R0912,R0914,R0915
     total_pages = token.get("total_pages")
     start_index = (current_page * songs_per_page) - songs_per_page
 
-    search_results = get_all_search_results(
-        start_index, songs_per_page, user_data.get("uid"), search_term,
-        sort_sql
-    )
+    if search_term:
+        search_results = get_all_search_results(
+            start_index, songs_per_page, user_data.get("uid"), search_term,
+            sort_sql
+        )
+    else:
+        search_results = get_all_compiled_songs(
+            start_index, songs_per_page, user_data.get("uid"), sort_sql
+        )
 
     res = []
     for song in search_results:

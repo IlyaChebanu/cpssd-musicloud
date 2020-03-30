@@ -170,7 +170,7 @@ def get_song_state(sid):
     return state[0][0]
 
 
-def get_all_compiled_songs(start_index, songs_per_page, uid):
+def get_all_compiled_songs(start_index, songs_per_page, uid, sort_sql=None):
     """
     Get any publicly available song.
     :param start_index:
@@ -192,8 +192,11 @@ def get_all_compiled_songs(start_index, songs_per_page, uid):
         "AND Song_Likes.uid=%s), description,"
         "(SELECT profiler FROM Users WHERE Songs.uid=Users.uid) as profiler"
         " FROM Songs WHERE public=1 "
-        "LIMIT %s, %s;"
     )
+    if sort_sql:
+        sql += sort_sql + "LIMIT %s, %s;"
+    else:
+        sql += "LIMIT %s, %s;"
     args = (
         uid,
         start_index,

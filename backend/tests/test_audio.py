@@ -1564,13 +1564,15 @@ class AudioTests(unittest.TestCase):
             )
             self.assertEqual(422, res.status_code)
 
-    def test_unlike_success(self):
+    @mock.patch('backend.src.controllers.audio.controllers.get_song_data')
+    def test_unlike_success(self, mocked_song):
         """
         Ensure unliking is successful.
         """
         test_req_data = {
             "sid": 1,
         }
+        mocked_song.return_value = [[None, "A username"]]
         with mock.patch("backend.src.controllers.audio.controllers.post_unlike"):
             with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
                 mock_token.return_value = MOCKED_TOKEN
@@ -1660,26 +1662,29 @@ class AudioTests(unittest.TestCase):
             )
             self.assertEqual(422, res.status_code)
 
-    def test_publish_success(self):
+    @mock.patch('backend.src.controllers.audio.controllers.get_song_data')
+    def test_publish_success(self, mocked_song):
         """
         Ensure publish is successful.
         """
         test_req_data = {
             "sid": 1,
         }
+        mocked_song.return_value = [[None, None, "Fake Title"]]
         with mock.patch("backend.src.controllers.audio.controllers.permitted_to_edit"):
             with mock.patch("backend.src.controllers.audio.controllers.update_published_status"):
-                with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-                    mock_token.return_value = MOCKED_TOKEN
-                    res = self.test_client.post(
-                        "/api/v1/audio/publish",
-                        json=test_req_data,
-                        headers={'Authorization': 'Bearer ' + TEST_TOKEN},
-                        follow_redirects=True
-                    )
-                    self.assertEqual(200, res.status_code)
-                    expected_body = {"message": "Song published."}
-                    self.assertEqual(expected_body, json.loads(res.data))
+                with mock.patch("backend.src.controllers.audio.controllers.update_publised_timestamp"):
+                    with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+                        mock_token.return_value = MOCKED_TOKEN
+                        res = self.test_client.post(
+                            "/api/v1/audio/publish",
+                            json=test_req_data,
+                            headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                            follow_redirects=True
+                        )
+                        self.assertEqual(200, res.status_code)
+                        expected_body = {"message": "Song published."}
+                        self.assertEqual(expected_body, json.loads(res.data))
 
     def test_publish_fail_missing_access_token(self):
         """
