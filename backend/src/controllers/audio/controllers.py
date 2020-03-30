@@ -32,7 +32,8 @@ from ...models.audio import (
     get_number_of_songs_in_playlist, get_playlist_data, add_to_playlist,
     remove_from_playlist, get_from_playlist, update_playlist_timestamp,
     update_playlist_name, update_publised_timestamp, notify_like_dids,
-    notify_song_dids, update_song_name, update_description, delete_song_data,
+    notify_song_dids, update_song_name, update_description,
+    get_number_of_searchable_songs, get_all_search_results, delete_song_data,
     get_sample_listing, add_sample_listing, update_sample_listing
 )
 from ...models.users import get_user_via_username
@@ -1243,6 +1244,190 @@ def description(user_data):
         request.json.get("sid"), request.json.get("description")
     )
     return {"message": "Description updated."}, 200
+
+
+@AUDIO.route("/search", methods=["GET"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def search_songs(user_data):  # pylint: disable=R0911,R0912,R0914,R0915
+    """
+    Endpoint for searching the song catalog.
+    """
+
+    next_page = request.args.get('next_page')
+    back_page = request.args.get('back_page')
+    if not next_page and not back_page:
+        search_term = request.args.get('search_term')
+        if search_term:
+            total_songs = get_number_of_searchable_songs(search_term)
+        else:
+            total_songs = get_number_of_compiled_songs()
+
+        publish_sort = request.args.get('publish_sort')
+        title_sort = request.args.get('title_sort')
+        artist_sort = request.args.get('artist_sort')
+        duration_sort = request.args.get('duration_sort')
+
+        sorts = [
+            sort for sort in
+            [publish_sort, title_sort, artist_sort, duration_sort]
+            if sort is not None
+        ]
+
+        sort_sql = None
+        if sorts:
+            if len(sorts) > 1:
+                return {
+                    "message": "Only one sort can be applied at a time."
+                }, 400
+
+            if not isinstance(sorts[0], str):
+                return {
+                    "message": "Sort values, must be a str of value 'up' or "
+                               "'down'"
+                }, 400
+
+            sorts[0] = sorts[0].lower()
+
+            if sorts[0] != "up" and sorts[0] != "down":
+                return {
+                    "message": "Sort values, must be a str of value 'up' or "
+                               "'down'"
+                }, 400
+
+            if publish_sort:
+                if sorts[0] == "up":
+                    sort_sql = " ORDER BY published ASC "
+                else:
+                    sort_sql = " ORDER BY published DESC "
+
+            if title_sort:
+                if sorts[0] == "up":
+                    sort_sql = " ORDER BY title DESC "
+                else:
+                    sort_sql = " ORDER BY title ASC "
+
+            if artist_sort:
+                if sorts[0] == "up":
+                    sort_sql = " ORDER BY username DESC "
+                else:
+                    sort_sql = " ORDER BY username ASC "
+
+            if duration_sort:
+                if sorts[0] == "up":
+                    sort_sql = " ORDER BY duration ASC "
+                else:
+                    sort_sql = " ORDER BY duration DESC "
+
+        songs_per_page = request.args.get('songs_per_page')
+        if not songs_per_page:
+            songs_per_page = 50
+        songs_per_page = int(songs_per_page)
+
+        current_page = request.args.get('current_page')
+        if not current_page:
+            current_page = 1
+        current_page = int(current_page)
+
+        total_pages = ceil(total_songs / songs_per_page)
+        if total_pages == 0:
+            total_pages = 1
+        if current_page > total_pages:
+            return {
+                "message": (
+                    "current_page exceeds the total number of pages available("
+                    + str(total_pages) + ")."
+                )
+            }, 422
+
+        start_index = (current_page * songs_per_page) - songs_per_page
+
+        if search_term:
+            search_results = get_all_search_results(
+                start_index, songs_per_page, user_data.get("uid"), search_term,
+                sort_sql
+            )
+        else:
+            search_results = get_all_compiled_songs(
+                start_index, songs_per_page, user_data.get("uid"), sort_sql
+            )
+
+        res = []
+        for song in search_results:
+            res.append(gen_song_object(song))
+
+        jwt_payload = {
+            "search_term": search_term,
+            "sort_sql": sort_sql,
+            "total_pages": total_pages,
+            "songs_per_page": songs_per_page,
+        }
+
+        back_page, next_page = gen_scroll_tokens(
+            current_page, total_pages, jwt_payload
+        )
+
+        return {
+            "current_page": current_page,
+            "total_pages": total_pages,
+            "songs_per_page": songs_per_page,
+            "next_page": next_page,
+            "back_page": back_page,
+            "songs": res,
+        }, 200
+    if next_page and back_page:
+        return {
+            "message": (
+                "You can't send both a 'next_page' token and a 'back_page' "
+                "token."
+            )
+        }, 422
+    token = next_page
+    if not token:
+        token = back_page
+    token = jwt.decode(token, JWT_SECRET, algorithms=['HS256'])
+
+    search_term = token.get("search_term")
+    sort_sql = token.get("sort_sql")
+
+    current_page = token.get("current_page")
+    songs_per_page = token.get("songs_per_page")
+    total_pages = token.get("total_pages")
+    start_index = (current_page * songs_per_page) - songs_per_page
+
+    if search_term:
+        search_results = get_all_search_results(
+            start_index, songs_per_page, user_data.get("uid"), search_term,
+            sort_sql
+        )
+    else:
+        search_results = get_all_compiled_songs(
+            start_index, songs_per_page, user_data.get("uid"), sort_sql
+        )
+
+    res = []
+    for song in search_results:
+        res.append(gen_song_object(song))
+
+    jwt_payload = {
+        "search_term": search_term,
+        "sort_sql": sort_sql,
+        "total_pages": total_pages,
+        "songs_per_page": songs_per_page,
+    }
+
+    back_page, next_page = gen_scroll_tokens(
+        current_page, total_pages, jwt_payload
+    )
+
+    return {
+        "current_page": current_page,
+        "total_pages": total_pages,
+        "songs_per_page": songs_per_page,
+        "next_page": next_page,
+        "back_page": back_page,
+        "songs": res,
+    }, 200
 
 
 @AUDIO.route("", methods=["DELETE"])
