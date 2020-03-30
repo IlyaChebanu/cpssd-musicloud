@@ -4296,8 +4296,8 @@ class AudioTests(unittest.TestCase):
                     follow_redirects=True
                 )
                 self.assertEqual(401, res.status_code)
-             
-     @mock.patch('backend.src.controllers.audio.controllers.get_all_search_results')
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_all_search_results')
     @mock.patch('backend.src.controllers.audio.controllers.get_number_of_searchable_songs')
     def test_get_search_success_no_scroll_token(self, mocked_num_songs, mocked_songs):
         """
@@ -4394,7 +4394,8 @@ class AudioTests(unittest.TestCase):
                 'next_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZWFyY2hfdGVybSI6InRlc3QiLCJzb3J0X3NxbCI6IiBPUkRFUiBCWSBkdXJhdGlvbiBBU0MgIiwidG90YWxfcGFnZXMiOjIxLCJzb25nc19wZXJfcGFnZSI6NTAsImN1cnJlbnRfcGFnZSI6NH0.KfhyMGH1U_QMzhTGwb6KAUDLva9COdedGk2wP6zFECs',
                 'songs': expected_songs,
                 'songs_per_page': 50,
-              
+                'total_pages': 21
+            }
             self.assertEqual(expected_body, json.loads(res.data))
 
     @mock.patch('backend.src.controllers.audio.controllers.get_all_search_results')
@@ -4553,4 +4554,3 @@ class AudioTests(unittest.TestCase):
                 follow_redirects=True
             )
             self.assertEqual(422, res.status_code)
-
