@@ -97,13 +97,12 @@ class Resets(db.Model):
 
 class Posts(db.Model):
     __tablename__ = 'Posts'
-    __table_args__ = (
-        db.PrimaryKeyConstraint('uid'),
+    post_id = db.Column(
+        db.Integer, primary_key=True, nullable=False, autoincrement=True
     )
-
-    uid = db.Column(db.Integer, db.ForeignKey(Users.uid), nullable=False)
     message = db.Column(db.VARCHAR(21844), nullable=False)
     time = db.Column(db.DATETIME, nullable=False)
+    uid = db.Column(db.Integer, db.ForeignKey(Users.uid), nullable=False)
 
 
 class Logins(db.Model):
@@ -174,6 +173,24 @@ class Notifications(db.Model):
         db.VARCHAR(255), unique=True, nullable=False, primary_key=True
     )
     uid = db.Column(db.Integer, db.ForeignKey(Users.uid), nullable=False)
+
+
+class Sample_Directory(db.Model):
+    __tablename__ = 'Sample_Directory'
+
+    file_id = db.Column(
+        db.Integer, primary_key=True, nullable=False, unique=True,
+        autoincrement=True
+    )
+    url = db.Column(
+        db.VARCHAR(3072), unique=True, nullable=False
+    )
+    filename = db.Column(
+        db.VARCHAR(3072), nullable=False
+    )
+    directory = db.Column(
+        db.VARCHAR(3072), nullable=False
+    )
 
 
 if __name__ == '__main__':
