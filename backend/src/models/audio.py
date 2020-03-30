@@ -1066,3 +1066,41 @@ def update_description(sid, description):
         sid,
     )
     query(sql, args)
+
+
+def delete_song_data(sid):
+    """
+    Remove a song, and all it's associated data, from the DB.
+    :param sid:
+    Int - ID of the song to be deleted.
+    :return:
+    None - Removes the song from the DB and returns None.
+    """
+    sql1 = (
+        "DELETE FROM Playlist_State "
+        "WHERE sid=%s"
+    )
+    sql2 = (
+        "DELETE FROM Song_State "
+        "WHERE sid=%s"
+    )
+    sql3 = (
+        "DELETE FROM Song_Likes "
+        "WHERE sid=%s"
+    )
+    sql4 = (
+        "DELETE FROM Song_Editors "
+        "WHERE sid=%s"
+    )
+    sql5 = (
+        "DELETE FROM Songs "
+        "WHERE sid=%s"
+    )
+    args = (
+        sid,
+    )
+    query(sql1, args)
+    query(sql2, args)
+    query(sql3, args)
+    query(sql4, args)
+    query(sql5, args)
