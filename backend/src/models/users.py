@@ -627,7 +627,7 @@ def get_timeline(uid, start_index, items_per_page):
     """
     sql = (
         "SELECT * FROM ((SELECT sid, "
-        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as usernanme"
+        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as username"
         ", title, duration, created, public,"
         "published AS time, url, cover, NULL AS message, "
         "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid ) "
@@ -639,7 +639,7 @@ def get_timeline(uid, start_index, items_per_page):
         "Songs WHERE (uid IN "
         "(SELECT Followers.following FROM Followers WHERE follower=%s)"
         " OR uid=%s) AND public=1) UNION (SELECT NULL AS sid, "
-        "(SELECT username FROM Users WHERE Posts.uid=Users.uid) as usernanme"
+        "(SELECT username FROM Users WHERE Posts.uid=Users.uid) as username"
         ", NULL AS title,"
         "NULL AS duration, NULL AS created, NULL AS public, time, NULL AS url,"
         "NULL AS cover, message, NULL AS likes,"
@@ -674,7 +674,7 @@ def get_timeline_length(uid):
     """
     sql = (
         "SELECT COUNT(*) FROM ((SELECT sid, "
-        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as usernanme"
+        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as username"
         ", title, duration, created, public,"
         "published AS time, url, cover, NULL AS message, "
         "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid ) "
@@ -686,7 +686,7 @@ def get_timeline_length(uid):
         "Songs WHERE (uid IN "
         "(SELECT Followers.following FROM Followers WHERE follower=%s)"
         " OR uid=%s) AND public=1) UNION (SELECT NULL AS sid, "
-        "(SELECT username FROM Users WHERE Posts.uid=Users.uid) as usernanme"
+        "(SELECT username FROM Users WHERE Posts.uid=Users.uid) as username"
         ", NULL AS title,"
         "NULL AS duration, NULL AS created, NULL AS public, time, NULL AS url,"
         "NULL AS cover, message, NULL AS likes, "
@@ -724,7 +724,7 @@ def get_timeline_posts_only(uid, start_index, items_per_page):
     """
     sql = (
         "SELECT * FROM ((SELECT NULL AS sid, "
-        "(SELECT username FROM Users WHERE Posts.uid=Users.uid) as usernanme"
+        "(SELECT username FROM Users WHERE Posts.uid=Users.uid) as username"
         ", NULL AS title,"
         "NULL AS duration, NULL AS created, NULL AS public, time, NULL AS url,"
         "NULL AS cover, message, NULL AS likes,"
@@ -756,7 +756,7 @@ def get_timeline_posts_only_length(uid):
     """
     sql = (
         "SELECT COUNT(*) FROM ((SELECT NULL AS sid, "
-        "(SELECT username FROM Users WHERE Posts.uid=Users.uid) as usernanme"
+        "(SELECT username FROM Users WHERE Posts.uid=Users.uid) as username"
         ", NULL AS title,"
         "NULL AS duration, NULL AS created, NULL AS public, time, NULL AS url,"
         "NULL AS cover, message, NULL AS likes,"
@@ -791,7 +791,7 @@ def get_timeline_song_only(uid, start_index, items_per_page):
     """
     sql = (
         "SELECT * FROM ((SELECT sid, "
-        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as usernanme"
+        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as username"
         ", title, duration, created, public,"
         "published AS time, url, cover, NULL AS message, "
         "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid ) "
@@ -826,7 +826,7 @@ def get_timeline_song_only_length(uid):
     """
     sql = (
         "SELECT COUNT(*) FROM ((SELECT sid, "
-        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as usernanme"
+        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as username"
         ", title, duration, created, public,"
         "published AS time, url, cover, NULL AS message, "
         "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid ) "
