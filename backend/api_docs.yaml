@@ -3872,8 +3872,8 @@ paths:
     get:
       tags:
       - "audio"
-      summary: "Get the sample names associated with any number of URLs."
-      description: "This endpoint takes one argument and returns a list of sample file names. The argument can be provided are as follows:\n\n \"urls\" = If a 'next_page' or 'back_page' argument is not sent, then this is a mandatory argument you must send. This should be set to an array of urls that you want to get file names for."
+      summary: "Get the sample name and directory associated with a URL."
+      description: "This endpoint takes one argument and returns an object containing a samples filename and directory path. The argument can be provided are as follows:\n\n \"url\" = If a 'next_page' or 'back_page' argument is not sent, then this is a mandatory argument you must send. This should be set to a url that you want to get the file name and directory for."
       consumes:
       - "application/json"
       produces:
@@ -3885,23 +3885,30 @@ paths:
           required: true
           type: "string"
         - in: "query"
-          name: "urls"
+          name: "url"
           type: "string"
           required: false
-          description: "The string representation of an array of urls."
+          description: "A url string."
       responses:
         200:
           description: "Successful search query"
           schema:
             type: "object"
             properties:
-              names:
-                type: "array"
-                items:
-                  type: "string"
-                  example:
-                    - "Example_Sample"
-                    - "Unknown Sample"
+              filename:
+                type: "string"
+                example: "UNKOWN"
+              directory:
+                type: "string"
+                example: "/"
+        400:
+          description: "Invalid sample URL"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Sample does not exist"
         401:
           description: "User's token has expired"
           schema:
@@ -3937,8 +3944,8 @@ paths:
     patch:
       tags:
       - "audio"
-      summary: "Add or update a filename mapping."
-      description: "Changes the filename mapped to a URL."
+      summary: "Add or update a url -> filename mapping."
+      description: "Changes the filename, and or directory, mapped to a URL."
       consumes:
       - "application/json"
       produces:
@@ -3955,12 +3962,27 @@ paths:
         schema:
           type: "object"
           properties:
-            mapping:
+            mappings:
               type: "object"
               properties:
                 http://url.com:
-                  type: "string"
-                  example: "Example_Sample_Name"
+                  type: "object"
+                  properties:
+                    filename:
+                      type: "string"
+                      example: "Example_Sample_Name"
+                    directory:
+                      type: "string"
+                      example: "/a/nested/directory"
+                http://a-website.org:
+                  type: "object"
+                  properties:
+                    filename:
+                      type: "string"
+                      example: "Example_Sample_Name"
+                    directory:
+                      type: "string"
+                      example: "/a/nested/directory"
       responses:
         200:
           description: "Mapping updated"
@@ -3969,7 +3991,7 @@ paths:
             properties:
               message:
                 type: "string"
-                example: "Name(s) updated"
+                example: "Mapping(s) updated"
         401:
           description: "User's token has expired"
           schema:
@@ -4002,5 +4024,64 @@ paths:
               message:
                 type: "string"
                 example: "MySQL unavailable."
+    delete:
+      tags:
+      - "audio"
+      summary: "Delete a sample listing."
+      description: "Deletes a sample listing in the sample directory."
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "query"
+          name: "url"
+          type: "string"
+          required: false
+          description: "A url string."
+      responses:
+        200:
+          description: "Sample Deleted"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Sample listing deleted"
+        401:
+          description: "Access_token missing or expired."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Request missing access_token."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable"
                 
 x-aws-api-id: 'fvg2nhhlzk'

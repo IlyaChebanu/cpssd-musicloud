@@ -1227,3 +1227,22 @@ def update_sample_listing(url, filename=None, directory=None):
     else:
         return
     query(sql, args)
+
+
+def delete_sample_listing(url):
+    """
+    Delete a sample listing.
+    :param url
+    Str - The url you want to delete the mapping of.
+    :return:
+    None - The url entry in the sample directory is deleted and
+    nothing returned.
+    """
+    sql = (
+        "DELETE FROM Sample_Directory "
+        "WHERE url=%s;"
+    )
+    args = (
+        url,
+    )
+    query(sql, args)

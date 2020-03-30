@@ -5,7 +5,6 @@
 import datetime
 import json
 from math import ceil
-from ast import literal_eval
 
 import jwt
 from flask import Blueprint
@@ -34,7 +33,8 @@ from ...models.audio import (
     update_playlist_name, update_publised_timestamp, notify_like_dids,
     notify_song_dids, update_song_name, update_description,
     get_number_of_searchable_songs, get_all_search_results, delete_song_data,
-    get_sample_listing, add_sample_listing, update_sample_listing
+    get_sample_listing, add_sample_listing, update_sample_listing,
+    delete_sample_listing
 )
 from ...models.users import get_user_via_username
 from ...models.errors import NoResults
@@ -1510,26 +1510,28 @@ def read_sample_directory():  # pylint: disable=R0911
     """
     Endpoint for getting a sample mapping from the sample directory.
     """
-    urls = request.args.get('urls')
-    print(urls)
-    if not urls:
-        return {"message": "urls param can't be empty!"}, 422
+    url = request.args.get('url')
 
-    urls = literal_eval(urls)
+    if not url:
+        return {"message": "url param can't be empty!"}, 422
 
-    if not isinstance(urls, list):
-        return {
-            "message": "urls param must be the string representation of an "
-                       "array of urls."
-        }, 422
+    sample = get_sample_listing(url.lower())
+    if sample:
+        return {"filename": sample[0][0], "directory": sample[0][1]}, 200
+    return {"message": "Sample does not exist"}, 400
 
-    res = {}
-    for url in urls:
-        print(url)
-        sample = get_sample_listing(url.lower())
-        if sample:
-            res[url] = {"filename": sample[0][0], "directory": sample[0][1]}
-        else:
-            continue
 
-    return {"mappings": res}, 200
+@AUDIO.route("/sample_names", methods=["DELETE"])
+@sql_err_catcher()
+@auth_required()
+def delete_sample_directory_listing():  # pylint: disable=R0911
+    """
+    Endpoint for deleting a sample mapping from the sample directory.
+    """
+    url = request.args.get('url')
+
+    if not url:
+        return {"message": "url param can't be empty!"}, 422
+
+    delete_sample_listing(url)
+    return {"message": "Sample listing deleted"}, 200
