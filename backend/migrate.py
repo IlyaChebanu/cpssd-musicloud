@@ -186,10 +186,10 @@ class Sample_Directory(db.Model):
         db.VARCHAR(3072), unique=True, nullable=False
     )
     filename = db.Column(
-        db.VARCHAR(3072), nullable=False
+        db.VARCHAR(3072), nullable=False, default='UNKNOWN'
     )
     directory = db.Column(
-        db.VARCHAR(3072), nullable=False
+        db.VARCHAR(3072), nullable=False, default='/'
     )
 
 

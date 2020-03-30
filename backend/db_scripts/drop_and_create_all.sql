@@ -120,8 +120,8 @@ CREATE TABLE `musicloud_db`.`Notifications` (
 );
 
 CREATE TABLE `musicloud_db`.`Sample_Directory` (
-    file_id INT UNIQUE NOT NULL PRIMARY KEY,
+    file_id INT UNIQUE NOT NULL PRIMARY KEY AUTO_INCREMENT,
     `url` VARCHAR(3072) NOT NULL UNIQUE,
-    `filename` VARCHAR(3072) NOT NULL,
-    `directory` VARCHAR(3072) NOT NULL
+    `filename` VARCHAR(3072) NOT NULL DEFAULT='UNKOWN',
+    `directory` VARCHAR(3072) NOT NULL DEFAULT='/'
 );

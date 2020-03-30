@@ -5,6 +5,7 @@
 import datetime
 import json
 from math import ceil
+from ast import literal_eval
 
 import jwt
 from flask import Blueprint
@@ -31,7 +32,8 @@ from ...models.audio import (
     get_number_of_songs_in_playlist, get_playlist_data, add_to_playlist,
     remove_from_playlist, get_from_playlist, update_playlist_timestamp,
     update_playlist_name, update_publised_timestamp, notify_like_dids,
-    notify_song_dids, update_song_name, update_description, delete_song_data
+    notify_song_dids, update_song_name, update_description, delete_song_data,
+    get_sample_listing, add_sample_listing, update_sample_listing
 )
 from ...models.users import get_user_via_username
 from ...models.errors import NoResults
@@ -1277,3 +1279,72 @@ def delete_song(user_data):
     delete_song_data(request.json.get('sid'))
 
     return {"message": "Song deleted"}, 200
+
+
+@AUDIO.route("/sample_names", methods=["PATCH"])
+@sql_err_catcher()
+@auth_required()
+def edit_sample_directory():  # pylint: disable=R0911
+    """
+    Endpoint for adding or updating a url -> filename mapping.
+    """
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "mappings": {
+                "type": "object",
+            }
+        },
+        "required": ["mappings"]
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    mappings = request.json.get('mappings')
+    urls = mappings.keys()
+
+    for url in urls:
+        filename = mappings[url].get("filename")
+        directory = mappings[url].get("directory")
+        sample = get_sample_listing(url.lower())
+        if sample:
+            update_sample_listing(url.lower(), filename, directory)
+        else:
+            add_sample_listing(url.lower(), filename, directory)
+
+    return {"message": "Mapping(s) updated"}, 200
+
+
+@AUDIO.route("/sample_names", methods=["GET"])
+@sql_err_catcher()
+@auth_required()
+def read_sample_directory():  # pylint: disable=R0911
+    """
+    Endpoint for getting a sample mapping from the sample directory.
+    """
+    urls = request.args.get('urls')
+    print(urls)
+    if not urls:
+        return {"message": "urls param can't be empty!"}, 422
+
+    urls = literal_eval(urls)
+
+    if not isinstance(urls, list):
+        return {
+            "message": "urls param must be the string representation of an "
+                       "array of urls."
+        }, 422
+
+    res = {}
+    for url in urls:
+        print(url)
+        sample = get_sample_listing(url.lower())
+        if sample:
+            res[url] = {"filename": sample[0][0], "directory": sample[0][1]}
+        else:
+            continue
+
+    return {"mappings": res}, 200

@@ -1026,3 +1026,126 @@ def delete_song_data(sid):
     query(sql3, args)
     query(sql4, args)
     query(sql5, args)
+
+
+def add_sample_listing(url, filename=None, directory=None):
+    """
+    Adds a new sample listing in the sample directory.
+    :param url:
+    Str - The url you want to map a filename & directory to.
+    :param filename:
+    Str - An optional param allowing you to name the file at the URL.
+    :param directory:
+    Str - An optional param allowing you to specify the directory of the URL.
+    :return:
+    None - Creates a listing in the sample directory for the url.
+    """
+    sql, args = None, None
+    if filename and directory:
+        sql = (
+            "INSERT INTO Sample_Directory "
+            "(url, filename, directory) "
+            "VALUES (%s, %s, %s)"
+        )
+        args = (
+            url,
+            filename,
+            directory
+        )
+    elif filename and not directory:
+        sql = (
+            "INSERT INTO Sample_Directory "
+            "(url, filename) "
+            "VALUES (%s, %s)"
+        )
+        args = (
+            url,
+            filename
+        )
+    elif directory and not filename:
+        sql = (
+            "INSERT INTO Sample_Directory "
+            "(url, directory) "
+            "VALUES (%s, %s)"
+        )
+        args = (
+            url,
+            directory
+        )
+    else:
+        sql = (
+            "INSERT INTO Sample_Directory "
+            "(url) "
+            "VALUES (%s)"
+        )
+        args = (
+            url
+        )
+    query(sql, args)
+
+
+def get_sample_listing(url):
+    """
+    Gets a sample listing and returns it.
+    :param url:
+    Str - The url you want to return the mapping of.
+    :return:
+    List - A list of filenames & directories mapped to a url.
+    """
+    sql = (
+        "SELECT filename, directory FROM Sample_Directory WHERE url=%s;"
+    )
+    args = (
+        url,
+    )
+    res = query(sql, args, True)
+    return res
+
+
+def update_sample_listing(url, filename=None, directory=None):
+    """
+    Updates a current sample listing in the sample directory.
+    :param url:
+    Str - The url you want to map a new filename & or directory to.
+    :param filename:
+    Str - An optional param allowing you to rename the file at the URL.
+    :param directory:
+    Str - An optional param allowing you to respecify the directory of the URL.
+    :return:
+    None - Updates a listing in the sample directory for the url.
+    """
+    sql, args = None, None
+    if filename and directory:
+        sql = (
+            "UPDATE Sample_Directory "
+            "SET filename = %s, directory=%s "
+            "WHERE url = %s"
+        )
+        args = (
+            filename,
+            directory,
+            url
+        )
+    elif filename and not directory:
+        sql = (
+            "UPDATE Sample_Directory "
+            "SET filename = %s "
+            "WHERE url = %s"
+        )
+        args = (
+            filename,
+            url,
+        )
+    elif directory and not filename:
+        sql = (
+            "UPDATE Sample_Directory "
+            "SET directory=%s "
+            "WHERE url = %s"
+        )
+        args = (
+            directory,
+            url
+        )
+    else:
+        return
+    query(sql, args)
