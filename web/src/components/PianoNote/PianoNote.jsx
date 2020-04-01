@@ -11,7 +11,6 @@ import Tone from 'tone';
 import styles from './PianoNote.module.scss';
 import {
   colours,
-  audioContext,
 } from '../../helpers/constants';
 import { useGlobalDrag } from '../../helpers/hooks';
 import {

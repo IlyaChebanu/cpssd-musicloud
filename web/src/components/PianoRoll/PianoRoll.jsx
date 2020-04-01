@@ -22,7 +22,6 @@ import {
 } from '../../actions/studioActions';
 import PianoNote from '../PianoNote/PianoNote';
 import SeekBar from '../SeekBar';
-import { audioContext } from '../../helpers/constants';
 import playNote from '../../middleware/playNote';
 import stopNote from '../../middleware/stopNote';
 
