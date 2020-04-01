@@ -13,6 +13,7 @@ import { ratio, screenWidth } from '../../utils/styles';
 import { postFile, putUploadFile, putUploadAudioFile } from "../../api/uploadApi";
 import CustomAlertComponent from "../../components/alertComponent/customAlert";
 import DocumentPicker from 'react-native-document-picker';
+import { LogLevel, RNFFmpeg, RNFFmpegConfig } from 'react-native-ffmpeg';
 
 const { width, height } = Dimensions.get('window');
 
@@ -150,9 +151,10 @@ class StudioScreen extends React.Component {
         this.setState({
             recordSecs: 0,
             duration: this.state.recordTime,
+            uri: result
         });
-        this.setState({ uri: result })
-        console.log(result);
+        // this.setState({ uri: result })
+        console.log('result is : ' + result);
     };
 
     onStartPlay = async () => {
@@ -225,14 +227,34 @@ class StudioScreen extends React.Component {
 
     async uploadAudio() {
 
-        let filetype = Platform.OS === 'android' ? 'mp4' : 'm4a'
+        let filetype = 'mp4'
         let filename = this.state.filename + '.' + filetype
+        let input = this.state.uri
+        let output = Platform.OS === 'android' ? this.state.uri : this.state.uri.replace('m4a', 'mp4')
+        if (__DEV__) {
+            logCallback = (logData) => {
+                console.log('ffmpeg: ' + logData.log);
+            };
+        }
+        
+        RNFFmpegConfig.enableLogCallback(this.logCallback);
+        RNFFmpegConfig.setLogLevel(LogLevel.AV_LOG_INFO);
+        
+        await RNFFmpeg.execute(`-i ${input} -c:v mpeg4 ${output}`).then(result => {
+            if (__DEV__) {
+                console.log("FFmpeg process exited with rc " + JSON.stringify(result))
+            }
+            this.postRecording(filename, filetype, output)
+        });
+    }
+
+    async postRecording(filename, filetype, output) {
         await postFile(this.props.token, 'audio', filename, `audio/x-${filetype}`).then(response => {
             if (isNaN(response)) {
                 if (response.signed_url.fields.key) {
                     this.setState({ urlKey: response.signed_url.fields.key })
                     let urlKey = response.signed_url.fields.key
-                    putUploadAudioFile(urlKey, this.state.uri, filetype, this.uploadAudioSuccess.bind(this), this.uploadAudioFail.bind(this))
+                    putUploadAudioFile(urlKey, output, filetype, this.uploadAudioSuccess.bind(this), this.uploadAudioFail.bind(this))
                 }
             }
         })
@@ -264,13 +286,13 @@ class StudioScreen extends React.Component {
                     <Text style={styles.txtRecordCounter}>{this.state.recordTime}</Text>
                     <View style={styles.viewRecorder}>
                         <View style={styles.recordBtnWrapper}>
-                            {!this.state.recording ? 
-                            <TouchableOpacity style={styles.recordBtn} onPress={this.onStartRecord}>
-                                <Image style={styles.microphoneImage} source={microphoneImage} />
-                            </TouchableOpacity> :
-                            <View style={styles.stopRecContainer}>
-                                <TouchableOpacity style={styles.stopRecBtn} onPress={this.onStopRecord} />
-                            </View>
+                            {!this.state.recording ?
+                                <TouchableOpacity style={styles.recordBtn} onPress={this.onStartRecord}>
+                                    <Image style={styles.microphoneImage} source={microphoneImage} />
+                                </TouchableOpacity> :
+                                <View style={styles.stopRecContainer}>
+                                    <TouchableOpacity style={styles.stopRecBtn} onPress={this.onStopRecord} />
+                                </View>
                             }
                         </View>
                     </View>
