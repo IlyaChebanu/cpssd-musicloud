@@ -31,7 +31,10 @@ from ...models.audio import (
     get_number_of_songs_in_playlist, get_playlist_data, add_to_playlist,
     remove_from_playlist, get_from_playlist, update_playlist_timestamp,
     update_playlist_name, update_publised_timestamp, notify_like_dids,
-    notify_song_dids, update_song_name, update_description
+    notify_song_dids, update_song_name, update_description,
+    get_number_of_searchable_songs, get_all_search_results, delete_song_data,
+    get_sample_listing, add_sample_listing, update_sample_listing,
+    delete_sample_listing
 )
 from ...models.users import get_user_via_username
 from ...models.errors import NoResults
@@ -335,11 +338,14 @@ def like_song(user_data):
         return {"message": str(exc)}, 422
 
     try:
-        title = get_song_data(
+        song = get_song_data(
             request.json.get("sid"), user_data.get("uid")
-        )[0][2]
+        )
     except NoResults:
         return {"message": "Song does not exist!"}, 400
+
+    if user_data.get("username") == song[0][1]:
+        return {"message": "You cannot like your own song"}, 422
 
     like_pair = get_like_pair(user_data.get("uid"), request.json.get("sid"))
 
@@ -352,7 +358,7 @@ def like_song(user_data):
             dids += did
         message = (
             user_data.get("username") + " just liked your song: \""
-            + title + "\""
+            + song[0][2] + "\""
         )
         notification_sender(message, dids, "New Like")
     except NoResults:
@@ -383,6 +389,16 @@ def unlike_song(user_data):
     except ValidationError as exc:
         log("warning", "Request validation failed.", str(exc))
         return {"message": str(exc)}, 422
+
+    try:
+        song = get_song_data(
+            request.json.get("sid"), user_data.get("uid")
+        )
+    except NoResults:
+        return {"message": "Song does not exist!"}, 400
+
+    if user_data.get("username") == song[0][1]:
+        return {"message": "You cannot unlike your own song"}, 422
 
     post_unlike(user_data.get("uid"), request.json.get("sid"))
     return {"message": "Song unliked"}, 200
@@ -1228,3 +1244,294 @@ def description(user_data):
         request.json.get("sid"), request.json.get("description")
     )
     return {"message": "Description updated."}, 200
+
+
+@AUDIO.route("/search", methods=["GET"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def search_songs(user_data):  # pylint: disable=R0911,R0912,R0914,R0915
+    """
+    Endpoint for searching the song catalog.
+    """
+
+    next_page = request.args.get('next_page')
+    back_page = request.args.get('back_page')
+    if not next_page and not back_page:
+        search_term = request.args.get('search_term')
+        if search_term:
+            total_songs = get_number_of_searchable_songs(search_term)
+        else:
+            total_songs = get_number_of_compiled_songs()
+
+        publish_sort = request.args.get('publish_sort')
+        title_sort = request.args.get('title_sort')
+        artist_sort = request.args.get('artist_sort')
+        duration_sort = request.args.get('duration_sort')
+
+        sorts = [
+            sort for sort in
+            [publish_sort, title_sort, artist_sort, duration_sort]
+            if sort is not None
+        ]
+
+        sort_sql = None
+        if sorts:
+            if len(sorts) > 1:
+                return {
+                    "message": "Only one sort can be applied at a time."
+                }, 400
+
+            if not isinstance(sorts[0], str):
+                return {
+                    "message": "Sort values, must be a str of value 'up' or "
+                               "'down'"
+                }, 400
+
+            sorts[0] = sorts[0].lower()
+
+            if sorts[0] != "up" and sorts[0] != "down":
+                return {
+                    "message": "Sort values, must be a str of value 'up' or "
+                               "'down'"
+                }, 400
+
+            if publish_sort:
+                if sorts[0] == "up":
+                    sort_sql = " ORDER BY published ASC "
+                else:
+                    sort_sql = " ORDER BY published DESC "
+
+            if title_sort:
+                if sorts[0] == "up":
+                    sort_sql = " ORDER BY title DESC "
+                else:
+                    sort_sql = " ORDER BY title ASC "
+
+            if artist_sort:
+                if sorts[0] == "up":
+                    sort_sql = " ORDER BY username DESC "
+                else:
+                    sort_sql = " ORDER BY username ASC "
+
+            if duration_sort:
+                if sorts[0] == "up":
+                    sort_sql = " ORDER BY duration ASC "
+                else:
+                    sort_sql = " ORDER BY duration DESC "
+
+        songs_per_page = request.args.get('songs_per_page')
+        if not songs_per_page:
+            songs_per_page = 50
+        songs_per_page = int(songs_per_page)
+
+        current_page = request.args.get('current_page')
+        if not current_page:
+            current_page = 1
+        current_page = int(current_page)
+
+        total_pages = ceil(total_songs / songs_per_page)
+        if total_pages == 0:
+            total_pages = 1
+        if current_page > total_pages:
+            return {
+                "message": (
+                    "current_page exceeds the total number of pages available("
+                    + str(total_pages) + ")."
+                )
+            }, 422
+
+        start_index = (current_page * songs_per_page) - songs_per_page
+
+        if search_term:
+            search_results = get_all_search_results(
+                start_index, songs_per_page, user_data.get("uid"), search_term,
+                sort_sql
+            )
+        else:
+            search_results = get_all_compiled_songs(
+                start_index, songs_per_page, user_data.get("uid"), sort_sql
+            )
+
+        res = []
+        for song in search_results:
+            res.append(gen_song_object(song))
+
+        jwt_payload = {
+            "search_term": search_term,
+            "sort_sql": sort_sql,
+            "total_pages": total_pages,
+            "songs_per_page": songs_per_page,
+        }
+
+        back_page, next_page = gen_scroll_tokens(
+            current_page, total_pages, jwt_payload
+        )
+
+        return {
+            "current_page": current_page,
+            "total_pages": total_pages,
+            "songs_per_page": songs_per_page,
+            "next_page": next_page,
+            "back_page": back_page,
+            "songs": res,
+        }, 200
+    if next_page and back_page:
+        return {
+            "message": (
+                "You can't send both a 'next_page' token and a 'back_page' "
+                "token."
+            )
+        }, 422
+    token = next_page
+    if not token:
+        token = back_page
+    token = jwt.decode(token, JWT_SECRET, algorithms=['HS256'])
+
+    search_term = token.get("search_term")
+    sort_sql = token.get("sort_sql")
+
+    current_page = token.get("current_page")
+    songs_per_page = token.get("songs_per_page")
+    total_pages = token.get("total_pages")
+    start_index = (current_page * songs_per_page) - songs_per_page
+
+    if search_term:
+        search_results = get_all_search_results(
+            start_index, songs_per_page, user_data.get("uid"), search_term,
+            sort_sql
+        )
+    else:
+        search_results = get_all_compiled_songs(
+            start_index, songs_per_page, user_data.get("uid"), sort_sql
+        )
+
+    res = []
+    for song in search_results:
+        res.append(gen_song_object(song))
+
+    jwt_payload = {
+        "search_term": search_term,
+        "sort_sql": sort_sql,
+        "total_pages": total_pages,
+        "songs_per_page": songs_per_page,
+    }
+
+    back_page, next_page = gen_scroll_tokens(
+        current_page, total_pages, jwt_payload
+    )
+
+    return {
+        "current_page": current_page,
+        "total_pages": total_pages,
+        "songs_per_page": songs_per_page,
+        "next_page": next_page,
+        "back_page": back_page,
+        "songs": res,
+    }, 200
+
+
+@AUDIO.route("", methods=["DELETE"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def delete_song(user_data):
+    """
+    Endpoint for deleting a song.
+    """
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "sid": {
+                "type": "integer",
+                "minimum": 1
+            }
+        },
+        "required": ["sid"]
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    try:
+        get_song_data(request.json.get("sid"), user_data.get("uid"))
+    except NoResults:
+        return {"message": "Song does not exist!"}, 400
+
+    if not permitted_to_edit(request.json.get("sid"), user_data.get("uid")):
+        return {"message": "You can't delete that song!"}, 401
+
+    delete_song_data(request.json.get('sid'))
+
+    return {"message": "Song deleted"}, 200
+
+
+@AUDIO.route("/sample_names", methods=["PATCH"])
+@sql_err_catcher()
+@auth_required()
+def edit_sample_directory():  # pylint: disable=R0911
+    """
+    Endpoint for adding or updating a url -> filename mapping.
+    """
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "mappings": {
+                "type": "object",
+            }
+        },
+        "required": ["mappings"]
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    mappings = request.json.get('mappings')
+    urls = mappings.keys()
+
+    for url in urls:
+        filename = mappings[url].get("filename")
+        directory = mappings[url].get("directory")
+        sample = get_sample_listing(url.lower())
+        if sample:
+            update_sample_listing(url.lower(), filename, directory)
+        else:
+            add_sample_listing(url.lower(), filename, directory)
+
+    return {"message": "Mapping(s) updated"}, 200
+
+
+@AUDIO.route("/sample_names", methods=["GET"])
+@sql_err_catcher()
+@auth_required()
+def read_sample_directory():  # pylint: disable=R0911
+    """
+    Endpoint for getting a sample mapping from the sample directory.
+    """
+    url = request.args.get('url')
+
+    if not url:
+        return {"message": "url param can't be empty!"}, 422
+
+    sample = get_sample_listing(url.lower())
+    if sample:
+        return {"filename": sample[0][0], "directory": sample[0][1]}, 200
+    return {"message": "Sample does not exist"}, 400
+
+
+@AUDIO.route("/sample_names", methods=["DELETE"])
+@sql_err_catcher()
+@auth_required()
+def delete_sample_directory_listing():  # pylint: disable=R0911
+    """
+    Endpoint for deleting a sample mapping from the sample directory.
+    """
+    url = request.args.get('url')
+
+    if not url:
+        return {"message": "url param can't be empty!"}, 422
+
+    delete_sample_listing(url)
+    return {"message": "Sample listing deleted"}, 200

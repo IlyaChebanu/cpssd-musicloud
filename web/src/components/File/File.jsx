@@ -4,7 +4,7 @@ import React, {
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { uploadFile, deleteFile } from 'react-s3';
+import { deleteFile } from 'react-s3';
 import {
   setSelectedFile,
   addSample as addSampleAction,
