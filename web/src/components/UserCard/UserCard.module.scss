@@ -1,0 +1,62 @@
+.wrapper {
+    height: fit-content;
+    width: 100%;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 25px;
+    background-color: #54565A;
+    cursor: pointer;
+    justify-content: center;
+    transition: background-color 100ms, transform 100ms, box-shadow 100ms;
+  
+  
+    &:hover {
+      background: #5F6165;
+      
+      box-shadow: 0px 5px 5px 0px rgba(0, 0, 0, 0.5);
+    }
+  
+    .userWrapper {
+        margin: 20px 0px 20px 0px;
+        text-align: center;
+        display: flex;
+        
+        width: 100%;
+    }
+
+ 
+  .username {
+    font-weight: 700;
+    color: white;
+    font-size: 16px;
+    
+    margin-left: 30px;
+  }
+
+  .back {
+      color: white;
+      position: relative;
+      left: 200px;
+      
+      border-radius: 10px;
+      
+      padding: 0px 10px 0px 10px;
+  }
+
+  .noBack {
+      border: 0px;
+  }
+  
+  .details {
+    display: flex;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+    img {
+      width: auto;
+      height: 102%;
+      left: 0;
+    }
+  }

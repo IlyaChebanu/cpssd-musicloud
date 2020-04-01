@@ -24,6 +24,7 @@ def refresh_token(access_token):
         access_token = jwt.decode(
             access_token, JWT_SECRET, algorithms=['HS256']
         )
+
     except Exception as exc:
         raise exc
 

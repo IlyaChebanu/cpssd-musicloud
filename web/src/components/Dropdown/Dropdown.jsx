@@ -9,11 +9,13 @@ const Dropdown = memo((props) => {
   const { items, title } = props;
   const [displayMenu, setDisplayMenu] = useState(false);
 
-  const showDropdown = useCallback(() => {
+  const showDropdown = useCallback((e) => {
+    e.preventDefault();
     setDisplayMenu(true);
   }, [setDisplayMenu]);
 
-  const hideDropdown = useCallback(() => {
+  const hideDropdown = useCallback((e) => {
+    e.preventDefault();
     setDisplayMenu(false);
   }, [setDisplayMenu]);
 
@@ -45,7 +47,7 @@ const Dropdown = memo((props) => {
 
 Dropdown.propTypes = {
   items: PropTypes.arrayOf(PropTypes.object).isRequired,
-  title: PropTypes.string.isRequired,
+  title: PropTypes.node.isRequired,
 };
 
 Dropdown.displayName = 'Dropdown';

@@ -1,5 +1,6 @@
 import { createStore, applyMiddleware, compose } from 'redux';
 import thunk from 'redux-thunk';
+// eslint-disable-next-line import/no-cycle
 import audioMiddleware from './middleware/audioRedux';
 import rootReducer from './reducers';
 

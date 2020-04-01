@@ -1,0 +1,38 @@
+.wrapper {
+    width: 50%;
+    max-width: 740px;
+    height: 30vh;
+    position: absolute;
+    top:0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+
+	margin: auto;
+    background-color: #303237;
+    z-index: 11;
+    border-radius: 25px;
+    padding: 40px;
+    overflow-y: scroll;
+
+
+
+    .userCards {
+        width: 100%;
+        flex-direction: column;
+        
+      }
+
+      .closePopup {
+        position: absolute;
+        top: 0;
+        right: 0;
+        margin: 10px;
+        transition: filter 200ms;
+        filter: invert(100%);
+
+        &:hover {
+            filter: invert(0%);
+        }
+    }
+  }

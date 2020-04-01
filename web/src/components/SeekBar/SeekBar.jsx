@@ -8,8 +8,13 @@ import { setCurrentBeat, play, pause } from '../../actions/studioActions';
 
 const SeekBar = memo((props) => {
   const {
-    currentBeat, scroll, playing, dispatch, gridSize,
+    playing, dispatch, gridSize, currentBeatStudio,
   } = props;
+
+  const currentBeat = props.currentBeat ? props.currentBeat : currentBeatStudio;
+
+  const scaleFactor = props.scaleFactor || gridSize;
+  const scroll = props.scrollPosition !== null ? props.scrollPosition : props.scroll;
 
   const handleDragStart = useCallback((ev) => {
     dispatch(pause);
@@ -21,7 +26,7 @@ const SeekBar = memo((props) => {
         setCurrentBeat(
           Math.max(
             1,
-            startBeat + (e.screenX - mousePosOffset) / (40 * gridSize) / window.devicePixelRatio,
+            startBeat + (e.screenX - mousePosOffset) / (40 * scaleFactor) / window.devicePixelRatio,
           ),
         ),
       );
@@ -37,23 +42,24 @@ const SeekBar = memo((props) => {
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleDragStop);
-  }, [currentBeat, dispatch, gridSize, playing]);
+  }, [currentBeat, dispatch, playing, scaleFactor]);
 
+  const offset = props.currentBeat ? 0 : 220;
   const iconStyle = useMemo(() => {
-    const pos = -7 + 220 + (currentBeat - 1) * (40 * gridSize) - scroll;
+    const pos = -7 + offset + (currentBeat - 1) * (40 * scaleFactor) - scroll;
     return {
       transform: `translate(${pos}px, -0px)`,
-      opacity: pos >= 213 ? 1 : 0,
+      opacity: pos >= offset - 7 ? 1 : 0,
     };
-  }, [currentBeat, gridSize, scroll]);
+  }, [offset, currentBeat, scaleFactor, scroll]);
 
   const barStyle = useMemo(() => {
-    const pos = 220 + (currentBeat - 1) * (40 * gridSize) - scroll;
+    const pos = offset + (currentBeat - 1) * (40 * scaleFactor) - scroll;
     return {
       transform: `translate(${pos}px, 60px)`,
-      opacity: pos >= 220 ? 1 : 0,
+      opacity: pos >= offset ? 1 : 0,
     };
-  }, [currentBeat, gridSize, scroll]);
+  }, [offset, currentBeat, scaleFactor, scroll]);
 
   return (
     <div className={styles.wrapper}>
@@ -64,17 +70,26 @@ const SeekBar = memo((props) => {
 });
 
 SeekBar.propTypes = {
-  currentBeat: PropTypes.number.isRequired,
+  currentBeat: PropTypes.number,
+  currentBeatStudio: PropTypes.number.isRequired,
   scroll: PropTypes.number.isRequired,
   playing: PropTypes.bool.isRequired,
   dispatch: PropTypes.func.isRequired,
   gridSize: PropTypes.number.isRequired,
+  scaleFactor: PropTypes.number,
+  scrollPosition: PropTypes.number,
+};
+
+SeekBar.defaultProps = {
+  currentBeat: 0,
+  scaleFactor: null,
+  scrollPosition: null,
 };
 
 SeekBar.displayName = 'SeekBar';
 
 const mapStateToProps = ({ studio }) => ({
-  currentBeat: studio.currentBeat,
+  currentBeatStudio: studio.currentBeat,
   scroll: studio.scroll,
   playing: studio.playing,
   gridSize: studio.gridSize,

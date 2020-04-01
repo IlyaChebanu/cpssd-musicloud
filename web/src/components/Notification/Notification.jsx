@@ -32,7 +32,8 @@ const Notification = memo((props) => {
     }, duration));
   }, [duration, id, dispatch]);
 
-  const handleClick = useCallback(() => {
+  const handleClick = useCallback((e) => {
+    e.preventDefault();
     setFadeOut(true);
     setTimeout(() => {
       dispatch(removeNotification(id));

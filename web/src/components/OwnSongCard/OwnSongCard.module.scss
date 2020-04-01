@@ -21,7 +21,9 @@
   color: white;
   font-size: 14px;
   margin: 8px;
-
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .details {

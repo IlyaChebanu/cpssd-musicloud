@@ -1,3 +1,4 @@
+# pylint: disable=C0302
 """
 Query models for interfacing with the DB for audio related transactions.
 """
@@ -74,12 +75,13 @@ def get_song_data(sid, uid):
     """
     sql = (
         "SELECT Songs.sid,"
-        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as usernanme,"
+        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as username,"
         "title, duration, created, public, url, cover, ("
         "SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=%s"
         ") as likes, ("
         "SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=%s AND "
-        "Song_Likes.uid=%s) as like_status FROM Songs WHERE sid=%s"
+        "Song_Likes.uid=%s) as like_status, description FROM Songs "
+        "WHERE sid=%s"
     )
     args = (
         sid,
@@ -168,31 +170,89 @@ def get_song_state(sid):
     return state[0][0]
 
 
-def get_all_compiled_songs(start_index, songs_per_page, uid):
+def get_all_compiled_songs(start_index, songs_per_page, uid, sort_sql=None):
     """
     Get any publicly available song.
     :param start_index:
     Int - Represents the start index of a new page.
     :param songs_per_page:
     Int - Represents the number of items on the new page.
+    :param uid:
+    Int - Your user ID.
     :return:
     List - Containing lists of song data.
     """
     sql = (
         "SELECT Songs.sid,"
-        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as usernanme,"
+        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as username,"
         "title, duration, created, public, url, cover, ("
         "SELECT COUNT(*) FROM Song_Likes WHERE Songs.sid = Song_Likes.sid"
         ") as likes, (SELECT COUNT(*) FROM Song_Likes WHERE "
         "Song_Likes.sid=Songs.sid "
-        "AND Song_Likes.uid=%s) FROM Songs WHERE public=1 LIMIT %s, %s;"
+        "AND Song_Likes.uid=%s), description,"
+        "(SELECT profiler FROM Users WHERE Songs.uid=Users.uid) as profiler"
+        " FROM Songs WHERE public=1 "
     )
+    if sort_sql:
+        sql += sort_sql + "LIMIT %s, %s;"
+    else:
+        sql += "LIMIT %s, %s;"
     args = (
         uid,
         start_index,
         songs_per_page
     )
     return query(sql, args, True)
+
+
+def get_all_search_results(
+        start_index, songs_per_page, uid, search_term, sort_sql):
+    """
+    Get all search results.
+    :param start_index:
+    Int - Represents the start index of a new page.
+    :param songs_per_page:
+    Int - Represents the number of items on the new page.
+    :param uid:
+    Int - Your user ID.
+    :param search_term:
+    Str - The artist username or song title we are searching for.
+    :param sort_sql:
+    Str|None - If not none, is an ORDER statement to be added to the SQL.
+    :return:
+    List - Containing all song results from your search.
+    """
+    search_term = "%" + search_term + "%"
+
+    sql = (
+        "SELECT Songs.sid,"
+        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as username,"
+        "title, duration, created, public, url, cover, ("
+        "SELECT COUNT(*) FROM Song_Likes WHERE Songs.sid = Song_Likes.sid"
+        ") as likes, (SELECT COUNT(*) FROM Song_Likes WHERE "
+        "Song_Likes.sid=Songs.sid "
+        "AND Song_Likes.uid=%s), description,"
+        "(SELECT profiler FROM Users WHERE Songs.uid=Users.uid) as profiler"
+        " FROM Songs WHERE public=1 AND (title LIKE %s OR "
+        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) LIKE %s) "
+    )
+
+    if sort_sql:
+        sql += sort_sql + "LIMIT %s, %s;"
+    else:
+        sql += "LIMIT %s, %s;"
+
+    args = (
+        uid,
+        search_term,
+        search_term,
+        start_index,
+        songs_per_page
+    )
+    res = query(sql, args, True)
+    if not res:
+        raise NoResults
+    return res
 
 
 def get_all_compiled_songs_by_uid(uid, start_index, songs_per_page, my_uid):
@@ -204,18 +264,22 @@ def get_all_compiled_songs_by_uid(uid, start_index, songs_per_page, my_uid):
     Int - Represents the start index of a new page.
     :param songs_per_page:
     Int - Represents the number of items on the new page.
+    :param my_uid:
+    Int - Your user ID.
     :return:
     List - Containing lists of song data.
     """
     sql = (
         "SELECT Songs.sid,"
-        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as usernanme,"
+        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as username,"
         "title, duration, created, public, url, cover, ("
         "SELECT COUNT(*) FROM Song_Likes WHERE Songs.sid = Song_Likes.sid"
         ") as likes, (SELECT COUNT(*) FROM Song_Likes WHERE "
         "Song_Likes.sid=Songs.sid "
-        "AND Song_Likes.uid=%s) FROM Songs WHERE public=1 AND uid=%s "
-        "LIMIT %s, %s;"
+        "AND Song_Likes.uid=%s), description,"
+        "(SELECT profiler FROM Users WHERE Songs.uid=Users.uid) as profiler"
+        " FROM Songs WHERE public=1 AND "
+        "uid=%s LIMIT %s, %s;"
     )
     args = (
         my_uid,
@@ -241,22 +305,28 @@ def get_all_editable_songs_by_uid(uid, start_index, songs_per_page):
     """
     sql = (
         "SELECT Songs.sid, "
-        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as usernanme,"
+        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as username,"
         "title, duration, created, public, url, cover,"
         "(SELECT COUNT(*) FROM Song_Likes WHERE "
         "Songs.sid = Song_Likes.sid ) as likes, "
         "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid "
-        "AND Song_Likes.uid=%s) AS like_status FROM Songs "
+        "AND Song_Likes.uid=%s) AS like_status, description, "
+        "(SELECT time_updated FROM Song_State WHERE sid=Songs.sid ORDER BY "
+        "time_updated DESC LIMIT 0, 1) as updated"
+        " FROM Songs "
         "WHERE uid = %s UNION SELECT "
         "Songs.sid, (SELECT username FROM Users "
-        "WHERE Songs.uid=Users.uid) as usernanme,"
+        "WHERE Songs.uid=Users.uid) as username,"
         "title, duration, created, public, url, cover,"
         "(SELECT COUNT(*) FROM Song_Likes WHERE "
         "Songs.sid = Song_Likes.sid) as likes, "
         "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid "
-        "AND Song_Likes.uid=%s) AS like_status FROM Songs INNER JOIN "
-        "Song_Editors ON Song_Editors.sid = Songs.sid WHERE "
-        "Song_Editors.uid = %s ORDER BY created DESC LIMIT %s, %s;"
+        "AND Song_Likes.uid=%s) AS like_status, description, "
+        "(SELECT time_updated FROM Song_State WHERE sid=Songs.sid ORDER BY "
+        "time_updated DESC LIMIT 0, 1) as updated"
+        " FROM Songs "
+        "INNER JOIN Song_Editors ON Song_Editors.sid = Songs.sid WHERE "
+        "Song_Editors.uid = %s ORDER BY updated DESC LIMIT %s, %s;"
     )
     args = (
         uid,
@@ -280,6 +350,27 @@ def get_number_of_compiled_songs():
         "WHERE public = 1"
     )
     return query(sql, (), True)[0][0]
+
+
+def get_number_of_searchable_songs(search_term):
+    """
+    Return the number of all searchable songs within the search constraints.
+    :return:
+    Int - Number of searchable songs in DB within the search constraints.
+    """
+    search_term = "%" + search_term + "%"
+
+    sql = (
+        "SELECT COUNT(*) FROM Songs "
+        "WHERE public = 1 AND (title LIKE %s OR "
+        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) LIKE %s);"
+    )
+    args = (
+        search_term,
+        search_term
+    )
+
+    return query(sql, args, True)[0][0]
 
 
 def get_number_of_compiled_songs_by_uid(uid):
@@ -484,12 +575,12 @@ def get_all_liked_songs_by_uid(uid, start_index, songs_per_page, my_uid):
     """
     sql = (
         "SELECT Songs.sid, "
-        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as usernanme,"
+        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as username,"
         "title, duration, created, public, url, cover, "
         "(SELECT COUNT(*) FROM Song_Likes WHERE "
         "Songs.sid = Song_Likes.sid) as likes, "
         "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid "
-        "AND Song_Likes.uid=%s) as like_status FROM Songs "
+        "AND Song_Likes.uid=%s) as like_status, description FROM Songs "
         "INNER JOIN Song_Likes ON "
         "Song_Likes.sid = Songs.sid WHERE Song_Likes.uid = %s LIMIT %s, %s;"
     )
@@ -686,7 +777,7 @@ def get_playlists(uid, start_index, playlists_per_page):
     sql = (
         "SELECT pid,"
         "(SELECT username FROM Users WHERE Playlists.uid=Users.uid)"
-        "as usernanme, title, created, updated FROM Playlists "
+        "as username, title, created, updated FROM Playlists "
         "WHERE uid = %s LIMIT %s, %s;"
     )
     args = (
@@ -711,13 +802,13 @@ def get_playlist_data(pid, start_index, songs_per_page, uid):
     """
     sql = (
         "SELECT Songs.sid, "
-        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as usernanme,"
+        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as username,"
         "title, duration, created, public, url, cover, "
         "(SELECT COUNT(*) FROM Song_Likes WHERE "
         "Songs.sid = Song_Likes.sid) as likes, "
-        "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid "
-        "AND Song_Likes.uid=%s) FROM Songs "
-        "INNER JOIN Playlist_State ON "
+        "(SELECT COUNT(*) FROM Song_Likes WHERE "
+        "Song_Likes.sid=Songs.sid AND Song_Likes.uid=%s) , description FROM "
+        "Songs INNER JOIN Playlist_State ON "
         "Playlist_State.sid = Songs.sid WHERE Playlist_State.pid = %s "
         "AND Songs.public = 1 LIMIT %s, %s;"
     )
@@ -951,5 +1042,207 @@ def update_song_name(title, sid):
     args = (
         title,
         sid,
+    )
+    query(sql, args)
+
+
+def update_description(sid, description):
+    """
+    Updates a song's description in the DB.
+    :param sid:
+    Int - ID of the song who's description we are changing.
+    :param description:
+    Str - New song description
+    :return:
+    None - Updated the description in the DB and returns None.
+    """
+    sql = (
+        "UPDATE Songs "
+        "SET description = %s "
+        "WHERE sid = %s"
+    )
+    args = (
+        description,
+        sid,
+    )
+    query(sql, args)
+
+
+def delete_song_data(sid):
+    """
+    Remove a song, and all it's associated data, from the DB.
+    :param sid:
+    Int - ID of the song to be deleted.
+    :return:
+    None - Removes the song from the DB and returns None.
+    """
+    sql1 = (
+        "DELETE FROM Playlist_State "
+        "WHERE sid=%s"
+    )
+    sql2 = (
+        "DELETE FROM Song_State "
+        "WHERE sid=%s"
+    )
+    sql3 = (
+        "DELETE FROM Song_Likes "
+        "WHERE sid=%s"
+    )
+    sql4 = (
+        "DELETE FROM Song_Editors "
+        "WHERE sid=%s"
+    )
+    sql5 = (
+        "DELETE FROM Songs "
+        "WHERE sid=%s"
+    )
+    args = (
+        sid,
+    )
+    query(sql1, args)
+    query(sql2, args)
+    query(sql3, args)
+    query(sql4, args)
+    query(sql5, args)
+
+
+def add_sample_listing(url, filename=None, directory=None):
+    """
+    Adds a new sample listing in the sample directory.
+    :param url:
+    Str - The url you want to map a filename & directory to.
+    :param filename:
+    Str - An optional param allowing you to name the file at the URL.
+    :param directory:
+    Str - An optional param allowing you to specify the directory of the URL.
+    :return:
+    None - Creates a listing in the sample directory for the url.
+    """
+    sql, args = None, None
+    if filename and directory:
+        sql = (
+            "INSERT INTO Sample_Directory "
+            "(url, filename, directory) "
+            "VALUES (%s, %s, %s)"
+        )
+        args = (
+            url,
+            filename,
+            directory
+        )
+    elif filename and not directory:
+        sql = (
+            "INSERT INTO Sample_Directory "
+            "(url, filename) "
+            "VALUES (%s, %s)"
+        )
+        args = (
+            url,
+            filename
+        )
+    elif directory and not filename:
+        sql = (
+            "INSERT INTO Sample_Directory "
+            "(url, directory) "
+            "VALUES (%s, %s)"
+        )
+        args = (
+            url,
+            directory
+        )
+    else:
+        sql = (
+            "INSERT INTO Sample_Directory "
+            "(url) "
+            "VALUES (%s)"
+        )
+        args = (
+            url
+        )
+    query(sql, args)
+
+
+def get_sample_listing(url):
+    """
+    Gets a sample listing and returns it.
+    :param url:
+    Str - The url you want to return the mapping of.
+    :return:
+    List - A list of filenames & directories mapped to a url.
+    """
+    sql = (
+        "SELECT filename, directory FROM Sample_Directory WHERE url=%s;"
+    )
+    args = (
+        url,
+    )
+    res = query(sql, args, True)
+    return res
+
+
+def update_sample_listing(url, filename=None, directory=None):
+    """
+    Updates a current sample listing in the sample directory.
+    :param url:
+    Str - The url you want to map a new filename & or directory to.
+    :param filename:
+    Str - An optional param allowing you to rename the file at the URL.
+    :param directory:
+    Str - An optional param allowing you to respecify the directory of the URL.
+    :return:
+    None - Updates a listing in the sample directory for the url.
+    """
+    sql, args = None, None
+    if filename and directory:
+        sql = (
+            "UPDATE Sample_Directory "
+            "SET filename = %s, directory=%s "
+            "WHERE url = %s"
+        )
+        args = (
+            filename,
+            directory,
+            url
+        )
+    elif filename and not directory:
+        sql = (
+            "UPDATE Sample_Directory "
+            "SET filename = %s "
+            "WHERE url = %s"
+        )
+        args = (
+            filename,
+            url,
+        )
+    elif directory and not filename:
+        sql = (
+            "UPDATE Sample_Directory "
+            "SET directory=%s "
+            "WHERE url = %s"
+        )
+        args = (
+            directory,
+            url
+        )
+    else:
+        return
+    query(sql, args)
+
+
+def delete_sample_listing(url):
+    """
+    Delete a sample listing.
+    :param url
+    Str - The url you want to delete the mapping of.
+    :return:
+    None - The url entry in the sample directory is deleted and
+    nothing returned.
+    """
+    sql = (
+        "DELETE FROM Sample_Directory "
+        "WHERE url=%s;"
+    )
+    args = (
+        url,
     )
     query(sql, args)

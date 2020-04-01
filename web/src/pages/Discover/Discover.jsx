@@ -1,26 +1,74 @@
-import React from 'react';
+import React, {
+  useEffect, useState, useCallback, useMemo,
+} from 'react';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import styles from './Discover.module.scss';
 import Header from '../../components/Header';
 import MusicSearch from '../../components/MusicSearch';
 import SongCard from '../../components/SongCard';
 import { useUpdateUserDetails } from '../../helpers/hooks';
-
-const songCards = [];
-for (let i = 0; i < 10; i += 1) {
-  songCards.push(<SongCard key={i} className={styles.songCard} />);
-}
+import { getCompiledSongs, getNextCompiledSongs } from '../../helpers/api';
+import Spinner from '../../components/Spinner/Spinner';
 
 const Discover = () => {
   useUpdateUserDetails();
+
+  const [songs, setSongs] = useState([]);
+  const [gotNextSongs, setNextSongs] = useState('');
+
+  const nextSongs = useCallback(async () => {
+    const res = await getNextCompiledSongs(gotNextSongs);
+    if (res.status === 200) {
+      setSongs([...songs, ...res.data.songs]);
+      if (res.data.next_page) {
+        setNextSongs(res.data.next_page);
+      } else {
+        setNextSongs('');
+      }
+    }
+  }, [songs, gotNextSongs]);
+
+  useEffect(() => {
+    (async () => {
+      const res = await getCompiledSongs();
+      if (res.status === 200) {
+        setSongs(res.data.songs);
+        if (res.data.next_page) {
+          setNextSongs(res.data.next_page);
+        }
+      }
+    })();
+  }, []);
+
+  const ownSongCards = useMemo(() => songs.map((song) => (
+    <SongCard
+      id={song.sid}
+      key={song.sid}
+      username={song.username}
+      title={song.title}
+      duration={song.duration}
+      url={song.url}
+      coverImage={song.cover}
+      likes={song.likes}
+      profileImg={song.profiler}
+    />
+  )), [songs]);
 
   return (
     <div className={styles.wrapper}>
       <Header selected={2} />
       <div className={styles.contentWrapper}>
         <MusicSearch className={styles.musicSearch} />
-        <div className={styles.songs}>
-          {songCards}
-        </div>
+        <InfiniteScroll
+          dataLength={songs.length}
+          next={nextSongs}
+          hasMore={gotNextSongs}
+          loader={<Spinner />}
+        >
+          <div className={styles.songs}>
+            {ownSongCards}
+          </div>
+        </InfiniteScroll>
       </div>
     </div>
   );

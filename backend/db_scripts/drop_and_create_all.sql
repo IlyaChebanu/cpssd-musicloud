@@ -1,3 +1,4 @@
+DROP TABLE `musicloud_db`.`Sample_Directory`;
 DROP TABLE `musicloud_db`.`Verification`;
 DROP TABLE `musicloud_db`.`Song_Likes`;
 DROP TABLE `musicloud_db`.`Song_Editors`;
@@ -37,6 +38,7 @@ CREATE TABLE `musicloud_db`.`Songs` (
     `url` VARCHAR(255),
     `cover` VARCHAR(255),
     `genre` VARCHAR(50),
+    `description` VARCHAR(512),
     FOREIGN KEY (uid) REFERENCES Users(uid)
 );
 
@@ -115,4 +117,11 @@ CREATE TABLE `musicloud_db`.`Notifications` (
     `did` VARCHAR(255) NOT NULL UNIQUE PRIMARY KEY,
     `uid` INT NOT NULL,
     FOREIGN KEY (uid) REFERENCES Users(uid)
+);
+
+CREATE TABLE `musicloud_db`.`Sample_Directory` (
+    file_id INT UNIQUE NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    `url` VARCHAR(3072) NOT NULL UNIQUE,
+    `filename` VARCHAR(3072) NOT NULL DEFAULT='UNKOWN',
+    `directory` VARCHAR(3072) NOT NULL DEFAULT='/'
 );
