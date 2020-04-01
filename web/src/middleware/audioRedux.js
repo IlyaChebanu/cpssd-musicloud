@@ -1,11 +1,12 @@
 /* eslint-disable no-param-reassign */
 import _ from 'lodash';
+import Tone from 'tone';
 // eslint-disable-next-line import/no-cycle
 import {
   playingStartTime, setCurrentBeat, playingStartBeat, stop,
 } from '../actions/studioActions';
 import {
-  audioContext, scheduledSamples,
+  scheduledSamples,
 } from '../helpers/constants';
 // eslint-disable-next-line import/no-cycle
 import scheduleSample from './scheduleSample';
@@ -16,46 +17,44 @@ import setFadeCurve from './setFadeCurve';
 
 export const renderTracks = (studio) => {
   const samples = Object.values(studio.samples);
-
   const getEndTime = (sample) => sample.time + sample.duration;
   const latestSample = _.maxBy(samples, (sample) => getEndTime(sample));
   const songDuration = getEndTime(latestSample) * (60 / studio.tempo);
+  return Tone.Offline(() => {
+    const offlineAudioContext = Tone.context.rawContext;
 
-  const offlineAudioContext = new (
-    window.OfflineAudioContext || window.webkitOfflineAudioContext
-  )(2, songDuration * 44100, 44100);
-  offlineAudioContext.globalGain = offlineAudioContext.createGain();
-  offlineAudioContext.globalGain.connect(offlineAudioContext.destination);
+    offlineAudioContext.globalGain = offlineAudioContext.createGain();
+    offlineAudioContext.globalGain.connect(offlineAudioContext.destination);
 
-  const soloTrack = _.find(studio.tracks, 'solo');
-  const trackChannels = {};
-  studio.tracks.forEach((track) => {
-    const gain = offlineAudioContext.createGain();
-    const pan = offlineAudioContext.createStereoPanner();
-    const muterGain = offlineAudioContext.createGain();
+    const soloTrack = _.find(studio.tracks, 'solo');
+    const trackChannels = {};
+    studio.tracks.forEach((track) => {
+      const gain = offlineAudioContext.createGain();
+      const pan = offlineAudioContext.createStereoPanner();
+      const muterGain = offlineAudioContext.createGain();
 
-    gain.gain.setValueAtTime(track.volume, 0);
-    pan.pan.setValueAtTime(track.pan, 0);
-    muterGain.gain.setValueAtTime(1 * (
-      soloTrack ? soloTrack.id === track.id : !track.mute
-    ), 0);
+      gain.gain.setValueAtTime(track.volume, 0);
+      pan.pan.setValueAtTime(track.pan, 0);
+      muterGain.gain.setValueAtTime(1 * (
+        soloTrack ? soloTrack.id === track.id : !track.mute
+      ), 0);
 
-    gain.connect(pan);
-    pan.connect(muterGain);
-    muterGain.connect(offlineAudioContext.globalGain);
+      gain.connect(pan);
+      pan.connect(muterGain);
+      muterGain.connect(offlineAudioContext.globalGain);
 
-    trackChannels[track.id] = { gain, pan, muterGain };
-  });
+      trackChannels[track.id] = { gain, pan, muterGain };
+    });
 
-  samples.forEach((sample) => {
-    const channel = trackChannels[sample.trackId];
-    scheduleSample(sample, channel.gain, offlineAudioContext, true);
-  });
-
-  return offlineAudioContext.startRendering();
+    samples.forEach((sample) => {
+      const channel = trackChannels[sample.trackId];
+      scheduleSample(sample, channel.gain, offlineAudioContext, true);
+    });
+  }, songDuration);
 };
 
 export default (store) => {
+  const audioContext = Tone.context.rawContext;
   const trackChannels = {};
 
   const startPlayback = () => {

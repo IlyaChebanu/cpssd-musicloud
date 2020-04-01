@@ -1,6 +1,8 @@
-import { audioContext } from '../helpers/constants';
+import Tone from 'tone';
+import stopNote from './stopNote';
 
 export default (sample) => {
+  const audioContext = Tone.context.rawContext;
   sample.popFilter.gain.setValueAtTime(1, 0);
   sample.popFilter.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.01);
 
@@ -10,13 +12,7 @@ export default (sample) => {
 
   if (sample.notes) {
     Object.values(sample.notes).forEach((note) => {
-      if (note.source) {
-        if (note.source.releaseAll) {
-          note.source.releaseAll();
-        } else {
-          note.source.triggerRelease();
-        }
-      }
+      stopNote(note);
     });
   }
 };

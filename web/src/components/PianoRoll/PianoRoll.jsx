@@ -12,6 +12,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 import { useMouseEvents, useGlobalEvent } from 'beautiful-react-hooks';
+import Tone from 'tone';
 import styles from './PianoRoll.module.scss';
 import { ReactComponent as CloseIcon } from '../../assets/icons/x-icon-10px.svg';
 import {
@@ -21,8 +22,8 @@ import {
 } from '../../actions/studioActions';
 import PianoNote from '../PianoNote/PianoNote';
 import SeekBar from '../SeekBar';
-import { audioContext } from '../../helpers/constants';
 import playNote from '../../middleware/playNote';
+import stopNote from '../../middleware/stopNote';
 
 const keyNames = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#'];
 
@@ -66,22 +67,17 @@ const PianoRoll = memo(({
   onMouseUp(() => {
     setIsMouseDown(false);
     if (playingNote.current) {
-      if (playingNote.current.releaseAll) {
-        playingNote.current.releaseAll();
-      } else {
-        playingNote.current.triggerRelease();
-      }
+      stopNote(playingNote.current);
+      playingNote.current = null;
     }
   });
 
   useEffect(() => {
+    const audioContext = Tone.context.rawContext;
     if (isMouseDown) {
       if (playingNote.current) {
-        if (playingNote.current.releaseAll) {
-          playingNote.current.releaseAll();
-        } else {
-          playingNote.current.triggerRelease();
-        }
+        stopNote(playingNote.current);
+        playingNote.current = null;
       }
       playingNote.current = playNote(
         audioContext,

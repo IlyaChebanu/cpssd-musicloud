@@ -1,6 +1,5 @@
 import Tone from 'tone';
 import { bufferStore } from '../helpers/constants';
-import { sliceBuffer } from '../helpers/utils';
 
 export default (
   context,
@@ -11,39 +10,38 @@ export default (
   endTime = null,
   url = null,
 ) => {
-  Tone.setContext(context);
-  let synth;
-  const frequency = 2 ** ((note.noteNumber - 49) / 12) * 440;
-
   if (url) {
-    const buffer = bufferStore[url];
-    const offsetScaled = offset * ((39 - note.noteNumber) / 12) ** 2;
-    if (offsetScaled > buffer.duration) {
-      return null;
-    }
-    const slice = sliceBuffer(buffer, offsetScaled);
-    synth = new Tone.Sampler({
-      C4: slice,
-    });
-    synth.attack = 0.005;
-    synth.release = 0.005;
-  } else {
-    synth = new Tone.Synth({
-      envelope: {
-        attack: 0.005,
-        decay: 0.1,
-        sustain: 0.3,
-        release: 1,
-      },
-    });
+    const source = new Tone.BufferSource();
+    source.buffer = bufferStore[url];
+    source.playbackRate.setValueAtTime(Tone.intervalToFrequencyRatio(note.noteNumber - 40), 0);
 
-    synth.oscillator.frequency.value = frequency;
+    source.connect(destination);
+    source.start(startTime, offset);
+    return {
+      source,
+      sourceType: 'sampler',
+    };
   }
+  const synth = new Tone.Synth({
+    envelope: {
+      attack: 0.005,
+      decay: 0.1,
+      sustain: 0.3,
+      release: 1,
+    },
+  });
 
-  synth.connect(destination);
+  const frequency = 2 ** ((note.noteNumber - 49) / 12) * 440;
+  synth.oscillator.frequency.value = frequency;
   synth.triggerAttack(frequency, `+${startTime - context.currentTime}`);
   if (endTime) {
     synth.triggerRelease(`+${endTime - context.currentTime}`);
   }
-  return synth;
+
+
+  synth.connect(destination);
+  return {
+    source: synth,
+    sourceType: 'synth',
+  };
 };

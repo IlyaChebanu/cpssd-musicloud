@@ -65,6 +65,15 @@ const File = memo((props) => {
       .catch();
   }, [awsConfig, config]);
 
+
+  // const uploadToS3 = useCallback(async (oldFileName, newFileName) => {
+  //   await awsConfig(path);
+  //   await deleteFromS3(path, extension === '' ? oldFileName : `${oldFileName}.${extension}`);
+  //   uploadFile(newFileName, config)
+  //     .then()
+  //     .catch();
+  // }, [awsConfig, config, deleteFromS3, extension, path]);
+
   const onInputBlur = async (e, key) => {
     if (key === 13) {
       // uploadToS3(oldName.current, newName);
