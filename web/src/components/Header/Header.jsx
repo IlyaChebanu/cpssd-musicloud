@@ -149,7 +149,8 @@ const Header = memo((props) => {
 
   const exportAction = useCallback(async () => {
     const renderedBuffer = await renderTracks(studio);
-    const encoded = toWav(renderedBuffer);
+    // eslint-disable-next-line no-underscore-dangle
+    const encoded = toWav(renderedBuffer._buffer);
     forceDownload(
       [new DataView(encoded)],
       'audio/wav',

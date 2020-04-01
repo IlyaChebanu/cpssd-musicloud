@@ -7,13 +7,18 @@ import React, {
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import _ from 'lodash';
+import Tone from 'tone';
 import styles from './PianoNote.module.scss';
-import { colours, audioContext } from '../../helpers/constants';
+import {
+  colours,
+  audioContext,
+} from '../../helpers/constants';
 import { useGlobalDrag } from '../../helpers/hooks';
 import {
   setPatternNoteTick, setPatternNoteNumber, setPatternNoteDuration, removePatternNote,
 } from '../../actions/studioActions';
 import playNote from '../../middleware/playNote';
+import stopNote from '../../middleware/stopNote';
 
 const ppq = 1;
 
@@ -71,11 +76,8 @@ const PianoNote = memo(({
     dispatch(setPatternNoteNumber(selectedSample, noteData.id, noteDisplayData.noteNumber));
     setIsDragging(false);
     if (playingNote.current) {
-      if (playingNote.current.releaseAll) {
-        playingNote.current.releaseAll();
-      } else {
-        playingNote.current.triggerRelease();
-      }
+      stopNote(playingNote.current);
+      playingNote.current = null;
     }
   });
 
@@ -97,13 +99,11 @@ const PianoNote = memo(({
   });
 
   useEffect(() => {
+    const audioContext = Tone.context.rawContext;
     if (isDragging) {
       if (playingNote.current) {
-        if (playingNote.current.releaseAll) {
-          playingNote.current.releaseAll();
-        } else {
-          playingNote.current.triggerRelease();
-        }
+        stopNote(playingNote.current);
+        playingNote.current = null;
       }
       playingNote.current = playNote(
         audioContext,

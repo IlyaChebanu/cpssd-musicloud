@@ -1,6 +1,7 @@
+import Tone from 'tone';
 // eslint-disable-next-line import/no-cycle
 import store from '../store';
-import { audioContext } from '../helpers/constants';
+// import { audioContext } from '../helpers/constants';
 import beatsToSeconds from './beatsToSeconds';
 import playSample from './playSample';
 import playNote from './playNote';
@@ -8,7 +9,7 @@ import setFadeCurve from './setFadeCurve';
 
 
 // eslint-disable-next-line consistent-return
-export default (sample, channel, context = audioContext, isOffline = false) => {
+export default (sample, channel, context = Tone.context.rawContext, isOffline = false) => {
   const { studio } = store.getState();
 
   const currentBeat = isOffline ? 1 : studio.currentBeat;
@@ -74,7 +75,7 @@ export default (sample, channel, context = audioContext, isOffline = false) => {
       );
       notes[noteId] = {
         ...note,
-        source,
+        ...source,
       };
     });
 
