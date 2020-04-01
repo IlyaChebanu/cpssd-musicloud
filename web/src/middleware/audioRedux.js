@@ -6,7 +6,6 @@ import {
   playingStartTime, setCurrentBeat, playingStartBeat, stop,
 } from '../actions/studioActions';
 import {
-  // audioContext,
   scheduledSamples,
 } from '../helpers/constants';
 // eslint-disable-next-line import/no-cycle

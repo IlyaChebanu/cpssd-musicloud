@@ -1,6 +1,5 @@
 import Tone from 'tone';
 import stopNote from './stopNote';
-// import { audioContext } from '../helpers/constants';
 
 export default (sample) => {
   const audioContext = Tone.context.rawContext;

@@ -1,7 +1,6 @@
 import Tone from 'tone';
 // eslint-disable-next-line import/no-cycle
 import store from '../store';
-// import { audioContext } from '../helpers/constants';
 import beatsToSeconds from './beatsToSeconds';
 import playSample from './playSample';
 import playNote from './playNote';
