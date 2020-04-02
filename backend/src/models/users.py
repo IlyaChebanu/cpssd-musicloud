@@ -1053,3 +1053,54 @@ def notify_post_dids(uid):
     if not res:
         raise NoResults
     return res
+
+
+def delete_user_data(uid):
+    """
+    Delete a user given there uid.
+    :param uid:
+    Int - Uid of the user we are deleting.
+    :return:
+    None - Deletes the user and returns None.
+    """
+    args = (
+        uid,
+    )
+    alt_args = (
+        uid,
+        uid,
+    )
+    sql = (
+        "DELETE FROM Song_State WHERE sid IN "
+        "(SELECT sid FROM Songs WHERE uid=%s)"
+    )
+    query(sql, args)
+    sql = "DELETE FROM Song_Likes WHERE uid=%s"
+    query(sql, args)
+    sql = "DELETE FROM Song_Editors WHERE uid=%s"
+    query(sql, args)
+    sql = (
+        "DELETE FROM Playlist_State WHERE sid IN "
+        "(SELECT sid FROM Songs WHERE uid=%s)"
+    )
+    query(sql, args)
+    sql = "DELETE FROM Songs WHERE uid=%s"
+    query(sql, args)
+    sql = "DELETE FROM Verification WHERE uid=%s"
+    query(sql, args)
+    sql = "DELETE FROM Playlists WHERE uid=%s"
+    query(sql, args)
+    sql = "DELETE FROM Notifications WHERE uid=%s"
+    query(sql, args)
+    sql = "DELETE FROM Notifications WHERE uid=%s"
+    query(sql, args)
+    sql = "DELETE FROM Followers WHERE follower=%s OR following=%s"
+    query(sql, alt_args)
+    sql = "DELETE FROM Posts WHERE uid=%s"
+    query(sql, args)
+    sql = "DELETE FROM Logins WHERE uid=%s"
+    query(sql, args)
+    sql = "DELETE FROM Resets WHERE uid=%s"
+    query(sql, args)
+    sql = "DELETE FROM Users WHERE uid=%s"
+    query(sql, args)
