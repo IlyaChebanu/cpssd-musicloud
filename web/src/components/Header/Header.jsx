@@ -44,7 +44,7 @@ import {
   setCompleteTracksState,
   setCompleteSamplesState,
 } from '../../actions/studioActions';
-import Button from "../Button";
+import Button from '../Button';
 
 const Header = memo((props) => {
   const {
