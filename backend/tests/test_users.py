@@ -3236,3 +3236,70 @@ class UserTests(unittest.TestCase):
                 follow_redirects=True
             )
             self.assertEqual(422, res.status_code)
+
+    def test_delete_user_success(self):
+        """
+        Ensure deleting a user is successful.
+        """
+        with mock.patch("backend.src.controllers.users.controllers.delete_user_data"):
+            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+                mock_token.return_value = MOCKED_TOKEN
+                res = self.test_client.delete(
+                    "/api/v1/users",
+                    headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                    follow_redirects=True
+                )
+                self.assertEqual(200, res.status_code)
+                expected_body = {"message": "User deleted."}
+                self.assertEqual(expected_body, json.loads(res.data))
+
+    def test_delete_user_fail_missing_access_token(self):
+        """
+        Ensure deleting a user fails if no access_token is sent.
+        """
+        res = self.test_client.delete(
+            "/api/v1/users",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_delete_user_fail_access_token_expired(self):
+        """
+        Ensure deleting a user fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
+            res = self.test_client.delete(
+                "/api/v1/users",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_delete_user_fail_bad_access_token_signature(self):
+        """
+        Ensure deleting a user fails if the access_token signature does not match
+        the one configured on the server.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
+            res = self.test_client.delete(
+                "/api/v1/users",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_delete_user_fail_unknown_access_token_issue(self):
+        """
+        Ensure deleting a user fails if some unknown error relating to the access_token
+        occurs.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
+            res = self.test_client.delete(
+                "/api/v1/users",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)

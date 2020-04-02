@@ -35,7 +35,7 @@ from ...models.users import (
     get_timeline_song_only_length, update_silence_all_notificaitons,
     get_dids_for_a_user, update_silence_follow_notificaitons,
     update_silence_post_notificaitons, update_silence_song_notificaitons,
-    update_silence_like_notificaitons, notify_post_dids
+    update_silence_like_notificaitons, notify_post_dids, delete_user_data
 )
 from ...models.verification import insert_verification, get_verification
 from ...middleware.auth_required import auth_required
@@ -1195,3 +1195,14 @@ def patch_like_notification_status(user_data):
     if request.json.get("status") == 0:
         return {"message": "Like notifications unmuted"}, 200
     return {"message": "Like notifications muted"}, 200
+
+
+@USERS.route("", methods=["DELETE"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def delete_user(user_data):
+    """
+    Endpoint for deleting a user.
+    """
+    delete_user_data(user_data.get("uid"))
+    return {"message": "User deleted."}, 200
