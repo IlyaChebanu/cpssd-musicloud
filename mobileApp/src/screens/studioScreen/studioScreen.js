@@ -153,8 +153,6 @@ class StudioScreen extends React.Component {
             duration: this.state.recordTime,
             uri: result
         });
-        // this.setState({ uri: result })
-        console.log('result is : ' + result);
     };
 
     onStartPlay = async () => {
