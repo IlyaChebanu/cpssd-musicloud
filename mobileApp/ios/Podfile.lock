@@ -21,6 +21,7 @@ PODS:
     - DoubleConversion
     - glog
   - glog (0.3.5)
+  - mobile-ffmpeg-https (4.3.1)
   - PushyRN (1.0.13):
     - React (< 1.0.0, >= 0.13.0)
   - RCTRequired (0.61.2)
@@ -188,6 +189,12 @@ PODS:
   - React-jsinspector (0.61.2)
   - react-native-document-picker (3.2.0):
     - React
+  - react-native-ffmpeg (0.4.4):
+    - React
+    - react-native-ffmpeg/https (= 0.4.4)
+  - react-native-ffmpeg/https (0.4.4):
+    - mobile-ffmpeg-https (= 4.3.1)
+    - React
   - react-native-image-picker (1.1.0):
     - React
   - react-native-image-resizer (1.1.0):
@@ -274,6 +281,7 @@ DEPENDENCIES:
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - react-native-document-picker (from `../node_modules/react-native-document-picker`)
+  - react-native-ffmpeg (from `../node_modules/react-native-ffmpeg`)
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
   - react-native-image-resizer (from `../node_modules/react-native-image-resizer`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
@@ -303,6 +311,8 @@ DEPENDENCIES:
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
     - boost-for-react-native
+  trunk:
+    - mobile-ffmpeg-https
 
 EXTERNAL SOURCES:
   BVLinearGradient:
@@ -339,6 +349,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
   react-native-document-picker:
     :path: "../node_modules/react-native-document-picker"
+  react-native-ffmpeg:
+    :path: "../node_modules/react-native-ffmpeg"
   react-native-image-picker:
     :path: "../node_modules/react-native-image-picker"
   react-native-image-resizer:
@@ -396,6 +408,7 @@ SPEC CHECKSUMS:
   FBReactNativeSpec: 5a764c60abdc3336a213e5310c40b74741f32839
   Folly: 30e7936e1c45c08d884aa59369ed951a8e68cf51
   glog: 1f3da668190260b06b429bb211bfbee5cd790c28
+  mobile-ffmpeg-https: c4a3c255163ddb1abc4b4dfc613c2d885f8c46eb
   PushyRN: a01f6e84036c909bcb920a62e8cabd565fed7296
   RCTRequired: c639d59ed389cfb1f1203f65c2ea946d8ec586e2
   RCTTypeSafety: dc23fb655d6c77667c78e327bf661bc11e3b8aec
@@ -407,6 +420,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 8909917ff7d8f21a57e443a866fd8d4560e50c65
   React-jsinspector: 111d7d342b07a904c400592e02a2b958f1098b60
   react-native-document-picker: e3516aff0dcf65ee0785d9bcf190eb10e2261154
+  react-native-ffmpeg: f9a60452aaa5d478aac205b248224994f3bde416
   react-native-image-picker: 3637d63fef7e32a230141ab4660d3ceb773c824f
   react-native-image-resizer: 9dfb844937574db849fd18a56d8e6c607b0a31d8
   react-native-netinfo: 4f7469b001be001975d1566fb757fb04e3905bec
@@ -432,6 +446,6 @@ SPEC CHECKSUMS:
   RNVectorIcons: 0bb4def82230be1333ddaeee9fcba45f0b288ed4
   Yoga: 14927e37bd25376d216b150ab2a561773d57911f
 
-PODFILE CHECKSUM: c36209579ea78aade68d4d3a98a9e33cfe4f45e2
+PODFILE CHECKSUM: 0fcdd252aa91cf5fcc6a9b5a220cf8d4ed8d6c10
 
 COCOAPODS: 1.8.4
