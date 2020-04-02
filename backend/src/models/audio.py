@@ -206,7 +206,8 @@ def get_all_compiled_songs(start_index, songs_per_page, uid, sort_sql=None):
 
 
 def get_all_search_results(
-        start_index, songs_per_page, uid, search_term, sort_sql):
+        start_index, songs_per_page, uid, search_term, sort_sql, profile_search
+):   # pylint: disable=R0913
     """
     Get all search results.
     :param start_index:
@@ -219,6 +220,8 @@ def get_all_search_results(
     Str - The artist username or song title we are searching for.
     :param sort_sql:
     Str|None - If not none, is an ORDER statement to be added to the SQL.
+    :param profile_search:
+    Bool - True if searching your own profile.
     :return:
     List - Containing all song results from your search.
     """
@@ -237,25 +240,48 @@ def get_all_search_results(
         "(SELECT username FROM Users WHERE Songs.uid=Users.uid) LIKE %s) "
     )
 
-    if sort_sql:
-        sql += sort_sql + "LIMIT %s, %s;"
-    else:
-        sql += "LIMIT %s, %s;"
+    profile_args = (
+        uid,
+        search_term,
+        search_term,
+        uid,
+        start_index,
+        songs_per_page
+    )
 
-    args = (
+    discover_args = (
         uid,
         search_term,
         search_term,
         start_index,
         songs_per_page
     )
-    res = query(sql, args, True)
+
+    res = None
+    if sort_sql:
+        if profile_search:
+            sql += "AND uid=%s " + sort_sql + "LIMIT %s, %s;"
+
+            res = query(sql, profile_args, True)
+        else:
+            sql += sort_sql + "LIMIT %s, %s;"
+            res = query(sql, discover_args, True)
+    else:
+        if profile_search:
+            sql += "AND uid=%s " + "LIMIT %s, %s;"
+            res = query(sql, profile_args, True)
+        else:
+            sql += "LIMIT %s, %s;"
+            res = query(sql, discover_args, True)
+
     if not res:
         raise NoResults
     return res
 
 
-def get_all_compiled_songs_by_uid(uid, start_index, songs_per_page, my_uid):
+def get_all_compiled_songs_by_uid(
+        uid, start_index, songs_per_page, my_uid, sort_sql=None
+):
     """
     Get any publicly available song for a specific user.
     :param uid:
@@ -279,8 +305,14 @@ def get_all_compiled_songs_by_uid(uid, start_index, songs_per_page, my_uid):
         "AND Song_Likes.uid=%s), description,"
         "(SELECT profiler FROM Users WHERE Songs.uid=Users.uid) as profiler"
         " FROM Songs WHERE public=1 AND "
-        "uid=%s LIMIT %s, %s;"
+        "uid=%s "
     )
+
+    if sort_sql:
+        sql += sort_sql + "LIMIT %s, %s;"
+    else:
+        sql += "LIMIT %s, %s;"
+
     args = (
         my_uid,
         uid,
@@ -431,9 +463,9 @@ def is_public(sid):
 
 # Safe to disable too-many-arguments as this func is just used for DB
 # population for testing.
-# pylint: disable=R0913
 def insert_full_song(
-        sid, uid, title, duration, created, public, url, cover, genre):
+        sid, uid, title, duration, created, public, url, cover, genre
+):  # pylint: disable=R0913
     """
     Used for testing to insert a full row into the Songs table in the DB.
     :param sid:

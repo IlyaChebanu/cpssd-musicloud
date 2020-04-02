@@ -1319,6 +1319,11 @@ def search_songs(user_data):  # pylint: disable=R0911,R0912,R0914,R0915
                 else:
                     sort_sql = " ORDER BY duration DESC "
 
+        profile_search = False
+        search_my_profile = request.args.get('profile_search')
+        if search_my_profile:
+            profile_search = True
+
         songs_per_page = request.args.get('songs_per_page')
         if not songs_per_page:
             songs_per_page = 50
@@ -1345,12 +1350,18 @@ def search_songs(user_data):  # pylint: disable=R0911,R0912,R0914,R0915
         if search_term:
             search_results = get_all_search_results(
                 start_index, songs_per_page, user_data.get("uid"), search_term,
-                sort_sql
+                sort_sql, profile_search
             )
         else:
-            search_results = get_all_compiled_songs(
-                start_index, songs_per_page, user_data.get("uid"), sort_sql
-            )
+            if profile_search:
+                search_results = get_all_compiled_songs_by_uid(
+                    user_data.get("uid"), start_index, songs_per_page,
+                    user_data.get("uid"), sort_sql
+                )
+            else:
+                search_results = get_all_compiled_songs(
+                    start_index, songs_per_page, user_data.get("uid"), sort_sql
+                )
 
         res = []
         for song in search_results:
@@ -1361,6 +1372,7 @@ def search_songs(user_data):  # pylint: disable=R0911,R0912,R0914,R0915
             "sort_sql": sort_sql,
             "total_pages": total_pages,
             "songs_per_page": songs_per_page,
+            "profile_search": profile_search,
         }
 
         back_page, next_page = gen_scroll_tokens(
@@ -1393,17 +1405,24 @@ def search_songs(user_data):  # pylint: disable=R0911,R0912,R0914,R0915
     current_page = token.get("current_page")
     songs_per_page = token.get("songs_per_page")
     total_pages = token.get("total_pages")
+    profile_search = token.get("profile_search")
     start_index = (current_page * songs_per_page) - songs_per_page
 
     if search_term:
         search_results = get_all_search_results(
             start_index, songs_per_page, user_data.get("uid"), search_term,
-            sort_sql
+            sort_sql, profile_search
         )
     else:
-        search_results = get_all_compiled_songs(
-            start_index, songs_per_page, user_data.get("uid"), sort_sql
-        )
+        if profile_search:
+            search_results = get_all_compiled_songs_by_uid(
+                user_data.get("uid"), start_index, songs_per_page,
+                user_data.get("uid"), sort_sql
+            )
+        else:
+            search_results = get_all_compiled_songs(
+                start_index, songs_per_page, user_data.get("uid"), sort_sql
+            )
 
     res = []
     for song in search_results:
