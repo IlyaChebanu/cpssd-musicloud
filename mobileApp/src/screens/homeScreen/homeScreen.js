@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from 'react-redux';
 import { ActionCreators } from '../../actions/index';
 import { bindActionCreators } from 'redux';
-import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity, BackHandler } from "react-native";
+import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity, BackHandler, RefreshControl } from "react-native";
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import HeaderComponent from "../../components/headerComponent/headerComponent";
@@ -22,6 +22,7 @@ class HomeScreen extends React.Component {
       alertTitle: 'Confirm exit',
       alertMessage: 'Do you want to quit the app?',
       nextPage: null,
+      refreshing: false,
     };
   }
 
@@ -77,6 +78,12 @@ class HomeScreen extends React.Component {
         this.setState({ songsData: response.data.songs, nextPage: response.data.next_page })
       }
     })
+  }
+
+  onRefresh = async () => {
+    this.setState({ refreshing: true });
+    await this.getSongs();
+    this.setState({ refreshing: false });
   }
 
   renderheader() {
@@ -148,6 +155,12 @@ class HomeScreen extends React.Component {
             extraData={this.state.songsData}
             onEndReached={this._handleLoadMore.bind(this)}
             onEndReachedThreshold={0.5}
+            refreshControl={(
+              <RefreshControl
+                tintColor={'white'}
+                refreshing={this.state.refreshing}
+                onRefresh={this.onRefresh}
+              />)}
           />
         </View>
 
