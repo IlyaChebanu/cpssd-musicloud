@@ -38,6 +38,6 @@ def sql_err_catcher():
             # Intended to be a general catch all exception.
             except Exception:  # pylint:disable=W0703
                 log("error", "MySQL query failed", traceback.format_exc())
-                return {"message": "MySQL unavailable."}, 503
+                return {"message": "Something has gone wrong."}, 503
         return __sql_err_catcher
     return _sql_err_catcher
