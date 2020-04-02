@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from 'react-redux';
 import { ActionCreators } from '../../actions/index';
 import { bindActionCreators } from 'redux';
-import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity, RefreshControl } from "react-native";
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import UserProfileComponent from "../profileComponent/userProfileComponent";
@@ -14,6 +14,7 @@ class UserProfileSongs extends React.Component {
     this.state = {
       songsData: [],
       nextPage: null,
+      refreshing: false,
     };
   }
 
@@ -33,6 +34,12 @@ class UserProfileSongs extends React.Component {
         this.setState({ songsData: response.data.songs, nextPage: response.data.next_page })
       }
     })
+  }
+
+  onRefresh = async () => {
+    this.setState({ refreshing: true });
+    await this.getSongs();
+    this.setState({ refreshing: false });
   }
 
   handleSongClick(item, index) {
@@ -149,6 +156,12 @@ class UserProfileSongs extends React.Component {
           extraData={this.state.songsData}
           onEndReached={this._handleLoadMore.bind(this)}
           onEndReachedThreshold={0.5}
+          refreshControl={(
+            <RefreshControl
+              tintColor={'white'}
+              refreshing={this.state.refreshing}
+              onRefresh={this.onRefresh}
+            />)}
         />
       </View>
     )
