@@ -11,6 +11,7 @@ import React, {
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { GlobalHotKeys } from 'react-hotkeys';
 import styles from './Studio.module.scss';
 import Header from '../../components/Header';
 import {
@@ -32,7 +33,6 @@ import PlayBackControls from '../../components/PlaybackControls';
 import SongPicker from '../../components/SongPicker';
 import Track from '../../components/Track/Track';
 import SampleControls from '../../components/SampleControls';
-
 import { saveState, getSongState, getSongInfo } from '../../helpers/api';
 import { useUpdateUserDetails } from '../../helpers/hooks';
 import Spinner from '../../components/Spinner/Spinner';
@@ -146,58 +146,69 @@ const Studio = memo((props) => {
     220 + (studio.currentBeat - 1) * (40 * studio.gridSize) - studio.scroll
   ), [studio.currentBeat, studio.gridSize, studio.scroll]);
 
+  const keyMap = {
+    SAVE: 'ctrl+s',
+  };
+
+  const handlers = {
+    SAVE: handleSaveState,
+  };
+
+
   return (
-    <div className={styles.wrapper}>
-      <Header selected={0}>
-
-        <Button className={styles.saveButton} onClick={handleSaveState}>
+    <GlobalHotKeys
+      ignoreRepeatedEventsWhenKeyHeldDown={false}
+      allowChanges
+      keyMap={keyMap}
+      handlers={handlers}
+    >
+      <div className={styles.wrapper}>
+        <Header selected={0}>
+          <Button className={styles.saveButton} onClick={handleSaveState}>
           Save
-        </Button>
-      </Header>
-      <div style={{ pointerEvents: songPickerHidden ? 'auto' : 'none' }}>
-        <div className={styles.contentWrapper}>
-          <SampleControls />
-          <SeekBar position={seekBarPosition} />
-
-          <Timeline />
-
-          <div className={styles.scrollable}>
-            <div className={styles.content}>
-              <div className={styles.trackControls}>
-                {trackControls}
-                <div
-                  className={`${styles.newTrack} ${
-                    tracks.length % 2 !== 1 ? styles.even : ''
-                  }`}
-                  onClick={handleAddNewTrack}
-                  role="button"
-                  tabIndex={0}
-                >
+          </Button>
+        </Header>
+        <div style={{ pointerEvents: songPickerHidden ? 'auto' : 'none' }}>
+          <div className={styles.contentWrapper}>
+            <SampleControls />
+            <SeekBar position={seekBarPosition} />
+            <Timeline />
+            <div className={styles.scrollable}>
+              <div className={styles.content}>
+                <div className={styles.trackControls}>
+                  {trackControls}
+                  <div
+                    className={`${styles.newTrack} ${
+                      tracks.length % 2 !== 1 ? styles.even : ''
+                    }`}
+                    onClick={handleAddNewTrack}
+                    role="button"
+                    tabIndex={0}
+                  >
                 Add new track
+                  </div>
                 </div>
-              </div>
-              <div
-                className={styles.tracks}
-                onScroll={handleScroll}
-                ref={tracksRef}
-              >
-                {tracksLoading ? <Spinner /> : renderableTracks}
-                {Object.entries(samples).map(([id, sample]) => (
-                  <Sample data={sample} id={id} key={id} />
-                ))}
+                <div
+                  className={styles.tracks}
+                  onScroll={handleScroll}
+                  ref={tracksRef}
+                >
+                  {tracksLoading ? <Spinner /> : renderableTracks}
+                  {Object.entries(samples).map(([id, sample]) => (
+                    <Sample data={sample} id={id} key={id} />
+                  ))}
+                </div>
               </div>
             </div>
           </div>
+          <PianoRoll />
+          <PlayBackControls style={{ 'pointer-events': 'none' }} />
+          <FileExplorer />
+          <PublishForm />
         </div>
-        <PianoRoll />
-        <PlayBackControls style={{ 'pointer-events': 'none' }} />
-        <FileExplorer />
-        <PublishForm />
+        <SongPicker songs={[]} />
       </div>
-      <SongPicker songs={[]} />
-
-
-    </div>
+    </GlobalHotKeys>
   );
 });
 

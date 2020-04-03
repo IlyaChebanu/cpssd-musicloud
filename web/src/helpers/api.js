@@ -12,7 +12,7 @@ axios.interceptors.response.use((res) => res, (err) => {
       message: 'An unknown error has occured. Please contact the site owners.',
     }));
   }
-  if (window.location.pathname !== '/login' && res.status === 401) {
+  if ((window.location.pathname !== '/login' && window.location.pathname !== '/discover') && res.status === 401) {
     store.dispatch(showNotification({
       message: 'Session expired. Please log back in.',
     }));
@@ -236,15 +236,18 @@ export const setSongCompiledUrl = (reqData) => axios.patch(
   },
 );
 
-export const getCompiledSongs = (username) => axios.get(
-  `${API_URL}/v1/audio/compiled_songs?songs_per_page=25&${username ? `username=${username}` : ''}`,
+export const getCompiledSongs = (username, searchText, order, sortedBy) => axios.get(
+  `${API_URL}/v1/audio/search?songs_per_page=25`
+  + `${searchText ? `&search_term=${searchText.trim()}` : ''}`
+  + `${username !== '' ? `&username=${username}` : ''}`
+  + `${sortedBy !== '' && order !== '' && order !== undefined ? `&${sortedBy}=${order}` : ''}`,
   {
     headers: getAuth(),
   },
 );
 
 export const getNextCompiledSongs = (next) => axios.get(
-  `${API_URL}/v1/audio/compiled_songs?songs_per_page=25&next_page=${next}`,
+  `${API_URL}/v1/audio/search?songs_per_page=25&next_page=${next}`,
   {
     headers: getAuth(),
   },

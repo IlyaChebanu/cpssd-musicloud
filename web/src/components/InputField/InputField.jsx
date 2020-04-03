@@ -45,6 +45,7 @@ const InputField = memo((props) => {
       onMouseLeave={handleMouseLeave}
     >
       <input
+        onKeyPress={props.onKeyPress}
         className={`${styles.input} ${props.className}`}
         type={props.password ? 'password' : 'text'}
         name={props.name}
@@ -70,6 +71,7 @@ InputField.propTypes = {
   className: PropTypes.string,
   animate: PropTypes.bool,
   borderColour: PropTypes.string,
+  onKeyPress: PropTypes.func,
 };
 
 InputField.defaultProps = {
@@ -80,6 +82,7 @@ InputField.defaultProps = {
   sideContent: null,
   className: '',
   animate: false,
+  onKeyPress: null,
 };
 
 InputField.displayName = 'InputField';
