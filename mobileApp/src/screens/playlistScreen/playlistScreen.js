@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from 'react-redux';
 import { ActionCreators } from '../../actions/index';
 import { bindActionCreators } from 'redux';
-import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity, BackHandler } from "react-native";
+import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity, BackHandler, RefreshControl } from "react-native";
 import styles from "./styles";
 import { SafeAreaView } from "react-navigation";
 import HeaderComponent from "../../components/headerComponent/headerComponent";
@@ -23,6 +23,7 @@ class PlaylistScreen extends React.Component {
             showExitAlert: false,
             nextPage: null,
             nextPagePlaylist: null,
+            refreshing: false,
         };
     }
 
@@ -57,6 +58,18 @@ class PlaylistScreen extends React.Component {
                 this.setState({ playlistSongData: response.data.songs, nextPage: response.data.next_page, screenState: 2 })
             }
         })
+    }
+
+    onRefresh = async () => {
+        this.setState({ refreshing: true });
+        await this.getPlaylistSongs(this.state.pid);
+        this.setState({ refreshing: false });
+    }
+
+    onRefreshPlaylist = async () => {
+        this.setState({ refreshing: true });
+        await this.getPlaylist();
+        this.setState({ refreshing: false });
     }
 
     getPlaylist() {
@@ -214,6 +227,12 @@ class PlaylistScreen extends React.Component {
                         extraData={this.state.playlistData}
                         onEndReached={this._handleLoadMorePlaylist.bind(this)}
                         onEndReachedThreshold={0.5}
+                        refreshControl={(
+                            <RefreshControl
+                                tintColor={'white'}
+                                refreshing={this.state.refreshing}
+                                onRefresh={this.onRefreshPlaylist}
+                            />)}
                     />
                         :
                         this.state.screenState === 2 ?
@@ -226,6 +245,12 @@ class PlaylistScreen extends React.Component {
                                 extraData={this.state.playlistSongData}
                                 onEndReached={this._handleLoadMore.bind(this)}
                                 onEndReachedThreshold={0.5}
+                                refreshControl={(
+                                    <RefreshControl
+                                        tintColor={'white'}
+                                        refreshing={this.state.refreshing}
+                                        onRefresh={this.onRefresh}
+                                    />)}
                             />
                             : null
                     }

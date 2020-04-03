@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from 'react-redux';
 import { ActionCreators } from '../../actions/index';
 import { bindActionCreators } from 'redux';
-import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList, Animated, Easing, Dimensions, BackHandler } from "react-native";
+import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList, Animated, Easing, Dimensions, BackHandler, RefreshControl } from "react-native";
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import HeaderComponent from "../../components/headerComponent/headerComponent";
@@ -46,6 +46,7 @@ class ProfileScreen extends React.Component {
       likedSongsData: [],
       showExitAlert: false,
       nextPage: null,
+      refreshing: false,
     }
   }
 
@@ -193,6 +194,12 @@ class ProfileScreen extends React.Component {
     })
   }
 
+  onRefresh = async () => {
+    this.setState({ refreshing: true });
+    await this.getLikedSongs();
+    this.setState({ refreshing: false });
+  }
+
   handleLikeClick(item, index) {
     if (item.like_status === 0) {
       postLikeSong(this.props.token, item.sid).then(response => {
@@ -276,6 +283,12 @@ class ProfileScreen extends React.Component {
           extraData={this.state.likedSongsData}
           onEndReached={this._handleLoadMore.bind(this)}
           onEndReachedThreshold={0.5}
+          refreshControl={(
+            <RefreshControl
+              tintColor={'white'}
+              refreshing={this.state.refreshing}
+              onRefresh={this.onRefresh}
+            />)}
         />
       </Animated.View>
     )

@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Text, View, Image, FlatList, TextInput } from "react-native";
+import { StyleSheet, Text, View, Image, FlatList, TextInput, RefreshControl } from "react-native";
 import GLOBALS from "../../utils/globalStrings";
 import styles from "./styles";
 import ProfileComponent from "../profileComponent/profileComponent";
@@ -14,6 +14,7 @@ export default class ProfilePosts extends React.Component {
     this.state = {
       posts: [],
       nextPage: null,
+      refreshing: false,
     };
   }
 
@@ -27,6 +28,12 @@ export default class ProfilePosts extends React.Component {
         this.setState({ posts: response.data.timeline, nextPage: response.data.next_page })
       }
     })
+  }
+
+  onRefresh = async () => {
+    this.setState({ refreshing: true });
+    await this.getPosts();
+    this.setState({ refreshing: false });
   }
 
   setTextInput(text) {
@@ -85,7 +92,7 @@ export default class ProfilePosts extends React.Component {
   }
 
   _handleLoadMore() {
-    if (this.state.nextPage !== null){
+    if (this.state.nextPage !== null) {
       getUserTimeline(this.props.accessToken, true, false, this.state.nextPage, 10).then(response => {
         if (response.status === 200) {
           var joined = this.state.posts.concat(response.data.timeline)
@@ -107,6 +114,12 @@ export default class ProfilePosts extends React.Component {
           extraData={this.state.posts}
           onEndReached={this._handleLoadMore.bind(this)}
           onEndReachedThreshold={0.5}
+          refreshControl={(
+            <RefreshControl
+              tintColor={'white'}
+              refreshing={this.state.refreshing}
+              onRefresh={this.onRefresh}
+            />)}
         />
       </View>
     )
