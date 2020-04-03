@@ -21,7 +21,6 @@ import {
 } from '../../helpers/api';
 import { showNotification } from '../../actions/notificationsActions';
 import { ReactComponent as Logo } from '../../assets/logo.svg';
-import { ReactComponent as SignOutIcon } from '../../assets/icons/sign-out-alt-light.svg';
 import CircularImage from '../CircularImage';
 import Dropdown from '../Dropdown';
 
@@ -45,6 +44,7 @@ import {
   setCompleteTracksState,
   setCompleteSamplesState,
 } from '../../actions/studioActions';
+import Button from '../Button';
 
 const Header = memo((props) => {
   const {
@@ -321,6 +321,9 @@ const Header = memo((props) => {
       </span>
       <span className={styles.nav}>
         <nav>
+          <Button className={styles.saveButton} onClick={handleSignout}>
+            Logout
+          </Button>
           <Link to="/studio" className={selected === 0 ? styles.selected : ''}>
             Studio
           </Link>
@@ -333,23 +336,15 @@ const Header = memo((props) => {
           >
             Discover
           </Link>
-          <Link
-            to={`/profile?username=${user.username}`}
-            className={selected === 3 ? styles.selected : ''}
-          >
-            Profile
-          </Link>
         </nav>
         <div className={styles.pictureWrapper}>
           <CircularImage src={user.profilePicUrl} />
-          <div
+          <Link
             className={styles.signout}
-            onClick={handleSignout}
+            to={`/profile?username=${user.username}`}
             role="button"
             tabIndex={0}
-          >
-            <SignOutIcon />
-          </div>
+          />
         </div>
       </span>
     </div>
