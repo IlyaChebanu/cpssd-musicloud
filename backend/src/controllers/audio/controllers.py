@@ -1309,9 +1309,9 @@ def search_songs(user_data):  # pylint: disable=R0911,R0912,R0914,R0915
 
             if artist_sort:
                 if sorts[0] == "up":
-                    sort_sql = " ORDER BY username DESC "
+                    sort_sql = " ORDER BY username DESC, sid ASC "
                 else:
-                    sort_sql = " ORDER BY username ASC "
+                    sort_sql = " ORDER BY username ASC, sid ASC "
 
             if duration_sort:
                 if sorts[0] == "up":
