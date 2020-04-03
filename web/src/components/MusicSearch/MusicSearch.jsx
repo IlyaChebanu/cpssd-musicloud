@@ -2,14 +2,11 @@ import React, { useState, useCallback, memo } from 'react';
 import PropTypes from 'prop-types';
 import styles from './MusicSearch.module.scss';
 import InputField from '../InputField';
-import { ReactComponent as SortIcon } from '../../assets/icons/sort-alt-light.svg';
 import { ReactComponent as SortDuotoneIcon } from '../../assets/icons/sort-duotone.svg';
 import { ReactComponent as SortUpIcon } from '../../assets/icons/sort-up-duotone.svg';
 
 const MusicSearch = memo((props) => {
   const { className, setSortedBy } = props;
-  const [expanded, setExpanded] = useState(false);
-  const toggleExplanded = useCallback(() => setExpanded(!expanded), [expanded]);
   const [sortPublished, setSortPublished] = useState('');
   const [sortDuration, setSortDuration] = useState('');
   const [sortTitle, setSortTitle] = useState('');
@@ -50,11 +47,8 @@ const MusicSearch = memo((props) => {
     <div className={`${styles.wrapper} ${className}`}>
       <span className={styles.search}>
         <InputField onKeyPress={props.onKeyPress} onChange={props.onChange} name="search" placeholder="Search" />
-        <button type="button" onClick={toggleExplanded}>
-          <SortIcon className={styles.sortIcon} />
-        </button>
       </span>
-      <span className={styles.filters + (expanded ? ` ${styles.expanded}` : ` ${styles.collapsed}`)}>
+      <span className={`${styles.filters} ${styles.expanded}`}>
         <button
           type="button"
           onClick={() => toggle(sortPublished, setSortPublished, 'publish_sort')}
