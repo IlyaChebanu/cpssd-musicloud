@@ -326,3 +326,47 @@ export function postPlaylistSong(token, pid, sid) {
             return error
         });
 }
+
+export function getSearchSongs(token, search_term, sort_type, sort, songs_per_page, next_page) {
+
+    let url = `${API_URL}api/v1/audio/search`;
+    url = url + `?search_term=${search_term}`
+    if (sort_type && sort) {
+        url = url + `&${sort_type}=${sort}`
+    }
+    if (songs_per_page) {
+        url = url + `&songs_per_page=${songs_per_page}`
+    }
+    if (next_page) {
+        url = url + `&next_page=${next_page}`
+    }
+    var request = new Request(url, {
+        method: "GET",
+        headers: new Headers({
+            "Content-Type": "application/json",
+            "Authorization": 'Bearer ' + token,
+        }),
+    });
+    if (__DEV__) {
+        console.log("getSearchSongs : request " + JSON.stringify(request))
+    }
+
+    return fetch(request)
+        .then(response => {
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
+        })
+        .then(responseJson => {
+            if (__DEV__) {
+                console.log("getSearchSongs : response " + JSON.stringify(responseJson))
+            }
+            return responseJson;
+        })
+        .catch(error => {
+            if (__DEV__) {
+                console.log("getSearchSongs : error " + JSON.stringify(error))
+            }
+            return error
+        });
+}
