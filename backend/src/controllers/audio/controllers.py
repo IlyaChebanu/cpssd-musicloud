@@ -33,8 +33,7 @@ from ...models.audio import (
     update_playlist_name, update_publised_timestamp, notify_like_dids,
     notify_song_dids, update_song_name, update_description,
     get_number_of_searchable_songs, get_all_search_results, delete_song_data,
-    get_sample_listing, add_sample_listing, update_sample_listing,
-    delete_sample_listing
+    create_folder_entry, add_sample
 )
 from ...models.users import get_user_via_username
 from ...models.errors import NoResults
@@ -1485,21 +1484,22 @@ def delete_song(user_data):
     return {"message": "Song deleted"}, 200
 
 
-@AUDIO.route("/sample_names", methods=["PATCH"])
+@AUDIO.route("/folders", methods=["POST"])
 @sql_err_catcher()
 @auth_required()
-def edit_sample_directory():  # pylint: disable=R0911
+def create_folder():  # pylint: disable=R0911
     """
-    Endpoint for adding or updating a url -> filename mapping.
+    Endpoint for creating a folder in the DB.
     """
     expected_body = {
         "type": "object",
         "properties": {
-            "mappings": {
-                "type": "object",
+            "folder_name": {
+                "type": "string",
+                "minLength": 1
             }
         },
-        "required": ["mappings"]
+        "required": ["folder_name"]
     }
     try:
         validate(request.json, schema=expected_body)
@@ -1507,50 +1507,46 @@ def edit_sample_directory():  # pylint: disable=R0911
         log("warning", "Request validation failed.", str(exc))
         return {"message": str(exc)}, 422
 
-    mappings = request.json.get('mappings')
-    urls = mappings.keys()
+    create_folder_entry(request.json.get("folder_name"))
 
-    for url in urls:
-        filename = mappings[url].get("filename")
-        directory = mappings[url].get("directory")
-        sample = get_sample_listing(url.lower())
-        if sample:
-            update_sample_listing(url.lower(), filename, directory)
-        else:
-            add_sample_listing(url.lower(), filename, directory)
-
-    return {"message": "Mapping(s) updated"}, 200
+    return {"message": "Folder created"}, 200
 
 
-@AUDIO.route("/sample_names", methods=["GET"])
+@AUDIO.route("/samples", methods=["POST"])
 @sql_err_catcher()
 @auth_required()
-def read_sample_directory():  # pylint: disable=R0911
+def add_to_folder():  # pylint: disable=R0911
     """
-    Endpoint for getting a sample mapping from the sample directory.
+    Endpoint for creating a folder in the DB.
     """
-    url = request.args.get('url')
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "sample_name": {
+                "type": "string",
+                "minLength": 1
+            },
+            "sample_url": {
+                "type": "string",
+                "minLength": 1
+            },
+            "folder_id": {
+                "type": "integer",
+                "minimum": 1
+            }
+        },
+        "required": ["sample_name", "sample_url", "folder_id"]
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
 
-    if not url:
-        return {"message": "url param can't be empty!"}, 422
+    add_sample(
+        request.json.get("sample_name"),
+        request.json.get("sample_url"),
+        request.json.get("folder_id")
+    )
 
-    sample = get_sample_listing(url.lower())
-    if sample:
-        return {"filename": sample[0][0], "directory": sample[0][1]}, 200
-    return {"message": "Sample does not exist"}, 400
-
-
-@AUDIO.route("/sample_names", methods=["DELETE"])
-@sql_err_catcher()
-@auth_required()
-def delete_sample_directory_listing():  # pylint: disable=R0911
-    """
-    Endpoint for deleting a sample mapping from the sample directory.
-    """
-    url = request.args.get('url')
-
-    if not url:
-        return {"message": "url param can't be empty!"}, 422
-
-    delete_sample_listing(url)
-    return {"message": "Sample listing deleted"}, 200
+    return {"message": "Sample added to folder"}, 200
