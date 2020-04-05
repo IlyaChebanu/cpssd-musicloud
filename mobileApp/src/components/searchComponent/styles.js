@@ -26,4 +26,21 @@ export default StyleSheet.create({
         paddingBottom: 0,
         paddingLeft: 10,
     },
+    sortContainer: {
+        flexDirection: 'row',
+        paddingTop: 7,
+        justifyContent: 'space-between',
+    },
+    sortButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    sortText: {
+        color: '#FFF',
+        fontSize: 15,
+    },
+    sortImage: {
+        width: 15,
+        height: 15,
+    },
 })
