@@ -4717,7 +4717,7 @@ class AudioTests(unittest.TestCase):
                 mock_token.return_value = ALT_MOCKED_TOKEN
                 res = self.test_client.delete(
                     "/api/v1/audio/folders",
-                    json={"folder_id": 1},
+                    query_string={"folder_id": 1},
                     headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                     follow_redirects=True
                 )
@@ -4789,7 +4789,7 @@ class AudioTests(unittest.TestCase):
                 mock_token.return_value = ALT_MOCKED_TOKEN
                 res = self.test_client.patch(
                     "/api/v1/audio/folders",
-                    json={"folder_id": 2, "parent_folder_id": 1},
+                    query_string={"folder_id": 2, "parent_folder_id": 1},
                     headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                     follow_redirects=True
                 )
@@ -4928,7 +4928,7 @@ class AudioTests(unittest.TestCase):
                 mock_token.return_value = ALT_MOCKED_TOKEN
                 res = self.test_client.delete(
                     "/api/v1/audio/files",
-                    json={"file_id": 1},
+                    query_string={"file_id": 1},
                     headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                     follow_redirects=True
                 )
@@ -4997,7 +4997,7 @@ class AudioTests(unittest.TestCase):
                 mock_token.return_value = ALT_MOCKED_TOKEN
                 res = self.test_client.patch(
                     "/api/v1/audio/files",
-                    json={"file_id": 2, "folder_id": 1},
+                    query_string={"file_id": 2, "folder_id": 1},
                     headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                     follow_redirects=True
                 )

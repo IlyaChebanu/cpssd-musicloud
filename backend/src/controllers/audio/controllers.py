@@ -1595,27 +1595,15 @@ def delete_folder():  # pylint: disable=R0911
     """
     Endpoint for deleting a folder in the DB.
     """
-    expected_body = {
-        "type": "object",
-        "properties": {
-            "folder_id": {
-                "type": "integer",
-                "minimum": 1
-            }
-        },
-        "required": ["folder_id"]
-    }
-    try:
-        validate(request.json, schema=expected_body)
-    except ValidationError as exc:
-        log("warning", "Request validation failed.", str(exc))
-        return {"message": str(exc)}, 422
+    folder_id = request.args.get('folder_id')
+    if not folder_id:
+        return {"message": "No folder_id sent"}, 422
 
     try:
-        get_root_folder_entry(request.json.get("folder_id"))
+        get_root_folder_entry(folder_id)
         return {"message": "You can't delete a root folder"}, 401
     except NoResults:
-        delete_folder_entry(request.json.get("folder_id"))
+        delete_folder_entry(folder_id)
         return {"message": "Folder deleted"}, 200
 
 
@@ -1626,23 +1614,11 @@ def delete_file():  # pylint: disable=R0911
     """
     Endpoint for deleting a file in the DB.
     """
-    expected_body = {
-        "type": "object",
-        "properties": {
-            "file_id": {
-                "type": "integer",
-                "minimum": 1
-            }
-        },
-        "required": ["file_id"]
-    }
-    try:
-        validate(request.json, schema=expected_body)
-    except ValidationError as exc:
-        log("warning", "Request validation failed.", str(exc))
-        return {"message": str(exc)}, 422
+    file_id = request.args.get('file_id')
+    if not file_id:
+        return {"message": "No file_id sent"}, 422
 
-    delete_file_entry(request.json.get("file_id"))
+    delete_file_entry(file_id)
     return {"message": "File deleted"}, 200
 
 
@@ -1653,34 +1629,19 @@ def move_folder():  # pylint: disable=R0911
     """
     Endpoint for moving a folder in the DB.
     """
-    expected_body = {
-        "type": "object",
-        "properties": {
-            "folder_id": {
-                "type": "integer",
-                "minimum": 1
-            },
-            "parent_folder_id": {
-                "type": "integer",
-                "minimum": 1
-            }
-        },
-        "required": ["folder_id", "parent_folder_id"]
-    }
-    try:
-        validate(request.json, schema=expected_body)
-    except ValidationError as exc:
-        log("warning", "Request validation failed.", str(exc))
-        return {"message": str(exc)}, 422
+    folder_id = request.args.get('folder_id')
+    if not folder_id:
+        return {"message": "No folder_id sent"}, 422
+
+    parent_folder_id = request.args.get('parent_folder_id')
+    if not parent_folder_id:
+        return {"message": "No parent_folder_id sent"}, 422
 
     try:
-        get_root_folder_entry(request.json.get("folder_id"))
+        get_root_folder_entry(folder_id)
         return {"message": "You can't move a root folder"}, 401
     except NoResults:
-        move_folder_entry(
-            request.json.get("folder_id"),
-            request.json.get("parent_folder_id")
-        )
+        move_folder_entry(folder_id, parent_folder_id)
         return {"message": "Folder moved"}, 200
 
 
@@ -1691,27 +1652,15 @@ def move_file():  # pylint: disable=R0911
     """
     Endpoint for moving a file in the DB.
     """
-    expected_body = {
-        "type": "object",
-        "properties": {
-            "folder_id": {
-                "type": "integer",
-                "minimum": 1
-            },
-            "file_id": {
-                "type": "integer",
-                "minimum": 1
-            }
-        },
-        "required": ["folder_id", "file_id"]
-    }
-    try:
-        validate(request.json, schema=expected_body)
-    except ValidationError as exc:
-        log("warning", "Request validation failed.", str(exc))
-        return {"message": str(exc)}, 422
+    folder_id = request.args.get('folder_id')
+    if not folder_id:
+        return {"message": "No folder_id sent"}, 422
 
-    move_file_entry(request.json.get("folder_id"), request.json.get("file_id"))
+    file_id = request.args.get('file_id')
+    if not file_id:
+        return {"message": "No file_id sent"}, 422
+
+    move_file_entry(folder_id, file_id)
     return {"message": "File moved"}, 200
 
 

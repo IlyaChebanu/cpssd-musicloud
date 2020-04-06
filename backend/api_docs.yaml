@@ -4024,18 +4024,16 @@ paths:
         description: "This is where you should set your access_token."
         required: true
         type: "string"
-      - in: "body"
-        name: "body"
-        description: "New Mapping"
-        schema:
-          type: "object"
-          properties:
-            folder_id:
-              type: "integer"
-              example: 2
-            parent_folder_id:
-              type: "integer"
-              example: 1
+      - in: "query"
+        name: "folder_id"
+        type: "integer"
+        required: true
+        description: "The ID of the folder you want to move."
+      - in: "query"
+        name: "parent_folder_id"
+        type: "integer"
+        required: true
+        description: "The ID of the folder you want to move the selected folder into."
       responses:
         200:
           description: "Folder moved"
@@ -4090,15 +4088,11 @@ paths:
           description: "This is where you should set your access_token."
           required: true
           type: "string"
-        - in: "body"
-          name: "body"
-          description: "A folder ID."
-          schema:
-            type: "object"
-            properties:
-              folder_id:
-                type: "integer"
-                example: 2
+        - in: "query"
+          name: "folder_id"
+          type: "integer"
+          required: true
+          description: "The ID of the folder you want to delete."
       responses:
         200:
           description: "Folder Deleted"
@@ -4225,18 +4219,16 @@ paths:
         description: "This is where you should set your access_token."
         required: true
         type: "string"
-      - in: "body"
-        name: "body"
-        description: "New Mapping"
-        schema:
-          type: "object"
-          properties:
-            folder_id:
-              type: "integer"
-              example: 2
-            file_id:
-              type: "integer"
-              example: 1
+      - in: "query"
+        name: "folder_id"
+        type: "integer"
+        required: true
+        description: "The ID of the folder you want to move a file into."
+      - in: "query"
+        name: "file_id"
+        type: "integer"
+        required: true
+        description: "The ID of the file you want to move."
       responses:
         200:
           description: "File moved"
@@ -4291,15 +4283,11 @@ paths:
           description: "This is where you should set your access_token."
           required: true
           type: "string"
-        - in: "body"
-          name: "body"
-          description: "A folder ID."
-          schema:
-            type: "object"
-            properties:
-              file_id:
-                type: "integer"
-                example: 2
+        - in: "query"
+          name: "file_id"
+          type: "integer"
+          required: true
+          description: "The ID of the file you want to delete."
       responses:
         200:
           description: "File Deleted"
