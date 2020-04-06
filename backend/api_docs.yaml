@@ -3776,7 +3776,7 @@ paths:
       tags:
       - "audio"
       summary: "Search through the song catalog with song & artist name search, and result filtering."
-      description: "This endpoint takes several arguments and returns a subset of all the songs on our system. The arguments that can be provided are as follows:\n\n \"search_term\" = If a 'next_page' or 'back_page' argument is not sent, then this is an optional argument you may send. This should be set to the username of the user who's songs you are trying to view, or the title of the song itself.\n\n \"publish_sort\" = If a 'next_page' or 'back_page' argument is not sent, then this is an optional argument you may send. This should be set to either the value 'up', to view results from the oldest publication date to the most recent, or to 'down', to view results from the newest publication date to the oldest. Only one type of sort can be applied to a search at a time.\n\n \"title_sort\" = If a 'next_page' or 'back_page' argument is not sent, then this is an optional argument you may send. This should be set to either the value 'up', to view results in reverse alphabetical order based on the song title, or to 'down', to view results in alphabetical order based on the song title. Only one type of sort can be applied to a search at a time.\n\n \"artist_sort\" = If a 'next_page' or 'back_page' argument is not sent, then this is an optional argument you may send. This should be set to either the value 'up', to view results in reverse alphabetical order based on the artist's name, or to 'down', to view results in alphabetical order based on the artist's name. Only one type of sort can be applied to a search at a time.\n\n \"duration_sort\" = If a 'next_page' or 'back_page' argument is not sent, then this is an optional argument you may send. This should be set to either the value 'up', to view results from the shortest songs to the longest, or to 'down', to view results from the longest songs to the shortest. Only one type of sort can be applied to a search at a time.\n\n \"songs_per_page\" = If a 'next_page' or 'back_page' argument is not sent, then this an optional argument you may send. This is used to adjust the number of songs you will get back per page of results.\n\n \"current_page\" = If a 'next_page' or 'back_page' argument is not sent, then this is an optional argument you may send. This is used to navigate through each of the pages of results. If this argument is not sent, the default page of results returned will be page 1.\n\n \"next_page\" = If this value is sent, then a back_page value should not be sent. This value should be set to a 'next_page' token. These tokens are returned by standard requests to support infinited scrolling. Making a request with this token requires no other value to be passed as it encodes all required data for the next request.\n\n \"back_page\" = If this value is sent, then a next_page value should not be sent. This value should be set to a 'back_page' token. These tokens are returned by standard requests to support infinited scrolling. Making a request with this token requires no other value to be passed as it encodes all required data for the next request."
+      description: "This endpoint takes several arguments and returns a subset of all the songs on our system. The arguments that can be provided are as follows:\n\n \"search_term\" = If a 'next_page' or 'back_page' argument is not sent, then this is an optional argument you may send. This should be set to the username of the user who's songs you are trying to view, or the title of the song itself.\n\n \"publish_sort\" = If a 'next_page' or 'back_page' argument is not sent, then this is an optional argument you may send. This should be set to either the value 'up', to view results from the oldest publication date to the most recent, or to 'down', to view results from the newest publication date to the oldest. Only one type of sort can be applied to a search at a time.\n\n \"title_sort\" = If a 'next_page' or 'back_page' argument is not sent, then this is an optional argument you may send. This should be set to either the value 'up', to view results in reverse alphabetical order based on the song title, or to 'down', to view results in alphabetical order based on the song title. Only one type of sort can be applied to a search at a time.\n\n \"artist_sort\" = If a 'next_page' or 'back_page' argument is not sent, then this is an optional argument you may send. This should be set to either the value 'up', to view results in reverse alphabetical order based on the artist's name, or to 'down', to view results in alphabetical order based on the artist's name. Only one type of sort can be applied to a search at a time.\n\n \"duration_sort\" = If a 'next_page' or 'back_page' argument is not sent, then this is an optional argument you may send. This should be set to either the value 'up', to view results from the shortest songs to the longest, or to 'down', to view results from the longest songs to the shortest. Only one type of sort can be applied to a search at a time.\n\n \"profile_search\" = If a 'next_page' or 'back_page' argument is not sent, then this is an optional argument you may send. If any value is sent for this, the results will be limited to songs your user owns.\n\n \"songs_per_page\" = If a 'next_page' or 'back_page' argument is not sent, then this an optional argument you may send. This is used to adjust the number of songs you will get back per page of results.\n\n \"current_page\" = If a 'next_page' or 'back_page' argument is not sent, then this is an optional argument you may send. This is used to navigate through each of the pages of results. If this argument is not sent, the default page of results returned will be page 1.\n\n \"next_page\" = If this value is sent, then a back_page value should not be sent. This value should be set to a 'next_page' token. These tokens are returned by standard requests to support infinited scrolling. Making a request with this token requires no other value to be passed as it encodes all required data for the next request.\n\n \"back_page\" = If this value is sent, then a next_page value should not be sent. This value should be set to a 'back_page' token. These tokens are returned by standard requests to support infinited scrolling. Making a request with this token requires no other value to be passed as it encodes all required data for the next request."
       consumes:
       - "application/json"
       produces:
@@ -3812,6 +3812,11 @@ paths:
           type: "string"
           required: false
           description: "Sort based on the duration of songs (valid values are either 'up' or 'down')."
+        - in: "query"
+          name: "profile_search"
+          type: "string"
+          required: false
+          description: "Limit results to only songs you own."
         - in: "query"
           name: "current_page"
           type: "string"
@@ -3924,12 +3929,12 @@ paths:
                 type: "string"
                 example: "MySQL unavailable."
                 
-  /audio/sample_names:
+  /audio/folders:
     get:
       tags:
       - "audio"
-      summary: "Get the sample name and directory associated with a URL."
-      description: "This endpoint takes one argument and returns an object containing a samples filename and directory path. The argument can be provided are as follows:\n\n \"url\" = If a 'next_page' or 'back_page' argument is not sent, then this is a mandatory argument you must send. This should be set to a url that you want to get the file name and directory for."
+      summary: "Get a folders content."
+      description: "This endpoint takes one optional argument and returns an object containing a folders content and details. The argument that can be provided is as follows:\n\n \"folder_id\" = The ID of the folder whos contents and details you want to view.\n\n If no folder_id is provided then this endpoint will return the contents and details of a user's root folder."
       consumes:
       - "application/json"
       produces:
@@ -3941,30 +3946,45 @@ paths:
           required: true
           type: "string"
         - in: "query"
-          name: "url"
+          name: "folder_id"
           type: "string"
           required: false
-          description: "A url string."
+          description: "A valid folder ID."
       responses:
         200:
-          description: "Successful search query"
+          description: "Successful Folder lookup"
           schema:
             type: "object"
             properties:
-              filename:
+              folder_name:
                 type: "string"
-                example: "UNKOWN"
-              directory:
-                type: "string"
-                example: "/"
+                example: "Example Folder Name"
+              folder_id:
+                type: "integer"
+                example: 1
+              child_files:
+                type: "array"
+                items:
+                  type: "string"
+                example:
+                  - "1"
+                  - "A Sample Name"
+                  - "http://afakeurl.com"
+              child_folders:
+                type: "array"
+                items:
+                  type: "string"
+                example:
+                  - "2"
+                  - "A Subfolder"
         400:
-          description: "Invalid sample URL"
+          description: "Invalid folder ID"
           schema:
             type: "object"
             properties:
               message:
                 type: "string"
-                example: "Sample does not exist"
+                example: "Invalid folder ID. Folder does not exist!"
         401:
           description: "User's token has expired"
           schema:
@@ -3973,14 +3993,6 @@ paths:
               message:
                 type: "string"
                 example: "Token expired."
-        422:
-          description: "Malformed request body."
-          schema:
-            type: "object"
-            properties:
-              message:
-                type: "string"
-                example: "A req validation traceback will be here."
         500:
           description: "Failed to decode token."
           schema:
@@ -4000,8 +4012,8 @@ paths:
     patch:
       tags:
       - "audio"
-      summary: "Add or update a url -> filename mapping."
-      description: "Changes the filename, and or directory, mapped to a URL."
+      summary: "Move a non-root folder."
+      description: "This endpoint takes two arguments and moves a folder in the DB. The arguments that are to be provided are as follows:\n\n \"folder_id\" = The ID of the folder you want to move.\n\n \"parent_folder_id\" = The ID of the folder you want to move your selected folder into. If you attempt to move a root folder, an error will be returned."
       consumes:
       - "application/json"
       produces:
@@ -4018,36 +4030,21 @@ paths:
         schema:
           type: "object"
           properties:
-            mappings:
-              type: "object"
-              properties:
-                http://url.com:
-                  type: "object"
-                  properties:
-                    filename:
-                      type: "string"
-                      example: "Example_Sample_Name"
-                    directory:
-                      type: "string"
-                      example: "/a/nested/directory"
-                http://a-website.org:
-                  type: "object"
-                  properties:
-                    filename:
-                      type: "string"
-                      example: "Example_Sample_Name"
-                    directory:
-                      type: "string"
-                      example: "/a/nested/directory"
+            folder_id:
+              type: "integer"
+              example: 2
+            parent_folder_id:
+              type: "integer"
+              example: 1
       responses:
         200:
-          description: "Mapping updated"
+          description: "Folder moved"
           schema:
             type: "object"
             properties:
               message:
                 type: "string"
-                example: "Mapping(s) updated"
+                example: "Folder moved"
         401:
           description: "User's token has expired"
           schema:
@@ -4083,8 +4080,8 @@ paths:
     delete:
       tags:
       - "audio"
-      summary: "Delete a sample listing."
-      description: "Deletes a sample listing in the sample directory."
+      summary: "Delete a non-root folder."
+      description: "This endpoint takes a folder ID & deletes that folder and all the subfolders and files in it from the DB. The argument that is to be provided is as follows:\n\n \"folder_id\" = The ID of a non-root folder you want to delete."
       produces:
       - "application/json"
       parameters:
@@ -4093,20 +4090,24 @@ paths:
           description: "This is where you should set your access_token."
           required: true
           type: "string"
-        - in: "query"
-          name: "url"
-          type: "string"
-          required: false
-          description: "A url string."
+        - in: "body"
+          name: "body"
+          description: "A folder ID."
+          schema:
+            type: "object"
+            properties:
+              folder_id:
+                type: "integer"
+                example: 2
       responses:
         200:
-          description: "Sample Deleted"
+          description: "Folder Deleted"
           schema:
             type: "object"
             properties:
               message:
                 type: "string"
-                example: "Sample listing deleted"
+                example: "Folder deleted"
         401:
           description: "Access_token missing or expired."
           schema:
@@ -4139,5 +4140,277 @@ paths:
               message:
                 type: "string"
                 example: "MySQL unavailable"
+    post:
+      tags:
+      - "audio"
+      summary: "Create a folder."
+      description: "This endpoint takes one mandatory and one optional argument and creates a folder in the DB. The arguments that can be provided are as follows:\n\n \"folder_name\" = This argument is mandatory. It is the name of your new folder.\n\n \"parent_folder_id\" = An optional argument that lets you create a folder inside another folder. By default all new folders are created in a user's root folder."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "Authorization Header"
+        description: "This is where you should set your access_token."
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "Folder creation data"
+        schema:
+          type: "object"
+          properties:
+            folder_name:
+              type: "string"
+              example: "A Folder Name"
+            parent_folder_id:
+              type: "integer"
+              example: 1
+      responses:
+        200:
+          description: "Folder created"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Folder created"
+        401:
+          description: "User's token has expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Failed to decode token."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+                
+  /audio/files:
+    patch:
+      tags:
+      - "audio"
+      summary: "Move a file."
+      description: "This endpoint takes two arguments and moves a file in the DB. The arguments that are to be provided are as follows:\n\n \"folder_id\" = The ID of the folder you want to move your file into.\n\n \"file_id\" = The ID of the file you want to move to your selected folder."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "Authorization Header"
+        description: "This is where you should set your access_token."
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "New Mapping"
+        schema:
+          type: "object"
+          properties:
+            folder_id:
+              type: "integer"
+              example: 2
+            file_id:
+              type: "integer"
+              example: 1
+      responses:
+        200:
+          description: "File moved"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "File moved"
+        401:
+          description: "User's token has expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Failed to decode token."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+    delete:
+      tags:
+      - "audio"
+      summary: "Delete a file."
+      description: "This endpoint takes a file ID & deletes that file from the DB. The argument that is to be provided is as follows:\n\n \"file_id\" = The ID of a file you want to delete."
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "A folder ID."
+          schema:
+            type: "object"
+            properties:
+              file_id:
+                type: "integer"
+                example: 2
+      responses:
+        200:
+          description: "File Deleted"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "File deleted"
+        401:
+          description: "Access_token missing or expired."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Request missing access_token."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable"
+    post:
+      tags:
+      - "audio"
+      summary: "Create a file."
+      description: "This endpoint takes two mandatory and one optional argument and creates a file in the DB. The arguments that can be provided are as follows:\n\n \"file_name\" = This argument is mandatory. It is the name of your new file.\n\n \"file_url\" = This argument is mandatory. It is the URL of your new file. \n\n \"folder_id\" = An optional argument that lets you create a file inside a specific folder. By default all new files are created in a user's root folder."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "Authorization Header"
+        description: "This is where you should set your access_token."
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "File creation data"
+        schema:
+          type: "object"
+          properties:
+            file_name:
+              type: "string"
+              example: "A File Name"
+            file_url:
+              type: "string"
+              example: "http://afakeurl.com"
+            folder_id:
+              type: "integer"
+              example: 1
+      responses:
+        200:
+          description: "File created"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "File added to folder"
+        401:
+          description: "User's token has expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Failed to decode token."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
                 
 x-aws-api-id: 'fvg2nhhlzk'

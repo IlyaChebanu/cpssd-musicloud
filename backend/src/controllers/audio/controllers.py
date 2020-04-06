@@ -33,7 +33,9 @@ from ...models.audio import (
     update_playlist_name, update_publised_timestamp, notify_like_dids,
     notify_song_dids, update_song_name, update_description,
     get_number_of_searchable_songs, get_all_search_results, delete_song_data,
-    create_folder_entry, add_sample
+    create_folder_entry, add_sample, get_folder_entry, delete_folder_entry,
+    get_root_folder_entry, delete_file_entry, move_folder_entry,
+    move_file_entry, get_child_folders, get_child_files
 )
 from ...models.users import get_user_via_username
 from ...models.errors import NoResults
@@ -1486,8 +1488,8 @@ def delete_song(user_data):
 
 @AUDIO.route("/folders", methods=["POST"])
 @sql_err_catcher()
-@auth_required()
-def create_folder():  # pylint: disable=R0911
+@auth_required(return_user=True)
+def create_folder(user_data):  # pylint: disable=R0911
     """
     Endpoint for creating a folder in the DB.
     """
@@ -1497,6 +1499,10 @@ def create_folder():  # pylint: disable=R0911
             "folder_name": {
                 "type": "string",
                 "minLength": 1
+            },
+            "parent_folder_id": {
+                "type": "integer",
+                "minimum": 1
             }
         },
         "required": ["folder_name"]
@@ -1507,26 +1513,42 @@ def create_folder():  # pylint: disable=R0911
         log("warning", "Request validation failed.", str(exc))
         return {"message": str(exc)}, 422
 
-    create_folder_entry(request.json.get("folder_name"))
+    if request.json.get("parent_folder_id"):
+        try:
+            get_folder_entry(request.json.get("parent_folder_id"))
+            parent_folder_id = request.json.get("parent_folder_id")
+        except NoResults:
+            return {
+                "message": ("Invalid parent folder ID. "
+                            "Folder does not exist!")
+            }, 400
+    else:
+        parent_folder_id = get_user_via_username(
+            user_data.get("username")
+        )[0][-1]
+
+    create_folder_entry(
+        request.json.get("folder_name"), parent_folder_id
+    )
 
     return {"message": "Folder created"}, 200
 
 
-@AUDIO.route("/samples", methods=["POST"])
+@AUDIO.route("/files", methods=["POST"])
 @sql_err_catcher()
-@auth_required()
-def add_to_folder():  # pylint: disable=R0911
+@auth_required(return_user=True)
+def create_file(user_data):  # pylint: disable=R0911
     """
-    Endpoint for creating a folder in the DB.
+    Endpoint for creating a File in the DB.
     """
     expected_body = {
         "type": "object",
         "properties": {
-            "sample_name": {
+            "file_name": {
                 "type": "string",
                 "minLength": 1
             },
-            "sample_url": {
+            "file_url": {
                 "type": "string",
                 "minLength": 1
             },
@@ -1535,7 +1557,7 @@ def add_to_folder():  # pylint: disable=R0911
                 "minimum": 1
             }
         },
-        "required": ["sample_name", "sample_url", "folder_id"]
+        "required": ["file_name", "file_url"]
     }
     try:
         validate(request.json, schema=expected_body)
@@ -1543,10 +1565,180 @@ def add_to_folder():  # pylint: disable=R0911
         log("warning", "Request validation failed.", str(exc))
         return {"message": str(exc)}, 422
 
+    if request.json.get("folder_id"):
+        try:
+            get_folder_entry(request.json.get("folder_id"))
+            folder_id = request.json.get("folder_id")
+        except NoResults:
+            return {
+                "message": ("Invalid parent folder ID. "
+                            "Folder does not exist!")
+            }, 400
+    else:
+        folder_id = get_user_via_username(
+            user_data.get("username")
+        )[0][-1]
+
     add_sample(
-        request.json.get("sample_name"),
-        request.json.get("sample_url"),
-        request.json.get("folder_id")
+        request.json.get("file_name"),
+        request.json.get("file_url"),
+        folder_id
     )
 
-    return {"message": "Sample added to folder"}, 200
+    return {"message": "File added to folder"}, 200
+
+
+@AUDIO.route("/folders", methods=["DELETE"])
+@sql_err_catcher()
+@auth_required()
+def delete_folder():  # pylint: disable=R0911
+    """
+    Endpoint for deleting a folder in the DB.
+    """
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "folder_id": {
+                "type": "integer",
+                "minimum": 1
+            }
+        },
+        "required": ["folder_id"]
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    try:
+        get_root_folder_entry(request.json.get("folder_id"))
+        return {"message": "You can't delete a root folder"}, 401
+    except NoResults:
+        delete_folder_entry(request.json.get("folder_id"))
+        return {"message": "Folder deleted"}, 200
+
+
+@AUDIO.route("/files", methods=["DELETE"])
+@sql_err_catcher()
+@auth_required()
+def delete_file():  # pylint: disable=R0911
+    """
+    Endpoint for deleting a file in the DB.
+    """
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "file_id": {
+                "type": "integer",
+                "minimum": 1
+            }
+        },
+        "required": ["file_id"]
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    delete_file_entry(request.json.get("file_id"))
+    return {"message": "File deleted"}, 200
+
+
+@AUDIO.route("/folders", methods=["PATCH"])
+@sql_err_catcher()
+@auth_required()
+def move_folder():  # pylint: disable=R0911
+    """
+    Endpoint for moving a folder in the DB.
+    """
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "folder_id": {
+                "type": "integer",
+                "minimum": 1
+            },
+            "parent_folder_id": {
+                "type": "integer",
+                "minimum": 1
+            }
+        },
+        "required": ["folder_id", "parent_folder_id"]
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    try:
+        get_root_folder_entry(request.json.get("folder_id"))
+        return {"message": "You can't move a root folder"}, 401
+    except NoResults:
+        move_folder_entry(
+            request.json.get("folder_id"),
+            request.json.get("parent_folder_id")
+        )
+        return {"message": "Folder moved"}, 200
+
+
+@AUDIO.route("/files", methods=["PATCH"])
+@sql_err_catcher()
+@auth_required()
+def move_file():  # pylint: disable=R0911
+    """
+    Endpoint for moving a file in the DB.
+    """
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "folder_id": {
+                "type": "integer",
+                "minimum": 1
+            },
+            "file_id": {
+                "type": "integer",
+                "minimum": 1
+            }
+        },
+        "required": ["folder_id", "file_id"]
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    move_file_entry(request.json.get("folder_id"), request.json.get("file_id"))
+    return {"message": "File moved"}, 200
+
+
+@AUDIO.route("/folders", methods=["GET"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def read_folder(user_data):  # pylint: disable=R0911
+    """
+    Endpoint for getting a folders contents in the DB.
+    """
+    res = {}
+
+    folder_id = request.args.get('folder_id')
+    if not folder_id:
+        folder_id = get_user_via_username(user_data.get("username"))[0][-1]
+
+    try:
+        row = get_folder_entry(folder_id)
+        res["folder_id"] = row[0][0]
+        res["folder_name"] = row[0][2]
+        row = get_child_folders(folder_id)
+        res["child_folders"] = row
+        row = get_child_files(folder_id)
+        res["child_files"] = row
+    except NoResults:
+        return {
+            "message": ("Invalid folder ID. Folder does not exist!")
+        }, 400
+
+    return {"folder": res}, 200
