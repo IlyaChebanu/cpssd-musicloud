@@ -1,4 +1,5 @@
-DROP TABLE `musicloud_db`.`Sample_Directory`;
+DROP TABLE `musicloud_db`.`File`;
+DROP TABLE `musicloud_db`.`Folder`;
 DROP TABLE `musicloud_db`.`Verification`;
 DROP TABLE `musicloud_db`.`Song_Likes`;
 DROP TABLE `musicloud_db`.`Song_Editors`;
@@ -24,7 +25,9 @@ CREATE TABLE `musicloud_db`.`Users` (
     `silence_follow_notifcation` TINYINT DEFAULT 0,
     `silence_post_notifcation` TINYINT DEFAULT 0,
     `silence_song_notifcation` TINYINT DEFAULT 0,
-    `silence_like_notifcation` TINYINT DEFAULT 0
+    `silence_like_notifcation` TINYINT DEFAULT 0,
+    `root_folder` INT UNIQUE NOT NULL,
+    FOREIGN KEY (root_folder) REFERENCES Folder(folder_id) ON DELETE CASCADE
 );
 
 CREATE TABLE `musicloud_db`.`Songs` (
@@ -119,9 +122,17 @@ CREATE TABLE `musicloud_db`.`Notifications` (
     FOREIGN KEY (uid) REFERENCES Users(uid)
 );
 
-CREATE TABLE `musicloud_db`.`Sample_Directory` (
-    file_id INT UNIQUE NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    `url` VARCHAR(3072) NOT NULL UNIQUE,
-    `filename` VARCHAR(3072) NOT NULL DEFAULT='UNKOWN',
-    `directory` VARCHAR(3072) NOT NULL DEFAULT='/'
+CREATE TABLE `musicloud_db`.`Folder` (
+    `folder_id` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    `parent_id` INT DEFAULT NULL,
+    `name` VARCHAR(3072) NOT NULL,
+    FOREIGN KEY (parent_id) REFERENCES Folder(folder_id) ON DELETE CASCADE
+);
+
+CREATE TABLE `musicloud_db`.`File` (
+    `file_id` INT UNIQUE NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    `folder_id` INT NOT NULL,
+    `name` VARCHAR(3072) NOT NULL,
+    `url` VARCHAR(3072) NOT NULL,
+    FOREIGN KEY (folder_id) REFERENCES Folder(folder_id) ON DELETE CASCADE
 );

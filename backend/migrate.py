@@ -18,6 +18,34 @@ manager = Manager(APP)
 manager.add_command('db', MigrateCommand)
 
 
+class Folder(db.Model):
+    __tablename__ = 'Folder'
+
+    folder_id = db.Column(
+        db.Integer, primary_key=True, nullable=False, autoincrement=True
+    )
+    parent_id = db.Column(
+        db.Integer, db.ForeignKey(folder_id, ondelete='CASCADE'),
+        default="NULL"
+    )
+    name = db.Column(db.VARCHAR(3072), nullable=False)
+
+
+class File(db.Model):
+    __tablename__ = 'File'
+
+    file_id = db.Column(
+        db.Integer, primary_key=True, nullable=False, unique=True,
+        autoincrement=True
+    )
+    folder_id = db.Column(
+        db.Integer, db.ForeignKey(Folder.folder_id, ondelete='CASCADE'),
+        nullable=False
+    )
+    name = db.Column(db.VARCHAR(3072), nullable=False)
+    url = db.Column(db.VARCHAR(3072), nullable=False)
+
+
 class Users(db.Model):
     __tablename__ = 'Users'
 
@@ -34,6 +62,9 @@ class Users(db.Model):
     silence_post_notifcation = db.Column(db.BOOLEAN, default=0)
     silence_song_notifcation = db.Column(db.BOOLEAN, default=0)
     silence_like_notifcation = db.Column(db.BOOLEAN, default=0)
+    root_folder = db.Column(db.Integer, db.ForeignKey(Folder.folder_id,
+                                                      ondelete='CASCADE'),
+                            nullable=False, unique=True)
 
 
 class Songs(db.Model):
@@ -173,24 +204,6 @@ class Notifications(db.Model):
         db.VARCHAR(255), unique=True, nullable=False, primary_key=True
     )
     uid = db.Column(db.Integer, db.ForeignKey(Users.uid), nullable=False)
-
-
-class Sample_Directory(db.Model):
-    __tablename__ = 'Sample_Directory'
-
-    file_id = db.Column(
-        db.Integer, primary_key=True, nullable=False, unique=True,
-        autoincrement=True
-    )
-    url = db.Column(
-        db.VARCHAR(3072), unique=True, nullable=False
-    )
-    filename = db.Column(
-        db.VARCHAR(3072), nullable=False, default='UNKNOWN'
-    )
-    directory = db.Column(
-        db.VARCHAR(3072), nullable=False, default='/'
-    )
 
 
 if __name__ == '__main__':

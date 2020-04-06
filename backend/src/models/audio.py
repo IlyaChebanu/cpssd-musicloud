@@ -1138,143 +1138,163 @@ def delete_song_data(sid):
     query(sql5, args)
 
 
-def add_sample_listing(url, filename=None, directory=None):
+def create_folder_entry(folder_name, parent_folder_id):
     """
-    Adds a new sample listing in the sample directory.
-    :param url:
-    Str - The url you want to map a filename & directory to.
-    :param filename:
-    Str - An optional param allowing you to name the file at the URL.
-    :param directory:
-    Str - An optional param allowing you to specify the directory of the URL.
+    Create a folder entry in the DB.
+    :param folder_name:
+    Str - The name of the new folder.
+    :param parent_folder_id:
+    Int - ID of the parent folder of the new folder.
     :return:
-    None - Creates a listing in the sample directory for the url.
+    None - Creates a new folder entry and returns None.
     """
-    sql, args = None, None
-    if filename and directory:
-        sql = (
-            "INSERT INTO Sample_Directory "
-            "(url, filename, directory) "
-            "VALUES (%s, %s, %s)"
-        )
-        args = (
-            url,
-            filename,
-            directory
-        )
-    elif filename and not directory:
-        sql = (
-            "INSERT INTO Sample_Directory "
-            "(url, filename) "
-            "VALUES (%s, %s)"
-        )
-        args = (
-            url,
-            filename
-        )
-    elif directory and not filename:
-        sql = (
-            "INSERT INTO Sample_Directory "
-            "(url, directory) "
-            "VALUES (%s, %s)"
-        )
-        args = (
-            url,
-            directory
-        )
-    else:
-        sql = (
-            "INSERT INTO Sample_Directory "
-            "(url) "
-            "VALUES (%s)"
-        )
-        args = (
-            url
-        )
+    sql = "INSERT INTO Folder (parent_id, name) VALUES (%s, %s)"
+    args = (parent_folder_id, folder_name,)
     query(sql, args)
 
 
-def get_sample_listing(url):
+def add_sample(sample_name, sample_url, folder_id):
     """
-    Gets a sample listing and returns it.
-    :param url:
-    Str - The url you want to return the mapping of.
+    Adds a sample to a folder.
+    :param sample_name:
+    Str - The name we want to give to the sample.
+    :param sample_url:
+    Str - The URL where the sample audio exists.
+    :param folder_id:
+    Int - The ID of the Folder we want to put the sample int.
     :return:
-    List - A list of filenames & directories mapped to a url.
+    None - Adds the sample to the folder and return None.
     """
-    sql = (
-        "SELECT filename, directory FROM Sample_Directory WHERE url=%s;"
-    )
-    args = (
-        url,
-    )
+    sql = "INSERT INTO File (folder_id, name, url) VALUES (%s, %s, %s)"
+    args = (folder_id, sample_name, sample_url)
+    query(sql, args)
+
+
+def get_folder_entry(folder_id):
+    """
+    Get a folder from the DB.
+    :param folder_id:
+    Int - The ID of the folder we want.
+    :return:
+    List|None - List containing 1 row or None if Folder doesn't exist.
+    """
+    sql = "SELECT * FROM Folder WHERE folder_id=%s"
+    args = (folder_id,)
     res = query(sql, args, True)
+    if not res:
+        raise NoResults
     return res
 
 
-def update_sample_listing(url, filename=None, directory=None):
+def delete_folder_entry(folder_id):
     """
-    Updates a current sample listing in the sample directory.
-    :param url:
-    Str - The url you want to map a new filename & or directory to.
-    :param filename:
-    Str - An optional param allowing you to rename the file at the URL.
-    :param directory:
-    Str - An optional param allowing you to respecify the directory of the URL.
+    Delete a folder and it's subfolders & files from the DB.
+    :param folder_id:
+    Int - A folder ID for a folder you wish to delete.
     :return:
-    None - Updates a listing in the sample directory for the url.
+    None - The folder & subfolders and files are deleted and nothing returned.
     """
-    sql, args = None, None
-    if filename and directory:
-        sql = (
-            "UPDATE Sample_Directory "
-            "SET filename = %s, directory=%s "
-            "WHERE url = %s"
-        )
-        args = (
-            filename,
-            directory,
-            url
-        )
-    elif filename and not directory:
-        sql = (
-            "UPDATE Sample_Directory "
-            "SET filename = %s "
-            "WHERE url = %s"
-        )
-        args = (
-            filename,
-            url,
-        )
-    elif directory and not filename:
-        sql = (
-            "UPDATE Sample_Directory "
-            "SET directory=%s "
-            "WHERE url = %s"
-        )
-        args = (
-            directory,
-            url
-        )
-    else:
-        return
+    sql = "DELETE FROM Folder WHERE folder_id=%s"
+    args = (folder_id,)
     query(sql, args)
 
 
-def delete_sample_listing(url):
+def get_root_folder_entry(folder_id):
     """
-    Delete a sample listing.
-    :param url
-    Str - The url you want to delete the mapping of.
+    Get a User from the DB based on there root folder ID.
+    :param folder_id:
+    Int - The ID of the root folder of a User.
     :return:
-    None - The url entry in the sample directory is deleted and
-    nothing returned.
+    List|None - List containing 1 row or None if User doesn't exist.
+    """
+    sql = "SELECT * FROM Users WHERE root_folder=%s"
+    args = (folder_id,)
+    res = query(sql, args, True)
+    if not res:
+        raise NoResults
+    return res
+
+
+def delete_file_entry(file_id):
+    """
+    Delete a file entry from the DB.
+    :param file_id:
+    Int - A file ID for a file you wish to delete.
+    :return:
+    None - The file is deleted and nothing returned.
+    """
+    sql = "DELETE FROM File WHERE file_id=%s"
+    args = (file_id,)
+    query(sql, args)
+
+
+def move_folder_entry(folder_id, parent_folder_id):
+    """
+    Takes a folder ID and the ID of it's new parent folder.
+    :param folder_id:
+    Int - ID of the folder we want to move.
+    :param parent_folder_id:
+    Int - ID of the folder we want to move or folder into.
+    :return:
+    None - Moves the folder and return None.
     """
     sql = (
-        "DELETE FROM Sample_Directory "
-        "WHERE url=%s;"
+        "UPDATE Folder "
+        "SET parent_id=%s "
+        "WHERE folder_id = %s"
     )
     args = (
-        url,
+        parent_folder_id,
+        folder_id,
     )
     query(sql, args)
+
+
+def move_file_entry(folder_id, file_id):
+    """
+    Takes a file ID and the ID of it's new parent folder.
+    :param folder_id:
+    Int - ID of the folder we want to move our file into.
+    :param file_id:
+    Int - ID of the file we want to move.
+    :return:
+    None - Moves the file and return None.
+    """
+    sql = (
+        "UPDATE File "
+        "SET folder_id=%s "
+        "WHERE file_id = %s"
+    )
+    args = (
+        folder_id,
+        file_id,
+    )
+    query(sql, args)
+
+
+def get_child_folders(folder_id):
+    """
+    Get the child folders for a given folder ID.
+    :param folder_id:
+    Int - The ID of the folder we want to get subfolders from.
+    :return:
+    List|None - List containing many rows or None if no subfolders doesn't
+    exist.
+    """
+    sql = "SELECT folder_id, name FROM Folder WHERE parent_id=%s"
+    args = (folder_id,)
+    return query(sql, args, True)
+
+
+def get_child_files(folder_id):
+    """
+    Get the child files for a given folder ID.
+    :param folder_id:
+    Int - The ID of the folder we want to get files from.
+    :return:
+    List|None - List containing many rows or None if no files doesn't
+    exist.
+    """
+    sql = "SELECT file_id, name, url FROM File WHERE folder_id=%s"
+    args = (folder_id,)
+    return query(sql, args, True)

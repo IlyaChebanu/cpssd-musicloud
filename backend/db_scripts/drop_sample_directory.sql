@@ -1,1 +1,0 @@
-DROP TABLE `musicloud_db`.`Sample_Directory`;

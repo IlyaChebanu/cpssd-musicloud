@@ -4555,290 +4555,504 @@ class AudioTests(unittest.TestCase):
             )
             self.assertEqual(422, res.status_code)
 
-    @mock.patch('backend.src.controllers.audio.controllers.get_sample_listing')
-    def test_get_sample_mapping_success(self, mocked_listing):
+    @mock.patch('backend.src.controllers.audio.controllers.get_child_files')
+    @mock.patch('backend.src.controllers.audio.controllers.get_child_folders')
+    @mock.patch('backend.src.controllers.audio.controllers.get_folder_entry')
+    def test_get_folder_success(self, mock_folder, mock_child_folders, mock_child_files):
         """
-        Ensure user's can load a url mapping.
+        Ensure getting a folder is successful.
         """
-        mocked_listing.return_value = [["a filename", "a directory"]]
+        mock_folder.return_value = [[1, None, "A Folder"]]
+        mock_child_folders.return_value = []
+        mock_child_files.return_value = []
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
             mock_token.return_value = ALT_MOCKED_TOKEN
-            test_req_data = {
-                "url": "http://afakeurl.edu"
-            }
             res = self.test_client.get(
-                "/api/v1/audio/sample_names",
-                query_string=test_req_data,
+                "/api/v1/audio/folders",
+                query_string={"folder_id": 1},
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
             self.assertEqual(200, res.status_code)
             expected_body = {
-                "filename": "a filename", "directory": "a directory"
+                "folder": {
+                    "child_files":[],
+                    "child_folders": [],
+                    "folder_id": 1,
+                    "folder_name": "A Folder"
+                }
             }
             self.assertEqual(expected_body, json.loads(res.data))
 
-    def test_get_sample_mapping_fail_missing_access_token(self):
+
+    def test_get_folder_fail_missing_access_token(self):
         """
-        Ensure loading a sample mapping fails if no access_token is sent.
+        Ensure getting a folder fails if no access_token is sent.
         """
         res = self.test_client.get(
-            "/api/v1/audio/sample_names",
+            "/api/v1/audio/folders",
             follow_redirects=True
         )
         self.assertEqual(401, res.status_code)
 
-    def test_get_sample_mapping_fail_access_token_expired(self):
+    def test_get_folder_fail_access_token_expired(self):
         """
-        Ensure loading a sample mapping fails if the access_token is expired.
+        Ensure getting a folder fails if the access_token is expired.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
             mock_token.side_effect = ValueError
             res = self.test_client.get(
-                "/api/v1/audio/sample_names",
+                "/api/v1/audio/folders",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
             self.assertEqual(401, res.status_code)
 
-    def test_get_sample_mapping_fail_bad_access_token_signature(self):
+    def test_get_folder_fail_bad_access_token_signature(self):
         """
-        Ensure loading a sample mapping fails if the access_token signature does not match
+        Ensure getting a folder fails if the access_token signature does not match
         the one configured on the server.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
             mock_token.side_effect = InvalidSignatureError
             res = self.test_client.get(
-                "/api/v1/audio/sample_names",
+                "/api/v1/audio/folders",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
             self.assertEqual(500, res.status_code)
 
-    def test_get_sample_mapping_fail_unknown_access_token_issue(self):
+    def test_get_folder_fail_unknown_access_token_issue(self):
         """
-        Ensure loading a sample mapping fails if some unknown error relating to the access_token
+        Ensure getting a folder fails if some unknown error relating to the access_token
         occurs.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
             mock_token.side_effect = Exception
             res = self.test_client.get(
-                "/api/v1/audio/sample_names",
+                "/api/v1/audio/folders",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
             self.assertEqual(500, res.status_code)
 
-    def test_get_sample_mapping_fail_missing_url(self):
+    def test_creating_a_folder_success(self):
         """
-        Ensure loading a sample mapping fails if a sid is not sent.
+        Ensure creating a folder is successful.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = ALT_MOCKED_TOKEN
-            test_req_data = {}
-            res = self.test_client.get(
-                "/api/v1/audio/sample_names",
-                query_string=test_req_data,
-                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
-                follow_redirects=True
-            )
-            self.assertEqual(422, res.status_code)
-            test_req_data = {
-                "url": "",
-            }
-            res = self.test_client.get(
-                "/api/v1/audio/sample_names",
-                query_string=test_req_data,
-                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
-                follow_redirects=True
-            )
-            self.assertEqual(422, res.status_code)
+            with mock.patch('backend.src.controllers.audio.controllers.get_folder_entry'):
+                with mock.patch('backend.src.controllers.audio.controllers.create_folder_entry'):
+                    mock_token.return_value = ALT_MOCKED_TOKEN
+                    res = self.test_client.post(
+                        "/api/v1/audio/folders",
+                        json={"folder_name": "name", "parent_folder_id": 1},
+                        headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                        follow_redirects=True
+                    )
+                    self.assertEqual(200, res.status_code)
+                    self.assertEqual({"message": "Folder created"}, json.loads(res.data))
 
-    def test_delete_sample_mapping_success(self):
+    def test_creating_a_folder_fail_missing_access_token(self):
         """
-        Ensure deleting a sample mapping works.
+        Ensure creating a folder fails if no access_token is sent.
         """
-        test_req_data = {
-            "url": "http://afakeurl.biz"
-        }
-        with mock.patch('backend.src.controllers.audio.controllers.delete_sample_listing'):
-            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-                mock_token.return_value = ALT_MOCKED_TOKEN
-                res = self.test_client.delete(
-                    "/api/v1/audio/sample_names",
-                    query_string=test_req_data,
-                    headers={'Authorization': 'Bearer ' + TEST_TOKEN},
-                    follow_redirects=True
-                )
-                self.assertEqual(200, res.status_code)
-                expected_body = {'message': 'Sample listing deleted'}
-                self.assertEqual(expected_body, json.loads(res.data))
-
-    def test_delete_sample_mapping_fail_missing_access_token(self):
-        """
-        Ensure deleting a sample mapping fails if no access_token is sent.
-        """
-        res = self.test_client.delete(
-            "/api/v1/audio/sample_names",
+        res = self.test_client.post(
+            "/api/v1/audio/folders",
             follow_redirects=True
         )
         self.assertEqual(401, res.status_code)
 
-    def test_delete_sample_mapping_fail_access_token_expired(self):
+    def test_creating_a_folder_fail_access_token_expired(self):
         """
-        Ensure deleting a sample mapping fails if the access_token is expired.
+        Ensure creating a folder fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
+            res = self.test_client.post(
+                "/api/v1/audio/folders",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_creating_a_folder_fail_bad_access_token_signature(self):
+        """
+        Ensure creating a folder fails if the access_token signature does not match
+        the one configured on the server.
         """
         with mock.patch(
                 'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.side_effect = ValueError
-            res = self.test_client.delete(
-                "/api/v1/audio/playlist",
-                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
-                follow_redirects=True
-            )
-            self.assertEqual(401, res.status_code)
-
-    def test_delete_sample_mapping_fail_bad_access_token_signature(self):
-        """
-        Ensure deleting a sample mapping fails if the access_token signature does
-        not match the one configured on the server.
-        """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
             mock_token.side_effect = InvalidSignatureError
-            res = self.test_client.delete(
-                "/api/v1/audio/sample_names",
+            res = self.test_client.post(
+                "/api/v1/audio/folders",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
             self.assertEqual(500, res.status_code)
 
-    def test_delete_sample_mapping_fail_unknown_access_token_issue(self):
+    def test_creating_a_folder_fail_unknown_access_token_issue(self):
         """
-        Ensure deleting a sample mapping fails if some unknown error relating to the
-        access_token occurs.
+        Ensure creating a folder fails if some unknown error relating to the access_token
+        occurs.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+        with mock.patch(
+                'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
             mock_token.side_effect = Exception
-            res = self.test_client.delete(
-                "/api/v1/audio/sample_names",
+            res = self.test_client.post(
+                "/api/v1/audio/folders",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
             self.assertEqual(500, res.status_code)
 
-    def test_delete_sample_mapping_fail_missing_url(self):
+    @mock.patch('backend.src.controllers.audio.controllers.get_root_folder_entry')
+    def test_deleting_a_folder_success(self, mock_root):
         """
-        Ensure deleting a sample mapping fails if a url is not sent.
+        Ensure deleting a folder is successful.
         """
+        mock_root.side_effect = NoResults
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = ALT_MOCKED_TOKEN
-            res = self.test_client.delete(
-                "/api/v1/audio/sample_names",
-                query_string={},
-                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
-                follow_redirects=True
-            )
-            self.assertEqual(422, res.status_code)
-            test_req_data = {
-                "url": None
-            }
-            res = self.test_client.delete(
-                "/api/v1/audio/sample_names",
-                json=test_req_data,
-                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
-                follow_redirects=True
-            )
-            self.assertEqual(422, res.status_code)
-
-    @mock.patch('backend.src.controllers.audio.controllers.get_sample_listing')
-    def test_patch_sample_mapping_success(self, mocked_sample):
-        """
-        Ensure editing a URL mapping for a sample works.
-        """
-        test_req_data = {
-            "mappings": {
-                "http://image.fake": {
-                    "filename": "a filename",
-                    "duration": "/a/dir"
-                }
-            }
-        }
-        mocked_sample.return_value = None
-        with mock.patch('backend.src.controllers.audio.controllers.add_sample_listing'):
-            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            with mock.patch('backend.src.controllers.audio.controllers.delete_folder_entry'):
                 mock_token.return_value = ALT_MOCKED_TOKEN
-                res = self.test_client.patch(
-                    "/api/v1/audio/sample_names",
-                    json=test_req_data,
+                res = self.test_client.delete(
+                    "/api/v1/audio/folders",
+                    query_string={"folder_id": 1},
                     headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                     follow_redirects=True
                 )
                 self.assertEqual(200, res.status_code)
-                expected_body = {'message': 'Mapping(s) updated'}
-                self.assertEqual(expected_body, json.loads(res.data))
+                self.assertEqual({"message": "Folder deleted"}, json.loads(res.data))
 
-    def test_patch_sample_mapping_fail_missing_access_token(self):
+    def test_deleting_a_folder_fail_missing_access_token(self):
         """
-        Ensure patching a URL mapping fails if no access_token is sent.
+        Ensure deleting a folder fails if no access_token is sent.
         """
-        res = self.test_client.patch(
-            "/api/v1/audio/sample_names",
+        res = self.test_client.delete(
+            "/api/v1/audio/folders",
             follow_redirects=True
         )
         self.assertEqual(401, res.status_code)
 
-    def test_patch_sample_mapping_fail_access_token_expired(self):
+    def test_deleting_a_folder_fail_access_token_expired(self):
         """
-        Ensure patching the URL mapping fails if the access_token is expired.
+        Ensure deleting a folder fails if the access_token is expired.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
             mock_token.side_effect = ValueError
-            res = self.test_client.patch(
-                "/api/v1/audio/sample_names",
+            res = self.test_client.delete(
+                "/api/v1/audio/folders",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
             self.assertEqual(401, res.status_code)
 
-    def test_patch_sample_mapping_fail_bad_access_token_signature(self):
+    def test_deleting_a_folder_fail_bad_access_token_signature(self):
         """
-        Ensure patching the URL mapping fails if the access_token signature does not match
+        Ensure deleting a folder fails if the access_token signature does not match
         the one configured on the server.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+        with mock.patch(
+                'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
             mock_token.side_effect = InvalidSignatureError
-            res = self.test_client.patch(
-                "/api/v1/audio/sample_names",
+            res = self.test_client.delete(
+                "/api/v1/audio/folders",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
             self.assertEqual(500, res.status_code)
 
-    def test_patch_sample_mapping_fail_unknown_access_token_issue(self):
+    def test_deleting_a_folder_fail_unknown_access_token_issue(self):
         """
-        Ensure patching the URL mapping fails if some unknown error relating to the access_token
+        Ensure deleting a folder fails if some unknown error relating to the access_token
         occurs.
         """
-        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+        with mock.patch(
+                'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
             mock_token.side_effect = Exception
-            res = self.test_client.patch(
-                "/api/v1/audio/sample_names",
+            res = self.test_client.delete(
+                "/api/v1/audio/folders",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
             self.assertEqual(500, res.status_code)
 
-    def test_patch_sample_mapping_fail_missing_mapping(self):
+    @mock.patch(
+        'backend.src.controllers.audio.controllers.get_root_folder_entry')
+    def test_moving_a_folder_success(self, mock_root):
         """
-        Ensure patching the URL mapping fails if the user doesn't send a mapping.
+        Ensure moving a folder is successful.
+        """
+        mock_root.side_effect = NoResults
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            with mock.patch('backend.src.controllers.audio.controllers.move_folder_entry'):
+                mock_token.return_value = ALT_MOCKED_TOKEN
+                res = self.test_client.patch(
+                    "/api/v1/audio/folders",
+                    query_string={"folder_id": 2, "parent_folder_id": 1},
+                    headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                    follow_redirects=True
+                )
+                self.assertEqual(200, res.status_code)
+                self.assertEqual({"message": "Folder moved"}, json.loads(res.data))
+
+    def test_moving_a_folder_fail_missing_access_token(self):
+        """
+        Ensure moving a folder fails if no access_token is sent.
+        """
+        res = self.test_client.patch(
+            "/api/v1/audio/folders",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_moving_a_folder_fail_access_token_expired(self):
+        """
+        Ensure moving a folder fails if the access_token is expired.
         """
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            mock_token.return_value = ALT_MOCKED_TOKEN
-            test_req_data = {}
+            mock_token.side_effect = ValueError
             res = self.test_client.patch(
-                "/api/v1/audio/sample_names",
-                json=test_req_data,
+                "/api/v1/audio/folders",
                 headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                 follow_redirects=True
             )
-            self.assertEqual(422, res.status_code)
+            self.assertEqual(401, res.status_code)
+
+    def test_moving_a_folder_fail_bad_access_token_signature(self):
+        """
+        Ensure moving a folder fails if the access_token signature does not match
+        the one configured on the server.
+        """
+        with mock.patch(
+                'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
+            res = self.test_client.patch(
+                "/api/v1/audio/folders",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_moving_a_folder_fail_unknown_access_token_issue(self):
+        """
+        Ensure moving a folder fails if some unknown error relating to the access_token
+        occurs.
+        """
+        with mock.patch(
+                'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
+            res = self.test_client.patch(
+                "/api/v1/audio/folders",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_creating_a_file_success(self):
+        """
+        Ensure creating a file is successful.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            with mock.patch('backend.src.controllers.audio.controllers.get_folder_entry'):
+                with mock.patch('backend.src.controllers.audio.controllers.add_sample'):
+                    mock_token.return_value = ALT_MOCKED_TOKEN
+                    res = self.test_client.post(
+                        "/api/v1/audio/files",
+                        json={"file_name": "name", "file_url": "http://afakeurl.com", "folder_id": 1},
+                        headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                        follow_redirects=True
+                    )
+                    self.assertEqual(200, res.status_code)
+                    self.assertEqual({"message": "File added to folder"}, json.loads(res.data))
+
+    def test_creating_a_file_fail_missing_access_token(self):
+        """
+        Ensure creating a file fails if no access_token is sent.
+        """
+        res = self.test_client.post(
+            "/api/v1/audio/files",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_creating_a_file_fail_access_token_expired(self):
+        """
+        Ensure creating a file fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
+            res = self.test_client.post(
+                "/api/v1/audio/files",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_creating_a_file_fail_bad_access_token_signature(self):
+        """
+        Ensure creating a file fails if the access_token signature does not match
+        the one configured on the server.
+        """
+        with mock.patch(
+                'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
+            res = self.test_client.post(
+                "/api/v1/audio/files",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_creating_a_file_fail_unknown_access_token_issue(self):
+        """
+        Ensure creating a file fails if some unknown error relating to the access_token
+        occurs.
+        """
+        with mock.patch(
+                'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
+            res = self.test_client.post(
+                "/api/v1/audio/files",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_deleting_a_file_success(self):
+        """
+        Ensure deleting a file is successful.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            with mock.patch('backend.src.controllers.audio.controllers.delete_file_entry'):
+                mock_token.return_value = ALT_MOCKED_TOKEN
+                res = self.test_client.delete(
+                    "/api/v1/audio/files",
+                    query_string={"file_id": 1},
+                    headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                    follow_redirects=True
+                )
+                self.assertEqual(200, res.status_code)
+                self.assertEqual({"message": "File deleted"}, json.loads(res.data))
+
+    def test_deleting_a_file_fail_missing_access_token(self):
+        """
+        Ensure deleting a file fails if no access_token is sent.
+        """
+        res = self.test_client.delete(
+            "/api/v1/audio/files",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_deleting_a_file_fail_access_token_expired(self):
+        """
+        Ensure deleting a file fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
+            res = self.test_client.delete(
+                "/api/v1/audio/files",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_deleting_a_file_fail_bad_access_token_signature(self):
+        """
+        Ensure deleting a file fails if the access_token signature does not match
+        the one configured on the server.
+        """
+        with mock.patch(
+                'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
+            res = self.test_client.delete(
+                "/api/v1/audio/files",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_deleting_a_file_fail_unknown_access_token_issue(self):
+        """
+        Ensure deleting a file fails if some unknown error relating to the access_token
+        occurs.
+        """
+        with mock.patch(
+                'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
+            res = self.test_client.delete(
+                "/api/v1/audio/files",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_moving_a_file_success(self):
+        """
+        Ensure moving a file is successful.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            with mock.patch('backend.src.controllers.audio.controllers.move_file_entry'):
+                mock_token.return_value = ALT_MOCKED_TOKEN
+                res = self.test_client.patch(
+                    "/api/v1/audio/files",
+                    query_string={"file_id": 2, "folder_id": 1},
+                    headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                    follow_redirects=True
+                )
+                self.assertEqual(200, res.status_code)
+                self.assertEqual({"message": "File moved"}, json.loads(res.data))
+
+    def test_moving_a_file_fail_missing_access_token(self):
+        """
+        Ensure moving a file fails if no access_token is sent.
+        """
+        res = self.test_client.patch(
+            "/api/v1/audio/files",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_moving_a_file_fail_access_token_expired(self):
+        """
+        Ensure moving a file fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
+            res = self.test_client.patch(
+                "/api/v1/audio/files",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_moving_a_file_fail_bad_access_token_signature(self):
+        """
+        Ensure moving a file fails if the access_token signature does not match
+        the one configured on the server.
+        """
+        with mock.patch(
+                'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
+            res = self.test_client.patch(
+                "/api/v1/audio/files",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_moving_a_file_fail_unknown_access_token_issue(self):
+        """
+        Ensure moving a file fails if some unknown error relating to the access_token
+        occurs.
+        """
+        with mock.patch(
+                'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
+            res = self.test_client.patch(
+                "/api/v1/audio/files",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)

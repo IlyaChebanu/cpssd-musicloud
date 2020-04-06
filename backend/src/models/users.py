@@ -18,16 +18,22 @@ def insert_user(email, username, password):
     :return:
     None - Inserts new user into DB & returns None.
     """
+    sql = "INSERT INTO Folder (name) VALUE (%s)"
+    args = (
+        username,
+    )
+    root_folder_id = query(sql, args, get_insert_row_id=True)
     sql = (
         "INSERT INTO Users "
-        "(email, username, password, verified) "
-        "VALUES (%s, %s, %s, %s)"
+        "(email, username, password, verified, root_folder) "
+        "VALUES (%s, %s, %s, %s, %s)"
     )
     args = (
         email,
         username,
         password,
         0,
+        root_folder_id,
     )
     query(sql, args)
 
@@ -1102,5 +1108,8 @@ def delete_user_data(uid):
     query(sql, args)
     sql = "DELETE FROM Resets WHERE uid=%s"
     query(sql, args)
-    sql = "DELETE FROM Users WHERE uid=%s"
+    sql = (
+        "DELETE FROM Folder WHERE folder_id=("
+        "SELECT root_folder FROM Users WHERE uid=%s);"
+    )
     query(sql, args)
