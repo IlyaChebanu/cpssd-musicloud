@@ -17,7 +17,7 @@ from ...middleware.sql_err_catcher import sql_err_catcher
 from ...utils.logger import log
 from ...utils import (
     permitted_to_edit, gen_scroll_tokens, gen_song_object, gen_playlist_object,
-    notification_sender
+    notification_sender, gen_folder_object, gen_file_object
 )
 from ...models.audio import (
     insert_song, insert_song_state, get_song_state, get_all_compiled_songs,
@@ -1682,9 +1682,15 @@ def read_folder(user_data):  # pylint: disable=R0911
         res["folder_id"] = row[0][0]
         res["folder_name"] = row[0][2]
         row = get_child_folders(folder_id)
-        res["child_folders"] = row
+        folders = []
+        for folder in row:
+            folders.append(gen_folder_object(folder))
+        res["child_folders"] = folders
         row = get_child_files(folder_id)
-        res["child_files"] = row
+        files = []
+        for file in row:
+            files.append(gen_file_object(file))
+        res["child_files"] = files
     except NoResults:
         return {
             "message": ("Invalid folder ID. Folder does not exist!")
