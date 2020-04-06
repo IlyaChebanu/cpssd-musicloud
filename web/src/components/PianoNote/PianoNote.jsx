@@ -106,7 +106,7 @@ const PianoNote = memo(({
       }
       playingNote.current = playNote(
         audioContext,
-        { noteNumber: noteDisplayData.noteNumber },
+        { noteNumber: noteDisplayData.noteNumber, velocity: 0.5 },
         audioContext.globalGain,
         audioContext.currentTime,
         0,

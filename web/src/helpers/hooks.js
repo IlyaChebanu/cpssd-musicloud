@@ -102,6 +102,40 @@ export const useGlobalDrag = (ref) => {
   };
 };
 
+export const useMidi = () => {
+  const onMidiMessageHandler = useRef();
+  const onMidiErrorHandler = useRef();
+
+  const midiInputs = useRef();
+  useEffect(() => {
+    if (!navigator.requestMIDIAccess) {
+      if (onMidiErrorHandler.current) onMidiErrorHandler.current('WebMIDI is not supported in this browser');
+    } else {
+      navigator.requestMIDIAccess()
+        .then((midi) => {
+          midiInputs.current = midi.inputs;
+          [...midiInputs.current.values()].forEach((input) => {
+            // eslint-disable-next-line no-param-reassign
+            input.onmidimessage = (message) => {
+              if (onMidiMessageHandler.current) onMidiMessageHandler.current(message, input);
+            };
+          });
+        }, (error) => {
+          if (onMidiErrorHandler.current) onMidiErrorHandler.current(`Error requesting MIDI access: ${error}`);
+        });
+    }
+  }, []);
+
+  return {
+    onMidiMessage: (cb) => {
+      onMidiMessageHandler.current = cb;
+    },
+    onMidiError: (cb) => {
+      onMidiErrorHandler.current = cb;
+    },
+  };
+};
+
 export const useEffectAfterMount = (cb, deps) => {
   const isFirstRun = useRef(true);
 

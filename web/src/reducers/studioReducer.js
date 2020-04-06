@@ -39,10 +39,21 @@ export default (
     publishFormHidden: true,
     songImageUrl: null,
     showPianoRoll: false,
+    recording: false,
   },
   action,
 ) => {
   switch (action.type) {
+    case 'RECORDING_START':
+      return {
+        ...state,
+        recording: true,
+      };
+    case 'RECORDING_STOP':
+      return {
+        ...state,
+        recording: false,
+      };
     case 'STUDIO_PLAY':
       return {
         ...state,
