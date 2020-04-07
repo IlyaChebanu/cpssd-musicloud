@@ -24,14 +24,21 @@ import PianoNote from '../PianoNote/PianoNote';
 import SeekBar from '../SeekBar';
 import playNote from '../../middleware/playNote';
 import stopNote from '../../middleware/stopNote';
+import { showNotification } from '../../actions/notificationsActions';
+import { useMidi } from '../../helpers/hooks';
 
 const keyNames = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#'];
 
-const PianoRoll = memo(({
-  showPianoRoll, selectedSample, dispatch, samples, currentBeat,
-}) => {
-  if (!showPianoRoll) return null;
+const MIDI = {
+  SUSTAIN_PEDAL_CHAN: 64,
+  CONTROL: 176,
+  KEY_DOWN: 144,
+  KEY_UP: 128,
+};
 
+const PianoRoll = memo(({
+  showPianoRoll, selectedSample, dispatch, samples, currentBeat, recording, loopEnabled, loopEnd, ppq,
+}) => {
   const [tracksRef, setTracksRef] = useState();
   const [scroll, setScroll] = useState(0);
 
@@ -44,12 +51,109 @@ const PianoRoll = memo(({
     dispatch(setShowPianoRoll(false));
   }, [dispatch]);
 
+
   const gridSize = 4;
   const gridSizePx = 40;
 
   const selectedSampleObject = useMemo(() => samples[selectedSample], [samples, selectedSample]);
   const notes = useMemo(() => (selectedSampleObject ? selectedSampleObject.notes : {}), [selectedSampleObject]);
 
+  const isSustainPressed = useRef(false);
+  const playingNotes = useRef({});
+  const pressedNotes = useRef({});
+  const { onMidiMessage, onMidiError } = useMidi();
+
+  const commitNote = (key, velocity) => {
+    const { recordingStartTime } = playingNotes.current[key];
+
+    let recordingEndTime = currentBeat;
+    if (loopEnabled && currentBeat < recordingStartTime) {
+      recordingEndTime = loopEnd;
+    }
+
+    const beatsDuration = recordingEndTime - recordingStartTime;
+    const ticksDuration = beatsDuration / (0.25 / ppq);
+
+    const offsetStartTime = recordingStartTime - selectedSampleObject.time;
+    const ticksStartTime = offsetStartTime / (0.25 / ppq);
+
+    const note = {
+      noteNumber: Math.min(88, Math.max(1, key)),
+      duration: ticksDuration,
+      tick: Math.max(0, ticksStartTime),
+      velocity,
+    };
+    dispatch(addPatternNote(selectedSample, note));
+  };
+
+  onMidiMessage((message) => {
+    const [type, channel, velocity] = message.data;
+
+    if (type === MIDI.CONTROL && channel === MIDI.SUSTAIN_PEDAL_CHAN) {
+      isSustainPressed.current = velocity > 0;
+
+      if (!velocity) {
+        Object.keys(playingNotes.current).forEach((key) => {
+          if (!pressedNotes.current[key]) {
+            stopNote(playingNotes.current[key]);
+            delete playingNotes.current[key];
+          }
+        });
+      }
+    }
+
+    if (!selectedSampleObject) return;
+
+    if (selectedSample) {
+      if (type === MIDI.KEY_DOWN) {
+        const key = channel - 21;
+
+        const context = Tone.context.rawContext;
+        if (playingNotes.current[key]) {
+          stopNote(playingNotes.current[key]);
+
+          if (recording) {
+            commitNote(key, playingNotes.current[key].velocity);
+          }
+        }
+        playingNotes.current[key] = playNote(
+          context,
+          { noteNumber: key, velocity: velocity / 256 },
+          context.globalGain,
+          context.currentTime,
+          0,
+          null,
+          selectedSampleObject.url,
+        );
+        playingNotes.current[key].velocity = velocity / 256;
+        pressedNotes.current[key] = true;
+
+        if (recording) {
+          playingNotes.current[key].recordingStartTime = currentBeat;
+        }
+      }
+
+      if (type === MIDI.KEY_UP) {
+        const key = channel - 21;
+
+        if (!isSustainPressed.current) {
+          stopNote(playingNotes.current[key]);
+
+          if (recording) {
+            commitNote(key, playingNotes.current[key].velocity);
+          }
+
+          delete playingNotes.current[key];
+        }
+        delete pressedNotes.current[key];
+      }
+    }
+  });
+
+  onMidiError((error) => {
+    console.error(error);
+    dispatch(showNotification({ message: `MIDI error: ${error}` }));
+  });
 
   const keysRef = useRef();
   const playingNote = useRef();
@@ -81,7 +185,7 @@ const PianoRoll = memo(({
       }
       playingNote.current = playNote(
         audioContext,
-        { noteNumber: hoveredKey },
+        { noteNumber: hoveredKey, velocity: 0.5 },
         audioContext.globalGain,
         audioContext.currentTime,
         0,
@@ -173,7 +277,7 @@ const PianoRoll = memo(({
       noteNumber: Math.min(88, Math.max(1, noteNumber)),
       duration: 2,
       tick: Math.max(0, tick),
-      velocity: 100,
+      velocity: 1,
     };
     dispatch(addPatternNote(selectedSample, note));
   }, [dispatch, selectedSample]);
@@ -191,6 +295,7 @@ const PianoRoll = memo(({
     return null;
   }, [selectedSampleObject]);
 
+  if (!showPianoRoll) return null;
   return (
     <div
       className={styles.background}
@@ -255,6 +360,10 @@ PianoRoll.propTypes = {
   selectedSample: PropTypes.string,
   dispatch: PropTypes.func.isRequired,
   samples: PropTypes.object.isRequired,
+  recording: PropTypes.bool.isRequired,
+  loopEnabled: PropTypes.bool.isRequired,
+  loopEnd: PropTypes.number.isRequired,
+  ppq: PropTypes.number.isRequired,
 };
 
 PianoRoll.defaultProps = {
@@ -268,6 +377,10 @@ const mapStateToProps = ({ studio }) => ({
   showPianoRoll: studio.showPianoRoll,
   selectedSample: studio.selectedSample,
   samples: studio.samples,
+  recording: studio.recording,
+  loopEnabled: studio.loopEnabled,
+  loopEnd: studio.loop.stop,
+  ppq: studio.ppq,
 });
 
 export default connect(mapStateToProps)(PianoRoll);

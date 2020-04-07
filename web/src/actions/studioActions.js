@@ -477,3 +477,12 @@ export const setPatternNoteDuration = (sampleId, noteId, value) => (dispatch) =>
     value: Math.max(0, value),
   });
 };
+
+
+export const startRecording = () => ({
+  type: 'RECORDING_START',
+});
+
+export const stopRecording = () => ({
+  type: 'RECORDING_STOP',
+});

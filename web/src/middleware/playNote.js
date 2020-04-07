@@ -1,6 +1,8 @@
 import Tone from 'tone';
 import { bufferStore } from '../helpers/constants';
 
+Tone.context.latencyHint = 'fastest';
+
 export default (
   context,
   note,
@@ -22,20 +24,30 @@ export default (
       sourceType: 'sampler',
     };
   }
+
+  const frequency = 2 ** ((note.noteNumber - 49) / 12) * 440;
+
   const synth = new Tone.Synth({
     envelope: {
-      attack: 0.005,
-      decay: 0.1,
-      sustain: 0.3,
-      release: 1,
+      attack: 0.01,
+      decay: 1,
+      sustain: 1,
+      release: 0.3,
+    },
+    oscillator: {
+      type: 'triangle',
     },
   });
 
-  const frequency = 2 ** ((note.noteNumber - 49) / 12) * 440;
-  synth.oscillator.frequency.value = frequency;
-  synth.triggerAttack(frequency, `+${startTime - context.currentTime}`);
+  synth.triggerAttack(
+    frequency,
+    startTime,
+    note.velocity,
+  );
+  synth.oscillator.frequency.cancelScheduledValues();
+  synth.oscillator.frequency.setValueAtTime(frequency);
   if (endTime) {
-    synth.triggerRelease(`+${endTime - context.currentTime}`);
+    synth.triggerRelease(endTime);
   }
 
 

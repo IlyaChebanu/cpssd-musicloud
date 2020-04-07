@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 import React, { useCallback, memo } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -16,13 +17,17 @@ import {
   setCurrentBeat, stop, pause, play,
   hideFileExplorer,
   showFileExplorer,
+  stopRecording,
+  startRecording,
 } from '../../actions/studioActions';
 
 const PlaybackControls = memo((props) => {
   const {
     dispatch, studio, songPickerHidden, fileExplorerHidden,
   } = props;
-  const { currentBeat, tempo, playing } = studio;
+  const {
+    currentBeat, tempo, playing, recording,
+  } = studio;
   const handlePlay = useCallback((e) => {
     if (songPickerHidden) {
       e.preventDefault();
@@ -36,6 +41,15 @@ const PlaybackControls = memo((props) => {
       dispatch(pause);
     }
   }, [dispatch, songPickerHidden]);
+
+  const handleRecording = useCallback((e) => {
+    e.preventDefault();
+    if (recording) {
+      dispatch(stopRecording());
+    } else {
+      dispatch(startRecording());
+    }
+  }, [dispatch, recording]);
 
   const toStart = useCallback((e) => {
     if (songPickerHidden) {
@@ -121,6 +135,12 @@ const PlaybackControls = memo((props) => {
             <Play className={styles.controlButton} onClick={handlePlay} />
           )}
           <Forward className={styles.controlButton} onClick={forward} />
+          <div
+            className={`${styles.recordButtonOuter} ${recording ? styles.active : ''}`}
+            onClick={handleRecording}
+          >
+            <div className={styles.recordButtonInner} />
+          </div>
           <p>{timeString}</p>
         </span>
 
