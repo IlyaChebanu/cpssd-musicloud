@@ -152,7 +152,7 @@ const PianoRoll = memo(({
 
   onMidiError((error) => {
     console.error(error);
-    dispatch(showNotification({ message: error }));
+    dispatch(showNotification({ message: `MIDI error: ${error}` }));
   });
 
   const keysRef = useRef();
