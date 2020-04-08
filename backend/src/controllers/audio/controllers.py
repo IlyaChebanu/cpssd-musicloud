@@ -17,7 +17,7 @@ from ...middleware.sql_err_catcher import sql_err_catcher
 from ...utils.logger import log
 from ...utils import (
     permitted_to_edit, gen_scroll_tokens, gen_song_object, gen_playlist_object,
-    notification_sender, gen_folder_object, gen_file_object
+    notification_sender, gen_folder_object, gen_file_object, gen_synth_object
 )
 from ...models.audio import (
     insert_song, insert_song_state, get_song_state, get_all_compiled_songs,
@@ -35,7 +35,8 @@ from ...models.audio import (
     get_number_of_searchable_songs, get_all_search_results, delete_song_data,
     create_folder_entry, add_sample, get_folder_entry, delete_folder_entry,
     get_root_folder_entry, delete_file_entry, move_folder_entry,
-    move_file_entry, get_child_folders, get_child_files
+    move_file_entry, get_child_folders, get_child_files, add_synth, get_synth,
+    update_synth, get_all_synths, delete_synth_entry
 )
 from ...models.users import get_user_via_username
 from ...models.errors import NoResults
@@ -1697,3 +1698,116 @@ def read_folder(user_data):  # pylint: disable=R0911
         }, 400
 
     return {"folder": res}, 200
+
+
+@AUDIO.route("/synth", methods=["POST"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def create_synth(user_data):  # pylint: disable=R0911
+    """
+    Endpoint for creating a Synth in the DB.
+    """
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "name": {
+                "type": "string",
+                "minLength": 1
+            },
+            "patch": {
+                "type": "object"
+            }
+        },
+        "required": ["name"]
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    patch = json.dumps({})
+    if request.json.get("patch"):
+        patch = json.dumps(request.json.get("patch"))
+    add_synth(
+        request.json.get("name"),
+        user_data.get("uid"),
+        patch
+    )
+    return {"message": "Synth created"}, 200
+
+
+@AUDIO.route("/synth", methods=["PATCH"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def edit_synth(user_data):  # pylint: disable=R0911
+    """
+    Endpoint for updating a synth in the DB.
+    """
+    synth_id = request.args.get('id')
+    if not synth_id:
+        return {"message": "No id sent"}, 422
+
+    patch = request.args.get('patch')
+    if not patch:
+        return {"message": "No patch sent"}, 422
+    try:
+        patch = json.loads(patch)
+    except json.decoder.JSONDecodeError:
+        return {"message": "Patch was not a valid JSON string."}, 400
+    except TypeError:
+        return {"message": "Patch was not a valid JSON string."}, 400
+
+    try:
+        synth = get_synth(synth_id)[0]
+        if user_data.get("uid") != synth[1]:
+            return {"message": "You can't edit that synth!"}, 401
+    except NoResults:
+        return {
+            "message": ("Invalid synth ID. Synth does not exist!")
+        }, 400
+
+    update_synth(synth_id, json.dumps(patch))
+
+    return {"message": "Synth updated"}, 200
+
+
+@AUDIO.route("/synth", methods=["GET"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def get_synths(user_data):  # pylint: disable=R0911
+    """
+    Endpoint for getting all a user's synths from the DB.
+    """
+    synths = get_all_synths(
+        user_data.get("uid")
+    )
+    res = {"synths": []}
+    for synth in synths:
+        res["synths"].append(gen_synth_object(synth))
+    return res, 200
+
+
+@AUDIO.route("/synth", methods=["DELETE"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def delete_synth(user_data):  # pylint: disable=R0911
+    """
+    Endpoint for deleting a synth in the DB.
+    """
+    synth_id = request.args.get('id')
+    if not synth_id:
+        return {"message": "No id sent"}, 422
+
+    try:
+        synth = get_synth(synth_id)[0]
+        if user_data.get("uid") != synth[1]:
+            return {"message": "You can't edit that synth!"}, 401
+    except NoResults:
+        return {
+            "message": ("Invalid synth ID. Synth does not exist!")
+        }, 400
+
+    delete_synth_entry(synth_id)
+
+    return {"message": "Synth deleted"}, 200

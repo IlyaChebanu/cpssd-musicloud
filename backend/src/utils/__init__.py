@@ -17,3 +17,4 @@ from .gen_timeline_song_object import gen_timeline_song_object
 from .notification_sender import notification_sender
 from .gen_folder_object import gen_folder_object
 from .gen_file_object import gen_file_object
+from .gen_synth_object import gen_synth_object

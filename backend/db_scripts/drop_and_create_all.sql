@@ -13,6 +13,7 @@ DROP TABLE `musicloud_db`.`Notifications`;
 DROP TABLE `musicloud_db`.`Playlists`;
 DROP TABLE `musicloud_db`.`Songs`;
 DROP TABLE `musicloud_db`.`Users`;
+DROP TABLE `musicloud_db`.`Synth`;
 
 
 CREATE TABLE `musicloud_db`.`Users` (
@@ -136,3 +137,12 @@ CREATE TABLE `musicloud_db`.`File` (
     `url` VARCHAR(3072) NOT NULL,
     FOREIGN KEY (folder_id) REFERENCES Folder(folder_id) ON DELETE CASCADE
 );
+
+CREATE TABLE `musicloud_db`.`Synth` (
+    `id` INT UNIQUE NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    `uid` INT NOT NULL,
+    `name` VARCHAR(500) NOT NULL,
+    `patch` JSON NOT NULL,
+    FOREIGN KEY (uid) REFERENCES Users(uid) ON DELETE CASCADE
+);
+

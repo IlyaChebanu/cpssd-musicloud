@@ -5056,3 +5056,283 @@ class AudioTests(unittest.TestCase):
                 follow_redirects=True
             )
             self.assertEqual(500, res.status_code)
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_all_synths')
+    def test_get_synths_success(self, mocked_synths):
+        """
+        Ensure getting synths is successful.
+        """
+        mocked_synths.return_value = []
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = ALT_MOCKED_TOKEN
+            res = self.test_client.get(
+                "/api/v1/audio/synth",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(200, res.status_code)
+            expected_body = {"synths": []}
+            self.assertEqual(expected_body, json.loads(res.data))
+
+    def test_get_synths_fail_missing_access_token(self):
+        """
+        Ensure getting synths fails if no access_token is sent.
+        """
+        res = self.test_client.get(
+            "/api/v1/audio/synth",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_get_synths_fail_access_token_expired(self):
+        """
+        Ensure getting synths fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
+            res = self.test_client.get(
+                "/api/v1/audio/synth",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_get_synths_fail_bad_access_token_signature(self):
+        """
+        Ensure getting synths fails if the access_token signature does not match
+        the one configured on the server.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
+            res = self.test_client.get(
+                "/api/v1/audio/synth",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_get_synths_fail_unknown_access_token_issue(self):
+        """
+        Ensure getting synths fails if some unknown error relating to the access_token
+        occurs.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
+            res = self.test_client.get(
+                "/api/v1/audio/synth",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_post_synth_success(self):
+        """
+        Ensure creating a synth is successful.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            with mock.patch('backend.src.controllers.audio.controllers.add_synth'):
+                mock_token.return_value = ALT_MOCKED_TOKEN
+                res = self.test_client.post(
+                    "/api/v1/audio/synth",
+                    json={'name': 'Piano'},
+                    headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                    follow_redirects=True
+                )
+                self.assertEqual(200, res.status_code)
+                expected_body = {'message': 'Synth created'}
+                self.assertEqual(expected_body, json.loads(res.data))
+
+    def test_post_synth_fail_missing_access_token(self):
+        """
+        Ensure posting a synth fails if no access_token is sent.
+        """
+        res = self.test_client.post(
+            "/api/v1/audio/synth",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_post_synth_fail_access_token_expired(self):
+        """
+        Ensure posting a synth fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
+            res = self.test_client.post(
+                "/api/v1/audio/synth",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_post_synth_fail_bad_access_token_signature(self):
+        """
+        Ensure posting a synth fails if the access_token signature does not match
+        the one configured on the server.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
+            res = self.test_client.post(
+                "/api/v1/audio/synth",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_post_synth_fail_unknown_access_token_issue(self):
+        """
+        Ensure posting a synth fails if some unknown error relating to the access_token
+        occurs.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
+            res = self.test_client.post(
+                "/api/v1/audio/synth",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_synth')
+    @mock.patch('backend.src.controllers.audio.controllers.json.loads')
+    def test_edit_synths_success(self, mocked_patch, mocked_synth):
+        """
+        Ensure editing synths is successful.
+        """
+        mocked_patch.return_value = {}
+        mocked_synth.return_value = [[None, -1]]
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            with mock.patch('backend.src.controllers.audio.controllers.update_synth'):
+                mock_token.return_value = ALT_MOCKED_TOKEN
+                res = self.test_client.patch(
+                    "/api/v1/audio/synth",
+                    query_string={"id": -1, "patch": {}},
+                    headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                    follow_redirects=True
+                )
+                self.assertEqual(200, res.status_code)
+
+    def test_edit_synths_fail_missing_access_token(self):
+        """
+        Ensure editing synths fails if no access_token is sent.
+        """
+        res = self.test_client.patch(
+            "/api/v1/audio/synth",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_edit_synths_fail_access_token_expired(self):
+        """
+        Ensure editing synths fails if the access_token is expired.
+        """
+        with mock.patch(
+                'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
+            res = self.test_client.patch(
+                "/api/v1/audio/synth",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_edit_synths_fail_bad_access_token_signature(self):
+        """
+        Ensure editing synths fails if the access_token signature does not match
+        the one configured on the server.
+        """
+        with mock.patch(
+                'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
+            res = self.test_client.patch(
+                "/api/v1/audio/synth",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_edit_synths_fail_unknown_access_token_issue(self):
+        """
+        Ensure editing synths fails if some unknown error relating to the access_token
+        occurs.
+        """
+        with mock.patch(
+                'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
+            res = self.test_client.patch(
+                "/api/v1/audio/synth",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_synth')
+    def test_delete_synths_success(self, mocked_synth):
+        """
+        Ensure deleting synths is successful.
+        """
+        mocked_synth.return_value = [[None, -1]]
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            with mock.patch('backend.src.controllers.audio.controllers.delete_synth_entry'):
+                mock_token.return_value = ALT_MOCKED_TOKEN
+                res = self.test_client.delete(
+                    "/api/v1/audio/synth",
+                    query_string={"id": -1},
+                    headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                    follow_redirects=True
+                )
+                self.assertEqual(200, res.status_code)
+
+    def test_delete_synths_fail_missing_access_token(self):
+        """
+        Ensure deleting synths fails if no access_token is sent.
+        """
+        res = self.test_client.delete(
+            "/api/v1/audio/synth",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_delete_synths_fail_access_token_expired(self):
+        """
+        Ensure deleting synths fails if the access_token is expired.
+        """
+        with mock.patch(
+                'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
+            res = self.test_client.delete(
+                "/api/v1/audio/synth",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_delete_synths_fail_bad_access_token_signature(self):
+        """
+        Ensure deleting synths fails if the access_token signature does not match
+        the one configured on the server.
+        """
+        with mock.patch(
+                'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
+            res = self.test_client.delete(
+                "/api/v1/audio/synth",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_delete_synths_fail_unknown_access_token_issue(self):
+        """
+        Ensure deleting synths fails if some unknown error relating to the access_token
+        occurs.
+        """
+        with mock.patch(
+                'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
+            res = self.test_client.delete(
+                "/api/v1/audio/synth",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
