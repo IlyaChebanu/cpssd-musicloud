@@ -13,7 +13,6 @@ import { connect } from 'react-redux';
 import _ from 'lodash';
 import { useMouseEvents, useGlobalEvent } from 'beautiful-react-hooks';
 import Tone from 'tone';
-import ReactTooltip from 'react-tooltip';
 import styles from './PianoRoll.module.scss';
 import { ReactComponent as CloseIcon } from '../../assets/icons/x-icon-10px.svg';
 import {
