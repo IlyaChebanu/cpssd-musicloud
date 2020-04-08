@@ -1,6 +1,9 @@
-import React, { memo, useCallback, useMemo } from 'react';
+import React, {
+  memo, useCallback, useMemo, useRef,
+} from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import ReactTooltip from 'react-tooltip';
 import { setVolume } from '../../actions/studioActions';
 import styles from './Slider.module.scss';
 import { ReactComponent as Volume } from '../../assets/icons/volume.svg';
@@ -9,14 +12,16 @@ import { clamp, lerp } from '../../helpers/utils';
 
 const Slider = memo((props) => {
   const { volume, dispatch } = props;
-
+  const ref = useRef();
   const handleDragStart = useCallback((ev) => {
     const initialMousePos = ev.screenX;
     const initialVolume = volume;
     const handleMouseMove = (e) => {
+      ReactTooltip.show(ref.current);
       dispatch(setVolume(clamp(0, 1, initialVolume + (e.screenX - initialMousePos) / 165)));
     };
     const handleDragStop = () => {
+      ReactTooltip.hide(ref.current);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleDragStop);
     };
@@ -34,7 +39,14 @@ const Slider = memo((props) => {
 
   return (
     <div className={styles.wrapper}>
-      <VolumeIndicator style={iconStyle} onMouseDown={handleDragStart} />
+      <VolumeIndicator
+        data-place="right"
+        data-delay-show={0}
+        data-tip={`${Math.floor(volume * 100)}% global volume`}
+        style={iconStyle}
+        onMouseDown={handleDragStart}
+        ref={(r) => { ref.current = r; }}
+      />
       <Volume />
     </div>
   );

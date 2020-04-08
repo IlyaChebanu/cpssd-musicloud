@@ -13,6 +13,7 @@ import { connect } from 'react-redux';
 import _ from 'lodash';
 import { useMouseEvents, useGlobalEvent } from 'beautiful-react-hooks';
 import Tone from 'tone';
+import ReactTooltip from 'react-tooltip';
 import styles from './PianoRoll.module.scss';
 import { ReactComponent as CloseIcon } from '../../assets/icons/x-icon-10px.svg';
 import {
@@ -202,9 +203,13 @@ const PianoRoll = memo(({
       if ([0, 2, 3, 5, 7, 8, 10].includes(i % 12)) {
         pianoKeys.push(
           <button
+            data-tip="Click and hold to play sound"
+            data-place="right"
             className={`${styles.whiteKey} ${isMouseDown && hoveredKey === i + 1 ? styles.active : ''} ${[0, 5, 10].includes(i % 12) ? styles.wide : ''}`}
             key={i}
-            onMouseOver={() => setHoveredKey(i + 1)}
+            onMouseOver={() => {
+              setHoveredKey(i + 1);
+            }}
           >
             <span className={`${i % 12 === 3 ? styles.bold : styles.light}`}>
               {`${keyNames[i % 12]}${Math.floor(i / 12) + 1}`}
@@ -215,9 +220,13 @@ const PianoRoll = memo(({
       } else {
         pianoKeys.push(
           <button
+            data-tip="Click and hold to play sound"
+            data-place="right"
             className={`${styles.blackKey} ${isMouseDown && hoveredKey === i + 1 ? styles.active : ''}`}
             key={i}
-            onMouseOver={() => setHoveredKey(i + 1)}
+            onMouseOver={() => {
+              setHoveredKey(i + 1);
+            }}
           />,
         );
         pianoTracks.push(<div className={`${styles.track} ${styles.black}`} key={i} />);

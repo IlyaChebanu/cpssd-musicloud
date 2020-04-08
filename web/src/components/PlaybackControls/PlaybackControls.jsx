@@ -143,26 +143,29 @@ const PlaybackControls = memo((props) => {
           </div>
           <p>{timeString}</p>
         </span>
+        <div
+          data-place="left"
+          data-tip={fileExplorerHidden ? 'Open file explorer' : 'Close file explorer'}
+        >
+          { fileExplorerHidden
+            ? (
+              <FileExplorerClosed
 
-        { fileExplorerHidden
-          ? (
-            <FileExplorerClosed
-              id="explorer"
-              className={styles.selectedIcon}
+                id="explorer"
+                className={styles.selectedIcon}
 
-              onClick={fileExplorerHidden ? showExplorer : hideExplorer}
-            />
-          )
-          : (
-            <FileExplorerOpened
-
-              className={styles.selectedIcon}
-              style={{ height: '60px' }}
-              id="explorer"
-              onClick={fileExplorerHidden ? showExplorer : hideExplorer}
-            />
-          )}
-
+                onClick={fileExplorerHidden ? showExplorer : hideExplorer}
+              />
+            )
+            : (
+              <FileExplorerOpened
+                className={styles.selectedIcon}
+                style={{ height: '60px' }}
+                id="explorer"
+                onClick={fileExplorerHidden ? showExplorer : hideExplorer}
+              />
+            )}
+        </div>
       </div>
     </GlobalHotKeys>
   );

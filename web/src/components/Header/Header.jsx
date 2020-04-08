@@ -8,6 +8,7 @@ import { connect } from 'react-redux';
 import { withRouter, Link } from 'react-router-dom';
 import toWav from 'audiobuffer-to-wav';
 import _ from 'lodash';
+import ReactTooltip from 'react-tooltip';
 import styles from './Header.module.scss';
 import { deleteToken } from '../../actions/userActions';
 import {
@@ -230,12 +231,24 @@ const Header = memo((props) => {
 
   const fileDropdownItems = useMemo(
     () => [
-      { name: 'New', action: handleHideSongPicker, icon: newIcon },
-      { name: 'Open', action: handleShowSongPicker, icon: openIcon },
-      { name: 'Publish', action: handlePublishSong, icon: publishIcon },
-      { name: 'Import', icon: importIcon, action: handleSampleImport },
-      { name: 'Add Synth', icon: importIcon, action: handleAddSynth },
-      { name: 'Export', icon: exportIcon, action: exportAction },
+      {
+        name: 'New', action: handleHideSongPicker, icon: newIcon, dataTip: 'Create a new song',
+      },
+      {
+        name: 'Open', action: handleShowSongPicker, icon: openIcon, dataTip: 'Open an existing song',
+      },
+      {
+        name: 'Publish', action: handlePublishSong, icon: publishIcon, dataTip: 'Publish song for everybody to see',
+      },
+      {
+        name: 'Import', icon: importIcon, action: handleSampleImport, dataTip: 'Import audio sample from device',
+      },
+      {
+        name: 'Add Synth', icon: importIcon, action: handleAddSynth, dataTip: 'Add basic synthesizer to use with a piano roll',
+      },
+      {
+        name: 'Export', icon: exportIcon, action: exportAction, dataTip: 'Export song as a single compiled audio',
+      },
     ],
     [
       exportAction,
@@ -295,11 +308,13 @@ const Header = memo((props) => {
     [handleSetName],
   );
 
-  const openModal = () => {
+  const openModal = (e) => {
+    e.preventDefault();
     setIsLogoutShowing(true);
   };
 
-  const closeModal = () => {
+  const closeModal = (e) => {
+    e.preventDefault();
     setIsLogoutShowing(false);
   };
 

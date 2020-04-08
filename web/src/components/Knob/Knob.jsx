@@ -3,12 +3,13 @@ import React, {
 } from 'react';
 import PropTypes from 'prop-types';
 import { useGlobalEvent, useMouseEvents } from 'beautiful-react-hooks';
+import ReactTooltip from 'react-tooltip';
 import styles from './Knob.module.scss';
 import { ReactComponent as KnobIcon } from '../../assets/icons/Knob.svg';
 import { clamp, lerp, toNormalRange } from '../../helpers/utils';
 
 const Knob = memo(({
-  className, name, sensitivity, value, onChange, min, max,
+  className, name, sensitivity, value, onChange, min, max, dataTip,
 }) => {
   const [val, setVal] = useState(value);
   const [startValue, setStartValue] = useState(value);
@@ -32,6 +33,7 @@ const Knob = memo(({
 
   onMouseMove((e) => {
     if (moving) {
+      ReactTooltip.hide(ref.current);
       e.preventDefault();
       const newVal = clamp(
         min,
@@ -55,12 +57,21 @@ const Knob = memo(({
   }), [max, min, val]);
 
   return (
-    <span className={`${styles.knob} ${className}`}>
+    <span
+      className={`${styles.knob} ${className}`}
+      data-tip={dataTip}
+      data-place="right"
+      ref={(r) => { ref.current = r; }}
+      role="button"
+      tabIndex={0}
+    >
       <KnobIcon
+        onClick={() => { ReactTooltip.hide(ref.current); }}
         ref={ref}
         style={rotationStyle}
       />
       <p>{name}</p>
+
     </span>
   );
 });
@@ -73,6 +84,7 @@ Knob.propTypes = {
   onChange: PropTypes.func,
   min: PropTypes.number,
   max: PropTypes.number,
+  dataTip: PropTypes.string,
 };
 
 Knob.defaultProps = {
@@ -83,6 +95,7 @@ Knob.defaultProps = {
   onChange: null,
   min: 0,
   max: 1,
+  dataTip: '',
 };
 
 Knob.displayName = 'Knob';

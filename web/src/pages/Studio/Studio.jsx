@@ -8,10 +8,12 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import ReactDOM from 'react-dom';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { GlobalHotKeys } from 'react-hotkeys';
+import ReactTooltip from 'react-tooltip';
 import styles from './Studio.module.scss';
 import Header from '../../components/Header';
 import {
@@ -50,10 +52,8 @@ const Studio = memo((props) => {
 
   const [tracksLoading, setTracksLoading] = useState(false);
   const [isLogoutShowing, setIsLogoutShowing] = useState(false);
-
   useUpdateUserDetails();
   const tracksRef = useRef();
-
   const urlParams = new URLSearchParams(window.location.search);
   const songId = Number(urlParams.get('sid'));
 
@@ -163,15 +163,17 @@ const Studio = memo((props) => {
       handlers={handlers}
     >
       <div className={styles.wrapper}>
+
         <Header selected={0}>
-          <Button className={styles.saveButton} onClick={handleSaveState}>
-          Save
+
+          <Button dataTip="Save song state" className={styles.saveButton} onClick={handleSaveState}>
+            Save
           </Button>
         </Header>
         <div style={{ pointerEvents: songPickerHidden ? 'auto' : 'none' }}>
           <div className={styles.contentWrapper}>
             <SampleControls />
-            <SeekBar position={seekBarPosition} />
+            <SeekBar dataTip="Move seekbar to desired beat" position={seekBarPosition} />
             <Timeline />
             <div className={styles.scrollable}>
               <div className={styles.content}>
@@ -196,17 +198,22 @@ const Studio = memo((props) => {
                   {tracksLoading ? <Spinner /> : renderableTracks}
                   {Object.entries(samples).map(([id, sample]) => (
                     <Sample data={sample} id={id} key={id} />
+
                   ))}
+
                 </div>
+
               </div>
             </div>
           </div>
           <PianoRoll />
+
           <PlayBackControls style={{ 'pointer-events': 'none' }} />
           <FileExplorer />
           <PublishForm />
         </div>
         <SongPicker songs={[]} />
+        <ReactTooltip className={styles.tooltip} delayShow={500} />
       </div>
     </GlobalHotKeys>
   );

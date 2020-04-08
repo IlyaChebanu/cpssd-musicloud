@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/mouse-events-have-key-events */
 /* eslint-disable react/no-array-index-key */
 import React, {
   memo, useCallback, useMemo, useEffect, useState, useRef,
@@ -8,6 +9,7 @@ import _ from 'lodash';
 import { HotKeys } from 'react-hotkeys';
 import axios from 'axios';
 import WaveSurfer from 'wavesurfer.js';
+import ReactTooltip from 'react-tooltip';
 import styles from './Sample.module.scss';
 import {
   dColours, colours, bufferStore, audioContext,
@@ -32,7 +34,6 @@ import { ReactComponent as PianoIcon } from '../../assets/icons/piano-keyboard-l
 import Spinner from '../Spinner/Spinner';
 import { useGlobalDrag } from '../../helpers/hooks';
 import store from '../../store';
-
 
 const Sample = memo((props) => {
   const {
@@ -268,12 +269,19 @@ const Sample = memo((props) => {
         && (
           <div className={styles.edit}>
             <EditIcon
+              onMouseOver={ReactTooltip.rebuild}
+              data-tip="Edit sample name and add effects"
+              data-place="right"
               onClick={handleShowHideSampleEffects}
             />
             <PianoIcon
+              onMouseOver={ReactTooltip.rebuild}
+              data-tip="Edit in a piano roll"
+              data-place="right"
               onClick={handleTogglePiano}
             />
           </div>
+
         )}
       {data.bufferLoading && <Spinner className={styles.spinner} />}
       {!data.bufferLoading && data.type === 'pattern' && patternPreview}

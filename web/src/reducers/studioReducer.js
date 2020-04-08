@@ -40,6 +40,7 @@ export default (
     songImageUrl: null,
     showPianoRoll: false,
     recording: false,
+    draggingSeekBar: false,
   },
   action,
 ) => {
@@ -179,6 +180,11 @@ export default (
       return {
         ...state,
         title: action.title,
+      };
+    case 'SET_DRAGGING_SEEKBAR':
+      return {
+        ...state,
+        draggingSeekBar: action.draggingSeekBar,
       };
     case 'SONG_PICKER_HIDE':
       return {

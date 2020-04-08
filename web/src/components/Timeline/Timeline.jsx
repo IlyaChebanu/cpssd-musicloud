@@ -5,7 +5,9 @@ import { connect } from 'react-redux';
 import styles from './Timeline.module.scss';
 import Looper from '../Looper';
 import TimelineControls from '../TimelineControls';
-import { setCurrentBeat, play, pause } from '../../actions/studioActions';
+import {
+  setCurrentBeat, play, pause, setDraggingSeekBar,
+} from '../../actions/studioActions';
 
 const Timeline = memo(({
   playing, dispatch, gridSize, gridWidth, scroll,
@@ -36,6 +38,7 @@ const Timeline = memo(({
   }), [scroll, widthStyle]);
 
   const handleDragStart = useCallback((ev) => {
+    dispatch(setDraggingSeekBar(true));
     dispatch(pause);
     const bb = ev.target.getBoundingClientRect();
     const handleMouseMove = (e) => {
@@ -65,6 +68,7 @@ const Timeline = memo(({
       if (playing) {
         dispatch(play);
       }
+      dispatch(setDraggingSeekBar(false));
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleDragStop);
     };
