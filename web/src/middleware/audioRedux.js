@@ -14,6 +14,41 @@ import stopSample from './stopSample';
 import beatsToSeconds from './beatsToSeconds';
 import playNote from './playNote';
 import setFadeCurve from './setFadeCurve';
+import { map } from '../helpers/utils';
+
+
+const setTrackChannel = (track, soloTrack, channels) => {
+  const audioContext = Tone.context.rawContext;
+  const gain = audioContext.createGain();
+  const pan = audioContext.createStereoPanner();
+  const muterGain = audioContext.createGain();
+
+  const reverb = new Tone.Freeverb(0.5, map(1 - (track.reverb || 0), 0, 1, 100, 1000));
+  reverb.wet.setValueAtTime(track.reverb || 0);
+
+  const adapter = new Tone.Gain();
+
+  gain.gain.setValueAtTime(track.volume, 0);
+  pan.pan.setValueAtTime(track.pan, 0);
+  muterGain.gain.setValueAtTime(1 * (
+    soloTrack ? soloTrack.id === track.id : !track.mute
+  ), 0);
+
+  gain.connect(pan);
+  pan.connect(muterGain);
+  // eslint-disable-next-line no-underscore-dangle
+  muterGain.connect(adapter._gainNode);
+  adapter.connect(reverb);
+  reverb.connect(audioContext.globalGain);
+
+  channels[track.id] = {
+    gain,
+    pan,
+    muterGain,
+    reverb,
+  };
+};
+
 
 export const renderTracks = (studio) => {
   const samples = Object.values(studio.samples);
@@ -27,31 +62,18 @@ export const renderTracks = (studio) => {
     offlineAudioContext.globalGain.connect(offlineAudioContext.destination);
 
     const soloTrack = _.find(studio.tracks, 'solo');
-    const trackChannels = {};
+    const offlineTrackChannels = {};
     studio.tracks.forEach((track) => {
-      const gain = offlineAudioContext.createGain();
-      const pan = offlineAudioContext.createStereoPanner();
-      const muterGain = offlineAudioContext.createGain();
-
-      gain.gain.setValueAtTime(track.volume, 0);
-      pan.pan.setValueAtTime(track.pan, 0);
-      muterGain.gain.setValueAtTime(1 * (
-        soloTrack ? soloTrack.id === track.id : !track.mute
-      ), 0);
-
-      gain.connect(pan);
-      pan.connect(muterGain);
-      muterGain.connect(offlineAudioContext.globalGain);
-
-      trackChannels[track.id] = { gain, pan, muterGain };
+      setTrackChannel(track, soloTrack, offlineTrackChannels);
     });
 
     samples.forEach((sample) => {
-      const channel = trackChannels[sample.trackId];
+      const channel = offlineTrackChannels[sample.trackId];
       scheduleSample(sample, channel.gain, offlineAudioContext, true);
     });
   }, songDuration);
 };
+
 
 export default (store) => {
   const audioContext = Tone.context.rawContext;
@@ -158,42 +180,14 @@ export default (store) => {
       case 'SET_COMPLETE_TRACKS_STATE': {
         const soloTrack = _.find(action.tracks, 'solo');
         action.tracks.forEach((track) => {
-          const gain = audioContext.createGain();
-          const pan = audioContext.createStereoPanner();
-          const muterGain = audioContext.createGain();
-
-          gain.gain.setValueAtTime(track.volume, 0);
-          pan.pan.setValueAtTime(track.pan, 0);
-          muterGain.gain.setValueAtTime(1 * (
-            soloTrack ? soloTrack.id === track.id : !track.mute
-          ), 0);
-
-          gain.connect(pan);
-          pan.connect(muterGain);
-          muterGain.connect(audioContext.globalGain);
-
-          trackChannels[track.id] = { gain, pan, muterGain };
+          setTrackChannel(track, soloTrack, trackChannels);
         });
         break;
       }
 
       case 'ADD_TRACK': {
         const soloTrack = _.find([...state.tracks, action.track], 'solo');
-        const gain = audioContext.createGain();
-        const pan = audioContext.createStereoPanner();
-        const muterGain = audioContext.createGain();
-
-        gain.gain.setValueAtTime(action.track.volume, 0);
-        pan.pan.setValueAtTime(action.track.pan, 0);
-        muterGain.gain.setValueAtTime(1 * (
-          soloTrack ? soloTrack.id === action.track.id : !action.track.mute
-        ), 0);
-
-        gain.connect(pan);
-        pan.connect(muterGain);
-        muterGain.connect(audioContext.globalGain);
-
-        trackChannels[action.track.id] = { gain, pan, muterGain };
+        setTrackChannel(action.track, soloTrack, trackChannels);
         break;
       }
 
@@ -208,6 +202,14 @@ export default (store) => {
 
       case 'SET_TRACK_PAN': {
         trackChannels[action.trackId].pan.pan.setValueAtTime(action.value, 0);
+        break;
+      }
+
+      case 'SET_TRACK_REVERB': {
+        trackChannels[action.trackId].reverb.wet.setValueAtTime(action.value || 0);
+        trackChannels[action.trackId].reverb.dampening.setValueAtTime(
+          map(1 - (action.value || 0), 0, 1, 100, 1000),
+        );
         break;
       }
 

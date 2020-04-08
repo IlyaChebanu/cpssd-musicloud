@@ -14,6 +14,7 @@ import {
   hideSampleEffects,
   setShowPianoRoll,
   removeTrack,
+  setTrackReverb,
 } from '../../actions/studioActions';
 import Knob from '../Knob';
 import { ReactComponent as Mute } from '../../assets/icons/volume-up-light.svg';
@@ -38,6 +39,10 @@ const TrackControls = memo((props) => {
 
   const handleSetTrackPan = useCallback((val) => {
     dispatch(setTrackPan(track.id, clamp(-1, 1, val)));
+  }, [dispatch, track.id]);
+
+  const handleSetTrackReverb = useCallback((val) => {
+    dispatch(setTrackReverb(track.id, clamp(0, 1, val)));
   }, [dispatch, track.id]);
 
   const handleTrackMute = useCallback((e) => {
@@ -96,6 +101,7 @@ const TrackControls = memo((props) => {
         <div className={styles.buttons}>
           <Knob min={0} max={1} value={track.volume} onChange={handleSetTrackVolume} name="Vol" />
           <Knob min={-1} max={1} value={track.pan} onChange={handleSetTrackPan} name="Pan" />
+          <Knob min={0} max={1} value={track.reverb} onChange={handleSetTrackReverb} name="Reverb" />
           <span>
             {track.mute || (soloTrack && soloTrack.id !== track.id)
               ? <MuteActive onClick={handleTrackMute} />

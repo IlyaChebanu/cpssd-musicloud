@@ -330,6 +330,13 @@ export default (
           t.id === action.trackId ? { ...t, name: action.value } : t
         )),
       };
+    case 'SET_TRACK_REVERB':
+      return {
+        ...state,
+        tracks: state.tracks.map((t) => (
+          t.id === action.trackId ? { ...t, reverb: action.value } : t
+        )),
+      };
     case 'ADD_SAMPLE':
       return {
         ...state,
