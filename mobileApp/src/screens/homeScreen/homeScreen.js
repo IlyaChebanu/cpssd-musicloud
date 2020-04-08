@@ -8,7 +8,7 @@ import styles from "./styles";
 import HeaderComponent from "../../components/headerComponent/headerComponent";
 import { SafeAreaView } from "react-navigation";
 import SearchComponent from "../../components/searchComponent/searchComponent";
-import { getCompiledSongs, postLikeSong, postUnlikeSong } from "../../api/audioAPI";
+import { getCompiledSongs, postLikeSong, postUnlikeSong, getSearchSongs } from "../../api/audioAPI";
 import { getUserInfo } from "../../api/usersAPI";
 import CustomAlertComponent from "../../components/alertComponent/customAlert";
 import SongComponent from "../../components/songComponent/songComponent";
@@ -23,6 +23,9 @@ class HomeScreen extends React.Component {
       alertMessage: 'Do you want to quit the app?',
       nextPage: null,
       refreshing: false,
+      searchTerm: '',
+      sortBy: '',
+      sortOrder: '',
     };
   }
 
@@ -80,17 +83,49 @@ class HomeScreen extends React.Component {
     })
   }
 
+  searchSongs(searchTerm, sortType, sort, nextPage) {
+    getSearchSongs(this.props.token, searchTerm, sortType, sort, 10, nextPage).then(response => {
+      this.setState({ songsData: response.data.songs, nextPage: response.data.next_page})
+    })
+  }
+
   onRefresh = async () => {
     this.setState({ refreshing: true });
-    await this.getSongs();
+    await this.searchSongs(this.state.searchTerm, this.state.sortBy, this.state.sortOrder, '')
     this.setState({ refreshing: false });
   }
 
+  handleTyping(text) {
+    this.setState({ searchTerm: text })
+    this.searchSongs(text, this.state.sortBy, this.state.sortOrder, '')
+  }
+
+  handleSorting(sortByNum, sortOrderNum) {
+    let sortBy = ''
+    let sortOrder =''
+    if (sortByNum === 1) {
+      sortBy = 'publish_sort'
+    } else if (sortByNum === 2) {
+      sortBy = 'title_sort'
+    } else if (sortByNum === 3) {
+      sortBy = 'artist_sort'
+    } else if (sortByNum === 4) {
+      sortBy = 'duration_sort'
+    }
+    if (sortOrderNum === 1) {
+      sortOrder = 'down'
+    } else if (sortOrderNum === 2) {
+      sortOrder = 'up'
+    }
+    this.setState({ sortBy: sortBy, sortOrder: sortOrder})
+    this.searchSongs(this.state.searchTerm, sortBy, sortOrder, '')
+  }
+  
   renderheader() {
     return (
       <View style={styles.container}>
         <Text style={styles.titleText}>{"DISCOVER"}</Text>
-        <SearchComponent />
+        <SearchComponent handleTyping={this.handleTyping.bind(this)} handleSorting={this.handleSorting.bind(this)}/>
       </View>
     )
   }
@@ -121,7 +156,7 @@ class HomeScreen extends React.Component {
 
   _handleLoadMore() {
     if (this.state.nextPage !== null) {
-      getCompiledSongs(this.props.token, '', 10, this.state.nextPage).then(response => {
+      getSearchSongs(this.props.token, this.state.searchTerm, this.state.sortBy, this.state.sortOrder, 10, this.state.nextPage).then(response => {
         if (response.status === 200) {
           var joined = this.state.songsData.concat(response.data.songs)
           this.setState({ songsData: joined, nextPage: response.data.next_page })
