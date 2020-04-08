@@ -280,6 +280,7 @@ export const addTrack = (track = {
   solo: false,
   volume: 0.75,
   pan: 0,
+  reverb: 0,
   name: 'New Track',
 }) => (dispatch) => {
   dispatch({
@@ -339,6 +340,14 @@ export const setTrackSolo = (trackId, value) => (dispatch) => {
 export const setTrackName = (trackId, value) => (dispatch) => {
   dispatch({
     type: 'SET_TRACK_NAME',
+    trackId,
+    value,
+  });
+};
+
+export const setTrackReverb = (trackId, value) => (dispatch) => {
+  dispatch({
+    type: 'SET_TRACK_REVERB',
     trackId,
     value,
   });
