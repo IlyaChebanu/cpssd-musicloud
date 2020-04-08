@@ -13,6 +13,7 @@ import { connect } from 'react-redux';
 import _ from 'lodash';
 import { useMouseEvents, useGlobalEvent } from 'beautiful-react-hooks';
 import Tone from 'tone';
+import ReactTooltip from 'react-tooltip';
 import styles from './PianoRoll.module.scss';
 import { ReactComponent as CloseIcon } from '../../assets/icons/x-icon-10px.svg';
 import {
@@ -210,6 +211,8 @@ const PianoRoll = memo(({
             data-tip="Click and hold to play sound"
             data-place="right"
             className={`${styles.whiteKey} ${isActive ? styles.active : ''} ${[0, 5, 10].includes(i % 12) ? styles.wide : ''}`}
+            data-tip="Click and hold to play sound"
+            data-place="right"
             key={i}
             onMouseOver={() => {
               setHoveredKey(i + 1);
@@ -227,6 +230,8 @@ const PianoRoll = memo(({
             data-tip="Click and hold to play sound"
             data-place="right"
             className={`${styles.blackKey} ${isActive ? styles.active : ''}`}
+            data-tip="Click and hold to play sound"
+            data-place="right"
             key={i}
             onMouseOver={() => {
               setHoveredKey(i + 1);

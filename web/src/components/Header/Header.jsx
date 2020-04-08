@@ -8,6 +8,7 @@ import { connect } from 'react-redux';
 import { withRouter, Link } from 'react-router-dom';
 import toWav from 'audiobuffer-to-wav';
 import _ from 'lodash';
+import ReactTooltip from 'react-tooltip';
 import styles from './Header.module.scss';
 import { deleteToken } from '../../actions/userActions';
 import {
