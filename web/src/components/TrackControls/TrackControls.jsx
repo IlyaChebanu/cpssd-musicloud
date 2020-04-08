@@ -23,7 +23,7 @@ import { ReactComponent as SoloActive } from '../../assets/icons/headphones-alt-
 import { ReactComponent as Delete } from '../../assets/icons/close-24px.svg';
 import { clamp } from '../../helpers/utils';
 import { colours } from '../../helpers/constants';
-
+import Modal from '../Modal';
 
 const TrackControls = memo((props) => {
   const {
@@ -31,6 +31,8 @@ const TrackControls = memo((props) => {
   } = props;
 
   const soloTrack = _.find(tracks, 'solo');
+
+  const [isModalShowing, setIsModalShowing] = useState(false);
 
   const handleSetTrackVolume = useCallback((val) => {
     dispatch(setTrackVolume(track.id, clamp(0, 1, val)));
@@ -77,6 +79,33 @@ const TrackControls = memo((props) => {
     dispatch(removeTrack(track.id));
   }, [dispatch, track.id]);
 
+  const openModal = () => {
+    setIsModalShowing(true);
+  };
+
+  const closeModal = () => {
+    setIsModalShowing(false);
+  };
+
+  const deleteTrackModal = useMemo(() => (
+    <div className={styles.modal} style={{ visibility: isModalShowing ? 'visible' : 'hidden' }}>
+
+      { isModalShowing ? <div role="none" onClick={closeModal} className={styles.backDrop} /> : null}
+      <Modal
+        header="Confirm deleting track"
+        className={styles.modal}
+        show={isModalShowing}
+        close={closeModal}
+        submit={handleDeleteTrack}
+      >
+        Are you sure you want to delete track?
+      </Modal>
+    </div>
+
+
+  ), [handleDeleteTrack, isModalShowing]);
+
+
   return (
     <div
       className={styles.outerWrap}
@@ -89,7 +118,7 @@ const TrackControls = memo((props) => {
         style={barStyle}
       />
       <div className={`${styles.wrapper} ${props.index % 2 ? styles.even : ''}`}>
-        <Delete onClick={handleDeleteTrack} className={styles.deleteTrack} />
+        <Delete onClick={openModal} className={styles.deleteTrack} />
         <div className={styles.title}>
           <input type="text" value={track.name} onChange={handleTrackNameChange} />
         </div>
@@ -110,7 +139,9 @@ const TrackControls = memo((props) => {
           </span>
         </div>
       </div>
+      {deleteTrackModal}
     </div>
+
   );
 });
 
