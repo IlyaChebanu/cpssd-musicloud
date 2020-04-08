@@ -45,6 +45,7 @@ import {
   setCompleteSamplesState,
 } from '../../actions/studioActions';
 import Button from '../Button';
+import Modal from '../Modal';
 
 const Header = memo((props) => {
   const {
@@ -54,7 +55,7 @@ const Header = memo((props) => {
   const [nameInput, setNameInput] = useState(studio.songName);
   const urlParams = new URLSearchParams(window.location.search);
   const songId = Number(urlParams.get('sid'));
-
+  const [isLogoutShowing, setIsLogoutShowing] = useState(false);
   const cleanSongSampleBuffers = (state) => {
     state.tracks.forEach((track) => {
       if (track.samples !== undefined) {
@@ -294,6 +295,30 @@ const Header = memo((props) => {
     [handleSetName],
   );
 
+  const openModal = () => {
+    setIsLogoutShowing(true);
+  };
+
+  const closeModal = () => {
+    setIsLogoutShowing(false);
+  };
+
+  const logOutModal = useMemo(() => (
+    <div className={styles.modal} style={{ visibility: isLogoutShowing ? 'visible' : 'hidden' }}>
+      { isLogoutShowing ? <div role="none" onClick={closeModal} className={styles.backDrop} /> : null}
+      <Modal
+        header="Confirm logging out"
+        className={styles.modal}
+        show={isLogoutShowing}
+        close={closeModal}
+        submit={handleSignout}
+      >
+        Are you sure you want to logout?
+      </Modal>
+    </div>
+  ), [handleSignout, isLogoutShowing]);
+
+
   return (
     <div className={styles.header}>
       <span className={styles.left}>
@@ -321,9 +346,10 @@ const Header = memo((props) => {
       </span>
       <span className={styles.nav}>
         <nav>
-          <Button className={styles.saveButton} onClick={handleSignout}>
+          <Button className={styles.saveButton} onClick={openModal}>
             Logout
           </Button>
+
           <Link to="/studio" className={selected === 0 ? styles.selected : ''}>
             Studio
           </Link>
@@ -347,6 +373,7 @@ const Header = memo((props) => {
           />
         </div>
       </span>
+      {logOutModal}
     </div>
   );
 });
