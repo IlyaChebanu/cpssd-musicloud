@@ -3962,21 +3962,31 @@ paths:
               folder_id:
                 type: "integer"
                 example: 1
-              child_files:
-                type: "array"
-                items:
-                  type: "string"
-                example:
-                  - "1"
-                  - "A Sample Name"
-                  - "http://afakeurl.com"
               child_folders:
                 type: "array"
                 items:
-                  type: "string"
-                example:
-                  - "2"
-                  - "A Subfolder"
+                  type: "object"
+                  properties:
+                    folder_id:
+                      type: "integer"
+                      example: 1
+                    name:
+                      type: "string"
+                      example: "A Subfolder"
+              child_files:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    file_id:
+                      type: "integer"
+                      example: 1
+                    name:
+                      type: "string"
+                      example: "A Song"
+                    url:
+                      type: "string"
+                      example: "http://afakeurl.com"
         400:
           description: "Invalid folder ID"
           schema:
@@ -4368,6 +4378,266 @@ paths:
               message:
                 type: "string"
                 example: "File added to folder"
+        401:
+          description: "User's token has expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Failed to decode token."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+                
+  /audio/synth:
+    get:
+      tags:
+      - "audio"
+      summary: "Get all of a user's synths."
+      description: "This endpoint takes a user's access_token and returns all of the synth definitions belonging to that user."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+      responses:
+        200:
+          description: "Successful synth lookup"
+          schema:
+            type: "object"
+            properties:
+              synths:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    id:
+                      type: "integer"
+                      example: 1
+                    name:
+                      type: "string"
+                      example: "Piano"
+                    patch:
+                      type: "object"
+        400:
+          description: "Invalid Synth ID"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Invalid synth ID. Synth does not exist!"
+        401:
+          description: "User's token has expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        500:
+          description: "Failed to decode token."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+    patch:
+      tags:
+      - "audio"
+      summary: "Update a synth definition."
+      description: "This endpoint takes two arguments and updates a synths patch column in the DB. The arguments that are to be provided are as follows:\n\n \"id\" = The ID of the synth you want to update.\n\n \"patch\" = The new JSON object you want to put into that synths patch column."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "Authorization Header"
+        description: "This is where you should set your access_token."
+        required: true
+        type: "string"
+      - in: "query"
+        name: "id"
+        type: "integer"
+        required: true
+        description: "The ID of the synth you want to update."
+      - in: "query"
+        name: "patch"
+        type: "integer"
+        required: true
+        description: "The JSON objet you want to replace the synths patch column value with."
+      responses:
+        200:
+          description: "Synth updated"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Synth updated"
+        401:
+          description: "User's token has expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Failed to decode token."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+    delete:
+      tags:
+      - "audio"
+      summary: "Delete a synth from the DB."
+      description: "This endpoint takes a synth ID & deletes that synth from the DB. The argument that is to be provided is as follows:\n\n \"id\" = The ID of the synth you want to delete."
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "query"
+          name: "id"
+          type: "integer"
+          required: true
+          description: "The ID of the synth you want to delete."
+      responses:
+        200:
+          description: "Synth deleted"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Synth deleted"
+        401:
+          description: "Access_token missing or expired."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Request missing access_token."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable"
+    post:
+      tags:
+      - "audio"
+      summary: "Create a synth."
+      description: "This endpoint takes one mandatory and one optional argument and creates a synth in the DB. The arguments that can be provided are as follows:\n\n \"name\" = This argument is mandatory. It is the name of your new synth.\n\n \"patch\" = An optional argument that lets you define the initial state of the synth. If this argument isn't sent, the patch column defaults to an empty object."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "Authorization Header"
+        description: "This is where you should set your access_token."
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "Synth creation data"
+        schema:
+          type: "object"
+          properties:
+            name:
+              type: "string"
+              example: "Piano"
+            patch:
+              type: "object"
+      responses:
+        200:
+          description: "Synth created"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Synth created"
         401:
           description: "User's token has expired"
           schema:

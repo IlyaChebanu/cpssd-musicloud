@@ -1,0 +1,7 @@
+CREATE TABLE `musicloud_db`.`Synth` (
+    `id` INT UNIQUE NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    `uid` INT NOT NULL,
+    `name` VARCHAR(500) NOT NULL,
+    `patch` JSON NOT NULL,
+    FOREIGN KEY (uid) REFERENCES Users(uid) ON DELETE CASCADE
+);

@@ -67,6 +67,21 @@ class Users(db.Model):
                             nullable=False, unique=True)
 
 
+class Synth(db.Model):
+    __tablename__ = 'Synth'
+
+    id = db.Column(
+        db.Integer, primary_key=True, nullable=False, autoincrement=True,
+        unique=True
+    )
+    uid = db.Column(
+        db.Integer, db.ForeignKey(Users.uid, ondelete='CASCADE'),
+        nullable=False
+    )
+    name = db.Column(db.VARCHAR(500), nullable=False)
+    patch = db.Column(db.JSON, nullable=False)
+
+
 class Songs(db.Model):
     __tablename__ = 'Songs'
 
