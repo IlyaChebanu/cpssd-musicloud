@@ -1,9 +1,6 @@
 import React, {
   useState, useCallback, memo,
 } from 'react';
-import AWS from 'aws-sdk';
-import * as s3ls from 's3-ls';
-import { deleteFile } from 'react-s3';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -33,23 +30,7 @@ const Folder = memo((props) => {
   const handleFolderNameChange = useCallback((e) => {
     e.preventDefault();
     setNewName(e.target.value);
-  }, [dir]);
-
-  const [config, setConfig] = useState({
-    bucketName: 'dcumusicloudbucket',
-    secretAccessKey: 'XVdgFyhjyhnqicDxxXZa9rLouFv5WQdXzXwxrP0u',
-    region: 'eu-west-1',
-  });
-
-  const awsConfig = useCallback(async (directory) => {
-    const res = await generatePresigned('/');
-    if (res.status === 200) {
-      const accessKey = res.data.signed_url.fields.AWSAccessKeyId;
-      config.accessKeyId = accessKey;
-      config.dirName = directory;
-      setConfig(config);
-    }
-  }, [config]);
+  }, []);
 
   const getFolderContents = useCallback(async () => {
     const res = await getFolderContent(dir['folder_id']);
@@ -66,26 +47,6 @@ const Folder = memo((props) => {
       }));
     }
   }, [dir, dispatch]);
-
-  // Used exclusively in deleteFromS3 & should not be modified.
-  const getContents = useCallback(async (directory) => {
-    const res = await generatePresigned('/');
-    if (res.status === 200) {
-      const accessKey = res.data.signed_url.fields.AWSAccessKeyId;
-      AWS.config.update({
-        accessKeyId: accessKey,
-        secretAccessKey: 'XVdgFyhjyhnqicDxxXZa9rLouFv5WQdXzXwxrP0u',
-        region: 'eu-west-1',
-      });
-      const lister = s3ls({
-        bucket: 'dcumusicloudbucket',
-      });
-
-      const { files, folders } = await lister.ls(directory);
-      return { files, folders };
-    }
-    return null;
-  }, []);
 
   const collapse = useCallback(() => {
     setExpanded(false);
@@ -108,29 +69,12 @@ const Folder = memo((props) => {
   }, [collapse, dir, dispatch, expanded, getFolderContents, selected, selectedFolder]);
 
 
-  const deleteFromS3 = useCallback(async (directory, files, dirs) => {
-    await awsConfig(directory);
-    files.forEach((file) => {
-      deleteFile(file.split('/').pop(), config)
-        .then(() => { setFiles([]); })
-        .catch((err) => console.error(err));
-    });
-    dirs.forEach(async (newDirectory) => {
-      await awsConfig(newDirectory);
-      const res = await getContents(newDirectory);
-      await deleteFromS3(newDirectory.substring(0, newDirectory.length - 1),
-        res.files, res.folders);
-      await deleteFromS3(newDirectory.substring(0, newDirectory.length - 1), ['.'], []);
-      setFolders([]);
-    });
-    if (dirs.length === 0) {
-      await awsConfig(directory);
-      deleteFile('.', config)
-        .then(() => { setFiles([]); })
-        .catch((err) => console.error(err));
-      setDeleted(true);
-    }
-  }, [dir, awsConfig, config, getContents]);
+  const deleteFiles = useCallback(async () => {
+    await deleteSampleFolder(dir['folder_id']);
+    setFiles([]);
+    setFolders([]);
+    setDeleted(true);
+  }, [dir]);
 
   const onInputBlur = async (e, key) => {
     if (key === 13) {
@@ -180,7 +124,7 @@ const Folder = memo((props) => {
             <Delete
               style={{ visibility: expanded ? 'visible' : 'hidden' }}
               className={styles.deleteFolder}
-              onClick={(e) => { e.stopPropagation(); deleteFromS3(`${dir.substring(0, dir.length - 1)}`, f, d); }}
+              onClick={(e) => { e.stopPropagation(); deleteFiles(); }}
             />
           </li>
         )
@@ -202,14 +146,11 @@ Folder.propTypes = {
   dispatch: PropTypes.func.isRequired,
   selectedFolder: PropTypes.object.isRequired,
   dir: PropTypes.object.isRequired,
-
 };
 
 
 const mapStateToProps = ({ studio }) => ({
-  fileExplorerHidden: studio.fileExplorerHidden,
   selectedFolder: studio.selectedFolder,
-  studio,
 });
 
 export default withRouter(connect(mapStateToProps)(Folder));
