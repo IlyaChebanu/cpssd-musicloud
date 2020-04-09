@@ -35,10 +35,10 @@ const Folder = memo((props) => {
   const handleFolderNameChange = useCallback(async (e) => {
     e.preventDefault();
     let name = e.target.value;
+    setNewName(name);
     if (!name) {
       name = 'Unnamed Folder';
     }
-    setNewName(name);
     await renameFolder(dir.folder_id, name);
   }, [dir.folder_id]);
 

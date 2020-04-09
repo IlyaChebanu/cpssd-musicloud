@@ -46,11 +46,11 @@ const File = memo((props) => {
   const handleFileNameChange = useCallback(async (e) => {
     e.preventDefault();
     let name = e.target.value;
+    dispatch(setSelectedFile(`${path}/${name}`));
+    setNewName(e.target.value);
     if (!name) {
       name = 'Unnamed File';
     }
-    dispatch(setSelectedFile(`${path}/${name}`));
-    setNewName(e.target.value);
     await renameFile(dir.folder_id, name);
   }, [dir.folder_id, dispatch, path]);
 
