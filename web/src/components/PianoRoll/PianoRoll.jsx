@@ -39,6 +39,8 @@ const MIDI = {
 const PianoRoll = memo(({
   showPianoRoll, selectedSample, dispatch, samples, currentBeat, recording, loopEnabled, loopEnd, ppq,
 }) => {
+  if (!showPianoRoll) return null;
+
   const [tracksRef, setTracksRef] = useState();
   const [scroll, setScroll] = useState(0);
 
@@ -60,7 +62,7 @@ const PianoRoll = memo(({
 
   const isSustainPressed = useRef(false);
   const playingNotes = useRef({});
-  const pressedNotes = useRef({});
+  const [pressedNotes, setPressedNotes] = useState({});
   const { onMidiMessage, onMidiError } = useMidi();
 
   const commitNote = (key, velocity) => {
@@ -94,7 +96,7 @@ const PianoRoll = memo(({
 
       if (!velocity) {
         Object.keys(playingNotes.current).forEach((key) => {
-          if (!pressedNotes.current[key]) {
+          if (!pressedNotes[key]) {
             stopNote(playingNotes.current[key]);
             delete playingNotes.current[key];
           }
@@ -126,7 +128,7 @@ const PianoRoll = memo(({
           selectedSampleObject.url,
         );
         playingNotes.current[key].velocity = velocity / 256;
-        pressedNotes.current[key] = true;
+        setPressedNotes({ ...pressedNotes, [key]: true });
 
         if (recording) {
           playingNotes.current[key].recordingStartTime = currentBeat;
@@ -145,7 +147,9 @@ const PianoRoll = memo(({
 
           delete playingNotes.current[key];
         }
-        delete pressedNotes.current[key];
+        const notes = { ...pressedNotes };
+        delete notes[key];
+        setPressedNotes(notes);
       }
     }
   });
@@ -199,10 +203,11 @@ const PianoRoll = memo(({
     const pianoKeys = [];
     const pianoTracks = [];
     for (let i = 0; i < 88; i += 1) {
+      const isActive = (isMouseDown && hoveredKey === i + 1) || pressedNotes[i];
       if ([0, 2, 3, 5, 7, 8, 10].includes(i % 12)) {
         pianoKeys.push(
           <button
-            className={`${styles.whiteKey} ${isMouseDown && hoveredKey === i + 1 ? styles.active : ''} ${[0, 5, 10].includes(i % 12) ? styles.wide : ''}`}
+            className={`${styles.whiteKey} ${isActive ? styles.active : ''} ${[0, 5, 10].includes(i % 12) ? styles.wide : ''}`}
             key={i}
             onMouseOver={() => setHoveredKey(i + 1)}
           >
@@ -215,7 +220,7 @@ const PianoRoll = memo(({
       } else {
         pianoKeys.push(
           <button
-            className={`${styles.blackKey} ${isMouseDown && hoveredKey === i + 1 ? styles.active : ''}`}
+            className={`${styles.blackKey} ${isActive ? styles.active : ''}`}
             key={i}
             onMouseOver={() => setHoveredKey(i + 1)}
           />,
@@ -224,7 +229,7 @@ const PianoRoll = memo(({
       }
     }
     return { pianoKeys, pianoTracks };
-  }, [hoveredKey, isMouseDown]);
+  }, [hoveredKey, isMouseDown, pressedNotes]);
 
 
   const numTicks = useMemo(() => {
@@ -295,7 +300,6 @@ const PianoRoll = memo(({
     return null;
   }, [selectedSampleObject]);
 
-  if (!showPianoRoll) return null;
   return (
     <div
       className={styles.background}
