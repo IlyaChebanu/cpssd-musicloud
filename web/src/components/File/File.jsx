@@ -68,7 +68,7 @@ const File = memo((props) => {
     deleteFile(file.split('/').pop(), config)
       .then(async () => {
         await deleteSampleFile(dir.file_id);
-        setDeleted(true);
+        await setDeleted(true);
       })
       .catch();
   }, [awsConfig, config, dir]);
