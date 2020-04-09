@@ -211,9 +211,7 @@ const PianoRoll = memo(({
             data-tip="Click and hold to play sound"
             data-place="right"
             className={`${styles.whiteKey} ${isActive ? styles.active : ''} ${[0, 5, 10].includes(i % 12) ? styles.wide : ''}`}
-            data-tip="Click and hold to play sound"
-            data-for="tooltip"
-            data-place="right"
+            data-for='tooltip'
             key={i}
             onMouseOver={() => {
               setHoveredKey(i + 1);
@@ -231,8 +229,6 @@ const PianoRoll = memo(({
             data-tip="Click and hold to play sound"
             data-place="right"
             className={`${styles.blackKey} ${isActive ? styles.active : ''}`}
-            data-tip="Click and hold to play sound"
-            data-place="right"
             data-for="tooltip"
             key={i}
             onMouseOver={() => {

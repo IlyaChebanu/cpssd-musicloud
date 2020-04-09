@@ -2,7 +2,7 @@
 /* eslint-disable no-param-reassign */
 import PropTypes from 'prop-types';
 import React, {
-  useCallback, useMemo, memo, useState, useEffect,
+  useCallback, useMemo, memo, useState, useEffect, useRef,
 } from 'react';
 import cookie from 'js-cookie';
 import { connect } from 'react-redux';
@@ -59,7 +59,7 @@ const Header = memo((props) => {
   const songId = Number(urlParams.get('sid'));
   const [isLogoutShowing, setIsLogoutShowing] = useState(false);
   const [inputSelected, setInputSelected] = useState(false);
-
+  const ref = useRef();
   const cleanSongSampleBuffers = (state) => {
     state.tracks.forEach((track) => {
       if (track.samples !== undefined) {
@@ -298,6 +298,7 @@ const Header = memo((props) => {
   const handleSetName = useCallback(async () => {
     dispatch(setSongName(nameInput));
     setNameInput(nameInput);
+    setInputSelected(false);
     const res = patchSongName(songId, nameInput);
     return res.status === 200;
   }, [dispatch, nameInput, songId]);
@@ -358,9 +359,19 @@ const Header = memo((props) => {
           data-tip={!inputSelected ? 'Change song name' : ''}
           data-place="bottom"
           data-for="tooltip"
+          ref={(r) => { ref.current = r; }}
           type={!studio.songPickerHidden || selected !== 0 ? 'hidden' : 'text'}
           value={nameInput}
           onChange={handleChange}
+          onMouseMove={() => {
+            if (inputSelected) {
+              ReactTooltip.hide(ref.current);
+            }
+          }}
+          onClick={() => {
+            setInputSelected(true);
+            ReactTooltip.hide(ref.current);
+          }}
           onBlur={handleSetName}
           onKeyDown={handleKeyDown}
           onMouseOver={ReactTooltip.rebuild}
