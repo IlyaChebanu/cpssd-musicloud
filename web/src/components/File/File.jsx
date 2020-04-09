@@ -65,10 +65,10 @@ const File = memo((props) => {
 
   const deleteFromS3 = useCallback(async (directory, file) => {
     await awsConfig(directory);
-    deleteFile(file.split('/').pop(), config)
+    await deleteFile(file.split('/').pop(), config)
       .then(async () => {
         await deleteSampleFile(dir.file_id);
-        await setDeleted(true);
+        setDeleted(true);
       })
       .catch();
   }, [awsConfig, config, dir]);
