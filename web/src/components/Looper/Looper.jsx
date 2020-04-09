@@ -84,13 +84,13 @@ const Looper = memo((props) => {
       className={`${styles.wrapper} ${loopEnabled ? styles.loopEnabled : ''}`}
       style={wrapperStyle}
     >
-      <div data-place="right" data-tip="Hold and move to set looper start">
+      <div data-place="right" data-tip="Hold and move to set looper start" data-for="tooltip">
         <Arrow
           className={styles.backArrow}
           onMouseDown={handleDragLArrow}
         />
       </div>
-      <div data-place="right" data-tip="Hold and move to set looper end">
+      <div data-place="right" data-tip="Hold and move to set looper end" data-for="tooltip">
         <Arrow
           className={styles.frontArrow}
           onMouseDown={handleDragRArrow}

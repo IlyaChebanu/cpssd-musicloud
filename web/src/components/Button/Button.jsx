@@ -12,6 +12,7 @@ const Button = memo(({
     type="button"
     data-tip={dataTip}
     data-place="right"
+    data-for="tooltip"
     onClick={onClick}
     onMouseOver={ReactTooltip.rebuild}
   >

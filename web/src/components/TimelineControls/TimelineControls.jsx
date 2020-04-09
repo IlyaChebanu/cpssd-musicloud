@@ -103,14 +103,15 @@ const TimelineControls = memo((props) => {
       <span>
         <input
           data-tip="Set beats per minute"
+          data-for="tooltip"
           data-place="right"
           onClick={() => {
             setInputSelected(true);
-            ReactTooltip.hide(ref.current);
+            ReactTooltip.hide();
           }}
           onMouseMove={() => {
             if (inputSelected) {
-              ReactTooltip.hide(ref.current);
+              ReactTooltip.hide();
             }
           }}
           onBlur={() => { handleSetTempo(); setInputSelected(false); }}
@@ -125,8 +126,9 @@ const TimelineControls = memo((props) => {
       {gridSnapEnabled
         ? (
           <SnapActive
-            onMouseOver={ReactTooltip.rebuild}
+            onMouseOver={() => { ReactTooltip.hide(ref.current); ReactTooltip.rebuild(); }}
             data-tip="Disable snap to grid"
+            data-for="tooltip"
             onClick={handleGridSnapClick}
             className={styles.icon}
           />
@@ -135,24 +137,29 @@ const TimelineControls = memo((props) => {
           <Snap
             onMouseOver={ReactTooltip.rebuild}
             data-tip="Enable snap to grid"
+            data-for="tooltip"
             onClick={handleGridSnapClick}
             className={styles.icon}
           />
         )}
-      <Dropdown onMouseOver={ReactTooltip.rebuild} items={gridDropdownItems} title={<Grid data-tip="Select grid size (beats per grid unit)" />} />
+      <Dropdown onMouseOver={ReactTooltip.rebuild} items={gridDropdownItems} title={<Grid data-for="tooltip" data-tip="Select grid size (beats per grid unit)" />} />
       {loopEnabled
         ? (
           <LoopActive
-            onMouseOver={ReactTooltip.rebuild}
+            ref={ref}
+            onMouseOver={() => { ReactTooltip.hide(ref.current); ReactTooltip.rebuild(); }}
             data-tip="Disable looper"
+            data-for="tooltip"
             onClick={handleLoopClick}
             className={styles.icon}
           />
         )
         : (
           <Loop
-            onMouseOver={ReactTooltip.rebuild}
+            ref={ref}
+            onMouseOver={() => { ReactTooltip.hide(ref.current); ReactTooltip.rebuild(); }}
             data-tip="Enable looper"
+            data-for="tooltip"
             onClick={handleLoopClick}
             className={styles.icon}
           />

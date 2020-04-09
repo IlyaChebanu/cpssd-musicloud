@@ -16,6 +16,7 @@ const Dropdown = memo((props) => {
   }, [setDisplayMenu]);
 
   const hideDropdown = useCallback((e) => {
+    ReactTooltip.hide();
     e.preventDefault();
     setDisplayMenu(false);
   }, [setDisplayMenu]);
@@ -24,6 +25,7 @@ const Dropdown = memo((props) => {
     <li
       style={{ zIndex: 1 }}
       data-tip={item.dataTip}
+      data-for="tooltip"
       data-place="right"
       key={item.name}
       onMouseOver={ReactTooltip.rebuild}

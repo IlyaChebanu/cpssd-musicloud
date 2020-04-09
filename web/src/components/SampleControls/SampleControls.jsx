@@ -58,6 +58,7 @@ const SampleControls = memo((props) => {
           <input
             ref={(r) => { ref.current = r; }}
             data-tip={!inputSelected ? 'Change sample name' : ''}
+            data-for="tooltip"
             data-place="right"
             value={sample.name}
             onClick={() => {

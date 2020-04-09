@@ -129,8 +129,8 @@ const TrackControls = memo((props) => {
         className={`${styles.selectBar} ${selectedTrack === index ? styles.selected : ''}`}
         style={barStyle}
       />
-      <div onMouseOver={ReactTooltip.rebuild} className={`${styles.wrapper} ${props.index % 2 ? styles.even : ''}`}>
-        <div data-place="right" data-tip="Delete track">
+      <div role="none" onMouseDown={ReactTooltip.rebuild} className={`${styles.wrapper} ${props.index % 2 ? styles.even : ''}`}>
+        <div data-place="right" data-tip="Delete track" data-for="tooltip" onMouseOver={ReactTooltip.rebuild}>
           <Delete onClick={openModal} className={styles.deleteTrack} />
         </div>
         <div
@@ -139,6 +139,8 @@ const TrackControls = memo((props) => {
           <input
             data-place="right"
             data-tip={!inputSelected ? 'Rename track' : ''}
+            data-for="tooltip"
+            onMouseOver={ReactTooltip.rebuild}
             ref={(r) => { ref.current = r; }}
             onClick={() => {
               setInputSelected(true);
@@ -180,13 +182,13 @@ const TrackControls = memo((props) => {
             onChange={handleSetTrackReverb}
             name="Reverb"
           />
-          <span data-place="right" data-tip={track.mute ? 'Unmute track' : 'Mute track'}>
+          <span data-place="right" data-tip={track.mute ? 'Unmute track' : 'Mute track'} data-for="tooltip" onMouseOver={ReactTooltip.rebuild}>
             {track.mute || (soloTrack && soloTrack.id !== track.id)
               ? <MuteActive onClick={handleTrackMute} />
               : <Mute onClick={handleTrackMute} />}
             <p>Mute</p>
           </span>
-          <span data-place="right" data-tip={track.solo ? 'Unsolo track' : 'Solo track'}>
+          <span data-place="right" data-tip={track.solo ? 'Unsolo track' : 'Solo track'} data-for="tooltip" onMouseOver={ReactTooltip.rebuild}>
             {track.solo
               ? <SoloActive onClick={handleTrackSolo} />
               : <Solo onClick={handleTrackSolo} />}

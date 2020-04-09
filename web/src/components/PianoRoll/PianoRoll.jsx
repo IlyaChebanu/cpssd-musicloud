@@ -212,9 +212,12 @@ const PianoRoll = memo(({
             data-place="right"
             className={`${styles.whiteKey} ${isActive ? styles.active : ''} ${[0, 5, 10].includes(i % 12) ? styles.wide : ''}`}
             data-tip="Click and hold to play sound"
+            data-for="tooltip"
             data-place="right"
             key={i}
+            onClick={() => ReactTooltip.hide()}
             onMouseOver={() => {
+              ReactTooltip.rebuild();
               setHoveredKey(i + 1);
             }}
           >
@@ -232,8 +235,11 @@ const PianoRoll = memo(({
             className={`${styles.blackKey} ${isActive ? styles.active : ''}`}
             data-tip="Click and hold to play sound"
             data-place="right"
+            data-for="tooltip"
+            onClick={() => ReactTooltip.hide()}
             key={i}
             onMouseOver={() => {
+              ReactTooltip.rebuild();
               setHoveredKey(i + 1);
             }}
           />,

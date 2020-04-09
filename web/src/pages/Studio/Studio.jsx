@@ -213,7 +213,7 @@ const Studio = memo((props) => {
           <PublishForm />
         </div>
         <SongPicker songs={[]} />
-        <ReactTooltip className={styles.tooltip} delayShow={500} />
+        <ReactTooltip id="tooltip" className={styles.tooltip} delayShow={500} />
       </div>
     </GlobalHotKeys>
   );

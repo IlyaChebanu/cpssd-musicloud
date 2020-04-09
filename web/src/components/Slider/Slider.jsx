@@ -43,6 +43,7 @@ const Slider = memo((props) => {
         data-place="right"
         data-delay-show={0}
         data-tip={`${Math.floor(volume * 100)}% global volume`}
+        data-for="tooltip"
         style={iconStyle}
         onMouseDown={handleDragStart}
         ref={(r) => { ref.current = r; }}

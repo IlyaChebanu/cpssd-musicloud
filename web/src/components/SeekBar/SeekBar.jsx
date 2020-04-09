@@ -74,6 +74,7 @@ const SeekBar = memo((props) => {
       <SeekBarSvg
         ref={(r) => { ref.current = r; }}
         data-tip={!draggingSeekBar ? dataTip : ''}
+        data-for="tooltip"
         data-place="right"
         style={iconStyle}
         onMouseDown={handleDragStart}

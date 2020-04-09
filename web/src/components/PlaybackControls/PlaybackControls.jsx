@@ -146,6 +146,7 @@ const PlaybackControls = memo((props) => {
         <div
           data-place="left"
           data-tip={fileExplorerHidden ? 'Open file explorer' : 'Close file explorer'}
+          data-for="tooltip"
         >
           { fileExplorerHidden
             ? (

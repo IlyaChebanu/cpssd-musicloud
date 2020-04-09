@@ -271,6 +271,7 @@ const Sample = memo((props) => {
             <EditIcon
               onMouseOver={ReactTooltip.rebuild}
               data-tip="Edit sample name and add effects"
+              data-for="tooltip"
               data-place="right"
               onClick={handleShowHideSampleEffects}
             />
@@ -278,6 +279,7 @@ const Sample = memo((props) => {
               onMouseOver={ReactTooltip.rebuild}
               data-tip="Edit in a piano roll"
               data-place="right"
+              data-for="tooltip"
               onClick={handleTogglePiano}
             />
           </div>
