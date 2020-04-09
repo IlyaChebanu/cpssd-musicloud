@@ -1,5 +1,5 @@
 import React, {
-  useState, useCallback, memo, useRef,
+  useState, useCallback, memo,
 } from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
@@ -9,7 +9,7 @@ import {
   setSelectedFile,
   addSample as addSampleAction,
 } from '../../actions/studioActions';
-import { generatePresigned } from '../../helpers/api';
+import { generatePresigned, deleteSampleFile, renameFile } from '../../helpers/api';
 import { ReactComponent as SampleIcon } from '../../assets/icons/music_note-24px.svg';
 import styles from './File.module.scss';
 import { ReactComponent as Delete } from '../../assets/icons/delete_outline-24px.svg';
@@ -17,15 +17,16 @@ import { showNotification } from '../../actions/notificationsActions';
 
 const File = memo((props) => {
   const {
-    dir, selectedFile, dispatch, studio, selectedTrack,
+    dir, level, selectedFile, dispatch, studio, selectedTrack,
   } = props;
   const [deleted, setDeleted] = useState(false);
-  const level = dir.split('/').length - 2;
-  const extension = dir.split('/').pop().split('.').length === 0 ? '' : dir.split('/').pop().split('.').pop();
-  const oldName = useRef(dir.split('/').pop().split('.')[0]);
+  const { url } = dir;
+  const urlArray = url.split('.');
+  const extension = urlArray[urlArray.length - 1];
+  const oldName = { current: dir.name };
   const [newName, setNewName] = useState(oldName.current);
-  const path = dir.split('/').slice(0, dir.split('/').length - 1).join('/');
-  const url = 'https://dcumusicloudbucket.s3-eu-west-1.amazonaws.com/';
+  const pathDir = urlArray[3].split('/');
+  const path = pathDir[1] + pathDir[2];
   const [config, setConfig] = useState({
     bucketName: 'dcumusicloudbucket',
     secretAccessKey: 'XVdgFyhjyhnqicDxxXZa9rLouFv5WQdXzXwxrP0u',
@@ -42,47 +43,40 @@ const File = memo((props) => {
     }
   }, [config]);
 
-  const handleFileNameChange = useCallback((e) => {
+  const handleFileNameChange = useCallback(async (e) => {
     e.preventDefault();
-    dispatch(setSelectedFile(`${path}/${e.target.value}`));
+    let name = e.target.value;
+    dispatch(setSelectedFile(`${path}/${name}`));
     setNewName(e.target.value);
-  }, [dispatch, path]);
+    if (!name) {
+      name = 'Unnamed File';
+    }
+    await renameFile(dir.folder_id, name);
+  }, [dir.folder_id, dispatch, path]);
 
   const fileClick = useCallback(() => {
-    if (selectedFile === `${path}/${newName}`) {
+    if (selectedFile === dir) {
       dispatch(setSelectedFile(''));
     } else {
-      dispatch(setSelectedFile(`${path}/${newName}`));
+      dispatch(setSelectedFile(dir));
     }
-    // setSelectedFolder(`${path}`);
-  }, [dispatch, newName, path, selectedFile]);
+  }, [dir, dispatch, selectedFile]);
 
 
   const deleteFromS3 = useCallback(async (directory, file) => {
     await awsConfig(directory);
-    deleteFile(file.split('/').pop(), config)
-      .then(() => { setDeleted(true); })
+    await deleteFile(file.split('/').pop(), config)
+      .then(async () => {
+        await deleteSampleFile(dir.file_id);
+        setDeleted(true);
+      })
       .catch();
-  }, [awsConfig, config]);
+  }, [awsConfig, config, dir]);
 
-
-  // const uploadToS3 = useCallback(async (oldFileName, newFileName) => {
-  //   await awsConfig(path);
-  //   await deleteFromS3(path, extension === '' ? oldFileName : `${oldFileName}.${extension}`);
-  //   uploadFile(newFileName, config)
-  //     .then()
-  //     .catch();
-  // }, [awsConfig, config, deleteFromS3, extension, path]);
-
-  const onInputBlur = async (e, key) => {
-    if (key === 13) {
-      // uploadToS3(oldName.current, newName);
-      oldName.current = newName;
-      setNewName(e.target.value);
-      e.target.blur();
-    } else {
-      setNewName(oldName.current);
-    }
+  const onInputBlur = async (e) => {
+    oldName.current = newName;
+    setNewName(e.target.value);
+    e.target.blur();
   };
 
   const addSample = useCallback(
@@ -107,7 +101,7 @@ const File = memo((props) => {
         return;
       }
       const sampleState = {
-        url: url + name,
+        url: dir.url,
         name,
         time: studio.currentBeat,
         fade: {
@@ -117,7 +111,7 @@ const File = memo((props) => {
       };
       dispatch(addSampleAction(studio.selectedTrack, sampleState));
     },
-    [dispatch, selectedTrack, studio.currentBeat, studio.selectedTrack, studio.tracks.length],
+    [dir, dispatch, selectedTrack, studio.currentBeat, studio.selectedTrack, studio.tracks.length],
   );
 
 
@@ -132,15 +126,16 @@ const File = memo((props) => {
               addSample(extension === '' ? `${path}/${oldName.current}` : `${path}/${oldName.current}.${extension}`);
               e.preventDefault(); fileClick();
             }}
-            className={selectedFile === `${path}/${newName}` ? styles.selected : ''}
+            className={selectedFile === dir ? styles.selected : ''}
+            key={dir.file_id}
           >
             <SampleIcon style={{ paddingRight: '4px', fill: 'white' }} />
             <form onSubmit={(e) => { e.preventDefault(); }}>
               <input
-                onBlur={(e) => { onInputBlur(e, -1); }}
+                onBlur={(e) => { onInputBlur(e); }}
                 onKeyDown={(e) => {
                   if (e.keyCode === 13) {
-                    onInputBlur(e, e.keyCode);
+                    onInputBlur(e);
                   }
                   // Skip dot, comma, slash, backslash
                   if (e.keyCode === 190 || e.keyCode === 191
@@ -148,16 +143,16 @@ const File = memo((props) => {
                     e.preventDefault();
                   }
                 }}
-                style={{ cursor: selectedFile !== `${path}/${newName}` ? 'pointer' : '' }}
+                style={{ cursor: selectedFile !== dir ? 'pointer' : '' }}
                 onChange={handleFileNameChange}
                 value={newName}
-                onClick={(e) => { if (selectedFile === `${path}/${newName}`) { e.stopPropagation(); } }}
-                disabled={!selectedFile === `${path}/${newName}`}
+                onClick={(e) => { if (selectedFile === dir) { e.stopPropagation(); } }}
+                disabled={!selectedFile === dir}
               />
             </form>
 
             <Delete
-              style={{ visibility: selectedFile === `${path}/${newName}` ? 'visible' : 'hidden' }}
+              style={{ visibility: selectedFile === dir ? 'visible' : 'hidden' }}
               className={styles.deleteFile}
               onClick={(e) => { e.stopPropagation(); deleteFromS3(path, extension === '' ? newName : `${newName}.${extension}`); }}
             />
@@ -171,17 +166,17 @@ const File = memo((props) => {
 
 File.propTypes = {
   studio: PropTypes.object.isRequired,
-  dir: PropTypes.string.isRequired,
-  selectedFile: PropTypes.string.isRequired,
+  dir: PropTypes.object.isRequired,
+  selectedFile: PropTypes.object.isRequired,
   dispatch: PropTypes.func.isRequired,
-  selectedTrack: PropTypes.string.isRequired,
+  selectedTrack: PropTypes.number.isRequired,
+  level: PropTypes.number.isRequired,
 };
 
 const mapStateToProps = ({ studio }) => ({
   selectedTrack: studio.selectedTrack,
   selectedFile: studio.selectedFile,
   studio,
-
 });
 
 export default withRouter(connect(mapStateToProps)(File));

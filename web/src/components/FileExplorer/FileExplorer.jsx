@@ -4,18 +4,13 @@ import React, {
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import AWS from 'aws-sdk';
-import * as s3ls from 's3-ls';
 import styles from './FileExplorer.module.scss';
 import samplesIcon from '../../assets/icons/samples.svg';
 import instrumentsIcon from '../../assets/icons/instruments.svg';
-import { ReactComponent as NewFolder } from '../../assets/icons/newFolder.svg';
-import { generatePresigned } from '../../helpers/api';
-import store from '../../store';
+import { ReactComponent as Create } from '../../assets/icons/newFolder.svg';
+import { getRootFolderContents, createRootSampleFolder } from '../../helpers/api';
 import FolderContents from '../FolderContents/FolderContents';
-import {
-  hideFileExplorer,
-} from '../../actions/studioActions';
+import { hideFileExplorer } from '../../actions/studioActions';
 import { showNotification } from '../../actions/notificationsActions';
 
 
@@ -27,29 +22,17 @@ const FileExplorer = memo((props) => {
   const [sampleTreeSelected, setSampleTreeSelected] = useState(false);
   const node = useRef();
   const getFiles = useCallback(async () => {
-    const res = await generatePresigned('/');
+    const res = await getRootFolderContents();
     if (res.status === 200) {
-      const accessKey = res.data.signed_url.fields.AWSAccessKeyId;
-      AWS.config.update({
-        accessKeyId: accessKey,
-        secretAccessKey: 'XVdgFyhjyhnqicDxxXZa9rLouFv5WQdXzXwxrP0u',
-        region: 'eu-west-1',
-      });
-
-      setSampleTreeSelected(true);
-      const { user } = store.getState();
-      const lister = s3ls({
-        bucket: 'dcumusicloudbucket',
-      });
-      const { files, folders } = await lister.ls(`/audio/${user.username}`);
-      const moreFolders = folders.filter((folder) => folder.split('/').slice(folder.split('/').length - 2, folder.split('/').length - 1).pop() !== '');
+      const files = res.data.folder.child_files;
+      const folders = res.data.folder.child_folders;
       setFileList(files);
-      setFolderList(moreFolders);
+      setFolderList(folders);
+      setSampleTreeSelected(true);
       return;
     }
     dispatch(showNotification({
       message: res,
-
     }));
   }, [dispatch]);
 
@@ -59,6 +42,26 @@ const FileExplorer = memo((props) => {
     setFolderList([]);
   }, []);
 
+  const createFile = useCallback(async () => {
+    let res = await createRootSampleFolder('New Folder');
+    if (res.status === 200) {
+      res = await getRootFolderContents();
+      if (res.status === 200) {
+        const files = res.data.folder.child_files;
+        const folders = res.data.folder.child_folders;
+        setFileList(files);
+        setFolderList(folders);
+      } else {
+        dispatch(showNotification({
+          message: 'An unknown file explorer error has occurred.',
+        }));
+      }
+    } else {
+      dispatch(showNotification({
+        message: 'An unknown file explorer error has occurred.',
+      }));
+    }
+  }, [dispatch]);
 
   const instruments = [
     { name: 'Instruments', action: null, icon: instrumentsIcon },
@@ -122,7 +125,6 @@ const FileExplorer = memo((props) => {
           key="Samples"
           onClick={sampleTreeSelected ? collapseSampleTree : getFiles}
           className={sampleTreeSelected ? styles.selected : ''}
-
         >
           {samplesIcon && (
           <img
@@ -133,8 +135,14 @@ const FileExplorer = memo((props) => {
           )}
           <p>Samples</p>
           { sampleTreeSelected
-            ? <NewFolder className={styles.newFolder} />
-            : null }
+            ? (
+              <Create
+                style={{ visibility: sampleTreeSelected ? 'visible' : 'hidden' }}
+                className={styles.newFolder}
+                onClick={(e) => { e.stopPropagation(); createFile(); }}
+              />
+            )
+            : null}
 
         </li>
         <FolderContents

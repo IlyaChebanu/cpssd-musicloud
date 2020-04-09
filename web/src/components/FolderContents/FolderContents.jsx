@@ -7,15 +7,16 @@ import File from '../File/File';
 import Folder from '../Folder/Folder';
 
 const FolderContents = (folder) => {
-  const { files, folders } = folder;
+  const { files, folders, level } = folder;
   return (
     <div>
       {folders.map((item) => (
-        <Folder dir={item} />
+        <Folder dir={item} level={level} />
       ))}
       {files.map((file) => (
         <File
           dir={file}
+          level={level}
         />
       ))}
     </div>
