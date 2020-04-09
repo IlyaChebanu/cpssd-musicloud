@@ -3956,37 +3956,40 @@ paths:
           schema:
             type: "object"
             properties:
-              folder_name:
-                type: "string"
-                example: "Example Folder Name"
-              folder_id:
-                type: "integer"
-                example: 1
-              child_folders:
-                type: "array"
-                items:
-                  type: "object"
-                  properties:
-                    folder_id:
-                      type: "integer"
-                      example: 1
-                    name:
-                      type: "string"
-                      example: "A Subfolder"
-              child_files:
-                type: "array"
-                items:
-                  type: "object"
-                  properties:
-                    file_id:
-                      type: "integer"
-                      example: 1
-                    name:
-                      type: "string"
-                      example: "A Song"
-                    url:
-                      type: "string"
-                      example: "http://afakeurl.com"
+              folder:
+                type: "object"
+                properties:
+                  folder_name:
+                    type: "string"
+                    example: "Example Folder Name"
+                  folder_id:
+                    type: "integer"
+                    example: 1
+                  child_folders:
+                    type: "array"
+                    items:
+                      type: "object"
+                      properties:
+                        folder_id:
+                          type: "integer"
+                          example: 1
+                        name:
+                          type: "string"
+                          example: "A Subfolder"
+                  child_files:
+                    type: "array"
+                    items:
+                      type: "object"
+                      properties:
+                        file_id:
+                          type: "integer"
+                          example: 1
+                        name:
+                          type: "string"
+                          example: "A Song"
+                        url:
+                          type: "string"
+                          example: "http://afakeurl.com"
         400:
           description: "Invalid folder ID"
           schema:
@@ -4217,8 +4220,8 @@ paths:
     patch:
       tags:
       - "audio"
-      summary: "Move a file."
-      description: "This endpoint takes two arguments and moves a file in the DB. The arguments that are to be provided are as follows:\n\n \"folder_id\" = The ID of the folder you want to move your file into.\n\n \"file_id\" = The ID of the file you want to move to your selected folder."
+      summary: "Move or rename a file."
+      description: "This endpoint takes multiple arguments and either renames or moves a file in the DB. The arguments that are to be provided are as follows:\n\n \"folder_id\" = The ID of the folder you want to move your file into.\n\n \"file_id\" = The ID of the file you want to move to your selected folder or rename.\n\n \"name\" = The new name for the file. If this argument is provided then a rename will occur provided the file_id has been sent. Otherwise a move will occur provided both the file & folder IDs were sent."
       consumes:
       - "application/json"
       produces:
@@ -4232,16 +4235,21 @@ paths:
       - in: "query"
         name: "folder_id"
         type: "integer"
-        required: true
+        required: false
         description: "The ID of the folder you want to move a file into."
       - in: "query"
         name: "file_id"
         type: "integer"
         required: true
         description: "The ID of the file you want to move."
+      - in: "query"
+        name: "name"
+        type: "string"
+        required: false
+        description: "The new name you want to give your file."
       responses:
         200:
-          description: "File moved"
+          description: "File moved or renamed"
           schema:
             type: "object"
             properties:

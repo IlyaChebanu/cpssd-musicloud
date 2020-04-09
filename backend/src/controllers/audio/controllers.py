@@ -36,7 +36,7 @@ from ...models.audio import (
     create_folder_entry, add_sample, get_folder_entry, delete_folder_entry,
     get_root_folder_entry, delete_file_entry, move_folder_entry,
     move_file_entry, get_child_folders, get_child_files, add_synth, get_synth,
-    update_synth, get_all_synths, delete_synth_entry
+    update_synth, get_all_synths, delete_synth_entry, rename_file_entry
 )
 from ...models.users import get_user_via_username
 from ...models.errors import NoResults
@@ -1651,19 +1651,25 @@ def move_folder():  # pylint: disable=R0911
 @auth_required()
 def move_file():  # pylint: disable=R0911
     """
-    Endpoint for moving a file in the DB.
+    Endpoint for moving a file in the DB or renaming it.
     """
-    folder_id = request.args.get('folder_id')
-    if not folder_id:
-        return {"message": "No folder_id sent"}, 422
+    if not request.args.get('name'):
+        folder_id = request.args.get('folder_id')
+        if not folder_id:
+            return {"message": "No folder_id sent"}, 422
 
+        file_id = request.args.get('file_id')
+        if not file_id:
+            return {"message": "No file_id sent"}, 422
+
+        move_file_entry(folder_id, file_id)
+        return {"message": "File moved"}, 200
     file_id = request.args.get('file_id')
     if not file_id:
         return {"message": "No file_id sent"}, 422
 
-    move_file_entry(folder_id, file_id)
-    return {"message": "File moved"}, 200
-
+    rename_file_entry(request.args.get('name'), file_id)
+    return {"message": "File renamed"}, 200
 
 @AUDIO.route("/folders", methods=["GET"])
 @sql_err_catcher()
