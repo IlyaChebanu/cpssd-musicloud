@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { GlobalHotKeys } from 'react-hotkeys';
+import ReactTooltip from 'react-tooltip';
 import styles from './PlaybackControls.module.scss';
 import { ReactComponent as Play } from '../../assets/icons/play-circle-light.svg';
 import { ReactComponent as Pause } from '../../assets/icons/pause-circle-light.svg';
@@ -21,7 +22,6 @@ import {
   stopRecording,
   startRecording,
 } from '../../actions/studioActions';
-import ReactTooltip from 'react-tooltip';
 
 const PlaybackControls = memo((props) => {
   const {
@@ -52,7 +52,6 @@ const PlaybackControls = memo((props) => {
       dispatch(startRecording());
     }
     ReactTooltip.hide();
-    
   }, [dispatch, recording]);
 
   const toStart = useCallback((e) => {

@@ -150,6 +150,7 @@ const PianoNote = memo(({
       onClick={() => ReactTooltip.hide()}
     >
       <div
+        ref={resizeRef}
         onMouseOver={(e) => { e.stopPropagation(); ReactTooltip.hide(); }}
         onMouseMove={(e) => { e.stopPropagation(); ReactTooltip.rebuild(); }}
         data-tip="Hold and move to resize note"
