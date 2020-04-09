@@ -36,7 +36,8 @@ from ...models.audio import (
     create_folder_entry, add_sample, get_folder_entry, delete_folder_entry,
     get_root_folder_entry, delete_file_entry, move_folder_entry,
     move_file_entry, get_child_folders, get_child_files, add_synth, get_synth,
-    update_synth, get_all_synths, delete_synth_entry, rename_file_entry
+    update_synth, get_all_synths, delete_synth_entry, rename_file_entry,
+    rename_folder_entry
 )
 from ...models.users import get_user_via_username
 from ...models.errors import NoResults
@@ -1630,21 +1631,26 @@ def move_folder():  # pylint: disable=R0911
     """
     Endpoint for moving a folder in the DB.
     """
+    if not request.args.get('name'):
+        folder_id = request.args.get('folder_id')
+        if not folder_id:
+            return {"message": "No folder_id sent"}, 422
+
+        parent_folder_id = request.args.get('parent_folder_id')
+        if not parent_folder_id:
+            return {"message": "No parent_folder_id sent"}, 422
+
+        try:
+            get_root_folder_entry(folder_id)
+            return {"message": "You can't move a root folder"}, 401
+        except NoResults:
+            move_folder_entry(folder_id, parent_folder_id)
+            return {"message": "Folder moved"}, 200
     folder_id = request.args.get('folder_id')
     if not folder_id:
         return {"message": "No folder_id sent"}, 422
-
-    parent_folder_id = request.args.get('parent_folder_id')
-    if not parent_folder_id:
-        return {"message": "No parent_folder_id sent"}, 422
-
-    try:
-        get_root_folder_entry(folder_id)
-        return {"message": "You can't move a root folder"}, 401
-    except NoResults:
-        move_folder_entry(folder_id, parent_folder_id)
-        return {"message": "Folder moved"}, 200
-
+    rename_folder_entry(folder_id, request.args.get('name'))
+    return {"message": "Folder renamed"}, 200
 
 @AUDIO.route("/files", methods=["PATCH"])
 @sql_err_catcher()
