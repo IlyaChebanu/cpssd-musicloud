@@ -211,7 +211,6 @@ const Folder = memo((props) => {
 });
 
 Folder.propTypes = {
-
   dispatch: PropTypes.func.isRequired,
   selectedFolder: PropTypes.string.isRequired,
   dir: PropTypes.string.isRequired,

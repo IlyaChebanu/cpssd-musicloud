@@ -4,8 +4,6 @@ import React, {
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import AWS from 'aws-sdk';
-import * as s3ls from 's3-ls';
 import styles from './FileExplorer.module.scss';
 import samplesIcon from '../../assets/icons/samples.svg';
 import instrumentsIcon from '../../assets/icons/instruments.svg';

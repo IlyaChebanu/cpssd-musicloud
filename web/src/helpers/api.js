@@ -343,8 +343,9 @@ export const deleteSampleFile = (fileId) => axios.delete(
   },
 );
 
-export const deleteSampleFile = (fileId) => axios.delete(
-  `${API_URL}/v1/audio/files?file_id=${fileId}`,
+export const renameFile = (fileId, name) => axios.patch(
+  `${API_URL}/v1/audio/files?file_id=${fileId}&name=${name}`,
+  {},
   {
       headers: getAuth(),
   },

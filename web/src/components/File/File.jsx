@@ -9,7 +9,7 @@ import {
   setSelectedFile,
   addSample as addSampleAction,
 } from '../../actions/studioActions';
-import { generatePresigned, deleteSampleFile } from '../../helpers/api';
+import { generatePresigned, deleteSampleFile, renameFile } from '../../helpers/api';
 import { ReactComponent as SampleIcon } from '../../assets/icons/music_note-24px.svg';
 import styles from './File.module.scss';
 import { ReactComponent as Delete } from '../../assets/icons/delete_outline-24px.svg';
@@ -21,11 +21,12 @@ const File = memo((props) => {
   } = props;
   const [deleted, setDeleted] = useState(false);
   const url = dir['url'];
-  const extension = url.split('.')[url.length()-1];
+  const urlArray = url.split('.')
+  const extension = urlArray[urlArray.length-1];
   const oldName = {current: dir['name']};
   const [newName, setNewName] = useState(oldName.current);
-  const path = dir.split('/').slice(0, dir.split('/').length - 1).join('/');
-  const baseUrl = 'https://dcumusicloudbucket.s3-eu-west-1.amazonaws.com/';
+  let pathDir = urlArray[3].split('/');
+  const path = pathDir[1] + pathDir[2];
   const [config, setConfig] = useState({
     bucketName: 'dcumusicloudbucket',
     secretAccessKey: 'XVdgFyhjyhnqicDxxXZa9rLouFv5WQdXzXwxrP0u',
@@ -72,6 +73,7 @@ const File = memo((props) => {
       oldName.current = newName;
       setNewName(e.target.value);
       e.target.blur();
+      await renameFile(dir['file_id'], newName);
     } else {
       setNewName(oldName.current);
     }
@@ -99,7 +101,7 @@ const File = memo((props) => {
         return;
       }
       const sampleState = {
-        url: baseUrl + name,
+        url: dir['url'],
         name,
         time: studio.currentBeat,
         fade: {
@@ -109,7 +111,7 @@ const File = memo((props) => {
       };
       dispatch(addSampleAction(studio.selectedTrack, sampleState));
     },
-    [dispatch, selectedTrack, studio.currentBeat, studio.selectedTrack, studio.tracks.length],
+    [dir, dispatch, selectedTrack, studio.currentBeat, studio.selectedTrack, studio.tracks.length],
   );
 
 
@@ -125,6 +127,7 @@ const File = memo((props) => {
               e.preventDefault(); fileClick();
             }}
             className={selectedFile === `${path}/${newName}` ? styles.selected : ''}
+            key={dir['file_id']}
           >
             <SampleIcon style={{ paddingRight: '4px', fill: 'white' }} />
             <form onSubmit={(e) => { e.preventDefault(); }}>
@@ -163,17 +166,16 @@ const File = memo((props) => {
 
 File.propTypes = {
   studio: PropTypes.object.isRequired,
-  dir: PropTypes.string.isRequired,
+  dir: PropTypes.object.isRequired,
   selectedFile: PropTypes.string.isRequired,
   dispatch: PropTypes.func.isRequired,
-  selectedTrack: PropTypes.string.isRequired,
+  selectedTrack: PropTypes.number.isRequired,
 };
 
 const mapStateToProps = ({ studio }) => ({
   selectedTrack: studio.selectedTrack,
   selectedFile: studio.selectedFile,
   studio,
-
 });
 
 export default withRouter(connect(mapStateToProps)(File));
