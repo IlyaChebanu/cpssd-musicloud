@@ -77,7 +77,7 @@ const SampleControls = memo((props) => {
         </span>
         <div className={styles.buttons}>
           <Knob dataTip="Hold and move up or down to gradually increase sound from silence at the beginning" value={sample.fade.fadeIn} onChange={handleFadeIn} name="Fade in" />
-          <Knob dataTip="Hold and move up or down to radually reduce sound to silence at its end" value={sample.fade.fadeOut} onChange={handleFadeOut} name="Fade out" />
+          <Knob dataTip="Hold and move up or down to gradually reduce sound to silence at its end" value={sample.fade.fadeOut} onChange={handleFadeOut} name="Fade out" />
         </div>
       </span>
     </div>

@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/mouse-events-have-key-events */
 /* eslint-disable no-shadow */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable react/no-array-index-key */
@@ -8,6 +9,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 import Tone from 'tone';
+import ReactTooltip from 'react-tooltip';
 import styles from './PianoNote.module.scss';
 import {
   colours,
@@ -55,6 +57,7 @@ const PianoNote = memo(({
   move.onDragging(({
     oldX, oldY, x, y,
   }) => {
+    ReactTooltip.hide();
     const newStartTime = dragStartData.tick + (x - oldX) / gridSizePx;
     const numDecimalPlaces = Math.max(0, String(1 / gridSize).length - 2);
     let tick = gridSnapEnabled
@@ -83,6 +86,7 @@ const PianoNote = memo(({
   resize.onDragging(({
     oldX, x,
   }) => {
+    ReactTooltip.hide();
     const newDuration = dragStartData.duration + (x - oldX) / gridSizePx;
     const numDecimalPlaces = Math.max(0, String(1 / gridSize).length - 2);
     let duration = gridSnapEnabled
@@ -139,10 +143,18 @@ const PianoNote = memo(({
       style={wrapperStyle}
       ref={noteRef}
       onContextMenu={handleDelete}
+      data-tip="Left click to play, right click to delete"
+      data-for="tooltip"
+      onMouseOver={() => { ReactTooltip.rebuild(); ReactTooltip.hide(); }}
+      onMouseMove={ReactTooltip.rebuild}
+      onClick={() => ReactTooltip.hide()}
     >
       <div
+        onMouseOver={(e) => { e.stopPropagation(); ReactTooltip.hide(); }}
+        onMouseMove={(e) => { e.stopPropagation(); ReactTooltip.rebuild(); }}
+        data-tip="Hold and move to resize note"
+        data-for="tooltip"
         className={styles.resizeHandle}
-        ref={resizeRef}
       />
     </div>
   );

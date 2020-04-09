@@ -159,7 +159,7 @@ const TrackControls = memo((props) => {
         </div>
         <div className={styles.buttons}>
           <Knob
-            dataTip="Hold and move up or down to adjust volume"
+            dataTip="Hold and move up or down to adjust the volume"
             min={0}
             max={1}
             value={track.volume}
@@ -167,7 +167,7 @@ const TrackControls = memo((props) => {
             name="Vol"
           />
           <Knob
-            dataTip="Hold and move up or down to make sound more prominent on one side or another"
+            dataTip="Hold and move up or down to make the sound more prominent on one side or another"
             min={-1}
             max={1}
             value={track.pan}

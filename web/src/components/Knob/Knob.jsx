@@ -1,5 +1,5 @@
 import React, {
-  memo, useRef, useState, useMemo, useEffect, useCallback,
+  memo, useRef, useState, useMemo, useEffect,
 } from 'react';
 import PropTypes from 'prop-types';
 import { useGlobalEvent, useMouseEvents } from 'beautiful-react-hooks';

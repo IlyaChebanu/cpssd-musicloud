@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/mouse-events-have-key-events */
 /* eslint-disable no-param-reassign */
 import PropTypes from 'prop-types';
 import React, {
@@ -57,6 +58,8 @@ const Header = memo((props) => {
   const urlParams = new URLSearchParams(window.location.search);
   const songId = Number(urlParams.get('sid'));
   const [isLogoutShowing, setIsLogoutShowing] = useState(false);
+  const [inputSelected, setInputSelected] = useState(false);
+
   const cleanSongSampleBuffers = (state) => {
     state.tracks.forEach((track) => {
       if (track.samples !== undefined) {
@@ -238,16 +241,16 @@ const Header = memo((props) => {
         name: 'Open', action: handleShowSongPicker, icon: openIcon, dataTip: 'Open an existing song',
       },
       {
-        name: 'Publish', action: handlePublishSong, icon: publishIcon, dataTip: 'Publish song for everybody to see',
+        name: 'Publish', action: handlePublishSong, icon: publishIcon, dataTip: 'Publish the current song for everybody to see',
       },
       {
-        name: 'Import', icon: importIcon, action: handleSampleImport, dataTip: 'Import audio sample from device',
+        name: 'Import', icon: importIcon, action: handleSampleImport, dataTip: 'Import and audio sample from this device',
       },
       {
-        name: 'Add Synth', icon: importIcon, action: handleAddSynth, dataTip: 'Add basic synthesizer to use with a piano roll',
+        name: 'Add Synth', icon: importIcon, action: handleAddSynth, dataTip: 'Add a basic synthesizer to use with the piano roll',
       },
       {
-        name: 'Export', icon: exportIcon, action: exportAction, dataTip: 'Export song as a single compiled audio',
+        name: 'Export', icon: exportIcon, action: exportAction, dataTip: 'Export the current song as a single compiled audio',
       },
     ],
     [
@@ -352,11 +355,15 @@ const Header = memo((props) => {
       </span>
       <span className={styles.songName}>
         <input
+          data-tip={!inputSelected ? 'Change song name' : ''}
+          data-place="bottom"
+          data-for="tooltip"
           type={!studio.songPickerHidden || selected !== 0 ? 'hidden' : 'text'}
           value={nameInput}
           onChange={handleChange}
           onBlur={handleSetName}
           onKeyDown={handleKeyDown}
+          onMouseOver={ReactTooltip.rebuild}
         />
       </span>
       <span className={styles.nav}>

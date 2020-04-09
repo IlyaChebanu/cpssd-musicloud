@@ -65,7 +65,7 @@ const PianoRoll = memo(({
   const playingNotes = useRef({});
   const [pressedNotes, setPressedNotes] = useState({});
   const { onMidiMessage, onMidiError } = useMidi();
-
+  const ref = useRef();
   const commitNote = (key, velocity) => {
     const { recordingStartTime } = playingNotes.current[key];
 
@@ -164,12 +164,12 @@ const PianoRoll = memo(({
   const playingNote = useRef();
   const [hoveredKey, setHoveredKey] = useState();
   const [isMouseDown, setIsMouseDown] = useState(false);
-
   const { onMouseDown } = useMouseEvents(keysRef);
   const onMouseUp = useGlobalEvent('mouseup');
 
   onMouseDown((e) => {
     e.stopPropagation();
+    ReactTooltip.hide();
     setIsMouseDown(true);
   });
 
@@ -215,9 +215,7 @@ const PianoRoll = memo(({
             data-for="tooltip"
             data-place="right"
             key={i}
-            onClick={() => ReactTooltip.hide()}
             onMouseOver={() => {
-              ReactTooltip.rebuild();
               setHoveredKey(i + 1);
             }}
           >
@@ -236,10 +234,8 @@ const PianoRoll = memo(({
             data-tip="Click and hold to play sound"
             data-place="right"
             data-for="tooltip"
-            onClick={() => ReactTooltip.hide()}
             key={i}
             onMouseOver={() => {
-              ReactTooltip.rebuild();
               setHoveredKey(i + 1);
             }}
           />,
@@ -288,6 +284,7 @@ const PianoRoll = memo(({
   ), [numTicks]);
 
   const handleCreateNote = useCallback((e) => {
+    ReactTooltip.hide();
     if (e.button !== 0) return;
     e.preventDefault();
     e.stopPropagation();
@@ -342,7 +339,7 @@ const PianoRoll = memo(({
                 <CloseIcon onClick={handleClose} />
               </div>
               <div className={styles.lower}>
-                <SeekBar currentBeat={selectedSampleObject ? (currentBeat - selectedSampleObject.time + 1) : 0} scaleFactor={gridSize} scrollPosition={scroll} />
+                <SeekBar dataTip="Move seekbar to desired beat" currentBeat={selectedSampleObject ? (currentBeat - selectedSampleObject.time + 1) : 0} scaleFactor={gridSize} scrollPosition={scroll} />
                 <div className={styles.timelineWrapper} style={wrapperStyle}>
                   <svg className={styles.ticks} style={widthStyle}>
                     <rect
@@ -362,7 +359,17 @@ const PianoRoll = memo(({
           <div className={styles.keys} ref={keysRef}>
             {pianoKeys}
           </div>
-          <div className={styles.keyTracks} onMouseDown={handleCreateNote} ref={(ref) => setTracksRef(ref)} onScroll={handleScrollX}>
+          <div
+            data-tip="Left click to add a note"
+            data-for="tool"
+            onMouseOver={ReactTooltip.rebuild}
+            onMouseMove={() => { ReactTooltip.hide(ref.current); }}
+            className={styles.keyTracks}
+            onMouseDown={handleCreateNote}
+            ref={(r) => { ref.current = r; setTracksRef(r); }}
+            onScroll={handleScrollX}
+          >
+
             {pianoTracks}
             <div className={styles.tickDividersWrapper}>
               {tickDividers}
@@ -373,6 +380,8 @@ const PianoRoll = memo(({
           </div>
         </div>
       </div>
+      <ReactTooltip id="tool" delayShow={500} />
+
     </div>
   );
 });

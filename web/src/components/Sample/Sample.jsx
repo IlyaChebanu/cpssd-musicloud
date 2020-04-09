@@ -277,7 +277,7 @@ const Sample = memo((props) => {
             />
             <PianoIcon
               onMouseOver={ReactTooltip.rebuild}
-              data-tip="Edit in a piano roll"
+              data-tip="Edit in the piano roll"
               data-place="right"
               data-for="tooltip"
               onClick={handleTogglePiano}
