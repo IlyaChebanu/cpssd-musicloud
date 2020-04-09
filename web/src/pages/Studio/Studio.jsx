@@ -49,6 +49,7 @@ const Studio = memo((props) => {
   const { samples, tracks } = studio;
 
   const [tracksLoading, setTracksLoading] = useState(false);
+  const [isLogoutShowing, setIsLogoutShowing] = useState(false);
 
   useUpdateUserDetails();
   const tracksRef = useRef();
@@ -153,7 +154,6 @@ const Studio = memo((props) => {
   const handlers = {
     SAVE: handleSaveState,
   };
-
 
   return (
     <GlobalHotKeys

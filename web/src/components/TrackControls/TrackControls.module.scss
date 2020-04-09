@@ -5,6 +5,24 @@
   &:hover {
     cursor: pointer;
   }
+
+  .backDrop {
+    background-color: rgba(48, 49, 48, 0.42);
+    height: 100%;
+    position: fixed;
+    transition: all 100ms;
+    width: 100%;
+  }
+
+  .modal {
+    z-index: 100;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+
 }
 
 .wrapper {

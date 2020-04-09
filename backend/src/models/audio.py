@@ -1250,6 +1250,28 @@ def move_folder_entry(folder_id, parent_folder_id):
     query(sql, args)
 
 
+def rename_folder_entry(folder_id, name):
+    """
+    Takes a folder ID and the new name we want to save for the file.
+    :param folder_id:
+    Int - ID of the folder we want to rename.
+    :param name:
+    Str - The new name we want to save for our file.
+    :return:
+    None - Renames the folder and returns None.
+    """
+    sql = (
+        "UPDATE Folder "
+        "SET name=%s "
+        "WHERE folder_id = %s"
+    )
+    args = (
+        name,
+        folder_id,
+    )
+    query(sql, args)
+
+
 def move_file_entry(folder_id, file_id):
     """
     Takes a file ID and the ID of it's new parent folder.
@@ -1267,6 +1289,28 @@ def move_file_entry(folder_id, file_id):
     )
     args = (
         folder_id,
+        file_id,
+    )
+    query(sql, args)
+
+
+def rename_file_entry(name, file_id):
+    """
+    Takes a file ID and a new name for that file & updates the file in the DB.
+    :param name:
+    Str - The new filename.
+    :param file_id:
+    Int - ID of the file we want to rename.
+    :return:
+    None - Renames the file and return None.
+    """
+    sql = (
+        "UPDATE File "
+        "SET name=%s "
+        "WHERE file_id = %s"
+    )
+    args = (
+        name,
         file_id,
     )
     query(sql, args)
@@ -1298,3 +1342,83 @@ def get_child_files(folder_id):
     sql = "SELECT file_id, name, url FROM File WHERE folder_id=%s"
     args = (folder_id,)
     return query(sql, args, True)
+
+
+def add_synth(name, uid, patch):
+    """
+    Adds a synth to the DB.
+    :param name:
+    Str - The name we want to give to the synth.
+    :param patch:
+    None|Dict - A dict containing the synth spec or None.
+    :return:
+    None - Adds the synth to the DB and return None.
+    """
+    sql = "INSERT INTO Synth (name, uid, patch) VALUES (%s, %s, %s)"
+    args = (name, uid, patch)
+    query(sql, args)
+
+
+def get_synth(synth_id):
+    """
+    Get a synth from the DB.
+    :param synth_id:
+    Int - The synths ID.
+    :return:
+    List - Returns a list with 1 item, the synths DB row.
+    """
+    sql = "SELECT * FROM Synth WHERE id=%s"
+    args = (synth_id,)
+    res = query(sql, args, True)
+    if not res:
+        raise NoResults
+    return res
+
+
+def update_synth(synth_id, patch):
+    """
+    Takes a synth ID and the new patch object to update that synth with.
+    :param synth_id:
+    Int - ID of the synth we want to update.
+    :param patch:
+    Dict - New JSON dict for the synth.
+    :return:
+    None - Updates the synth and returns None.
+    """
+    sql = (
+        "UPDATE Synth "
+        "SET patch=%s "
+        "WHERE id = %s"
+    )
+    args = (
+        patch,
+        synth_id,
+    )
+    query(sql, args)
+
+
+def get_all_synths(uid):
+    """
+    Get all synths belonging to a user from the DB.
+    :param uid:
+    Int - The uid of the user who's synths we want to get.
+    :return:
+    List - Returns a list containing all a user's synths.
+    """
+    sql = "SELECT * FROM Synth WHERE uid=%s"
+    args = (uid,)
+    res = query(sql, args, True)
+    return res
+
+
+def delete_synth_entry(synth_id):
+    """
+    Delete a synth entry from the DB.
+    :param synth_id:
+    Int - A synth ID for a synth you wish to delete.
+    :return:
+    None - The synth is deleted and nothing returned.
+    """
+    sql = "DELETE FROM Synth WHERE id=%s"
+    args = (synth_id,)
+    query(sql, args)
