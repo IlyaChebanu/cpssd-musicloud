@@ -1,9 +1,10 @@
 import React, {
-  useCallback, memo, useMemo,
+  useCallback, memo, useMemo, useRef, useState,
 } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
+import ReactTooltip from 'react-tooltip';
 import styles from './SampleControls.module.scss';
 import {
   setSampleName, setSampleFadeIn, setSampleFadeOut,
@@ -15,6 +16,9 @@ const SampleControls = memo((props) => {
     dispatch, studio,
   } = props;
   const { samples, selectedSample } = studio;
+
+  const ref = useRef();
+  const [inputSelected, setInputSelected] = useState(false);
 
   const sample = useMemo(() => (
     samples[selectedSample]
@@ -52,13 +56,28 @@ const SampleControls = memo((props) => {
       <span>
         <span className={styles.sampleName}>
           <input
+            ref={(r) => { ref.current = r; }}
+            data-tip={!inputSelected ? 'Change sample name' : ''}
+            data-for="tooltip"
+            data-place="right"
             value={sample.name}
+            onClick={() => {
+              setInputSelected(true);
+              ReactTooltip.hide(ref.current);
+            }}
+            onMouseMove={() => {
+              if (inputSelected) {
+                ReactTooltip.hide(ref.current);
+              }
+            }}
+            onBlur={() => setInputSelected(false)}
             onChange={handleChange}
           />
+
         </span>
         <div className={styles.buttons}>
-          <Knob value={sample.fade.fadeIn} onChange={handleFadeIn} name="Fade in" />
-          <Knob value={sample.fade.fadeOut} onChange={handleFadeOut} name="Fade out" />
+          <Knob dataTip="Hold and move up or down to gradually increase sound from silence at the beginning" value={sample.fade.fadeIn} onChange={handleFadeIn} name="Fade in" />
+          <Knob dataTip="Hold and move up or down to gradually reduce sound to silence at its end" value={sample.fade.fadeOut} onChange={handleFadeOut} name="Fade out" />
         </div>
       </span>
     </div>

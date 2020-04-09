@@ -1,9 +1,11 @@
+/* eslint-disable jsx-a11y/mouse-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import React, { useCallback, memo } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { GlobalHotKeys } from 'react-hotkeys';
+import ReactTooltip from 'react-tooltip';
 import styles from './PlaybackControls.module.scss';
 import { ReactComponent as Play } from '../../assets/icons/play-circle-light.svg';
 import { ReactComponent as Pause } from '../../assets/icons/pause-circle-light.svg';
@@ -49,6 +51,7 @@ const PlaybackControls = memo((props) => {
     } else {
       dispatch(startRecording());
     }
+    ReactTooltip.hide();
   }, [dispatch, recording]);
 
   const toStart = useCallback((e) => {
@@ -136,6 +139,8 @@ const PlaybackControls = memo((props) => {
           )}
           <Forward className={styles.controlButton} onClick={forward} />
           <div
+            data-tip={!recording ? 'Press to record MIDI input' : 'Press to stop recording'}
+            data-for="tooltip"
             className={`${styles.recordButtonOuter} ${recording ? styles.active : ''}`}
             onClick={handleRecording}
           >
@@ -143,26 +148,30 @@ const PlaybackControls = memo((props) => {
           </div>
           <p>{timeString}</p>
         </span>
+        <div
+          data-place="left"
+          data-tip={fileExplorerHidden ? 'Open file explorer' : 'Close file explorer'}
+          data-for="tooltip"
+        >
+          { fileExplorerHidden
+            ? (
+              <FileExplorerClosed
 
-        { fileExplorerHidden
-          ? (
-            <FileExplorerClosed
-              id="explorer"
-              className={styles.selectedIcon}
+                id="explorer"
+                className={styles.selectedIcon}
 
-              onClick={fileExplorerHidden ? showExplorer : hideExplorer}
-            />
-          )
-          : (
-            <FileExplorerOpened
-
-              className={styles.selectedIcon}
-              style={{ height: '60px' }}
-              id="explorer"
-              onClick={fileExplorerHidden ? showExplorer : hideExplorer}
-            />
-          )}
-
+                onClick={fileExplorerHidden ? showExplorer : hideExplorer}
+              />
+            )
+            : (
+              <FileExplorerOpened
+                className={styles.selectedIcon}
+                style={{ height: '60px' }}
+                id="explorer"
+                onClick={fileExplorerHidden ? showExplorer : hideExplorer}
+              />
+            )}
+        </div>
       </div>
     </GlobalHotKeys>
   );

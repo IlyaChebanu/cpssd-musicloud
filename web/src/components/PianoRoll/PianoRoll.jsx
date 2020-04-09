@@ -13,6 +13,7 @@ import { connect } from 'react-redux';
 import _ from 'lodash';
 import { useMouseEvents, useGlobalEvent } from 'beautiful-react-hooks';
 import Tone from 'tone';
+import ReactTooltip from 'react-tooltip';
 import styles from './PianoRoll.module.scss';
 import { ReactComponent as CloseIcon } from '../../assets/icons/x-icon-10px.svg';
 import {
@@ -64,7 +65,7 @@ const PianoRoll = memo(({
   const playingNotes = useRef({});
   const [pressedNotes, setPressedNotes] = useState({});
   const { onMidiMessage, onMidiError } = useMidi();
-
+  const ref = useRef();
   const commitNote = (key, velocity) => {
     const { recordingStartTime } = playingNotes.current[key];
 
@@ -163,12 +164,12 @@ const PianoRoll = memo(({
   const playingNote = useRef();
   const [hoveredKey, setHoveredKey] = useState();
   const [isMouseDown, setIsMouseDown] = useState(false);
-
   const { onMouseDown } = useMouseEvents(keysRef);
   const onMouseUp = useGlobalEvent('mouseup');
 
   onMouseDown((e) => {
     e.stopPropagation();
+    ReactTooltip.hide();
     setIsMouseDown(true);
   });
 
@@ -207,9 +208,14 @@ const PianoRoll = memo(({
       if ([0, 2, 3, 5, 7, 8, 10].includes(i % 12)) {
         pianoKeys.push(
           <button
+            data-tip="Click and hold to play sound"
+            data-place="right"
             className={`${styles.whiteKey} ${isActive ? styles.active : ''} ${[0, 5, 10].includes(i % 12) ? styles.wide : ''}`}
+            data-for="tooltip"
             key={i}
-            onMouseOver={() => setHoveredKey(i + 1)}
+            onMouseOver={() => {
+              setHoveredKey(i + 1);
+            }}
           >
             <span className={`${i % 12 === 3 ? styles.bold : styles.light}`}>
               {`${keyNames[i % 12]}${Math.floor(i / 12) + 1}`}
@@ -220,9 +226,14 @@ const PianoRoll = memo(({
       } else {
         pianoKeys.push(
           <button
+            data-tip="Click and hold to play sound"
+            data-place="right"
             className={`${styles.blackKey} ${isActive ? styles.active : ''}`}
+            data-for="tooltip"
             key={i}
-            onMouseOver={() => setHoveredKey(i + 1)}
+            onMouseOver={() => {
+              setHoveredKey(i + 1);
+            }}
           />,
         );
         pianoTracks.push(<div className={`${styles.track} ${styles.black}`} key={i} />);
@@ -269,6 +280,7 @@ const PianoRoll = memo(({
   ), [numTicks]);
 
   const handleCreateNote = useCallback((e) => {
+    ReactTooltip.hide();
     if (e.button !== 0) return;
     e.preventDefault();
     e.stopPropagation();
@@ -323,7 +335,7 @@ const PianoRoll = memo(({
                 <CloseIcon onClick={handleClose} />
               </div>
               <div className={styles.lower}>
-                <SeekBar currentBeat={selectedSampleObject ? (currentBeat - selectedSampleObject.time + 1) : 0} scaleFactor={gridSize} scrollPosition={scroll} />
+                <SeekBar dataTip="Move seekbar to desired beat" currentBeat={selectedSampleObject ? (currentBeat - selectedSampleObject.time + 1) : 0} scaleFactor={gridSize} scrollPosition={scroll} />
                 <div className={styles.timelineWrapper} style={wrapperStyle}>
                   <svg className={styles.ticks} style={widthStyle}>
                     <rect
@@ -343,7 +355,17 @@ const PianoRoll = memo(({
           <div className={styles.keys} ref={keysRef}>
             {pianoKeys}
           </div>
-          <div className={styles.keyTracks} onMouseDown={handleCreateNote} ref={(ref) => setTracksRef(ref)} onScroll={handleScrollX}>
+          <div
+            data-tip="Left click to add a note"
+            data-for="tool"
+            onMouseOver={ReactTooltip.rebuild}
+            onMouseMove={() => { ReactTooltip.hide(ref.current); }}
+            className={styles.keyTracks}
+            onMouseDown={handleCreateNote}
+            ref={(r) => { ref.current = r; setTracksRef(r); }}
+            onScroll={handleScrollX}
+          >
+
             {pianoTracks}
             <div className={styles.tickDividersWrapper}>
               {tickDividers}
@@ -354,6 +376,8 @@ const PianoRoll = memo(({
           </div>
         </div>
       </div>
+      <ReactTooltip id="tool" delayShow={500} />
+
     </div>
   );
 });

@@ -154,6 +154,13 @@ export const setSongTitle = (title) => (dispatch) => {
   });
 };
 
+export const setDraggingSeekBar = (draggingSeekBar) => (dispatch) => {
+  dispatch({
+    type: 'SET_DRAGGING_SEEKBAR',
+    draggingSeekBar,
+  });
+};
+
 export const hideSongPicker = () => (dispatch) => {
   dispatch({
     type: 'SONG_PICKER_HIDE',

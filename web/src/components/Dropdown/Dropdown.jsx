@@ -1,9 +1,10 @@
+/* eslint-disable jsx-a11y/mouse-events-have-key-events */
 import React, {
   useState, useCallback, useMemo, memo,
 } from 'react';
 import PropTypes from 'prop-types';
+import ReactTooltip from 'react-tooltip';
 import styles from './Dropdown.module.scss';
-
 
 const Dropdown = memo((props) => {
   const { items, title } = props;
@@ -15,20 +16,28 @@ const Dropdown = memo((props) => {
   }, [setDisplayMenu]);
 
   const hideDropdown = useCallback((e) => {
+    ReactTooltip.hide();
     e.preventDefault();
     setDisplayMenu(false);
   }, [setDisplayMenu]);
 
   const menuItems = useMemo(() => items.map((item) => (
     <li
+      style={{ zIndex: 1 }}
+      data-tip={item.dataTip}
+      data-for="tooltip"
+      data-place="right"
       key={item.name}
+      onMouseOver={ReactTooltip.rebuild}
       onMouseDown={() => {
         if (item.action) item.action();
+        ReactTooltip.hide();
         setDisplayMenu(false);
       }}
     >
       {item.icon && <img className={styles.icon} src={item.icon} alt="dropdown item icon" />}
       <p>{item.name}</p>
+
     </li>
   )), [items]);
 
@@ -41,6 +50,7 @@ const Dropdown = memo((props) => {
         {menuItems}
       </ul>
       )}
+
     </div>
   );
 });

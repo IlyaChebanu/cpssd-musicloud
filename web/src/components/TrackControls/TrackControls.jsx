@@ -1,9 +1,11 @@
+/* eslint-disable jsx-a11y/mouse-events-have-key-events */
 import React, {
-  memo, useCallback, useMemo, useState,
+  memo, useCallback, useMemo, useState, useRef,
 } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import _ from 'lodash';
+import ReactTooltip from 'react-tooltip';
 import styles from './TrackControls.module.scss';
 import {
   setSelectedTrack,
@@ -32,8 +34,10 @@ const TrackControls = memo((props) => {
   const {
     track, tracks, dispatch, index, selectedTrack,
   } = props;
-
   const soloTrack = _.find(tracks, 'solo');
+
+  const [inputSelected, setInputSelected] = useState(false);
+  const ref = useRef();
 
   const [isModalShowing, setIsModalShowing] = useState(false);
 
@@ -120,26 +124,71 @@ const TrackControls = memo((props) => {
       role="row"
       tabIndex={0}
     >
+
       <div
         className={`${styles.selectBar} ${selectedTrack === index ? styles.selected : ''}`}
         style={barStyle}
       />
-      <div className={`${styles.wrapper} ${props.index % 2 ? styles.even : ''}`}>
-        <Delete onClick={openModal} className={styles.deleteTrack} />
-        <div className={styles.title}>
-          <input type="text" value={track.name} onChange={handleTrackNameChange} />
+      <div role="none" onMouseDown={ReactTooltip.rebuild} className={`${styles.wrapper} ${props.index % 2 ? styles.even : ''}`}>
+        <div data-place="right" data-tip="Delete track" data-for="tooltip" onMouseOver={ReactTooltip.rebuild}>
+          <Delete onClick={openModal} className={styles.deleteTrack} />
+        </div>
+        <div
+          className={styles.title}
+        >
+          <input
+            data-place="right"
+            data-tip={!inputSelected ? 'Rename track' : ''}
+            data-for="tooltip"
+            onMouseOver={ReactTooltip.rebuild}
+            ref={(r) => { ref.current = r; }}
+            onClick={() => {
+              setInputSelected(true);
+              ReactTooltip.hide(ref.current);
+            }}
+            onMouseMove={() => {
+              if (inputSelected) {
+                ReactTooltip.hide(ref.current);
+              }
+            }}
+            onBlur={() => setInputSelected(false)}
+            type="text"
+            value={track.name}
+            onChange={handleTrackNameChange}
+          />
         </div>
         <div className={styles.buttons}>
-          <Knob min={0} max={1} value={track.volume} onChange={handleSetTrackVolume} name="Vol" />
-          <Knob min={-1} max={1} value={track.pan} onChange={handleSetTrackPan} name="Pan" />
-          <Knob min={0} max={1} value={track.reverb} onChange={handleSetTrackReverb} name="Reverb" />
-          <span>
+          <Knob
+            dataTip="Hold and move up or down to adjust the volume"
+            min={0}
+            max={1}
+            value={track.volume}
+            onChange={handleSetTrackVolume}
+            name="Vol"
+          />
+          <Knob
+            dataTip="Hold and move up or down to make the sound more prominent on one side or another"
+            min={-1}
+            max={1}
+            value={track.pan}
+            onChange={handleSetTrackPan}
+            name="Pan"
+          />
+          <Knob
+            dataTip="Hold and move up or down to add reverberation effect"
+            min={0}
+            max={1}
+            value={track.reverb}
+            onChange={handleSetTrackReverb}
+            name="Reverb"
+          />
+          <span data-place="right" data-tip={track.mute ? 'Unmute track' : 'Mute track'} data-for="tooltip" onMouseOver={ReactTooltip.rebuild}>
             {track.mute || (soloTrack && soloTrack.id !== track.id)
               ? <MuteActive onClick={handleTrackMute} />
               : <Mute onClick={handleTrackMute} />}
             <p>Mute</p>
           </span>
-          <span>
+          <span data-place="right" data-tip={track.solo ? 'Unsolo track' : 'Solo track'} data-for="tooltip" onMouseOver={ReactTooltip.rebuild}>
             {track.solo
               ? <SoloActive onClick={handleTrackSolo} />
               : <Solo onClick={handleTrackSolo} />}

@@ -22,14 +22,15 @@
       cursor: ew-resize;
     }
 
-    &:first-child {
-      margin-left: 5px;
-      transform: rotate(-90deg);
-    }
 
-    &:last-child {
-      margin-right: 5px;
-      transform: rotate(90deg);
-    }
+  }
+  .backArrow {
+    margin-left: 5px;
+    transform: rotate(-90deg);
+  }
+
+  .frontArrow {
+    margin-right: 5px;
+    transform: rotate(90deg);
   }
 }

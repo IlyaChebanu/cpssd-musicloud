@@ -1,13 +1,15 @@
+/* eslint-disable jsx-a11y/mouse-events-have-key-events */
 /* eslint-disable no-param-reassign */
 import PropTypes from 'prop-types';
 import React, {
-  useCallback, useMemo, memo, useState, useEffect,
+  useCallback, useMemo, memo, useState, useEffect, useRef,
 } from 'react';
 import cookie from 'js-cookie';
 import { connect } from 'react-redux';
 import { withRouter, Link } from 'react-router-dom';
 import toWav from 'audiobuffer-to-wav';
 import _ from 'lodash';
+import ReactTooltip from 'react-tooltip';
 import styles from './Header.module.scss';
 import { deleteToken } from '../../actions/userActions';
 import {
@@ -56,6 +58,8 @@ const Header = memo((props) => {
   const urlParams = new URLSearchParams(window.location.search);
   const songId = Number(urlParams.get('sid'));
   const [isLogoutShowing, setIsLogoutShowing] = useState(false);
+  const [inputSelected, setInputSelected] = useState(false);
+  const ref = useRef();
   const cleanSongSampleBuffers = (state) => {
     state.tracks.forEach((track) => {
       if (track.samples !== undefined) {
@@ -230,12 +234,24 @@ const Header = memo((props) => {
 
   const fileDropdownItems = useMemo(
     () => [
-      { name: 'New', action: handleHideSongPicker, icon: newIcon },
-      { name: 'Open', action: handleShowSongPicker, icon: openIcon },
-      { name: 'Publish', action: handlePublishSong, icon: publishIcon },
-      { name: 'Import', icon: importIcon, action: handleSampleImport },
-      { name: 'Add Synth', icon: importIcon, action: handleAddSynth },
-      { name: 'Export', icon: exportIcon, action: exportAction },
+      {
+        name: 'New', action: handleHideSongPicker, icon: newIcon, dataTip: 'Create a new song',
+      },
+      {
+        name: 'Open', action: handleShowSongPicker, icon: openIcon, dataTip: 'Open an existing song',
+      },
+      {
+        name: 'Publish', action: handlePublishSong, icon: publishIcon, dataTip: 'Publish the current song for everybody to see',
+      },
+      {
+        name: 'Import', icon: importIcon, action: handleSampleImport, dataTip: 'Import and audio sample from this device',
+      },
+      {
+        name: 'Add Synth', icon: importIcon, action: handleAddSynth, dataTip: 'Add a basic synthesizer to use with the piano roll',
+      },
+      {
+        name: 'Export', icon: exportIcon, action: exportAction, dataTip: 'Export the current song as a single compiled audio',
+      },
     ],
     [
       exportAction,
@@ -282,6 +298,7 @@ const Header = memo((props) => {
   const handleSetName = useCallback(async () => {
     dispatch(setSongName(nameInput));
     setNameInput(nameInput);
+    setInputSelected(false);
     const res = patchSongName(songId, nameInput);
     return res.status === 200;
   }, [dispatch, nameInput, songId]);
@@ -295,11 +312,13 @@ const Header = memo((props) => {
     [handleSetName],
   );
 
-  const openModal = () => {
+  const openModal = (e) => {
+    e.preventDefault();
     setIsLogoutShowing(true);
   };
 
-  const closeModal = () => {
+  const closeModal = (e) => {
+    e.preventDefault();
     setIsLogoutShowing(false);
   };
 
@@ -337,11 +356,25 @@ const Header = memo((props) => {
       </span>
       <span className={styles.songName}>
         <input
+          data-tip={!inputSelected ? 'Change song name' : ''}
+          data-place="bottom"
+          data-for="tooltip"
+          ref={(r) => { ref.current = r; }}
           type={!studio.songPickerHidden || selected !== 0 ? 'hidden' : 'text'}
           value={nameInput}
           onChange={handleChange}
+          onMouseMove={() => {
+            if (inputSelected) {
+              ReactTooltip.hide(ref.current);
+            }
+          }}
+          onClick={() => {
+            setInputSelected(true);
+            ReactTooltip.hide(ref.current);
+          }}
           onBlur={handleSetName}
           onKeyDown={handleKeyDown}
+          onMouseOver={ReactTooltip.rebuild}
         />
       </span>
       <span className={styles.nav}>

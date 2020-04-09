@@ -1,26 +1,32 @@
-import React, { memo, useCallback, useMemo } from 'react';
+import React, {
+  memo, useCallback, useMemo, useRef,
+} from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import ReactTooltip from 'react-tooltip';
 import styles from './SeekBar.module.scss';
 import { ReactComponent as SeekBarSvg } from '../../assets/seekbar.svg';
-import { setCurrentBeat, play, pause } from '../../actions/studioActions';
-
+import {
+  setCurrentBeat, play, pause, setDraggingSeekBar,
+} from '../../actions/studioActions';
 
 const SeekBar = memo((props) => {
   const {
-    playing, dispatch, gridSize, currentBeatStudio,
+    playing, dispatch, gridSize, draggingSeekBar, currentBeatStudio, dataTip,
   } = props;
 
   const currentBeat = props.currentBeat ? props.currentBeat : currentBeatStudio;
-
+  const ref = useRef();
   const scaleFactor = props.scaleFactor || gridSize;
   const scroll = props.scrollPosition !== null ? props.scrollPosition : props.scroll;
 
   const handleDragStart = useCallback((ev) => {
+    dispatch(setDraggingSeekBar(true));
     dispatch(pause);
     const mousePosOffset = ev.screenX;
     const startBeat = currentBeat;
     const handleMouseMove = (e) => {
+      ReactTooltip.hide(ref.current);
       e.preventDefault();
       dispatch(
         setCurrentBeat(
@@ -36,6 +42,7 @@ const SeekBar = memo((props) => {
       if (playing) {
         dispatch(play);
       }
+      dispatch(setDraggingSeekBar(false));
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleDragStop);
     };
@@ -60,10 +67,18 @@ const SeekBar = memo((props) => {
       opacity: pos >= offset ? 1 : 0,
     };
   }, [offset, currentBeat, scaleFactor, scroll]);
-
   return (
-    <div className={styles.wrapper}>
-      <SeekBarSvg style={iconStyle} onMouseDown={handleDragStart} />
+    <div
+      className={styles.wrapper}
+    >
+      <SeekBarSvg
+        ref={(r) => { ref.current = r; }}
+        data-tip={!draggingSeekBar ? dataTip : ''}
+        data-for="tooltip"
+        data-place="right"
+        style={iconStyle}
+        onMouseDown={handleDragStart}
+      />
       <div className={styles.bar} style={barStyle} />
     </div>
   );
@@ -78,12 +93,15 @@ SeekBar.propTypes = {
   gridSize: PropTypes.number.isRequired,
   scaleFactor: PropTypes.number,
   scrollPosition: PropTypes.number,
+  dataTip: PropTypes.string,
+  draggingSeekBar: PropTypes.bool.isRequired,
 };
 
 SeekBar.defaultProps = {
   currentBeat: 0,
   scaleFactor: null,
   scrollPosition: null,
+  dataTip: '',
 };
 
 SeekBar.displayName = 'SeekBar';
@@ -93,6 +111,7 @@ const mapStateToProps = ({ studio }) => ({
   scroll: studio.scroll,
   playing: studio.playing,
   gridSize: studio.gridSize,
+  draggingSeekBar: studio.draggingSeekBar,
 });
 
 export default connect(mapStateToProps)(SeekBar);
