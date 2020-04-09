@@ -50,10 +50,10 @@ const File = memo((props) => {
   }, [dispatch, path]);
 
   const fileClick = useCallback(() => {
-    if (selectedFile === `${path}/${newName}`) {
+    if (selectedFile === dir) {
       dispatch(setSelectedFile(''));
     } else {
-      dispatch(setSelectedFile(`${path}/${newName}`));
+      dispatch(setSelectedFile(dir));
     }
   }, [dispatch, newName, path, selectedFile]);
 
@@ -126,7 +126,7 @@ const File = memo((props) => {
               addSample(extension === '' ? `${path}/${oldName.current}` : `${path}/${oldName.current}.${extension}`);
               e.preventDefault(); fileClick();
             }}
-            className={selectedFile === `${path}/${newName}` ? styles.selected : ''}
+            className={selectedFile === dir ? styles.selected : ''}
             key={dir['file_id']}
           >
             <SampleIcon style={{ paddingRight: '4px', fill: 'white' }} />
@@ -143,16 +143,16 @@ const File = memo((props) => {
                     e.preventDefault();
                   }
                 }}
-                style={{ cursor: selectedFile !== `${path}/${newName}` ? 'pointer' : '' }}
+                style={{ cursor: selectedFile !== dir ? 'pointer' : '' }}
                 onChange={handleFileNameChange}
                 value={newName}
-                onClick={(e) => { if (selectedFile === `${path}/${newName}`) { e.stopPropagation(); } }}
-                disabled={!selectedFile === `${path}/${newName}`}
+                onClick={(e) => { if (selectedFile === dir) { e.stopPropagation(); } }}
+                disabled={!selectedFile === dir}
               />
             </form>
 
             <Delete
-              style={{ visibility: selectedFile === `${path}/${newName}` ? 'visible' : 'hidden' }}
+              style={{ visibility: selectedFile === dir ? 'visible' : 'hidden' }}
               className={styles.deleteFile}
               onClick={(e) => { e.stopPropagation(); deleteFromS3(path, extension === '' ? newName : `${newName}.${extension}`); }}
             />
@@ -167,7 +167,7 @@ const File = memo((props) => {
 File.propTypes = {
   studio: PropTypes.object.isRequired,
   dir: PropTypes.object.isRequired,
-  selectedFile: PropTypes.string.isRequired,
+  selectedFile: PropTypes.object.isRequired,
   dispatch: PropTypes.func.isRequired,
   selectedTrack: PropTypes.number.isRequired,
 };

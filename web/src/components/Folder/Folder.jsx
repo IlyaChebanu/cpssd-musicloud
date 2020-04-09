@@ -1,5 +1,5 @@
 import React, {
-  useState, useCallback, memo, useRef,
+  useState, useCallback, memo,
 } from 'react';
 import AWS from 'aws-sdk';
 import * as s3ls from 's3-ls';
@@ -13,29 +13,27 @@ import {
 import { ReactComponent as ClosedFolder } from '../../assets/icons/file-explorer.svg';
 import { ReactComponent as OpenFolder } from '../../assets/icons/folder-24px.svg';
 import { ReactComponent as Delete } from '../../assets/icons/delete_outline-24px.svg';
-import { generatePresigned } from '../../helpers/api';
+import { generatePresigned, renameFolder, getFolderContent, deleteSampleFolder } from '../../helpers/api';
 import { showNotification } from '../../actions/notificationsActions';
 import styles from './Folder.module.scss';
 // eslint-disable-next-line import/no-cycle
 import FolderContents from '../FolderContents/FolderContents';
 
 const Folder = memo((props) => {
-  const { dir, dispatch, selectedFolder } = props;
+  const { dir, level, dispatch, selectedFolder } = props;
   const [deleted, setDeleted] = useState(false);
   // eslint-disable-next-line no-unused-vars
   const [selected, setSelected] = useState(selectedFolder === dir);
   const [expanded, setExpanded] = useState(false);
   const [f, setFiles] = useState([]);
   const [d, setFolders] = useState([]);
-  const list = dir.split('/');
-  const level = list.length - 3;
-  const oldName = useRef(list[list.length - 2]);
+  const oldName = {current: dir['name']};
   const [newName, setNewName] = useState(oldName.current);
-  //   const path = list.slice(0, list.length - 1).join('/');
+
   const handleFolderNameChange = useCallback((e) => {
     e.preventDefault();
     setNewName(e.target.value);
-  }, []);
+  }, [dir]);
 
   const [config, setConfig] = useState({
     bucketName: 'dcumusicloudbucket',
@@ -54,31 +52,22 @@ const Folder = memo((props) => {
   }, [config]);
 
   const getFolderContents = useCallback(async () => {
-    const res = await generatePresigned('/');
+    const res = await getFolderContent(dir['folder_id']);
     if (res.status === 200) {
-      const accessKey = res.data.signed_url.fields.AWSAccessKeyId;
-      AWS.config.update({
-        accessKeyId: accessKey,
-        secretAccessKey: 'XVdgFyhjyhnqicDxxXZa9rLouFv5WQdXzXwxrP0u',
-        region: 'eu-west-1',
-      });
       setExpanded(true);
       dispatch(setSelectedFolder(dir));
-      const lister = s3ls({
-        bucket: 'dcumusicloudbucket',
-      });
-
-      const { files, folders } = await lister.ls(dir);
+      const files = res.data['folder']['child_files']
+      const folders = res.data['folder']['child_folders']
       setFiles(files);
       setFolders(folders);
     } else {
       dispatch(showNotification({
-        message: 'Unknown error occured',
-
+        message: 'An unknown file explorer error has occurred.',
       }));
     }
   }, [dir, dispatch]);
 
+  // Used exclusively in deleteFromS3 & should not be modified.
   const getContents = useCallback(async (directory) => {
     const res = await generatePresigned('/');
     if (res.status === 200) {
@@ -121,7 +110,6 @@ const Folder = memo((props) => {
 
   const deleteFromS3 = useCallback(async (directory, files, dirs) => {
     await awsConfig(directory);
-
     files.forEach((file) => {
       deleteFile(file.split('/').pop(), config)
         .then(() => { setFiles([]); })
@@ -142,14 +130,14 @@ const Folder = memo((props) => {
         .catch((err) => console.error(err));
       setDeleted(true);
     }
-  }, [awsConfig, config, getContents]);
+  }, [dir, awsConfig, config, getContents]);
 
-  const onInputBlur = (e, key) => {
+  const onInputBlur = async (e, key) => {
     if (key === 13) {
       oldName.current = newName;
       setNewName(e.target.value);
-
       e.target.blur();
+      await renameFolder(dir['folder_id'], newName);
     } else {
       setNewName(oldName.current);
     }
@@ -165,6 +153,7 @@ const Folder = memo((props) => {
             className={selectedFolder === dir ? styles.selected : (expanded ? styles.expanded : '')}
             style={{ transition: 'width 200ms', marginLeft: `${level * 25}px` }}
             onClick={folderClick}
+            key={dir['folder_id']}
           >
             { expanded
               ? <OpenFolder style={{ width: '22px', paddingRight: '6px', fill: 'white' }} />
@@ -188,7 +177,6 @@ const Folder = memo((props) => {
               onClick={(e) => { dispatch(setSelectedFolder(dir)); e.stopPropagation(); }}
               value={newName}
             />
-
             <Delete
               style={{ visibility: expanded ? 'visible' : 'hidden' }}
               className={styles.deleteFolder}
@@ -212,8 +200,8 @@ const Folder = memo((props) => {
 
 Folder.propTypes = {
   dispatch: PropTypes.func.isRequired,
-  selectedFolder: PropTypes.string.isRequired,
-  dir: PropTypes.string.isRequired,
+  selectedFolder: PropTypes.object.isRequired,
+  dir: PropTypes.object.isRequired,
 
 };
 
