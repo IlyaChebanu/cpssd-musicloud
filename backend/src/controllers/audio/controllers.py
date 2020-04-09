@@ -1664,13 +1664,12 @@ def move_file():  # pylint: disable=R0911
 
         move_file_entry(folder_id, file_id)
         return {"message": "File moved"}, 200
-    else:
-        file_id = request.args.get('file_id')
-        if not file_id:
-            return {"message": "No file_id sent"}, 422
+    file_id = request.args.get('file_id')
+    if not file_id:
+        return {"message": "No file_id sent"}, 422
 
-        rename_file_entry(request.args.get('name'), file_id)
-        return {"message": "File renamed"}, 200
+    rename_file_entry(request.args.get('name'), file_id)
+    return {"message": "File renamed"}, 200
 
 @AUDIO.route("/folders", methods=["GET"])
 @sql_err_catcher()
