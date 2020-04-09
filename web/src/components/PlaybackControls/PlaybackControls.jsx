@@ -21,6 +21,7 @@ import {
   stopRecording,
   startRecording,
 } from '../../actions/studioActions';
+import ReactTooltip from 'react-tooltip';
 
 const PlaybackControls = memo((props) => {
   const {
@@ -50,6 +51,7 @@ const PlaybackControls = memo((props) => {
     } else {
       dispatch(startRecording());
     }
+    ReactTooltip.hide();
   }, [dispatch, recording]);
 
   const toStart = useCallback((e) => {
@@ -137,7 +139,7 @@ const PlaybackControls = memo((props) => {
           )}
           <Forward className={styles.controlButton} onClick={forward} />
           <div
-            data-tip="Press to record MIDI input"
+            data-tip={!recording ? 'Press to record MIDI input' : 'Press to stop recording'}
             data-for="tooltip"
             className={`${styles.recordButtonOuter} ${recording ? styles.active : ''}`}
             onClick={handleRecording}
