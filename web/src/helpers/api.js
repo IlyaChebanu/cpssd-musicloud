@@ -339,7 +339,7 @@ export const getFolderContent = (folderId) => axios.get(
 export const deleteSampleFile = (fileId) => axios.delete(
   `${API_URL}/v1/audio/files?file_id=${fileId}`,
   {
-      headers: getAuth(),
+    headers: getAuth(),
   },
 );
 
@@ -347,7 +347,7 @@ export const renameFile = (fileId, name) => axios.patch(
   `${API_URL}/v1/audio/files?file_id=${fileId}&name=${name}`,
   {},
   {
-      headers: getAuth(),
+    headers: getAuth(),
   },
 );
 
@@ -355,22 +355,22 @@ export const renameFolder = (folderId, name) => axios.patch(
   `${API_URL}/v1/audio/folders?folder_id=${folderId}&name=${name}`,
   {},
   {
-      headers: getAuth(),
+    headers: getAuth(),
   },
 );
 
 export const deleteSampleFolder = (folderId) => axios.delete(
   `${API_URL}/v1/audio/folders?folder_id=${folderId}`,
   {
-      headers: getAuth(),
+    headers: getAuth(),
   },
 );
 
 export const createSampleFolder = (folderName, parentFolderId) => axios.post(
   `${API_URL}/v1/audio/folders`,
   {
-      folder_name: folderName,
-      parent_folder_id: parentFolderId,
+    folder_name: folderName,
+    parent_folder_id: parentFolderId,
   },
   {
     headers: getAuth(),
@@ -380,7 +380,7 @@ export const createSampleFolder = (folderName, parentFolderId) => axios.post(
 export const createRootSampleFolder = (folderName) => axios.post(
   `${API_URL}/v1/audio/folders`,
   {
-      folder_name: folderName,
+    folder_name: folderName,
   },
   {
     headers: getAuth(),

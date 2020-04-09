@@ -20,12 +20,12 @@ const File = memo((props) => {
     dir, level, selectedFile, dispatch, studio, selectedTrack,
   } = props;
   const [deleted, setDeleted] = useState(false);
-  const url = dir['url'];
-  const urlArray = url.split('.')
-  const extension = urlArray[urlArray.length-1];
-  const oldName = {current: dir['name']};
+  const { url } = dir;
+  const urlArray = url.split('.');
+  const extension = urlArray[urlArray.length - 1];
+  const oldName = { current: dir.name };
   const [newName, setNewName] = useState(oldName.current);
-  let pathDir = urlArray[3].split('/');
+  const pathDir = urlArray[3].split('/');
   const path = pathDir[1] + pathDir[2];
   const [config, setConfig] = useState({
     bucketName: 'dcumusicloudbucket',
@@ -55,14 +55,14 @@ const File = memo((props) => {
     } else {
       dispatch(setSelectedFile(dir));
     }
-  }, [dispatch, newName, path, selectedFile]);
+  }, [dir, dispatch, selectedFile]);
 
 
   const deleteFromS3 = useCallback(async (directory, file) => {
     await awsConfig(directory);
     deleteFile(file.split('/').pop(), config)
       .then(async () => {
-        await deleteSampleFile(dir['file_id']);
+        await deleteSampleFile(dir.file_id);
         setDeleted(true);
       })
       .catch();
@@ -73,7 +73,7 @@ const File = memo((props) => {
       oldName.current = newName;
       setNewName(e.target.value);
       e.target.blur();
-      await renameFile(dir['file_id'], newName);
+      await renameFile(dir.file_id, newName);
     } else {
       setNewName(oldName.current);
     }
@@ -101,7 +101,7 @@ const File = memo((props) => {
         return;
       }
       const sampleState = {
-        url: dir['url'],
+        url: dir.url,
         name,
         time: studio.currentBeat,
         fade: {
@@ -127,7 +127,7 @@ const File = memo((props) => {
               e.preventDefault(); fileClick();
             }}
             className={selectedFile === dir ? styles.selected : ''}
-            key={dir['file_id']}
+            key={dir.file_id}
           >
             <SampleIcon style={{ paddingRight: '4px', fill: 'white' }} />
             <form onSubmit={(e) => { e.preventDefault(); }}>
@@ -170,6 +170,7 @@ File.propTypes = {
   selectedFile: PropTypes.object.isRequired,
   dispatch: PropTypes.func.isRequired,
   selectedTrack: PropTypes.number.isRequired,
+  level: PropTypes.number.isRequired,
 };
 
 const mapStateToProps = ({ studio }) => ({

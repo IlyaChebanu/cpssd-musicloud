@@ -24,8 +24,8 @@ const FileExplorer = memo((props) => {
   const getFiles = useCallback(async () => {
     const res = await getRootFolderContents();
     if (res.status === 200) {
-      const files = res.data['folder']['child_files']
-      const folders = res.data['folder']['child_folders']
+      const files = res.data.folder.child_files;
+      const folders = res.data.folder.child_folders;
       setFileList(files);
       setFolderList(folders);
       setSampleTreeSelected(true);
@@ -43,12 +43,12 @@ const FileExplorer = memo((props) => {
   }, []);
 
   const createFile = useCallback(async () => {
-    let res = await createRootSampleFolder("New Folder");
+    let res = await createRootSampleFolder('New Folder');
     if (res.status === 200) {
       res = await getRootFolderContents();
       if (res.status === 200) {
-        const files = res.data['folder']['child_files']
-        const folders = res.data['folder']['child_folders']
+        const files = res.data.folder.child_files;
+        const folders = res.data.folder.child_folders;
         setFileList(files);
         setFolderList(folders);
       } else {
@@ -61,7 +61,7 @@ const FileExplorer = memo((props) => {
         message: 'An unknown file explorer error has occurred.',
       }));
     }
-  }, []);
+  }, [dispatch]);
 
   const instruments = [
     { name: 'Instruments', action: null, icon: instrumentsIcon },
@@ -135,14 +135,14 @@ const FileExplorer = memo((props) => {
           )}
           <p>Samples</p>
           { sampleTreeSelected
-            ?
-            <Create
-              style={{ visibility: sampleTreeSelected ? 'visible' : 'hidden' }}
-              className={styles.newFolder}
-              onClick={(e) => { e.stopPropagation(); createFile(); }}
-            />
-            : null
-          }
+            ? (
+              <Create
+                style={{ visibility: sampleTreeSelected ? 'visible' : 'hidden' }}
+                className={styles.newFolder}
+                onClick={(e) => { e.stopPropagation(); createFile(); }}
+              />
+            )
+            : null}
 
         </li>
         <FolderContents

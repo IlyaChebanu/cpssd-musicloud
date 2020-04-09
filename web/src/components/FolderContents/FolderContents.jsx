@@ -11,7 +11,7 @@ const FolderContents = (folder) => {
   return (
     <div>
       {folders.map((item) => (
-        <Folder dir={item} level={level}/>
+        <Folder dir={item} level={level} />
       ))}
       {files.map((file) => (
         <File

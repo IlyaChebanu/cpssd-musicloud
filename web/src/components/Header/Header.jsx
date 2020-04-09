@@ -116,7 +116,7 @@ const Header = memo((props) => {
           fadeOut: 0,
         },
       };
-      await saveFile(sampleFile.name, url)
+      await saveFile(sampleFile.name, url);
       dispatch(addSample(studio.selectedTrack, sampleState));
     };
   }, [dispatch, studio]);
