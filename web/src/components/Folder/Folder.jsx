@@ -10,7 +10,8 @@ import {
 import { ReactComponent as ClosedFolder } from '../../assets/icons/file-explorer.svg';
 import { ReactComponent as OpenFolder } from '../../assets/icons/folder-24px.svg';
 import { ReactComponent as Delete } from '../../assets/icons/delete_outline-24px.svg';
-import { generatePresigned, renameFolder, getFolderContent, deleteSampleFolder } from '../../helpers/api';
+import { ReactComponent as Create } from '../../assets/icons/newFolder.svg';
+import { renameFolder, getFolderContent, deleteSampleFolder, createSampleFolder } from '../../helpers/api';
 import { showNotification } from '../../actions/notificationsActions';
 import styles from './Folder.module.scss';
 // eslint-disable-next-line import/no-cycle
@@ -76,6 +77,29 @@ const Folder = memo((props) => {
     setDeleted(true);
   }, [dir]);
 
+  const createFile = useCallback(async () => {
+    let res = await createSampleFolder("New Folder", dir['folder_id']);
+    if (res.status === 200) {
+      res = await getFolderContent(dir['folder_id']);
+      if (res.status === 200) {
+        setExpanded(true);
+        dispatch(setSelectedFolder(dir));
+        const files = res.data['folder']['child_files']
+        const folders = res.data['folder']['child_folders']
+        setFiles(files);
+        setFolders(folders);
+      } else {
+        dispatch(showNotification({
+          message: 'An unknown file explorer error has occurred.',
+        }));
+      }
+    } else {
+      dispatch(showNotification({
+        message: 'An unknown file explorer error has occurred.',
+      }));
+    }
+  }, [dir]);
+
   const onInputBlur = async (e, key) => {
     if (key === 13) {
       oldName.current = newName;
@@ -120,6 +144,11 @@ const Folder = memo((props) => {
               onChange={handleFolderNameChange}
               onClick={(e) => { dispatch(setSelectedFolder(dir)); e.stopPropagation(); }}
               value={newName}
+            />
+            <Create
+              style={{ visibility: expanded ? 'visible' : 'hidden' }}
+              className={styles.deleteFolder}
+              onClick={(e) => { e.stopPropagation(); createFile(); }}
             />
             <Delete
               style={{ visibility: expanded ? 'visible' : 'hidden' }}

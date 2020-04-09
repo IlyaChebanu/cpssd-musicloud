@@ -365,3 +365,24 @@ export const deleteSampleFolder = (folderId) => axios.delete(
       headers: getAuth(),
   },
 );
+
+export const createSampleFolder = (folderName, parentFolderId) => axios.post(
+  `${API_URL}/v1/audio/folders`,
+  {
+      folder_name: folderName,
+      parent_folder_id: parentFolderId,
+  },
+  {
+    headers: getAuth(),
+  },
+);
+
+export const createRootSampleFolder = (folderName) => axios.post(
+  `${API_URL}/v1/audio/folders`,
+  {
+      folder_name: folderName,
+  },
+  {
+    headers: getAuth(),
+  },
+);
