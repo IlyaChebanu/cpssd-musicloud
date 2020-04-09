@@ -52,6 +52,7 @@ const PlaybackControls = memo((props) => {
       dispatch(startRecording());
     }
     ReactTooltip.hide();
+    
   }, [dispatch, recording]);
 
   const toStart = useCallback((e) => {
