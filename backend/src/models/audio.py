@@ -1250,6 +1250,28 @@ def move_folder_entry(folder_id, parent_folder_id):
     query(sql, args)
 
 
+def rename_folder_entry(folder_id, name):
+    """
+    Takes a folder ID and the new name we want to save for the file.
+    :param folder_id:
+    Int - ID of the folder we want to rename.
+    :param name:
+    Str - The new name we want to save for our file.
+    :return:
+    None - Renames the folder and returns None.
+    """
+    sql = (
+        "UPDATE Folder "
+        "SET name=%s "
+        "WHERE folder_id = %s"
+    )
+    args = (
+        name,
+        folder_id,
+    )
+    query(sql, args)
+
+
 def move_file_entry(folder_id, file_id):
     """
     Takes a file ID and the ID of it's new parent folder.

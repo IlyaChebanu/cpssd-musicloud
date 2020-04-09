@@ -4026,7 +4026,7 @@ paths:
       tags:
       - "audio"
       summary: "Move a non-root folder."
-      description: "This endpoint takes two arguments and moves a folder in the DB. The arguments that are to be provided are as follows:\n\n \"folder_id\" = The ID of the folder you want to move.\n\n \"parent_folder_id\" = The ID of the folder you want to move your selected folder into. If you attempt to move a root folder, an error will be returned."
+      description: "This endpoint takes multiple arguments and either renames or moves a folder in the DB. The arguments that are to be provided are as follows:\n\n \"folder_id\" = The ID of the folder you want to move or rename.\n\n \"parent_folder_id\" = The ID of the folder you want to move your selected folder into. If you attempt to move a root folder, an error will be returned.\n\n \"name\" = The new name for the folder. If this argument is provided then a rename will occur provided the folder_id has been sent. Otherwise a move will occur provided both the folder & parent folder IDs were sent."
       consumes:
       - "application/json"
       produces:
