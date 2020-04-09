@@ -43,11 +43,16 @@ const File = memo((props) => {
     }
   }, [config]);
 
-  const handleFileNameChange = useCallback((e) => {
+  const handleFileNameChange = useCallback(async (e) => {
     e.preventDefault();
-    dispatch(setSelectedFile(`${path}/${e.target.value}`));
+    let name = e.target.value;
+    if (!name) {
+      name = 'Unnamed File';
+    }
+    dispatch(setSelectedFile(`${path}/${name}`));
     setNewName(e.target.value);
-  }, [dispatch, path]);
+    await renameFile(dir.folder_id, name);
+  }, [dir.folder_id, dispatch, path]);
 
   const fileClick = useCallback(() => {
     if (selectedFile === dir) {
@@ -68,15 +73,10 @@ const File = memo((props) => {
       .catch();
   }, [awsConfig, config, dir]);
 
-  const onInputBlur = async (e, key) => {
-    if (key === 13) {
-      oldName.current = newName;
-      setNewName(e.target.value);
-      e.target.blur();
-      await renameFile(dir.file_id, newName);
-    } else {
-      setNewName(oldName.current);
-    }
+  const onInputBlur = async (e) => {
+    oldName.current = newName;
+    setNewName(e.target.value);
+    e.target.blur();
   };
 
   const addSample = useCallback(
@@ -132,10 +132,10 @@ const File = memo((props) => {
             <SampleIcon style={{ paddingRight: '4px', fill: 'white' }} />
             <form onSubmit={(e) => { e.preventDefault(); }}>
               <input
-                onBlur={(e) => { onInputBlur(e, -1); }}
+                onBlur={(e) => { onInputBlur(e); }}
                 onKeyDown={(e) => {
                   if (e.keyCode === 13) {
-                    onInputBlur(e, e.keyCode);
+                    onInputBlur(e);
                   }
                   // Skip dot, comma, slash, backslash
                   if (e.keyCode === 190 || e.keyCode === 191

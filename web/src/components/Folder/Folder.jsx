@@ -32,10 +32,15 @@ const Folder = memo((props) => {
   const oldName = { current: dir.name };
   const [newName, setNewName] = useState(oldName.current);
 
-  const handleFolderNameChange = useCallback((e) => {
+  const handleFolderNameChange = useCallback(async (e) => {
     e.preventDefault();
-    setNewName(e.target.value);
-  }, []);
+    let name = e.target.value;
+    if (!name) {
+      name = 'Unnamed Folder';
+    }
+    setNewName(name);
+    await renameFolder(dir.folder_id, name);
+  }, [dir.folder_id]);
 
   const getFolderContents = useCallback(async () => {
     const res = await getFolderContent(dir.folder_id);
@@ -104,15 +109,10 @@ const Folder = memo((props) => {
     }
   }, [dir, dispatch]);
 
-  const onInputBlur = async (e, key) => {
-    if (key === 13) {
-      oldName.current = newName;
-      setNewName(e.target.value);
-      e.target.blur();
-      await renameFolder(dir.folder_id, newName);
-    } else {
-      setNewName(oldName.current);
-    }
+  const onInputBlur = async (e) => {
+    oldName.current = newName;
+    setNewName(e.target.value);
+    e.target.blur();
   };
 
 
@@ -134,7 +134,7 @@ const Folder = memo((props) => {
               type="text"
               onKeyDown={(e) => {
                 if (e.keyCode === 13) {
-                  onInputBlur(e, e.keyCode);
+                  onInputBlur(e);
                 }
                 // Skip dot, comma, slash, backslash
                 if (e.keyCode === 190 || e.keyCode === 191
@@ -142,7 +142,7 @@ const Folder = memo((props) => {
                   e.preventDefault();
                 }
               }}
-              onBlur={(e) => { onInputBlur(e, -1); }}
+              onBlur={(e) => { onInputBlur(e); }}
               disabled={!selectedFolder === dir}
               style={{ cursor: !selectedFolder === dir ? 'pointer' : '' }}
               onChange={handleFolderNameChange}
