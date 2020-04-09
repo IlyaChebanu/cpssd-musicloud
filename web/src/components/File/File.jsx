@@ -1,5 +1,5 @@
 import React, {
-  useState, useCallback, memo, useRef,
+  useState, useCallback, memo,
 } from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
@@ -9,7 +9,7 @@ import {
   setSelectedFile,
   addSample as addSampleAction,
 } from '../../actions/studioActions';
-import { generatePresigned } from '../../helpers/api';
+import { generatePresigned, deleteSampleFile } from '../../helpers/api';
 import { ReactComponent as SampleIcon } from '../../assets/icons/music_note-24px.svg';
 import styles from './File.module.scss';
 import { ReactComponent as Delete } from '../../assets/icons/delete_outline-24px.svg';
@@ -17,15 +17,15 @@ import { showNotification } from '../../actions/notificationsActions';
 
 const File = memo((props) => {
   const {
-    dir, selectedFile, dispatch, studio, selectedTrack,
+    dir, level, selectedFile, dispatch, studio, selectedTrack,
   } = props;
   const [deleted, setDeleted] = useState(false);
-  const level = dir.split('/').length - 2;
-  const extension = dir.split('/').pop().split('.').length === 0 ? '' : dir.split('/').pop().split('.').pop();
-  const oldName = useRef(dir.split('/').pop().split('.')[0]);
+  const url = dir['url'];
+  const extension = url.split('.')[url.length()-1];
+  const oldName = {current: dir['name']};
   const [newName, setNewName] = useState(oldName.current);
   const path = dir.split('/').slice(0, dir.split('/').length - 1).join('/');
-  const url = 'https://dcumusicloudbucket.s3-eu-west-1.amazonaws.com/';
+  const baseUrl = 'https://dcumusicloudbucket.s3-eu-west-1.amazonaws.com/';
   const [config, setConfig] = useState({
     bucketName: 'dcumusicloudbucket',
     secretAccessKey: 'XVdgFyhjyhnqicDxxXZa9rLouFv5WQdXzXwxrP0u',
@@ -54,29 +54,21 @@ const File = memo((props) => {
     } else {
       dispatch(setSelectedFile(`${path}/${newName}`));
     }
-    // setSelectedFolder(`${path}`);
   }, [dispatch, newName, path, selectedFile]);
 
 
   const deleteFromS3 = useCallback(async (directory, file) => {
     await awsConfig(directory);
     deleteFile(file.split('/').pop(), config)
-      .then(() => { setDeleted(true); })
+      .then(async () => {
+        await deleteSampleFile(dir['file_id']);
+        setDeleted(true);
+      })
       .catch();
-  }, [awsConfig, config]);
-
-
-  // const uploadToS3 = useCallback(async (oldFileName, newFileName) => {
-  //   await awsConfig(path);
-  //   await deleteFromS3(path, extension === '' ? oldFileName : `${oldFileName}.${extension}`);
-  //   uploadFile(newFileName, config)
-  //     .then()
-  //     .catch();
-  // }, [awsConfig, config, deleteFromS3, extension, path]);
+  }, [awsConfig, config, dir]);
 
   const onInputBlur = async (e, key) => {
     if (key === 13) {
-      // uploadToS3(oldName.current, newName);
       oldName.current = newName;
       setNewName(e.target.value);
       e.target.blur();
@@ -107,7 +99,7 @@ const File = memo((props) => {
         return;
       }
       const sampleState = {
-        url: url + name,
+        url: baseUrl + name,
         name,
         time: studio.currentBeat,
         fade: {

@@ -10,8 +10,7 @@ import styles from './FileExplorer.module.scss';
 import samplesIcon from '../../assets/icons/samples.svg';
 import instrumentsIcon from '../../assets/icons/instruments.svg';
 import { ReactComponent as NewFolder } from '../../assets/icons/newFolder.svg';
-import { generatePresigned } from '../../helpers/api';
-import store from '../../store';
+import { getRootFolderContents } from '../../helpers/api';
 import FolderContents from '../FolderContents/FolderContents';
 import {
   hideFileExplorer,
@@ -27,29 +26,16 @@ const FileExplorer = memo((props) => {
   const [sampleTreeSelected, setSampleTreeSelected] = useState(false);
   const node = useRef();
   const getFiles = useCallback(async () => {
-    const res = await generatePresigned('/');
+    const res = await getRootFolderContents();
     if (res.status === 200) {
-      const accessKey = res.data.signed_url.fields.AWSAccessKeyId;
-      AWS.config.update({
-        accessKeyId: accessKey,
-        secretAccessKey: 'XVdgFyhjyhnqicDxxXZa9rLouFv5WQdXzXwxrP0u',
-        region: 'eu-west-1',
-      });
-
-      setSampleTreeSelected(true);
-      const { user } = store.getState();
-      const lister = s3ls({
-        bucket: 'dcumusicloudbucket',
-      });
-      const { files, folders } = await lister.ls(`/audio/${user.username}`);
-      const moreFolders = folders.filter((folder) => folder.split('/').slice(folder.split('/').length - 2, folder.split('/').length - 1).pop() !== '');
+      const files = res.data['folder']['child_files']
+      const folders = res.data['folder']['child_folders']
       setFileList(files);
-      setFolderList(moreFolders);
+      setFolderList(folders);
       return;
     }
     dispatch(showNotification({
       message: res,
-
     }));
   }, [dispatch]);
 

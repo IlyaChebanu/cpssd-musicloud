@@ -313,3 +313,39 @@ export const changeProfiler = (reqData) => axios.patch(
     headers: getAuth(),
   },
 );
+
+export const saveFile = (fileName, fileUrl) => axios.post(
+  `${API_URL}/v1/audio/files`,
+  { file_name: fileName, file_url: fileUrl },
+  {
+    headers: getAuth(),
+  },
+);
+
+export const getRootFolderContents = () => axios.get(
+  `${API_URL}/v1/audio/folders`,
+  {
+    headers: getAuth(),
+  },
+);
+
+export const getFolderContents = (folderId) => axios.get(
+  `${API_URL}/v1/audio/folders?folder_id=${folderId}`,
+  {
+    headers: getAuth(),
+  },
+);
+
+export const deleteSampleFile = (fileId) => axios.delete(
+  `${API_URL}/v1/audio/files?file_id=${fileId}`,
+  {
+      headers: getAuth(),
+  },
+);
+
+export const deleteSampleFile = (fileId) => axios.delete(
+  `${API_URL}/v1/audio/files?file_id=${fileId}`,
+  {
+      headers: getAuth(),
+  },
+);
