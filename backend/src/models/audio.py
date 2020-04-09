@@ -1272,6 +1272,28 @@ def move_file_entry(folder_id, file_id):
     query(sql, args)
 
 
+def rename_file_entry(name, file_id):
+    """
+    Takes a file ID and a new name for that file & updates the file in the DB.
+    :param name:
+    Str - The new filename.
+    :param file_id:
+    Int - ID of the file we want to rename.
+    :return:
+    None - Renames the file and return None.
+    """
+    sql = (
+        "UPDATE File "
+        "SET name=%s "
+        "WHERE file_id = %s"
+    )
+    args = (
+        name,
+        file_id,
+    )
+    query(sql, args)
+
+
 def get_child_folders(folder_id):
     """
     Get the child folders for a given folder ID.
