@@ -1448,6 +1448,7 @@ def search_songs(user_data):  # pylint: disable=R0911,R0912,R0914,R0915
         "songs_per_page": songs_per_page,
         "next_page": next_page,
         "back_page": back_page,
+        "profile_search": profile_search,
         "songs": res,
     }, 200
 
