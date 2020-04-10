@@ -162,7 +162,10 @@ export default (
     case 'SET_GRID_UNIT_WIDTH':
       return {
         ...state,
-        gridUnitWidth: Math.max(Math.min(state.maxGridUnitWidth, action.width), state.minGridUnitWidth),
+        gridUnitWidth: Math.max(
+          Math.min(state.maxGridUnitWidth, action.width),
+          state.minGridUnitWidth,
+        ),
       };
     case 'SET_GRID_SNAP_ENABLED':
       return {

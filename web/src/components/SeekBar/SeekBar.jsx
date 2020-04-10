@@ -32,7 +32,8 @@ const SeekBar = memo((props) => {
         setCurrentBeat(
           Math.max(
             1,
-            startBeat + (e.screenX - mousePosOffset) / (gridUnitWidth * scaleFactor) / window.devicePixelRatio,
+            startBeat + (e.screenX - mousePosOffset) / (gridUnitWidth * scaleFactor)
+            / window.devicePixelRatio,
           ),
         ),
       );

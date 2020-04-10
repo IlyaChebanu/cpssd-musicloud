@@ -23,7 +23,13 @@ const Ticks = memo(({ gridSize, gridWidth, gridUnitWidth }) => {
       .map((__, i) => <rect key={i} x={i * gridUnitWidth} className={styles.tick} />)
   ), [gridSize, gridWidth, gridUnitWidth]);
   return (
-    <svg className={styles.gridLines} style={{ width: Math.ceil(gridWidth * gridSize) * gridUnitWidth }}>
+    <svg
+      className={styles.gridLines}
+      style={{
+        width: Math.ceil(gridWidth * gridSize)
+    * gridUnitWidth,
+      }}
+    >
       {ticks}
     </svg>
   );
