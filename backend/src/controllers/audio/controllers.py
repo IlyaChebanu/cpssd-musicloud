@@ -1260,11 +1260,21 @@ def search_songs(user_data):  # pylint: disable=R0911,R0912,R0914,R0915
     next_page = request.args.get('next_page')
     back_page = request.args.get('back_page')
     if not next_page and not back_page:
+        profile_search = False
+        search_my_profile = request.args.get('profile_search')
+        if search_my_profile:
+            profile_search = True
+
         search_term = request.args.get('search_term')
         if search_term:
             total_songs = get_number_of_searchable_songs(search_term)
         else:
-            total_songs = get_number_of_compiled_songs()
+            if profile_search:
+                total_songs = get_number_of_compiled_songs_by_uid(
+                    user_data.get("uid")
+                )
+            else:
+                total_songs = get_number_of_compiled_songs()
 
         publish_sort = request.args.get('publish_sort')
         title_sort = request.args.get('title_sort')
@@ -1321,11 +1331,6 @@ def search_songs(user_data):  # pylint: disable=R0911,R0912,R0914,R0915
                     sort_sql = " ORDER BY duration ASC "
                 else:
                     sort_sql = " ORDER BY duration DESC "
-
-        profile_search = False
-        search_my_profile = request.args.get('profile_search')
-        if search_my_profile:
-            profile_search = True
 
         songs_per_page = request.args.get('songs_per_page')
         if not songs_per_page:
