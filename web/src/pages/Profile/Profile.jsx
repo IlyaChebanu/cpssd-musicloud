@@ -15,6 +15,7 @@ import {
 } from '../../helpers/api';
 import Spinner from '../../components/Spinner';
 import SongCard from '../../components/SongCard';
+import MusicSearch from '../../components/MusicSearch';
 
 
 const Profile = memo((props) => {
@@ -27,6 +28,8 @@ const Profile = memo((props) => {
   const [gotPosts, setGotPosts] = useState([]);
   const [gotNextSongs, setNextSongs] = useState('');
   const [gotNextPosts, setNextPosts] = useState('');
+  const [searchText, setSearchText] = useState('');
+  const [sortedBy, setSortedBy] = useState([]);
 
   useEffect(() => {
     setNextSongs('');
@@ -50,7 +53,7 @@ const Profile = memo((props) => {
 
   useEffect(() => {
     const getSongs = async () => {
-      const res = await getCompiledSongs(username);
+      const res = await getCompiledSongs(true, searchText, sortedBy[0], sortedBy[1]);
       if (res.status === 200) {
         setGotSongs(res.data.songs);
         if (res.data.next_page) {
@@ -59,7 +62,7 @@ const Profile = memo((props) => {
       }
     };
     getSongs();
-  }, [username]);
+  }, [searchText, sortedBy]);
 
   const nextSongs = useCallback(async (e) => {
     e.preventDefault();
@@ -123,6 +126,10 @@ const Profile = memo((props) => {
     />
   )), [gotPosts, user.profiler, username]);
 
+  const handleChange = useCallback((text) => {
+    setSearchText(text.trim());
+  }, []);
+  const profile = 'profile';
   return (
     <div className={styles.wrapper}>
       <Header selected={3} />
@@ -132,12 +139,20 @@ const Profile = memo((props) => {
       </div>
       <div className={styles.contentWrapper}>
         <title className={styles.sectionTitle}>Songs</title>
+        <MusicSearch
+          setSortedBy={setSortedBy}
+          onChange={handleChange}
+          className={styles.musicSearch}
+          profile={profile}
+        />
         <div className={styles.songs}>
           {ownSongCards}
         </div>
         <p
-          className={gotNextSongs ? styles.seeMore : styles.hide}
-          onClick={gotNextSongs ? nextSongs : () => {}}
+          className={(gotNextSongs && ((gotSongs.length % 25) === 0)
+              && gotSongs.length !== 0) ? styles.seeMore : styles.hide}
+          onClick={(gotNextSongs && ((gotSongs.length % 25) === 0)
+              && gotSongs.length !== 0) ? nextSongs : () => { }}
         >
           See more
         </p>
