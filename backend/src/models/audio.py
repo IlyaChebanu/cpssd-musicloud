@@ -257,7 +257,6 @@ def get_all_search_results(
         songs_per_page
     )
 
-    res = None
     if sort_sql:
         if profile_search:
             sql += "AND uid=%s " + sort_sql + "LIMIT %s, %s;"
@@ -274,8 +273,6 @@ def get_all_search_results(
             sql += "LIMIT %s, %s;"
             res = query(sql, discover_args, True)
 
-    if not res:
-        raise NoResults
     return res
 
 
