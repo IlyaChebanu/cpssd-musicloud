@@ -61,39 +61,38 @@ const TimelineControls = memo((props) => {
 
   const gridDropdownItems = useMemo(() => [
     {
+      size: 1,
       name: '1/1',
       action() {
         dispatch(setGridSize(1));
       },
     },
     {
+      size: 2,
       name: '1/2',
       action() {
         dispatch(setGridSize(2));
       },
     },
     {
+      size: 4,
       name: '1/4',
       action() {
         dispatch(setGridSize(4));
       },
     },
     {
+      size: 8,
       name: '1/8',
       action() {
         dispatch(setGridSize(8));
       },
     },
     {
+      size: 16,
       name: '1/16',
       action() {
         dispatch(setGridSize(16));
-      },
-    },
-    {
-      name: '1/32',
-      action() {
-        dispatch(setGridSize(32));
       },
     },
   ], [dispatch]);

@@ -17,13 +17,13 @@ configure({
   allowCombinationSubmatches: true,
 });
 
-const Ticks = memo(({ gridSize, gridWidth }) => {
+const Ticks = memo(({ gridSize, gridWidth, gridUnitWidth }) => {
   const ticks = useMemo(() => (
     [...Array(Math.ceil(gridWidth * gridSize))]
-      .map((__, i) => <rect key={i} x={i * 40} className={styles.tick} />)
-  ), [gridSize, gridWidth]);
+      .map((__, i) => <rect key={i} x={i * gridUnitWidth} className={styles.tick} />)
+  ), [gridSize, gridWidth, gridUnitWidth]);
   return (
-    <svg className={styles.gridLines} style={{ width: Math.ceil(gridWidth * gridSize) * 40 }}>
+    <svg className={styles.gridLines} style={{ width: Math.ceil(gridWidth * gridSize) * gridUnitWidth }}>
       {ticks}
     </svg>
   );
@@ -32,13 +32,14 @@ const Ticks = memo(({ gridSize, gridWidth }) => {
 Ticks.propTypes = {
   gridSize: PropTypes.number.isRequired,
   gridWidth: PropTypes.number.isRequired,
+  gridUnitWidth: PropTypes.number.isRequired,
 };
 
 Ticks.displayName = 'Ticks';
 
 const Track = memo((props) => {
   const {
-    dispatch, clipboard, track, className, gridSize, gridWidth, index,
+    dispatch, clipboard, track, className, gridSize, gridWidth, gridUnitWidth, index,
   } = props;
 
   const handleSetSelected = useCallback(() => {
@@ -66,8 +67,8 @@ const Track = memo((props) => {
   };
 
   const widthStyle = useMemo(() => ({
-    width: Math.ceil(gridWidth * gridSize) * 40,
-  }), [gridSize, gridWidth]);
+    width: Math.ceil(gridWidth * gridSize) * gridUnitWidth,
+  }), [gridSize, gridUnitWidth, gridWidth]);
 
   return (
     <HotKeys
@@ -78,7 +79,7 @@ const Track = memo((props) => {
       onMouseDown={handleSetSelected}
       style={widthStyle}
     >
-      <Ticks gridSize={gridSize} gridWidth={gridWidth} />
+      <Ticks gridSize={gridSize} gridWidth={gridWidth} gridUnitWidth={gridUnitWidth} />
     </HotKeys>
   );
 });
@@ -91,6 +92,7 @@ Track.propTypes = {
   className: PropTypes.string,
   gridSize: PropTypes.number.isRequired,
   gridWidth: PropTypes.number.isRequired,
+  gridUnitWidth: PropTypes.number.isRequired,
 };
 
 Track.defaultProps = {
@@ -107,6 +109,7 @@ const mapStateToProps = ({ studio }) => ({
   test: studio.test,
   gridSize: studio.gridSize,
   gridWidth: studio.gridWidth,
+  gridUnitWidth: studio.gridUnitWidth,
 });
 
 export default connect(mapStateToProps)(Track);

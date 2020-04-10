@@ -12,7 +12,7 @@ import {
 
 const SeekBar = memo((props) => {
   const {
-    playing, dispatch, gridSize, draggingSeekBar, currentBeatStudio, dataTip,
+    playing, dispatch, gridSize, gridUnitWidth, draggingSeekBar, currentBeatStudio, dataTip,
   } = props;
 
   const currentBeat = props.currentBeat ? props.currentBeat : currentBeatStudio;
@@ -32,7 +32,7 @@ const SeekBar = memo((props) => {
         setCurrentBeat(
           Math.max(
             1,
-            startBeat + (e.screenX - mousePosOffset) / (40 * scaleFactor) / window.devicePixelRatio,
+            startBeat + (e.screenX - mousePosOffset) / (gridUnitWidth * scaleFactor) / window.devicePixelRatio,
           ),
         ),
       );
@@ -49,24 +49,24 @@ const SeekBar = memo((props) => {
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleDragStop);
-  }, [currentBeat, dispatch, playing, scaleFactor]);
+  }, [currentBeat, dispatch, gridUnitWidth, playing, scaleFactor]);
 
   const offset = props.currentBeat ? 0 : 220;
   const iconStyle = useMemo(() => {
-    const pos = -7 + offset + (currentBeat - 1) * (40 * scaleFactor) - scroll;
+    const pos = -7 + offset + (currentBeat - 1) * (gridUnitWidth * scaleFactor) - scroll;
     return {
       transform: `translate(${pos}px, -0px)`,
       opacity: pos >= offset - 7 ? 1 : 0,
     };
-  }, [offset, currentBeat, scaleFactor, scroll]);
+  }, [offset, currentBeat, gridUnitWidth, scaleFactor, scroll]);
 
   const barStyle = useMemo(() => {
-    const pos = offset + (currentBeat - 1) * (40 * scaleFactor) - scroll;
+    const pos = offset + (currentBeat - 1) * (gridUnitWidth * scaleFactor) - scroll;
     return {
       transform: `translate(${pos}px, 60px)`,
       opacity: pos >= offset ? 1 : 0,
     };
-  }, [offset, currentBeat, scaleFactor, scroll]);
+  }, [offset, currentBeat, gridUnitWidth, scaleFactor, scroll]);
   return (
     <div
       className={styles.wrapper}
@@ -91,6 +91,7 @@ SeekBar.propTypes = {
   playing: PropTypes.bool.isRequired,
   dispatch: PropTypes.func.isRequired,
   gridSize: PropTypes.number.isRequired,
+  gridUnitWidth: PropTypes.number.isRequired,
   scaleFactor: PropTypes.number,
   scrollPosition: PropTypes.number,
   dataTip: PropTypes.string,
@@ -111,6 +112,7 @@ const mapStateToProps = ({ studio }) => ({
   scroll: studio.scroll,
   playing: studio.playing,
   gridSize: studio.gridSize,
+  gridUnitWidth: studio.gridUnitWidth,
   draggingSeekBar: studio.draggingSeekBar,
 });
 
