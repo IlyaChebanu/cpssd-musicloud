@@ -149,8 +149,8 @@ const Profile = memo((props) => {
           {ownSongCards}
         </div>
         <p
-          className={gotNextSongs ? styles.seeMore : styles.hide}
-          onClick={gotNextSongs ? nextSongs : () => { }}
+          className={(gotNextSongs && ((gotSongs.length % 25) === 0) && gotSongs.length !== 0) ? styles.seeMore : styles.hide}
+          onClick={(gotNextSongs && ((gotSongs.length % 25) === 0) && gotSongs.length !== 0) ? nextSongs : () => { }}
         >
           See more
         </p>
