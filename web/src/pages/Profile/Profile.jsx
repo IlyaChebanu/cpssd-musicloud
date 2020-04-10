@@ -129,6 +129,7 @@ const Profile = memo((props) => {
   const handleChange = useCallback((text) => {
     setSearchText(text.trim());
   }, []);
+  const profile = 'profile';
   return (
     <div className={styles.wrapper}>
       <Header selected={3} />
@@ -142,6 +143,7 @@ const Profile = memo((props) => {
           setSortedBy={setSortedBy}
           onChange={handleChange}
           className={styles.musicSearch}
+          profile={profile}
         />
         <div className={styles.songs}>
           {ownSongCards}
