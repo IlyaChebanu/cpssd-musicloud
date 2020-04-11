@@ -213,7 +213,7 @@ class StudioScreen extends React.Component {
     }
 
     makeSignedUrl(object) {
-        return (new URL(object.url + object.fields.key)).href;
+        return (object.url + object.fields.key)
     }
 
     async uploadSelectedAudio(filename, filetype, uri) {
