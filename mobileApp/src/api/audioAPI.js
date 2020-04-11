@@ -370,3 +370,41 @@ export function getSearchSongs(token, search_term, sort_type, sort, songs_per_pa
             return error
         });
 }
+
+export function postAudioFiles(token, fileUrl, name) {
+
+    let url = `${API_URL}api/v1/audio/files`;
+    var request = new Request(url, {
+        method: "POST",
+        headers: new Headers({
+            "Content-Type": "application/json",
+            "Authorization": 'Bearer ' + token,
+        }),
+        body: JSON.stringify({
+            "file_name": name,
+            "file_url": fileUrl,
+        })
+    });
+    if (__DEV__) {
+        console.log("postAudioFiles : request " + JSON.stringify(request))
+    }
+
+    return fetch(request)
+        .then(response => {
+            return response.json().then(jsonResponse => {
+                return {status: response.status, data: jsonResponse}
+            })
+        })
+        .then(responseJson => {
+            if (__DEV__) {
+                console.log("postAudioFiles : response " + JSON.stringify(responseJson))
+            }
+            return responseJson;
+        })
+        .catch(error => {
+            if (__DEV__) {
+                console.log("postAudioFiles : error " + JSON.stringify(error))
+            }
+            return error
+        });
+}
