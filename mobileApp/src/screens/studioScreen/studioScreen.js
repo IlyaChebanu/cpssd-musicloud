@@ -14,6 +14,7 @@ import { postFile, putUploadFile, putUploadAudioFile } from "../../api/uploadApi
 import CustomAlertComponent from "../../components/alertComponent/customAlert";
 import DocumentPicker from 'react-native-document-picker';
 import { LogLevel, RNFFmpeg, RNFFmpegConfig } from 'react-native-ffmpeg';
+import { postAudioFiles } from "../../api/audioAPI";
 
 const { width, height } = Dimensions.get('window');
 
@@ -211,13 +212,19 @@ class StudioScreen extends React.Component {
         this.setState({ alertTitle: 'Error', alertMessage: 'Failed to upload recording', showAlert: true })
     }
 
+    makeSignedUrl(object) {
+        return (object.url + object.fields.key)
+    }
+
     async uploadSelectedAudio(filename, filetype, uri) {
         await postFile(this.props.token, 'audio', filename, `audio/x-${filetype}`).then(response => {
             if (isNaN(response)) {
                 if (response.signed_url.fields.key) {
                     this.setState({ urlKey: response.signed_url.fields.key })
                     let urlKey = response.signed_url.fields.key
+                    let url = this.makeSignedUrl(response)
                     putUploadAudioFile(urlKey, uri, filetype, this.uploadAudioSuccess.bind(this), this.uploadAudioFail.bind(this))
+                    postAudioFiles(this.props.token, url, filename)
                 }
             }
         })
@@ -252,7 +259,9 @@ class StudioScreen extends React.Component {
                 if (response.signed_url.fields.key) {
                     this.setState({ urlKey: response.signed_url.fields.key })
                     let urlKey = response.signed_url.fields.key
+                    let url = this.makeSignedUrl(response.signed_url)
                     putUploadAudioFile(urlKey, output, filetype, this.uploadAudioSuccess.bind(this), this.uploadAudioFail.bind(this))
+                    postAudioFiles(this.props.token, url, filename)
                 }
             }
         })
