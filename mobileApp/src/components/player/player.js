@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Text, View, Image, Dimensions } from "react-native";
+import { StyleSheet, Text, View, Image, Dimensions, Platform } from "react-native";
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Slider from 'react-native-slider';
 import Video from 'react-native-video';
@@ -58,7 +58,7 @@ export default class Player extends React.Component {
         MusicControl.enableControl('changePlaybackPosition', true)
         // pause during audio interuptions (eg phone call)
         MusicControl.handleAudioInterruptions(true);
-        
+
         MusicControl.enableControl('seek', true) // Android only
         MusicControl.enableControl('volume', true) // Only affected when remoteVolume is enabled
         MusicControl.enableControl('remoteVolume', true)
@@ -100,14 +100,23 @@ export default class Player extends React.Component {
             });
             let songPlaying = this.props.songs[this.state.songIndex];
             let songCover = songPlaying.cover ? songPlaying.cover : 'https://dcumusicloudbucket.s3-eu-west-1.amazonaws.com/cover/1001_index.jpg'
+            Platform.OS === 'ios' ?
             MusicControl.updatePlayback({
+                title: songPlaying.title,
                 state: MusicControl.STATE_PLAYING,
                 elapsedTime: 0,
+                artwork: songCover,
+                artist: songPlaying.username,
+                description: songPlaying.description,
+                duration: this.state.songDuration,
+            }) :
+            MusicControl.setNowPlaying({
                 title: songPlaying.title,
                 artwork: songCover,
                 artist: songPlaying.username,
                 description: songPlaying.description,
                 duration: this.state.songDuration,
+                notificationIcon: 'ic_notification',
             })
         } else {
             this.refs.audio.seek(0);
@@ -130,6 +139,7 @@ export default class Player extends React.Component {
         }, () => {
             let songPlaying = this.props.songs[this.state.songIndex];
             let songCover = songPlaying.cover ? songPlaying.cover : 'https://dcumusicloudbucket.s3-eu-west-1.amazonaws.com/cover/1001_index.jpg'
+            Platform.OS === 'ios' ? 
             MusicControl.updatePlayback({
                 state: MusicControl.STATE_PLAYING,
                 elapsedTime: 0,
@@ -137,13 +147,21 @@ export default class Player extends React.Component {
                 artwork: songCover,
                 artist: songPlaying.username,
                 description: songPlaying.description,
+            }) :
+            MusicControl.setNowPlaying({
+                title: songPlaying.title,
+                artwork: songCover,
+                artist: songPlaying.username,
+                description: songPlaying.description,
+                duration: this.state.songDuration,
+                notificationIcon: 'ic_notification',
             })
-            setTimeout(function() {
+            setTimeout(function () {
                 MusicControl.updatePlayback({
                     duration: this.state.songDuration,
                 })
-              }.bind(this), 500)
-          
+            }.bind(this), 500)
+
         });
         this.refs.audio.seek(0);
     }
