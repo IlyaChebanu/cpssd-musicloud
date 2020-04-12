@@ -236,10 +236,10 @@ export const setSongCompiledUrl = (reqData) => axios.patch(
   },
 );
 
-export const getCompiledSongs = (username, searchText, order, sortedBy) => axios.get(
+export const getCompiledSongs = (profileSearch, searchText, order, sortedBy) => axios.get(
   `${API_URL}/v1/audio/search?songs_per_page=25`
   + `${searchText ? `&search_term=${searchText.trim()}` : ''}`
-  + `${username !== '' ? `&username=${username}` : ''}`
+  + `${profileSearch !== '' ? `&profile_search=${profileSearch}` : ''}`
   + `${sortedBy !== '' && order !== '' && order !== undefined ? `&${sortedBy}=${order}` : ''}`,
   {
     headers: getAuth(),

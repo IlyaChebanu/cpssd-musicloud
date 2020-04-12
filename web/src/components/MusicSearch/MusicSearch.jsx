@@ -63,13 +63,17 @@ const MusicSearch = memo((props) => {
           <p>Title</p>
           {switchIcon(sortTitle)}
         </button>
-        <button
-          type="button"
-          onClick={() => toggle(sortArtist, setSortArtist, 'artist_sort')}
-        >
-          <p>Artist</p>
-          {switchIcon(sortArtist)}
-        </button>
+        {props.profile !== 'profile'
+          ? (
+            <button
+              type="button"
+              onClick={() => toggle(sortArtist, setSortArtist, 'artist_sort')}
+            >
+              <p>Artist</p>
+              {switchIcon(sortArtist)}
+            </button>
+          )
+          : null}
         <button
           type="button"
           onClick={() => toggle(sortDuration, setSortDuration, 'duration_sort')}
@@ -87,6 +91,7 @@ MusicSearch.propTypes = {
   onChange: PropTypes.func,
   onKeyPress: PropTypes.func,
   setSortedBy: PropTypes.func,
+  profile: PropTypes.string,
 };
 
 MusicSearch.defaultProps = {
@@ -94,6 +99,7 @@ MusicSearch.defaultProps = {
   onChange: null,
   onKeyPress: null,
   setSortedBy: null,
+  profile: '',
 };
 
 MusicSearch.displayName = 'MusicSearch';
