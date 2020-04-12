@@ -122,8 +122,9 @@ export default class Player extends React.Component {
     }
 
     goForward() {
+        let songIdx = (this.state.songIndex + 1 < this.props.songs.length) ? this.state.songIndex + 1 : this.props.songs.length - 1
         this.setState({
-            songIndex: this.state.songIndex + 1,
+            songIndex: songIdx,
             currentTime: 0,
             playing: true,
         }, () => {
