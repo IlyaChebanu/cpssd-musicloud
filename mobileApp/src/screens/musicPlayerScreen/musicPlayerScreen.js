@@ -40,6 +40,7 @@ class MusicPlayerScreen extends React.Component {
 
     handleAndroidBackPress = () => {
         this.props.navigateBack()
+        this.triggerClosePlayer()
         return true;
     }
 
@@ -168,6 +169,7 @@ class MusicPlayerScreen extends React.Component {
     }
 
     navBack() {
+        this.triggerClosePlayer()
         this.props.setSongUpdate(!this.props.songUpdate)
         this.props.navigateBack()
     }
@@ -175,6 +177,10 @@ class MusicPlayerScreen extends React.Component {
     onPressAlertPositiveButton = () => {
         this.setState({ showAlert: false })
     };
+
+    triggerClosePlayer() {
+        this.refs.player.closePlayer()
+    }
 
     render() {
         var logoImage = require("../../assets/images/logo1.png");
@@ -199,12 +205,14 @@ class MusicPlayerScreen extends React.Component {
                         </View>
                         {/* <HeaderComponent navigation={this.props.navigation} /> */}
                         <Player
+                            ref="player"
                             songIndex={this.props.songIndex}
                             handlePlaylistClick={this.handlePlaylistClick.bind(this)}
                             handleProfileClick={this.handleAuthorClick.bind(this)}
                             accessToken={this.props.token}
                             profilePic={this.props.otherUserData.profile_pic_url ? this.props.otherUserData.profile_pic_url : null}
                             songs={this.props.songData}
+                            closePlayer={this.triggerClosePlayer}
                         />
                     </View>
                 </TouchableWithoutFeedback>

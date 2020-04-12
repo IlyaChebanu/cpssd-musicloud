@@ -68,9 +68,8 @@ export default class Player extends React.Component {
         MusicControl.enableControl('remoteVolume', true)
     }
 
-    componentWillUnmount() {
-        // MusicControl.resetNowPlaying()
-        // MusicControl.stopControl()
+    closePlayer() {
+        MusicControl.resetNowPlaying()
     }
 
     togglePlay(playing) {
@@ -165,7 +164,7 @@ export default class Player extends React.Component {
             artist: songPlaying.username,
             description: songPlaying.description,
             duration: params.duration,
-            notificationIcon: 'ic_launcher',
+            notificationIcon: 'ic_notification',
         });
         MusicControl.updatePlayback({
             state: MusicControl.STATE_PLAYING,
