@@ -43,9 +43,6 @@ export default class Player extends React.Component {
                 elapsedTime: time,
             })
         })
-        MusicControl.on('closeNotification', () => {
-            console.warn('close notif')
-        })
     }
 
     componentDidMount() {
@@ -61,8 +58,7 @@ export default class Player extends React.Component {
         MusicControl.enableControl('changePlaybackPosition', true)
         // pause during audio interuptions (eg phone call)
         MusicControl.handleAudioInterruptions(true);
-
-        MusicControl.enableControl('closeNotification', true, {when: 'always'})
+        
         MusicControl.enableControl('seek', true) // Android only
         MusicControl.enableControl('volume', true) // Only affected when remoteVolume is enabled
         MusicControl.enableControl('remoteVolume', true)
