@@ -158,6 +158,7 @@ export default class Player extends React.Component {
                     onProgress={this.setTime.bind(this)}
                     onEnd={this.onEnd.bind(this)}
                     resizeMode="cover"
+                    playInBackground={true}
                     repeat={false} />
 
                 <View style={styles.headerClose}>
