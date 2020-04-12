@@ -9,6 +9,7 @@
 
     <application
       android:name=".MainApplication"
+        android:launchMode="singleTask"
       android:usesCleartextTraffic="true"
       android:label="@string/app_name"
       android:icon="@mipmap/ic_launcher"
@@ -20,6 +21,7 @@
         <activity
           android:name=".SplashActivity"
           android:theme="@style/SplashTheme"
+            android:launchMode="singleTask"
           android:label="@string/app_name">
           <intent-filter>
               <action android:name="android.intent.action.MAIN" />
@@ -29,6 +31,7 @@
 
       <activity
         android:name=".MainActivity"
+          android:launchMode="singleTask"
         android:label="@string/app_name"
         android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
         android:windowSoftInputMode="adjustPan">
