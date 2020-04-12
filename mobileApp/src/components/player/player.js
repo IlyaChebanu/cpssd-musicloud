@@ -103,11 +103,12 @@ export default class Player extends React.Component {
                 playing: true,
             });
             let songPlaying = this.props.songs[this.state.songIndex];
+            let songCover = songPlaying.cover ? songPlaying.cover : 'https://dcumusicloudbucket.s3-eu-west-1.amazonaws.com/cover/1001_index.jpg'
             MusicControl.updatePlayback({
                 state: MusicControl.STATE_PLAYING,
                 elapsedTime: 0,
                 title: songPlaying.title,
-                artwork: songPlaying.cover,
+                artwork: songCover,
                 artist: songPlaying.username,
                 description: songPlaying.description,
                 duration: this.state.songDuration,
@@ -131,11 +132,12 @@ export default class Player extends React.Component {
             playing: true,
         }, () => {
             let songPlaying = this.props.songs[this.state.songIndex];
+            let songCover = songPlaying.cover ? songPlaying.cover : 'https://dcumusicloudbucket.s3-eu-west-1.amazonaws.com/cover/1001_index.jpg'
             MusicControl.updatePlayback({
                 state: MusicControl.STATE_PLAYING,
                 elapsedTime: 0,
                 title: songPlaying.title,
-                artwork: songPlaying.cover,
+                artwork: songCover,
                 artist: songPlaying.username,
                 description: songPlaying.description,
             })
@@ -158,9 +160,10 @@ export default class Player extends React.Component {
     onLoad(params) {
         this.setState({ numLikes: this.props.songs[this.state.songIndex].likes, liked: this.props.songs[this.state.songIndex].like_status, songDuration: params.duration })
         let songPlaying = this.props.songs[this.state.songIndex];
+        let songCover = songPlaying.cover ? songPlaying.cover : 'https://dcumusicloudbucket.s3-eu-west-1.amazonaws.com/cover/1001_index.jpg'
         MusicControl.setNowPlaying({
             title: songPlaying.title,
-            artwork: songPlaying.cover,
+            artwork: songCover,
             artist: songPlaying.username,
             description: songPlaying.description,
             duration: params.duration,
