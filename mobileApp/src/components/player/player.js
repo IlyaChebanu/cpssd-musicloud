@@ -7,6 +7,7 @@ import styles from "./styles";
 import { formattedTime } from '../../utils/helpers';
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { postLikeSong, postUnlikeSong } from "../../api/audioAPI";
+import MusicControl from 'react-native-music-control';
 
 const { width, height } = Dimensions.get('window');
 
@@ -22,10 +23,69 @@ export default class Player extends React.Component {
             liked: props.SongPlaying ? props.SongPlaying.like_status : 0,
             numLikes: props.SongPlaying ? props.SongPlaying.like_status : 0,
         };
+        MusicControl.on('play', () => {
+            this.togglePlay(this.state.playing)
+        })
+        MusicControl.on('pause', () => {
+            this.togglePlay(this.state.playing)
+        });
+        MusicControl.on('nextTrack', () => {
+            this.goForward()
+        })
+
+        MusicControl.on('previousTrack', () => {
+            this.goBackward()
+        })
+        MusicControl.on('changePlaybackPosition', (time) => {
+            this.setState({ currentTime: time })
+            this.refs.audio.seek(this.state.currentTime);
+            MusicControl.updatePlayback({
+                elapsedTime: time,
+            })
+        })
+        MusicControl.on('closeNotification', () => {
+            console.warn('close notif')
+        })
     }
 
-    togglePlay() {
+    componentDidMount() {
+        // enable background mode
+        MusicControl.enableBackgroundMode(true);
+        // enable below controls
+        MusicControl.enableControl('play', true)
+        MusicControl.enableControl('pause', true)
+        MusicControl.enableControl('stop', false)
+        MusicControl.enableControl('nextTrack', true)
+        MusicControl.enableControl('previousTrack', true)
+        // Changing track position on lockscreen
+        MusicControl.enableControl('changePlaybackPosition', true)
+        // pause during audio interuptions (eg phone call)
+        MusicControl.handleAudioInterruptions(true);
+
+        MusicControl.enableControl('closeNotification', true, {when: 'always'})
+        MusicControl.enableControl('seek', true) // Android only
+        MusicControl.enableControl('volume', true) // Only affected when remoteVolume is enabled
+        MusicControl.enableControl('remoteVolume', true)
+    }
+
+    componentWillUnmount() {
+        // MusicControl.resetNowPlaying()
+        // MusicControl.stopControl()
+    }
+
+    togglePlay(playing) {
         this.setState({ playing: !this.state.playing });
+        if (playing)
+            MusicControl.updatePlayback({
+                state: MusicControl.STATE_PAUSED,
+                elapsedTime: this.state.currentTime,
+            })
+        else {
+            MusicControl.updatePlayback({
+                state: MusicControl.STATE_PLAYING,
+                elapsedTime: this.state.currentTime,
+            })
+        }
     }
 
     toggleVolume() {
@@ -41,11 +101,26 @@ export default class Player extends React.Component {
             this.setState({
                 songIndex: this.state.songIndex - 1,
                 currentTime: 0,
+                playing: true,
             });
+            let songPlaying = this.props.songs[this.state.songIndex];
+            MusicControl.updatePlayback({
+                state: MusicControl.STATE_PLAYING,
+                elapsedTime: 0,
+                title: songPlaying.title,
+                artwork: songPlaying.cover,
+                artist: songPlaying.username,
+                description: songPlaying.description,
+                duration: this.state.songDuration,
+            })
         } else {
             this.refs.audio.seek(0);
             this.setState({
                 currentTime: 0,
+            }, () => {
+                MusicControl.updatePlayback({
+                    elapsedTime: 0,
+                })
             });
         }
     }
@@ -54,6 +129,23 @@ export default class Player extends React.Component {
         this.setState({
             songIndex: this.state.songIndex + 1,
             currentTime: 0,
+            playing: true,
+        }, () => {
+            let songPlaying = this.props.songs[this.state.songIndex];
+            MusicControl.updatePlayback({
+                state: MusicControl.STATE_PLAYING,
+                elapsedTime: 0,
+                title: songPlaying.title,
+                artwork: songPlaying.cover,
+                artist: songPlaying.username,
+                description: songPlaying.description,
+            })
+            setTimeout(function() {
+                MusicControl.updatePlayback({
+                    duration: this.state.songDuration,
+                })
+              }.bind(this), 500)
+          
         });
         this.refs.audio.seek(0);
     }
@@ -65,8 +157,20 @@ export default class Player extends React.Component {
     }
 
     onLoad(params) {
-        this.setState({ numLikes: this.props.songs[this.state.songIndex].likes, liked: this.props.songs[this.state.songIndex].like_status})
-        this.setState({ songDuration: params.duration });
+        this.setState({ numLikes: this.props.songs[this.state.songIndex].likes, liked: this.props.songs[this.state.songIndex].like_status, songDuration: params.duration })
+        let songPlaying = this.props.songs[this.state.songIndex];
+        MusicControl.setNowPlaying({
+            title: songPlaying.title,
+            artwork: songPlaying.cover,
+            artist: songPlaying.username,
+            description: songPlaying.description,
+            duration: params.duration,
+            notificationIcon: 'ic_launcher',
+        });
+        MusicControl.updatePlayback({
+            state: MusicControl.STATE_PLAYING,
+        });
+
     }
 
     onSlidingStart() {
@@ -85,6 +189,10 @@ export default class Player extends React.Component {
 
     onEnd() {
         this.setState({ playing: false });
+        MusicControl.updatePlayback({
+            state: MusicControl.STATE_PAUSED,
+            elapsedTime: this.state.currentTime,
+        })
     }
 
     handleArrowBack() {
@@ -94,6 +202,7 @@ export default class Player extends React.Component {
     handleProfileClick() {
         this.setState({ playing: false });
         this.props.handleProfileClick()
+        MusicControl.stopControl()
     }
 
     likeSong() {
@@ -119,9 +228,9 @@ export default class Player extends React.Component {
 
         let playButton;
         if (this.state.playing) {
-            playButton = <Icon onPress={this.togglePlay.bind(this)} style={styles.play} name="pause" size={70} color="#fff" />;
+            playButton = <Icon onPress={this.togglePlay.bind(this, this.state.playing)} style={styles.play} name="pause" size={70} color="#fff" />;
         } else {
-            playButton = <Icon onPress={this.togglePlay.bind(this)} style={styles.play} name="play-arrow" size={70} color="#fff" />;
+            playButton = <Icon onPress={this.togglePlay.bind(this, this.state.playing)} style={styles.play} name="play-arrow" size={70} color="#fff" />;
         }
 
         let forwardButton;
