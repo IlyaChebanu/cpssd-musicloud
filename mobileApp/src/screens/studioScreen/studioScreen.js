@@ -13,7 +13,7 @@ import { ratio, screenWidth } from '../../utils/styles';
 import { postFile, putUploadFile, putUploadAudioFile } from "../../api/uploadApi";
 import CustomAlertComponent from "../../components/alertComponent/customAlert";
 import DocumentPicker from 'react-native-document-picker';
-import { LogLevel, RNFFmpeg, RNFFmpegConfig } from 'react-native-ffmpeg';
+// import { LogLevel, RNFFmpeg, RNFFmpegConfig } from 'react-native-ffmpeg';
 import { postAudioFiles } from "../../api/audioAPI";
 
 const { width, height } = Dimensions.get('window');
@@ -232,25 +232,25 @@ class StudioScreen extends React.Component {
 
     async uploadAudio() {
 
-        let filetype = 'mp4'
-        let filename = this.state.filename + '.' + filetype
-        let input = this.state.uri
-        let output = Platform.OS === 'android' ? this.state.uri : this.state.uri.replace('m4a', 'mp4')
-        if (__DEV__) {
-            logCallback = (logData) => {
-                console.log('ffmpeg: ' + logData.log);
-            };
-        }
+        // let filetype = 'mp4'
+        // let filename = this.state.filename + '.' + filetype
+        // let input = this.state.uri
+        // let output = Platform.OS === 'android' ? this.state.uri : this.state.uri.replace('m4a', 'mp4')
+        // if (__DEV__) {
+        //     logCallback = (logData) => {
+        //         console.log('ffmpeg: ' + logData.log);
+        //     };
+        // }
         
-        RNFFmpegConfig.enableLogCallback(this.logCallback);
-        RNFFmpegConfig.setLogLevel(LogLevel.AV_LOG_INFO);
+        // RNFFmpegConfig.enableLogCallback(this.logCallback);
+        // RNFFmpegConfig.setLogLevel(LogLevel.AV_LOG_INFO);
         
-        await RNFFmpeg.execute(`-i ${input} -c:v mpeg4 ${output}`).then(result => {
-            if (__DEV__) {
-                console.log("FFmpeg process exited with rc " + JSON.stringify(result))
-            }
-            this.postRecording(filename, filetype, output)
-        });
+        // await RNFFmpeg.execute(`-i ${input} -c:v mpeg4 ${output}`).then(result => {
+        //     if (__DEV__) {
+        //         console.log("FFmpeg process exited with rc " + JSON.stringify(result))
+        //     }
+        //     this.postRecording(filename, filetype, output)
+        // });
     }
 
     async postRecording(filename, filetype, output) {

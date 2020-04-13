@@ -14,7 +14,7 @@ import Orientation from 'react-native-orientation';
 import SplashScreen from 'react-native-splash-screen';
 import OfflineNotice from './components/offlineNotice/offlineNotice'
 
-console.disableYellowBox = true;
+// console.disableYellowBox = true;
 
 const App = () => {
   useEffect(() => {
