@@ -152,7 +152,7 @@ export default (
     case 'SET_GRID_SIZE':
       return {
         ...state,
-        gridSize: Math.max(1, Math.min(16, action.gridSize)),
+        gridSize: Math.max(1, Math.min(8, action.gridSize)),
       };
     case 'SET_GRID_WIDTH':
       return {

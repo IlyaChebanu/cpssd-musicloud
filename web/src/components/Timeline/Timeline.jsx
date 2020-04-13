@@ -1,6 +1,6 @@
 /* eslint-disable react/no-array-index-key */
 import React, {
-  memo, useMemo, useCallback, useRef,
+  memo, useMemo, useCallback, useRef, useEffect, useState,
 } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -41,18 +41,48 @@ const Timeline = memo(({
     ...widthStyle,
   }), [scroll, widthStyle]);
 
+  const [ctrlPressed, setCtrlPressed] = useState(false);
+
+  const ctrlDown = (e) => {
+    if (e.keyCode === 17) {
+      setCtrlPressed(true);
+    }
+  };
+
+  const ctrlUp = (e) => {
+    if (e.keyCode === 17) {
+      setCtrlPressed(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('keydown', ctrlDown);
+    document.addEventListener('keyup', ctrlUp);
+
+    return () => {
+      document.removeEventListener('keydown', ctrlDown);
+      document.removeEventListener('keyup', ctrlUp);
+    };
+  });
+
   const handleWheelUp = useCallback(() => {
+    if (ctrlPressed) {
+      return;
+    }
     if (gridUnitWidth === maxGridUnitWidth) {
-      if (gridSize !== 16) {
+      if (gridSize !== 8) {
         dispatch(setGridSize(gridSize * 2));
         dispatch(setGridUnitWidth(minGridUnitWidth + 10));
       }
       return;
     }
     dispatch(setGridUnitWidth(gridUnitWidth + 10));
-  }, [dispatch, gridSize, gridUnitWidth, maxGridUnitWidth, minGridUnitWidth]);
+  }, [ctrlPressed, dispatch, gridSize, gridUnitWidth, maxGridUnitWidth, minGridUnitWidth]);
 
   const handleWheelDown = useCallback(() => {
+    if (ctrlPressed) {
+      return;
+    }
     if (gridUnitWidth === minGridUnitWidth) {
       if (gridSize !== 1) {
         dispatch(setGridSize(gridSize / 2));
@@ -61,9 +91,10 @@ const Timeline = memo(({
       return;
     }
     dispatch(setGridUnitWidth(gridUnitWidth - 10));
-  }, [dispatch, gridSize, gridUnitWidth, maxGridUnitWidth, minGridUnitWidth]);
+  }, [ctrlPressed, dispatch, gridSize, gridUnitWidth, maxGridUnitWidth, minGridUnitWidth]);
 
   const handleResizeGrid = (ev) => {
+    ev.stopPropagation();
     if (ev.deltaY < 0) {
       handleWheelUp();
     } else {
@@ -113,15 +144,11 @@ const Timeline = memo(({
   const keyMap = {
     WHEEL_UP: '+',
     WHEEL_DOWN: '-',
-    CTRL_WHEEL_UP: 'ctrl++',
-    CTRL_WHEEL_DOWN: 'ctrl+-',
   };
 
   const handlers = {
     WHEEL_UP: handleWheelUp,
     WHEEL_DOWN: handleWheelDown,
-    CTRL_WHEEL_UP: (e) => { e.stopPropagation(); },
-    CTRL_WHEEL_DOWN: (e) => { e.stopPropagation(); },
   };
 
 

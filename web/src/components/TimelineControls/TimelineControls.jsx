@@ -88,13 +88,6 @@ const TimelineControls = memo((props) => {
         dispatch(setGridSize(8));
       },
     },
-    {
-      size: 16,
-      name: '1/16',
-      action() {
-        dispatch(setGridSize(16));
-      },
-    },
   ], [dispatch]);
 
   return (
