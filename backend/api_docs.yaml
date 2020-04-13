@@ -4506,11 +4506,15 @@ paths:
         type: "integer"
         required: true
         description: "The ID of the synth you want to update."
-      - in: "query"
-        name: "patch"
-        type: "integer"
+      - in: "body"
+        name: "body"
         required: true
-        description: "The JSON objet you want to replace the synths patch column value with."
+        description: "New patch data"
+        schema:
+          type: "object"
+          properties:
+            patch:
+              type: "object"
       responses:
         200:
           description: "Synth updated"

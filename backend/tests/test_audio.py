@@ -5207,7 +5207,8 @@ class AudioTests(unittest.TestCase):
                 mock_token.return_value = ALT_MOCKED_TOKEN
                 res = self.test_client.patch(
                     "/api/v1/audio/synth",
-                    query_string={"id": -1, "patch": {}},
+                    query_string={"id": -1},
+                    json={"patch": {}},
                     headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                     follow_redirects=True
                 )

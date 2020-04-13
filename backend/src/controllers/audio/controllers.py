@@ -1763,19 +1763,26 @@ def edit_synth(user_data):  # pylint: disable=R0911
     """
     Endpoint for updating a synth in the DB.
     """
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "patch": {
+                "type": "object"
+            }
+        },
+        "required": ["patch"]
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
     synth_id = request.args.get('id')
     if not synth_id:
         return {"message": "No id sent"}, 422
 
-    patch = request.args.get('patch')
-    if not patch:
-        return {"message": "No patch sent"}, 422
-    try:
-        patch = json.loads(patch)
-    except json.decoder.JSONDecodeError:
-        return {"message": "Patch was not a valid JSON string."}, 400
-    except TypeError:
-        return {"message": "Patch was not a valid JSON string."}, 400
+    patch = json.dumps(request.json.get("patch"))
 
     try:
         synth = get_synth(synth_id)[0]
@@ -1786,7 +1793,7 @@ def edit_synth(user_data):  # pylint: disable=R0911
             "message": ("Invalid synth ID. Synth does not exist!")
         }, 400
 
-    update_synth(synth_id, json.dumps(patch))
+    update_synth(synth_id, patch)
 
     return {"message": "Synth updated"}, 200
 
@@ -1821,7 +1828,7 @@ def delete_synth(user_data):  # pylint: disable=R0911
     try:
         synth = get_synth(synth_id)[0]
         if user_data.get("uid") != synth[1]:
-            return {"message": "You can't edit that synth!"}, 401
+            return {"message": "You can't delete that synth!"}, 401
     except NoResults:
         return {
             "message": ("Invalid synth ID. Synth does not exist!")
