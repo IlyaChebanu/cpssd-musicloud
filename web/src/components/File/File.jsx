@@ -5,19 +5,15 @@ import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { deleteFile } from 'react-s3';
-import {
-  setSelectedFile,
-  addSample as addSampleAction,
-} from '../../actions/studioActions';
+import { setSelectedFile } from '../../actions/studioActions';
 import { generatePresigned, deleteSampleFile, renameFile } from '../../helpers/api';
 import { ReactComponent as SampleIcon } from '../../assets/icons/music_note-24px.svg';
 import styles from './File.module.scss';
 import { ReactComponent as Delete } from '../../assets/icons/delete_outline-24px.svg';
-import { showNotification } from '../../actions/notificationsActions';
 
 const File = memo((props) => {
   const {
-    dir, level, selectedFile, dispatch, studio, selectedTrack,
+    dir, level, selectedFile, dispatch,
   } = props;
   const [deleted, setDeleted] = useState(false);
   const { url } = dir;
@@ -79,41 +75,17 @@ const File = memo((props) => {
     e.target.blur();
   };
 
-  const addSample = useCallback(
-    (name) => {
-      dispatch(setSelectedFile(''));
-      if (studio.tracks.length === 0) {
-        dispatch(
-          showNotification({
-            message: 'Please add a track first',
-            type: 'info',
-          }),
-        );
-        return;
-      }
-      if (selectedTrack === 0) {
-        dispatch(
-          showNotification({
-            message: 'Please select a track first',
-            type: 'info',
-          }),
-        );
-        return;
-      }
-      const sampleState = {
-        url: dir.url,
-        name,
-        time: studio.currentBeat,
-        fade: {
-          fadeIn: 0,
-          fadeOut: 0,
-        },
-      };
-      dispatch(addSampleAction(studio.selectedTrack, sampleState));
-    },
-    [dir, dispatch, selectedTrack, studio.currentBeat, studio.selectedTrack, studio.tracks.length],
-  );
-
+  const togglePlayback = useCallback(async () => {
+    const audio = document.getElementById(`file_id_${dir.file_id}_audio`);
+    if (!audio.paused) {
+      await audio.pause();
+    } else {
+      const allAudio = document.getElementsByTagName('audio');
+      for (let i = 0; i < allAudio.length; i += 1) allAudio[i].pause();
+      audio.currentTime = 0;
+      await audio.play();
+    }
+  }, [dir.file_id]);
 
   return (
     <div>
@@ -122,13 +94,15 @@ const File = memo((props) => {
           <li
             style={{ marginLeft: `${level * 25}px` }}
             onBlur={(e) => setSelectedFile(`${path}/${e.target.value}`)}
-            onClick={(e) => {
-              addSample(extension === '' ? `${path}/${oldName.current}` : `${path}/${oldName.current}.${extension}`);
-              e.preventDefault(); fileClick();
+            onClick={async (e) => {
+              e.preventDefault();
+              fileClick();
+              togglePlayback();
             }}
             className={selectedFile === dir ? styles.selected : ''}
-            key={dir.file_id}
+            key={`${dir.file_id}_file`}
           >
+            <audio id={`file_id_${dir.file_id}_audio`} controls="controls" src={dir.url} style={{ display: 'none' }} />
             <SampleIcon style={{ paddingRight: '4px', fill: 'white' }} />
             <form onSubmit={(e) => { e.preventDefault(); }}>
               <input
@@ -156,7 +130,6 @@ const File = memo((props) => {
               className={styles.deleteFile}
               onClick={(e) => { e.stopPropagation(); deleteFromS3(path, extension === '' ? newName : `${newName}.${extension}`); }}
             />
-
           </li>
         )
         : null }
@@ -165,18 +138,14 @@ const File = memo((props) => {
 });
 
 File.propTypes = {
-  studio: PropTypes.object.isRequired,
   dir: PropTypes.object.isRequired,
   selectedFile: PropTypes.object.isRequired,
   dispatch: PropTypes.func.isRequired,
-  selectedTrack: PropTypes.number.isRequired,
   level: PropTypes.number.isRequired,
 };
 
 const mapStateToProps = ({ studio }) => ({
-  selectedTrack: studio.selectedTrack,
   selectedFile: studio.selectedFile,
-  studio,
 });
 
 export default withRouter(connect(mapStateToProps)(File));

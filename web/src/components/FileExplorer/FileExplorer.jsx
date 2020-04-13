@@ -37,6 +37,8 @@ const FileExplorer = memo((props) => {
   }, [dispatch]);
 
   const collapseSampleTree = useCallback(() => {
+    const allAudio = document.getElementsByTagName('audio');
+    for (let i = 0; i < allAudio.length; i += 1) allAudio[i].pause();
     setSampleTreeSelected(false);
     setFileList([]);
     setFolderList([]);
@@ -93,15 +95,22 @@ const FileExplorer = memo((props) => {
       if (node.current.contains(e.target)) {
         // inside click
         return;
-      } if ((e.target.id === 'explorer')
+      }
+      if ((e.target.id === 'explorer')
       || (e.toElement.viewportElement.id === 'explorer')) {
-      // or click on file explorer button
+        // or click on file explorer button
         collapseSampleTree();
-        return;
+      } else if (!props.fileExplorerHidden) {
+        const allAudio = document.getElementsByTagName('audio');
+        for (let i = 0; i < allAudio.length; i += 1) allAudio[i].pause();
+        dispatch(hideFileExplorer());
+        setFileList([]);
       }
     } catch (err) {
       // outside click
       if (!props.fileExplorerHidden) {
+        const allAudio = document.getElementsByTagName('audio');
+        for (let i = 0; i < allAudio.length; i += 1) allAudio[i].pause();
         dispatch(hideFileExplorer());
         setFileList([]);
       }
