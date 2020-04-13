@@ -7,10 +7,11 @@ import { withRouter } from 'react-router-dom';
 import ReactTooltip from 'react-tooltip';
 import styles from './SampleControls.module.scss';
 import {
-  setSampleName, setSampleFadeIn, setSampleFadeOut, setSamplePatch,
+  setSampleName, setSampleFadeIn, setSampleFadeOut, setSamplePatch, setSamplePatchId,
 } from '../../actions/studioActions';
 import Knob from '../Knob';
 import Button from '../Button';
+import { createSynth, updateSynth } from '../../helpers/api';
 
 const SampleControls = memo((props) => {
   const {
@@ -77,9 +78,19 @@ const SampleControls = memo((props) => {
     }));
   }, [dispatch, sample, selectedSample]);
 
-  const handleSavePatch = useCallback(() => {
-
-  }, []);
+  const handleSavePatch = useCallback(async (e) => {
+    e.preventDefault();
+    if (!sample.patchId) {
+      const res = await createSynth(sample.name, sample.patch);
+      dispatch(setSamplePatchId(selectedSample, res.data.synth_id));
+    } else {
+      const response = await updateSynth(sample.patchId, sample.patch);
+      if (response.status === 400) {
+        const res = await createSynth(sample.name, sample.patch);
+        dispatch(setSamplePatchId(selectedSample, res.data.synth_id));
+      }
+    }
+  }, [dispatch, sample, selectedSample]);
 
   if (!sample) {
     return null;
