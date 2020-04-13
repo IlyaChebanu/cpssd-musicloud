@@ -143,6 +143,6 @@ File.propTypes = {
   level: PropTypes.number.isRequired,
 };
 
-const mapStateToProps = ({}) => ({});
+const mapStateToProps = () => ({});
 
 export default withRouter(connect(mapStateToProps)(File));
