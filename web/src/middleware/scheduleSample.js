@@ -71,6 +71,7 @@ export default (sample, channel, context = Tone.context.rawContext, isOffline = 
         noteOffset,
         noteEndTime,
         sample.url,
+        sample.patch,
       );
       notes[noteId] = {
         ...note,

@@ -40,7 +40,7 @@ const MIDI = {
 const PianoRoll = memo(({
   showPianoRoll, selectedSample, dispatch, samples, currentBeat, recording, loopEnabled, loopEnd, ppq,
 }) => {
-  if (!showPianoRoll) return null;
+  if (!selectedSample) return null;
 
   const [tracksRef, setTracksRef] = useState();
   const [scroll, setScroll] = useState(0);
@@ -127,6 +127,7 @@ const PianoRoll = memo(({
           0,
           null,
           selectedSampleObject.url,
+          selectedSampleObject.patch,
         );
         playingNotes.current[key].velocity = velocity / 256;
         setPressedNotes({ ...pressedNotes, [key]: true });
@@ -196,6 +197,7 @@ const PianoRoll = memo(({
         0,
         null,
         selectedSampleObject.url,
+        selectedSampleObject.patch,
       );
     }
   }, [hoveredKey, isMouseDown, selectedSampleObject]);
@@ -312,6 +314,7 @@ const PianoRoll = memo(({
     return null;
   }, [selectedSampleObject]);
 
+  if (!showPianoRoll) return null;
   return (
     <div
       className={styles.background}

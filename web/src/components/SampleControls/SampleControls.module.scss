@@ -11,7 +11,7 @@
     display: flex;
     align-items: center;
     transition: bottom 100ms, visibility 100ms;
-    
+
     .buttons {
         flex: 1;
         display: flex;
@@ -25,23 +25,23 @@
         -moz-user-select: none; /* Old versions of Firefox */
         -ms-user-select: none; /* Internet Explorer/Edge */
         user-select: none; /* Non-prefixed version */
-    
+
         svg {
           height: 25px;
           width: auto;
-    
+
           &:hover {
             cursor: move;
           }
         }
-    
+
         span {
           display: flex;
           flex-direction: column;
           align-items: center;
           padding-left: 5px;
           padding-right: 5px;
-    
+
           p {
             padding: 5px 0 0 0;
             margin: 0;
@@ -56,7 +56,7 @@
         align-items: center;
     }
       .sampleName {
-        
+
         input {
           color: white;
           padding-bottom: 5px;
@@ -69,6 +69,16 @@
           margin-left: 20px;
           width: 200px;
         }
-    
+
       }
   }
+
+
+.wave {
+  margin: 5px 10px;
+}
+
+.saveBtn {
+  margin: 5px 10px;
+  height: 30px;
+}
