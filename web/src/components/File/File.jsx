@@ -50,14 +50,13 @@ const File = memo((props) => {
     await renameFile(dir.folder_id, name);
   }, [dir.folder_id, dispatch, path]);
 
-  const updateSelected = useCallback(() => {
-    if (selectedFile) {
-      setSelectedFile(false);
-    } else {
-      setSelectedFile(true);
-    }
-  }, [setSelectedFile, selectedFile]);
+  const selected = useCallback(() => {
+    setSelectedFile(true);
+  }, [setSelectedFile]);
 
+  const deselected = useCallback(() => {
+    setSelectedFile(false);
+  }, [setSelectedFile]);
 
   const deleteFromS3 = useCallback(async (directory, file) => {
     await awsConfig(directory);
@@ -98,8 +97,9 @@ const File = memo((props) => {
               e.preventDefault();
               togglePlayback();
             }}
-            onHover={updateSelected()}
-            className={selectedFile === dir ? styles.selected : ''}
+            onMouseEnter={selected}
+            onMouseLeave={deselected}
+            className={selectedFile ? styles.selected : ''}
             key={`${dir.file_id}_file`}
           >
             <audio id={`file_id_${dir.file_id}_audio`} controls="controls" src={dir.url} style={{ display: 'none' }} />
@@ -117,16 +117,16 @@ const File = memo((props) => {
                     e.preventDefault();
                   }
                 }}
-                style={{ cursor: selectedFile !== dir ? 'pointer' : '' }}
+                style={{ cursor: selectedFile ? 'pointer' : '' }}
                 onChange={handleFileNameChange}
                 value={newName}
-                onClick={(e) => { if (selectedFile === dir) { e.stopPropagation(); } }}
-                disabled={!selectedFile === dir}
+                onClick={(e) => { if (selectedFile) { e.stopPropagation(); } }}
+                disabled={!selectedFile}
               />
             </form>
 
             <Delete
-              style={{ visibility: selectedFile === dir ? 'visible' : 'hidden' }}
+              style={{ visibility: selectedFile ? 'visible' : 'hidden' }}
               className={styles.deleteFile}
               onClick={(e) => { e.stopPropagation(); deleteFromS3(path, extension === '' ? newName : `${newName}.${extension}`); }}
             />
