@@ -5,7 +5,6 @@ import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { deleteFile } from 'react-s3';
-import { setSelectedFile } from '../../actions/studioActions';
 import { generatePresigned, deleteSampleFile, renameFile } from '../../helpers/api';
 import { ReactComponent as SampleIcon } from '../../assets/icons/music_note-24px.svg';
 import styles from './File.module.scss';
@@ -13,9 +12,10 @@ import { ReactComponent as Delete } from '../../assets/icons/delete_outline-24px
 
 const File = memo((props) => {
   const {
-    dir, level, selectedFile, dispatch,
+    dir, level, dispatch,
   } = props;
   const [deleted, setDeleted] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(false);
   const { url } = dir;
   const urlArray = url.split('.');
   const extension = urlArray[urlArray.length - 1];
@@ -50,13 +50,13 @@ const File = memo((props) => {
     await renameFile(dir.folder_id, name);
   }, [dir.folder_id, dispatch, path]);
 
-  const fileClick = useCallback(() => {
-    if (selectedFile === dir) {
-      dispatch(setSelectedFile(''));
+  const updateSelected = useCallback(() => {
+    if (selectedFile) {
+      setSelectedFile(false);
     } else {
-      dispatch(setSelectedFile(dir));
+      setSelectedFile(true);
     }
-  }, [dir, dispatch, selectedFile]);
+  }, [setSelectedFile, selectedFile]);
 
 
   const deleteFromS3 = useCallback(async (directory, file) => {
@@ -96,9 +96,9 @@ const File = memo((props) => {
             onBlur={(e) => setSelectedFile(`${path}/${e.target.value}`)}
             onClick={async (e) => {
               e.preventDefault();
-              fileClick();
               togglePlayback();
             }}
+            onHover={updateSelected()}
             className={selectedFile === dir ? styles.selected : ''}
             key={`${dir.file_id}_file`}
           >
@@ -139,13 +139,10 @@ const File = memo((props) => {
 
 File.propTypes = {
   dir: PropTypes.object.isRequired,
-  selectedFile: PropTypes.object.isRequired,
   dispatch: PropTypes.func.isRequired,
   level: PropTypes.number.isRequired,
 };
 
-const mapStateToProps = ({ studio }) => ({
-  selectedFile: studio.selectedFile,
-});
+const mapStateToProps = ({}) => ({});
 
 export default withRouter(connect(mapStateToProps)(File));
