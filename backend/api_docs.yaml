@@ -4646,6 +4646,9 @@ paths:
               message:
                 type: "string"
                 example: "Synth created"
+              synth_id:
+                type: "integer"
+                example: 1
         401:
           description: "User's token has expired"
           schema:

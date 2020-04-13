@@ -5139,7 +5139,7 @@ class AudioTests(unittest.TestCase):
                     follow_redirects=True
                 )
                 self.assertEqual(200, res.status_code)
-                expected_body = {'message': 'Synth created'}
+                expected_body = {'message': 'Synth created', 'synth_id': {}}
                 self.assertEqual(expected_body, json.loads(res.data))
 
     def test_post_synth_fail_missing_access_token(self):

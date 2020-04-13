@@ -1747,12 +1747,13 @@ def create_synth(user_data):  # pylint: disable=R0911
     patch = json.dumps({})
     if request.json.get("patch"):
         patch = json.dumps(request.json.get("patch"))
-    add_synth(
+
+    synth_id = add_synth(
         request.json.get("name"),
         user_data.get("uid"),
         patch
     )
-    return {"message": "Synth created"}, 200
+    return {"message": "Synth created", "synth_id": synth_id}, 200
 
 
 @AUDIO.route("/synth", methods=["PATCH"])
