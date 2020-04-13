@@ -5125,22 +5125,23 @@ class AudioTests(unittest.TestCase):
             )
             self.assertEqual(500, res.status_code)
 
-    def test_post_synth_success(self):
+    @mock.patch('backend.src.controllers.audio.controllers.add_synth')
+    def test_post_synth_success(self, mock_synth_id):
         """
         Ensure creating a synth is successful.
         """
+        mock_synth_id.return_value = 1
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            with mock.patch('backend.src.controllers.audio.controllers.add_synth'):
-                mock_token.return_value = ALT_MOCKED_TOKEN
-                res = self.test_client.post(
-                    "/api/v1/audio/synth",
-                    json={'name': 'Piano'},
-                    headers={'Authorization': 'Bearer ' + TEST_TOKEN},
-                    follow_redirects=True
-                )
-                self.assertEqual(200, res.status_code)
-                expected_body = {'message': 'Synth created', 'synth_id': {}}
-                self.assertEqual(expected_body, json.loads(res.data))
+            mock_token.return_value = ALT_MOCKED_TOKEN
+            res = self.test_client.post(
+                "/api/v1/audio/synth",
+                json={'name': 'Piano'},
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(200, res.status_code)
+            expected_body = {'message': 'Synth created', 'synth_id': 1}
+            self.assertEqual(expected_body, json.loads(res.data))
 
     def test_post_synth_fail_missing_access_token(self):
         """
