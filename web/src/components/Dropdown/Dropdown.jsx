@@ -2,12 +2,13 @@
 import React, {
   useState, useCallback, useMemo, memo,
 } from 'react';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import ReactTooltip from 'react-tooltip';
 import styles from './Dropdown.module.scss';
 
 const Dropdown = memo((props) => {
-  const { items, title } = props;
+  const { items, title, gridSize } = props;
   const [displayMenu, setDisplayMenu] = useState(false);
 
   const showDropdown = useCallback((e) => {
@@ -23,7 +24,7 @@ const Dropdown = memo((props) => {
 
   const menuItems = useMemo(() => items.map((item) => (
     <li
-      style={{ zIndex: 1 }}
+      className={gridSize === item.size ? styles.liSelected : ''}
       data-tip={item.dataTip}
       data-for="tooltip"
       data-place="right"
@@ -39,7 +40,7 @@ const Dropdown = memo((props) => {
       <p>{item.name}</p>
 
     </li>
-  )), [items]);
+  )), [gridSize, items]);
 
   return (
     <div className={styles.dropdown} onBlur={hideDropdown}>
@@ -55,11 +56,18 @@ const Dropdown = memo((props) => {
   );
 });
 
-Dropdown.propTypes = {
-  items: PropTypes.arrayOf(PropTypes.object).isRequired,
-  title: PropTypes.node.isRequired,
-};
 
 Dropdown.displayName = 'Dropdown';
 
-export default Dropdown;
+Dropdown.propTypes = {
+  items: PropTypes.arrayOf(PropTypes.object).isRequired,
+  title: PropTypes.node.isRequired,
+  gridSize: PropTypes.node.isRequired,
+};
+
+const mapStateToProps = ({ studio }) => ({
+  gridSize: studio.gridSize,
+});
+
+
+export default connect(mapStateToProps)(Dropdown);

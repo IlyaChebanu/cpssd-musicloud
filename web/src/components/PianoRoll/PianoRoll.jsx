@@ -38,7 +38,7 @@ const MIDI = {
 };
 
 const PianoRoll = memo(({
-  showPianoRoll, selectedSample, dispatch, samples, currentBeat, recording, loopEnabled, loopEnd, ppq,
+  showPianoRoll, selectedSample, dispatch, samples, currentBeat, recording, loopEnabled, loopEnd, ppq, gridUnitWidth,
 }) => {
   if (!showPianoRoll) return null;
 
@@ -335,7 +335,12 @@ const PianoRoll = memo(({
                 <CloseIcon onClick={handleClose} />
               </div>
               <div className={styles.lower}>
-                <SeekBar dataTip="Move seekbar to desired beat" currentBeat={selectedSampleObject ? (currentBeat - selectedSampleObject.time + 1) : 0} scaleFactor={gridSize} scrollPosition={scroll} />
+                <SeekBar
+                  dataTip="Move seekbar to desired beat"
+                  currentBeat={selectedSampleObject ? (currentBeat - selectedSampleObject.time + 1) : 0}
+                  scaleFactor={gridSize * (gridSizePx / gridUnitWidth)}
+                  scrollPosition={scroll}
+                />
                 <div className={styles.timelineWrapper} style={wrapperStyle}>
                   <svg className={styles.ticks} style={widthStyle}>
                     <rect
@@ -392,6 +397,7 @@ PianoRoll.propTypes = {
   loopEnabled: PropTypes.bool.isRequired,
   loopEnd: PropTypes.number.isRequired,
   ppq: PropTypes.number.isRequired,
+  gridUnitWidth: PropTypes.number.isRequired,
 };
 
 PianoRoll.defaultProps = {
@@ -409,6 +415,7 @@ const mapStateToProps = ({ studio }) => ({
   loopEnabled: studio.loopEnabled,
   loopEnd: studio.loop.stop,
   ppq: studio.ppq,
+  gridUnitWidth: studio.gridUnitWidth,
 });
 
 export default connect(mapStateToProps)(PianoRoll);

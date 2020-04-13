@@ -93,11 +93,11 @@ const Studio = memo((props) => {
       latest,
       tracksRef.current
         ? tracksRef.current.getBoundingClientRect().width
-          / (40 * studio.gridSize)
+          / (studio.gridUnitWidth * studio.gridSize)
         : 0,
     );
     dispatch(setGridWidth(width + 10));
-  }, [dispatch, samples, studio.gridSize, studio.tempo]);
+  }, [dispatch, samples, studio.gridSize, studio.gridUnitWidth, studio.tempo]);
 
   window.onresize = resizeGrid;
   useEffect(() => {
@@ -144,8 +144,8 @@ const Studio = memo((props) => {
   );
 
   const seekBarPosition = useMemo(() => (
-    220 + (studio.currentBeat - 1) * (40 * studio.gridSize) - studio.scroll
-  ), [studio.currentBeat, studio.gridSize, studio.scroll]);
+    220 + (studio.currentBeat - 1) * (studio.gridUnitWidth * studio.gridSize) - studio.scroll
+  ), [studio.currentBeat, studio.gridSize, studio.gridUnitWidth, studio.scroll]);
 
   const keyMap = {
     SAVE: 'ctrl+s',
