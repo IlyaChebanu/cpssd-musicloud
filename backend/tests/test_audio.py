@@ -5208,7 +5208,7 @@ class AudioTests(unittest.TestCase):
                 res = self.test_client.patch(
                     "/api/v1/audio/synth",
                     query_string={"id": -1},
-                    json={"patch": {}},
+                    json={"patch": {"attack": 200}},
                     headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                     follow_redirects=True
                 )
