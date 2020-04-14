@@ -375,6 +375,10 @@ export const removeSample = (sampleId) => (dispatch) => {
     type: 'REMOVE_SAMPLE',
     sampleId,
   });
+  dispatch({
+    type: 'SET_SELECTED_SAMPLE',
+    id: null,
+  });
 };
 
 export const setSampleBufferLoading = (sampleId, value) => (dispatch) => {
