@@ -29,6 +29,7 @@
     "react-tooltip": "^4.1.5",
     "redux": "^4.0.4",
     "redux-thunk": "^2.3.0",
+    "redux-undo": "^1.0.1",
     "s3-ls": "^3.0.0",
     "soundbank-reverb": "^1.1.2",
     "tone": "^13.8.25",

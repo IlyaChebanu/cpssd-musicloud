@@ -129,9 +129,9 @@ SongPicker.propTypes = {
 
 SongPicker.displayName = 'SongPicker';
 
-const mapStateToProps = ({ studio }) => ({
+const mapStateToProps = ({ studio, studioUndoable }) => ({
   songPickerHidden: studio.songPickerHidden,
-  tracks: studio.tracks,
+  tracks: studioUndoable.present.tracks,
 });
 
 export default connect(mapStateToProps)(SongPicker);

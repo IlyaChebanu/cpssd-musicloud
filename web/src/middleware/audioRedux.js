@@ -50,8 +50,8 @@ const setTrackChannel = (track, soloTrack, channels) => {
 };
 
 
-export const renderTracks = (studio) => {
-  const samples = Object.values(studio.samples);
+export const renderTracks = (studio, studioUndoable) => {
+  const samples = Object.values(studioUndoable.present.samples);
   const getEndTime = (sample) => sample.time + sample.duration;
   const latestSample = _.maxBy(samples, (sample) => getEndTime(sample));
   const songDuration = getEndTime(latestSample) * (60 / studio.tempo);
@@ -61,9 +61,9 @@ export const renderTracks = (studio) => {
     offlineAudioContext.globalGain = offlineAudioContext.createGain();
     offlineAudioContext.globalGain.connect(offlineAudioContext.destination);
 
-    const soloTrack = _.find(studio.tracks, 'solo');
+    const soloTrack = _.find(studioUndoable.present.tracks, 'solo');
     const offlineTrackChannels = {};
-    studio.tracks.forEach((track) => {
+    studioUndoable.present.tracks.forEach((track) => {
       setTrackChannel(track, soloTrack, offlineTrackChannels);
     });
 
@@ -80,8 +80,8 @@ export default (store) => {
   const trackChannels = {};
 
   const startPlayback = () => {
-    const { studio } = store.getState();
-    Object.entries(studio.samples).forEach(([sampleId, sample]) => {
+    const { studio, studioUndoable } = store.getState();
+    Object.entries(studioUndoable.present.samples).forEach(([sampleId, sample]) => {
       if (sample.time + sample.duration > studio.currentBeat && (
         studio.loopEnabled
           ? sample.time + sample.duration >= studio.loop.start
@@ -101,7 +101,11 @@ export default (store) => {
     });
   };
 
-  const getTrackVolume = (track, volume, tracks = store.getState().studio.tracks) => {
+  const getTrackVolume = (
+    track,
+    volume,
+    tracks = store.getState().studioUndoable.present.tracks,
+  ) => {
     const soloTrack = _.find(tracks, 'solo');
     return volume * (
       soloTrack ? soloTrack.id === track.id : !track.mute
@@ -140,6 +144,7 @@ export default (store) => {
 
   return (next) => async (action) => {
     const state = store.getState().studio;
+    const { studioUndoable } = store.getState();
     switch (action.type) {
       case 'STUDIO_PLAY': {
         store.dispatch(playingStartTime(audioContext.currentTime));
@@ -186,13 +191,13 @@ export default (store) => {
       }
 
       case 'ADD_TRACK': {
-        const soloTrack = _.find([...state.tracks, action.track], 'solo');
+        const soloTrack = _.find([...studioUndoable.present.tracks, action.track], 'solo');
         setTrackChannel(action.track, soloTrack, trackChannels);
         break;
       }
 
       case 'SET_TRACK_VOLUME': {
-        const track = _.find(state.tracks, (o) => o.id === action.trackId);
+        const track = _.find(studioUndoable.present.tracks, (o) => o.id === action.trackId);
         trackChannels[action.trackId].gain.gain.setValueAtTime(
           getTrackVolume(track, action.value),
           0,
@@ -234,7 +239,7 @@ export default (store) => {
 
       case 'SET_TRACK_SOLO': {
         Object.entries(trackChannels).forEach(([trackId, channel]) => {
-          const track = _.find(state.tracks, (o) => o.id === trackId);
+          const track = _.find(studioUndoable.present.tracks, (o) => o.id === trackId);
           if (!track) {
             return;
           }
@@ -303,7 +308,7 @@ export default (store) => {
 
       case 'SET_SAMPLE_FADE_IN': {
         const sample = scheduledSamples[action.sampleId];
-        const stateSample = state.samples[action.sampleId];
+        const stateSample = studioUndoable.present.samples[action.sampleId];
 
         if (sample) {
           const startTime = audioContext.currentTime + beatsToSeconds(
@@ -329,7 +334,7 @@ export default (store) => {
 
       case 'SET_SAMPLE_FADE_OUT': {
         const sample = scheduledSamples[action.sampleId];
-        const stateSample = state.samples[action.sampleId];
+        const stateSample = studioUndoable.present.samples[action.sampleId];
 
         if (sample) {
           const startTime = audioContext.currentTime + beatsToSeconds(
