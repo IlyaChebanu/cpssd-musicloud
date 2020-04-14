@@ -1,41 +1,106 @@
 /* eslint-disable react/no-array-index-key */
-import React, { memo, useMemo, useCallback } from 'react';
+import React, {
+  memo, useMemo, useCallback, useRef, useEffect, useState,
+} from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { GlobalHotKeys } from 'react-hotkeys';
 import styles from './Timeline.module.scss';
 import Looper from '../Looper';
 import TimelineControls from '../TimelineControls';
 import {
-  setCurrentBeat, play, pause, setDraggingSeekBar,
+  setCurrentBeat, play, pause, setDraggingSeekBar, setGridUnitWidth, setGridSize,
 } from '../../actions/studioActions';
 
 const Timeline = memo(({
-  playing, dispatch, gridSize, gridWidth, scroll,
+  playing, dispatch, gridSize, gridWidth, minGridUnitWidth, maxGridUnitWidth, gridUnitWidth, scroll,
 }) => {
+  const ref = useRef();
   const ticks = useMemo(() => (
     [...Array(Math.ceil(gridWidth * gridSize) + 1)].map(
-      (_, i) => <rect style={{ pointerEvents: 'none' }} key={i} x={i * 40} y={24} className={styles.tick} />,
+      (_, i) => <rect style={{ pointerEvents: 'none' }} key={i} x={i * gridUnitWidth} y={24} className={styles.tick} />,
     )
-  ), [gridSize, gridWidth]);
+  ), [gridSize, gridUnitWidth, gridWidth]);
 
   const numbers = useMemo(() => (
     [...Array(Math.ceil(gridWidth) + 1)].map(
       (_, i) => (
-        <text style={{ pointerEvents: 'none' }} key={i} x={i * (40 * gridSize) + 5} y={24} className={styles.nums}>
+        <text style={{ pointerEvents: 'none' }} key={i} x={i * (gridUnitWidth * gridSize) + 5} y={24} className={styles.nums}>
           {i + 1}
         </text>
       ),
     )
-  ), [gridSize, gridWidth]);
+  ), [gridSize, gridUnitWidth, gridWidth]);
 
   const widthStyle = useMemo(() => ({
-    width: Math.ceil(gridWidth * gridSize) * 40 + 10,
-  }), [gridSize, gridWidth]);
+    width: Math.ceil(gridWidth * gridSize) * gridUnitWidth + 10,
+  }), [gridSize, gridUnitWidth, gridWidth]);
 
   const wrapperStyle = useMemo(() => ({
     transform: `translateX(${-scroll}px)`,
     ...widthStyle,
   }), [scroll, widthStyle]);
+
+  const [ctrlPressed, setCtrlPressed] = useState(false);
+
+  const ctrlDown = (e) => {
+    if (e.keyCode === 17) {
+      setCtrlPressed(true);
+    }
+  };
+
+  const ctrlUp = (e) => {
+    if (e.keyCode === 17) {
+      setCtrlPressed(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('keydown', ctrlDown);
+    document.addEventListener('keyup', ctrlUp);
+
+    return () => {
+      document.removeEventListener('keydown', ctrlDown);
+      document.removeEventListener('keyup', ctrlUp);
+    };
+  });
+
+  const handleWheelUp = useCallback(() => {
+    if (ctrlPressed) {
+      return;
+    }
+    if (gridUnitWidth === maxGridUnitWidth) {
+      if (gridSize !== 8) {
+        dispatch(setGridSize(gridSize * 2));
+        dispatch(setGridUnitWidth(minGridUnitWidth + 10));
+      }
+      return;
+    }
+    dispatch(setGridUnitWidth(gridUnitWidth + 10));
+  }, [ctrlPressed, dispatch, gridSize, gridUnitWidth, maxGridUnitWidth, minGridUnitWidth]);
+
+  const handleWheelDown = useCallback(() => {
+    if (ctrlPressed) {
+      return;
+    }
+    if (gridUnitWidth === minGridUnitWidth) {
+      if (gridSize !== 1) {
+        dispatch(setGridSize(gridSize / 2));
+        dispatch(setGridUnitWidth(maxGridUnitWidth - 10));
+      }
+      return;
+    }
+    dispatch(setGridUnitWidth(gridUnitWidth - 10));
+  }, [ctrlPressed, dispatch, gridSize, gridUnitWidth, maxGridUnitWidth, minGridUnitWidth]);
+
+  const handleResizeGrid = (ev) => {
+    ev.stopPropagation();
+    if (ev.deltaY < 0) {
+      handleWheelUp();
+    } else {
+      handleWheelDown();
+    }
+  };
 
   const handleDragStart = useCallback((ev) => {
     dispatch(setDraggingSeekBar(true));
@@ -48,7 +113,7 @@ const Timeline = memo(({
           Math.max(
             1,
             1 + ((e.clientX - bb.left) * window.devicePixelRatio)
-             / (40 * window.devicePixelRatio * gridSize),
+             / (gridUnitWidth * window.devicePixelRatio * gridSize),
           ),
         ),
       );
@@ -60,7 +125,7 @@ const Timeline = memo(({
           Math.max(
             1,
             1 + ((e.clientX - bb.left) * window.devicePixelRatio)
-             / (40 * window.devicePixelRatio * gridSize),
+             / (gridUnitWidth * window.devicePixelRatio * gridSize),
           ),
         ),
       );
@@ -74,29 +139,52 @@ const Timeline = memo(({
     };
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleDragStop);
-  }, [dispatch, gridSize, playing]);
+  }, [dispatch, gridSize, gridUnitWidth, playing]);
+
+  const keyMap = {
+    WHEEL_UP: '+',
+    WHEEL_DOWN: '-',
+  };
+
+  const handlers = {
+    WHEEL_UP: handleWheelUp,
+    WHEEL_DOWN: handleWheelDown,
+  };
+
 
   return (
-    <div className={styles.outerWrap}>
-      <TimelineControls />
+    <GlobalHotKeys
+      allowChanges
+      keyMap={keyMap}
+      handlers={handlers}
+      className={styles.wrapper}
+      innerRef={ref}
+    >
       <div
+        className={styles.outerWrap}
         role="none"
+        onWheel={handleResizeGrid}
         onMouseDown={handleDragStart}
-        className={styles.wrapper}
-        style={wrapperStyle}
       >
-        <svg className={styles.ticks} style={widthStyle}>
-          <rect
-            y={29}
-            className={styles.bottom}
-            style={widthStyle}
-          />
-          {ticks}
-          {numbers}
-        </svg>
-        <Looper />
+        <TimelineControls />
+        <div
+
+          className={styles.wrapper}
+          style={wrapperStyle}
+        >
+          <svg className={styles.ticks} style={widthStyle}>
+            <rect
+              y={29}
+              className={styles.bottom}
+              style={widthStyle}
+            />
+            {ticks}
+            {numbers}
+          </svg>
+          <Looper />
+        </div>
       </div>
-    </div>
+    </GlobalHotKeys>
   );
 });
 
@@ -106,6 +194,9 @@ Timeline.propTypes = {
   scroll: PropTypes.number.isRequired,
   dispatch: PropTypes.func.isRequired,
   gridWidth: PropTypes.number.isRequired,
+  gridUnitWidth: PropTypes.number.isRequired,
+  minGridUnitWidth: PropTypes.isRequired,
+  maxGridUnitWidth: PropTypes.isRequired,
 };
 
 Timeline.displayName = 'Timeline';
@@ -115,6 +206,9 @@ const mapStateToProps = ({ studio }) => ({
   scroll: studio.scroll,
   playing: studio.playing,
   gridWidth: studio.gridWidth,
+  minGridUnitWidth: studio.minGridUnitWidth,
+  maxGridUnitWidth: studio.maxGridUnitWidth,
+  gridUnitWidth: studio.gridUnitWidth,
 });
 
 export default connect(mapStateToProps)(Timeline);

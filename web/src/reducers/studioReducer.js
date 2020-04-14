@@ -15,6 +15,9 @@ export default (
     songDescription: '',
     gridSize: 1,
     gridWidth: 1,
+    minGridUnitWidth: 40,
+    gridUnitWidth: 40,
+    maxGridUnitWidth: 80,
     gridSnapEnabled: true,
     loopEnabled: true,
     scroll: 0,
@@ -149,12 +152,20 @@ export default (
     case 'SET_GRID_SIZE':
       return {
         ...state,
-        gridSize: action.gridSize,
+        gridSize: Math.max(1, Math.min(8, action.gridSize)),
       };
     case 'SET_GRID_WIDTH':
       return {
         ...state,
         gridWidth: action.width,
+      };
+    case 'SET_GRID_UNIT_WIDTH':
+      return {
+        ...state,
+        gridUnitWidth: Math.max(
+          Math.min(state.maxGridUnitWidth, action.width),
+          state.minGridUnitWidth,
+        ),
       };
     case 'SET_GRID_SNAP_ENABLED':
       return {
