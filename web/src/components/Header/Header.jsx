@@ -52,9 +52,9 @@ import Modal from '../Modal';
 
 const Header = memo((props) => {
   const {
-    selected, studio, children, dispatch, history, user,
+    selected, studio, children, dispatch, history, user, tracks, samples, studioUndoable,
   } = props;
-  const { tempo, tracks, samples } = studio;
+  const { tempo } = studio;
   const [nameInput, setNameInput] = useState(studio.songName);
   const urlParams = new URLSearchParams(window.location.search);
   const songId = Number(urlParams.get('sid'));
@@ -92,7 +92,7 @@ const Header = memo((props) => {
   }, [songId, tempo, tracks, samples, dispatch]);
 
   const handleSampleImport = useCallback(() => {
-    if (studio.tracks.length === 0) {
+    if (tracks.length === 0) {
       dispatch(
         showNotification({ message: 'Please add a track first', type: 'info' }),
       );
@@ -123,10 +123,10 @@ const Header = memo((props) => {
       await saveFile(sampleFile.name, url);
       dispatch(addSample(studio.selectedTrack, sampleState));
     };
-  }, [dispatch, studio]);
+  }, [dispatch, studio.currentBeat, studio.selectedTrack, tracks.length]);
 
   const handleAddSynth = useCallback(() => {
-    if (studio.tracks.length === 0) {
+    if (tracks.length === 0) {
       dispatch(
         showNotification({ message: 'Please add a track first', type: 'info' }),
       );
@@ -152,10 +152,10 @@ const Header = memo((props) => {
         notes: [],
       },
     ));
-  }, [dispatch, studio.currentBeat, studio.selectedTrack, studio.tracks.length]);
+  }, [dispatch, studio.currentBeat, studio.selectedTrack, tracks.length]);
 
   const exportAction = useCallback(async () => {
-    const renderedBuffer = await renderTracks(studio);
+    const renderedBuffer = await renderTracks(studio, studioUndoable);
     // eslint-disable-next-line no-underscore-dangle
     const encoded = toWav(renderedBuffer._buffer);
     forceDownload(
@@ -163,7 +163,7 @@ const Header = memo((props) => {
       'audio/wav',
       `${studio.songName}.wav`,
     ); // for mp3 [new DataView] not needed
-  }, [studio]);
+  }, [studio, studioUndoable]);
 
   const handleShowSongPicker = useCallback(async () => {
     if (await handleSaveState()) {
@@ -195,21 +195,21 @@ const Header = memo((props) => {
   }, [dispatch, handleSaveState]);
 
   const tracksAndSamplesSet = useCallback(() => {
-    if (_.isEmpty(studio.tracks)) {
+    if (_.isEmpty(tracks)) {
       dispatch(
         showNotification({ message: 'Please add a track first', type: 'info' }),
       );
       return false;
     }
 
-    if (_.isEmpty(studio.samples)) {
+    if (_.isEmpty(samples)) {
       dispatch(
         showNotification({ message: 'Please add a sample first', type: 'info' }),
       );
       return false;
     }
     return true;
-  }, [dispatch, studio.samples, studio.tracks]);
+  }, [dispatch, samples, tracks]);
 
   const handlePublishSong = useCallback(async () => {
     if (songId) {
@@ -218,7 +218,7 @@ const Header = memo((props) => {
       }
       if (await handleSaveState()) {
         dispatch(showPublishForm());
-        const renderedBuffer = await renderTracks(studio);
+        const renderedBuffer = await renderTracks(studio, studioUndoable);
         const encoded = toWav(renderedBuffer);
         const res = await uploadFile(
           'compiled_audio',
@@ -232,7 +232,7 @@ const Header = memo((props) => {
         setSongCompiledUrl(songData);
       }
     }
-  }, [dispatch, handleSaveState, studio, tracksAndSamplesSet, songId]);
+  }, [songId, tracksAndSamplesSet, handleSaveState, dispatch, studio, studioUndoable]);
 
   const fileDropdownItems = useMemo(
     () => [
@@ -420,6 +420,9 @@ Header.propTypes = {
   studio: PropTypes.object.isRequired,
   user: PropTypes.object.isRequired,
   children: PropTypes.node,
+  tracks: PropTypes.arrayOf(PropTypes.object).isRequired,
+  samples: PropTypes.object.isRequired,
+  studioUndoable: PropTypes.object.isRequired,
 };
 
 Header.defaultProps = {
@@ -428,6 +431,12 @@ Header.defaultProps = {
 
 Header.displayName = 'Header';
 
-const mapStateToProps = ({ user, studio }) => ({ user, studio });
+const mapStateToProps = ({ user, studio, studioUndoable }) => ({
+  user,
+  studio,
+  tracks: studioUndoable.present.tracks,
+  samples: studioUndoable.present.samples,
+  studioUndoable,
+});
 
 export default withRouter(connect(mapStateToProps)(Header));

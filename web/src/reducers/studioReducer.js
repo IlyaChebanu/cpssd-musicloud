@@ -1,98 +1,16 @@
 /* eslint-disable no-param-reassign */
 
 import _ from 'lodash';
+import undoable, { includeAction, groupByActionTypes } from 'redux-undo';
 
-export default (
+export const undoableStateReducer = undoable((
   state = {
-    ppq: 1,
-    loop: {
-      start: 1,
-      stop: 17,
-    },
-    selectedFile: {},
-    selectedFolder: {},
-    songName: 'New Song',
-    songDescription: '',
-    gridSize: 1,
-    gridWidth: 1,
-    minGridUnitWidth: 40,
-    gridUnitWidth: 40,
-    maxGridUnitWidth: 80,
-    gridSnapEnabled: true,
-    loopEnabled: true,
-    scroll: 0,
-    scrollY: 0,
-    tempo: 140.0,
-    playingStartBeat: 1,
-    playingStartTime: 0,
-    playing: false,
-    currentBeat: 1,
-    volume: 1,
-    sampleLoading: false,
     tracks: [],
     samples: {},
-    channels: [],
-    selectedTrack: 0,
-    selectedSample: '',
-    clipboard: {},
-    title: 'Untitled',
-    songPickerHidden: false,
-    fileExplorerHidden: true,
-    sampleEffectsHidden: true,
-    publishFormHidden: true,
-    songImageUrl: null,
-    showPianoRoll: false,
-    recording: false,
-    draggingSeekBar: false,
   },
   action,
 ) => {
   switch (action.type) {
-    case 'RECORDING_START':
-      return {
-        ...state,
-        recording: true,
-      };
-    case 'RECORDING_STOP':
-      return {
-        ...state,
-        recording: false,
-      };
-    case 'STUDIO_PLAY':
-      return {
-        ...state,
-        playing: true,
-      };
-    case 'STUDIO_PAUSE':
-      return {
-        ...state,
-        playing: false,
-      };
-    case 'STUDIO_STOP':
-      return {
-        ...state,
-        playing: false,
-      };
-    case 'PLAYING_START_TIME':
-      return {
-        ...state,
-        playingStartTime: action.time,
-      };
-    case 'PLAYING_START_BEAT':
-      return {
-        ...state,
-        playingStartBeat: action.beat,
-      };
-    case 'SET_CURRENT_BEAT':
-      return {
-        ...state,
-        currentBeat: action.beat,
-      };
-    case 'SET_TEMPO':
-      return {
-        ...state,
-        tempo: action.tempo,
-      };
     case 'SET_COMPLETE_TRACKS_STATE':
       return {
         ...state,
@@ -119,144 +37,6 @@ export default (
         tracks,
       };
     }
-    case 'SET_SAMPLE_LOADING':
-      return {
-        ...state,
-        sampleLoading: action.bool,
-      };
-    case 'SET_VOLUME':
-      return {
-        ...state,
-        volume: action.volume,
-      };
-    case 'SET_SCROLL':
-      return {
-        ...state,
-        scroll: action.scroll,
-      };
-    case 'SET_SCROLL_Y':
-      return {
-        ...state,
-        scrollY: action.scroll,
-      };
-    case 'SET_LOOP':
-      return {
-        ...state,
-        loop: action.obj,
-      };
-    case 'SET_LOOP_ENABLED':
-      return {
-        ...state,
-        loopEnabled: action.bool,
-      };
-    case 'SET_GRID_SIZE':
-      return {
-        ...state,
-        gridSize: Math.max(1, Math.min(8, action.gridSize)),
-      };
-    case 'SET_GRID_WIDTH':
-      return {
-        ...state,
-        gridWidth: action.width,
-      };
-    case 'SET_GRID_UNIT_WIDTH':
-      return {
-        ...state,
-        gridUnitWidth: Math.max(
-          Math.min(state.maxGridUnitWidth, action.width),
-          state.minGridUnitWidth,
-        ),
-      };
-    case 'SET_GRID_SNAP_ENABLED':
-      return {
-        ...state,
-        gridSnapEnabled: action.bool,
-      };
-    case 'SET_SELECTED_TRACK':
-      return {
-        ...state,
-        selectedTrack: action.track,
-      };
-    case 'SET_SELECTED_SAMPLE':
-      return {
-        ...state,
-        selectedSample: action.id,
-      };
-    case 'SET_CLIPBOARD':
-      return {
-        ...state,
-        clipboard: action.sample,
-      };
-    case 'SET_SONG_TITLE':
-      return {
-        ...state,
-        title: action.title,
-      };
-    case 'SET_DRAGGING_SEEKBAR':
-      return {
-        ...state,
-        draggingSeekBar: action.draggingSeekBar,
-      };
-    case 'SONG_PICKER_HIDE':
-      return {
-        ...state,
-        songPickerHidden: true,
-      };
-    case 'SONG_PICKER_SHOW':
-      return {
-        ...state,
-        songPickerHidden: false,
-      };
-    case 'SAMPLE_EFFECTS_HIDE':
-      return {
-        ...state,
-        sampleEffectsHidden: true,
-      };
-    case 'SAMPLE_EFFECTS_SHOW':
-      return {
-        ...state,
-        sampleEffectsHidden: false,
-      };
-    case 'PUBLISH_FORM_HIDE':
-      return {
-        ...state,
-        publishFormHidden: true,
-      };
-    case 'PUBLISH_FORM_SHOW':
-      return {
-        ...state,
-        publishFormHidden: false,
-      };
-    case 'FILE_EXPLORER_HIDE':
-      return {
-        ...state,
-        fileExplorerHidden: true,
-      };
-    case 'FILE_EXPLORER_SHOW':
-      return {
-        ...state,
-        fileExplorerHidden: false,
-      };
-    case 'SET_SELECTED_FILE':
-      return {
-        ...state,
-        selectedFile: action.selectedFile,
-      };
-    case 'SET_SELECTED_FOLDER':
-      return {
-        ...state,
-        selectedFolder: action.selectedFolder,
-      };
-    case 'SET_SONG_NAME':
-      return {
-        ...state,
-        songName: action.songName,
-      };
-    case 'SET_SONG_DESCRIPTION':
-      return {
-        ...state,
-        songDescription: action.description,
-      };
     case 'SET_SAMPLE_FADE':
       return {
         ...state,
@@ -288,16 +68,6 @@ export default (
           });
           return track;
         }),
-      };
-    case 'SET_SONG_IMAGE_URL':
-      return {
-        ...state,
-        songImageUrl: action.songImageUrl,
-      };
-    case 'SET_SHOW_PIANO_ROLL':
-      return {
-        ...state,
-        showPianoRoll: action.bool,
       };
     case 'ADD_TRACK':
       return {
@@ -540,6 +310,275 @@ export default (
         },
       };
     }
+    default:
+      return state;
+  }
+}, {
+  filter: includeAction([
+    'SET_COMPLETE_TRACKS_STATE',
+    'SET_COMPLETE_SAMPLES_STATE',
+    'SET_TRACK',
+    'ADD_TRACK',
+    'REMOVE_TRACK',
+    'ADD_SAMPLE',
+    'REMOVE_SAMPLE',
+    'SET_SAMPLE_TRACK_ID',
+    'SET_SAMPLE_START_TIME',
+    'SET_SAMPLE_TYPE',
+    'ADD_PATTERN_NOTE',
+    'REMOVE_PATTERN_NOTE',
+    'SET_PATTERN_NOTE_TICK',
+    'SET_PATTERN_NOTE_NUMBER',
+    'SET_PATTERN_NOTE_VELOCITY',
+    'SET_PATTERN_NOTE_DURATION',
+    'SET_SAMPLE_PATCH',
+    'SET_SAMPLE_FADE_IN',
+    'SET_SAMPLE_FADE_OUT',
+  ]),
+  groupBy: groupByActionTypes([
+    'SET_SAMPLE_PATCH',
+    'SET_SAMPLE_FADE_IN',
+    'SET_SAMPLE_FADE_OUT',
+  ]),
+});
+
+export default (
+  state = {
+    ppq: 1,
+    loop: {
+      start: 1,
+      stop: 17,
+    },
+    selectedFile: {},
+    selectedFolder: {},
+    songName: 'New Song',
+    songDescription: '',
+    gridSize: 1,
+    gridWidth: 1,
+    minGridUnitWidth: 40,
+    gridUnitWidth: 40,
+    maxGridUnitWidth: 80,
+    gridSnapEnabled: true,
+    loopEnabled: true,
+    scroll: 0,
+    scrollY: 0,
+    tempo: 140.0,
+    playingStartBeat: 1,
+    playingStartTime: 0,
+    playing: false,
+    currentBeat: 1,
+    volume: 1,
+    sampleLoading: false,
+    channels: [],
+    selectedTrack: 0,
+    selectedSample: '',
+    clipboard: {},
+    title: 'Untitled',
+    songPickerHidden: false,
+    fileExplorerHidden: true,
+    sampleEffectsHidden: true,
+    publishFormHidden: true,
+    songImageUrl: null,
+    showPianoRoll: false,
+    recording: false,
+    draggingSeekBar: false,
+  },
+  action,
+) => {
+  switch (action.type) {
+    case 'RECORDING_START':
+      return {
+        ...state,
+        recording: true,
+      };
+    case 'RECORDING_STOP':
+      return {
+        ...state,
+        recording: false,
+      };
+    case 'STUDIO_PLAY':
+      return {
+        ...state,
+        playing: true,
+      };
+    case 'STUDIO_PAUSE':
+      return {
+        ...state,
+        playing: false,
+      };
+    case 'STUDIO_STOP':
+      return {
+        ...state,
+        playing: false,
+      };
+    case 'PLAYING_START_TIME':
+      return {
+        ...state,
+        playingStartTime: action.time,
+      };
+    case 'PLAYING_START_BEAT':
+      return {
+        ...state,
+        playingStartBeat: action.beat,
+      };
+    case 'SET_CURRENT_BEAT':
+      return {
+        ...state,
+        currentBeat: action.beat,
+      };
+    case 'SET_TEMPO':
+      return {
+        ...state,
+        tempo: action.tempo,
+      };
+    case 'SET_SAMPLE_LOADING':
+      return {
+        ...state,
+        sampleLoading: action.bool,
+      };
+    case 'SET_VOLUME':
+      return {
+        ...state,
+        volume: action.volume,
+      };
+    case 'SET_SCROLL':
+      return {
+        ...state,
+        scroll: action.scroll,
+      };
+    case 'SET_SCROLL_Y':
+      return {
+        ...state,
+        scrollY: action.scroll,
+      };
+    case 'SET_LOOP':
+      return {
+        ...state,
+        loop: action.obj,
+      };
+    case 'SET_LOOP_ENABLED':
+      return {
+        ...state,
+        loopEnabled: action.bool,
+      };
+    case 'SET_GRID_SIZE':
+      return {
+        ...state,
+        gridSize: Math.max(1, Math.min(8, action.gridSize)),
+      };
+    case 'SET_GRID_WIDTH':
+      return {
+        ...state,
+        gridWidth: action.width,
+      };
+    case 'SET_GRID_UNIT_WIDTH':
+      return {
+        ...state,
+        gridUnitWidth: Math.max(
+          Math.min(state.maxGridUnitWidth, action.width),
+          state.minGridUnitWidth,
+        ),
+      };
+    case 'SET_GRID_SNAP_ENABLED':
+      return {
+        ...state,
+        gridSnapEnabled: action.bool,
+      };
+    case 'SET_SELECTED_TRACK':
+      return {
+        ...state,
+        selectedTrack: action.track,
+      };
+    case 'SET_SELECTED_SAMPLE':
+      return {
+        ...state,
+        selectedSample: action.id,
+      };
+    case 'SET_CLIPBOARD':
+      return {
+        ...state,
+        clipboard: action.sample,
+      };
+    case 'SET_SONG_TITLE':
+      return {
+        ...state,
+        title: action.title,
+      };
+    case 'SET_DRAGGING_SEEKBAR':
+      return {
+        ...state,
+        draggingSeekBar: action.draggingSeekBar,
+      };
+    case 'SONG_PICKER_HIDE':
+      return {
+        ...state,
+        songPickerHidden: true,
+      };
+    case 'SONG_PICKER_SHOW':
+      return {
+        ...state,
+        songPickerHidden: false,
+      };
+    case 'SAMPLE_EFFECTS_HIDE':
+      return {
+        ...state,
+        sampleEffectsHidden: true,
+      };
+    case 'SAMPLE_EFFECTS_SHOW':
+      return {
+        ...state,
+        sampleEffectsHidden: false,
+      };
+    case 'PUBLISH_FORM_HIDE':
+      return {
+        ...state,
+        publishFormHidden: true,
+      };
+    case 'PUBLISH_FORM_SHOW':
+      return {
+        ...state,
+        publishFormHidden: false,
+      };
+    case 'FILE_EXPLORER_HIDE':
+      return {
+        ...state,
+        fileExplorerHidden: true,
+      };
+    case 'FILE_EXPLORER_SHOW':
+      return {
+        ...state,
+        fileExplorerHidden: false,
+      };
+    case 'SET_SELECTED_FILE':
+      return {
+        ...state,
+        selectedFile: action.selectedFile,
+      };
+    case 'SET_SELECTED_FOLDER':
+      return {
+        ...state,
+        selectedFolder: action.selectedFolder,
+      };
+    case 'SET_SONG_NAME':
+      return {
+        ...state,
+        songName: action.songName,
+      };
+    case 'SET_SONG_DESCRIPTION':
+      return {
+        ...state,
+        songDescription: action.description,
+      };
+    case 'SET_SONG_IMAGE_URL':
+      return {
+        ...state,
+        songImageUrl: action.songImageUrl,
+      };
+    case 'SET_SHOW_PIANO_ROLL':
+      return {
+        ...state,
+        showPianoRoll: action.bool,
+      };
     default:
       return state;
   }

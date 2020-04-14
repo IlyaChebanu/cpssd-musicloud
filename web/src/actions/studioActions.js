@@ -1,3 +1,4 @@
+import { ActionCreators } from 'redux-undo';
 import { genId } from '../helpers/utils';
 // eslint-disable-next-line import/no-cycle
 import store from '../store';
@@ -279,6 +280,7 @@ export const setCompleteTracksState = (tracks) => (dispatch) => {
     type: 'SET_COMPLETE_TRACKS_STATE',
     tracks,
   });
+  dispatch(ActionCreators.clearHistory());
 };
 
 export const setCompleteSamplesState = (samples) => (dispatch) => {
@@ -286,6 +288,7 @@ export const setCompleteSamplesState = (samples) => (dispatch) => {
     type: 'SET_COMPLETE_SAMPLES_STATE',
     samples,
   });
+  dispatch(ActionCreators.clearHistory());
 };
 
 export const addTrack = (track = {
@@ -304,11 +307,7 @@ export const addTrack = (track = {
 };
 
 export const removeTrack = (trackId) => (dispatch) => {
-  const { samples } = store.getState().studio;
-  dispatch({
-    type: 'REMOVE_TRACK',
-    trackId,
-  });
+  const { samples } = store.getState().studioUndoable.present;
   Object.entries(samples).forEach(([sampleId, sample]) => {
     if (sample.trackId === trackId) {
       dispatch({
@@ -316,6 +315,10 @@ export const removeTrack = (trackId) => (dispatch) => {
         sampleId,
       });
     }
+  });
+  dispatch({
+    type: 'REMOVE_TRACK',
+    trackId,
   });
 };
 
@@ -394,6 +397,7 @@ export const setSampleBufferLoading = (sampleId, value) => (dispatch) => {
     sampleId,
     value,
   });
+  dispatch(ActionCreators.clearHistory());
 };
 
 export const setSampleTrackId = (sampleId, value) => (dispatch) => {

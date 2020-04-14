@@ -55,6 +55,10 @@ const Sample = memo((props) => {
   const [samplePosition, setSamplePosition] = useState({ time: data.time, trackId: data.trackId });
   const { onDragStart, onDragging, onDragEnd } = useGlobalDrag(ref);
 
+  useEffect(() => {
+    setSamplePosition({ time: data.time, trackId: data.trackId });
+  }, [data.time, data.trackId]);
+
   onDragStart(() => {
     setDragStartData({ ...data, trackIndex: _.findIndex(tracks, (o) => o.id === data.trackId) });
     dispatch(setSelectedSample(id));
@@ -79,8 +83,12 @@ const Sample = memo((props) => {
   });
 
   onDragEnd(() => {
-    dispatch(setSampleStartTime(id, samplePosition.time));
-    dispatch(setSampleTrackId(id, samplePosition.trackId));
+    if (data.time !== samplePosition.time) {
+      dispatch(setSampleStartTime(id, samplePosition.time));
+    }
+    if (data.trackId !== samplePosition.trackId) {
+      dispatch(setSampleTrackId(id, samplePosition.trackId));
+    }
   });
 
   const trackIndexLocal = useMemo(() => (
@@ -313,14 +321,14 @@ Sample.defaultProps = {
 
 Sample.displayName = 'Sample';
 
-const mapStateToProps = ({ studio }) => ({
+const mapStateToProps = ({ studio, studioUndoable }) => ({
   sampleLoading: studio.sampleLoading,
   tempo: studio.tempo,
   gridSnapEnabled: studio.gridSnapEnabled,
   gridSize: studio.gridSize,
   gridUnitWidth: studio.gridUnitWidth,
   selectedSample: studio.selectedSample,
-  tracks: studio.tracks,
+  tracks: studioUndoable.present.tracks,
   sampleEffectsHidden: studio.sampleEffectsHidden,
   showPianoRoll: studio.showPianoRoll,
 });

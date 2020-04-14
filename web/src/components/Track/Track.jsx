@@ -107,8 +107,8 @@ Track.defaultProps = {
 
 Track.displayName = 'Track';
 
-const mapStateToProps = ({ studio }) => ({
-  tracks: studio.tracks,
+const mapStateToProps = ({ studio, studioUndoable }) => ({
+  tracks: studioUndoable.present.tracks,
   scroll: studio.scroll,
   selectedTrack: studio.selectedTrack,
   clipboard: studio.clipboard,
