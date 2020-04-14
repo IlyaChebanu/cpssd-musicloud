@@ -353,6 +353,12 @@ export const updateSynth = (patchId, patch) => axios.patch(
   { headers: getAuth() },
 );
 
+export const changeSynthName = (synthId, name) => axios.patch(
+  `${API_URL}/v1/audio/synth?id=${synthId}`,
+  { name },
+  { headers: getAuth() },
+);
+
 export const deleteSynth = (synthId) => axios.delete(
   `${API_URL}/v1/audio/synth?id=${synthId}`,
   { headers: getAuth() },
