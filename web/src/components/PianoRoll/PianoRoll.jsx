@@ -11,7 +11,7 @@ import React, {
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import _ from 'lodash';
-import { useMouseEvents, useGlobalEvent } from 'beautiful-react-hooks';
+import { useGlobalEvent } from 'beautiful-react-hooks';
 import Tone from 'tone';
 import ReactTooltip from 'react-tooltip';
 import styles from './PianoRoll.module.scss';
@@ -165,7 +165,7 @@ const PianoRoll = memo(({
   const playingNote = useRef();
   const [hoveredKey, setHoveredKey] = useState();
   const [isMouseDown, setIsMouseDown] = useState(false);
-  const { onMouseDown } = useMouseEvents(keysRef);
+  const onMouseDown = useGlobalEvent('mousedown');
   const onMouseUp = useGlobalEvent('mouseup');
 
   onMouseDown((e) => {
@@ -184,7 +184,7 @@ const PianoRoll = memo(({
 
   useEffect(() => {
     const audioContext = Tone.context.rawContext;
-    if (isMouseDown) {
+    if (isMouseDown && hoveredKey) {
       if (playingNote.current) {
         stopNote(playingNote.current);
         playingNote.current = null;
@@ -360,7 +360,7 @@ const PianoRoll = memo(({
           </div>
         </div>
         <div className={styles.keyboard}>
-          <div className={styles.keys} ref={keysRef}>
+          <div className={styles.keys} ref={keysRef} onMouseLeave={() => setHoveredKey(null)}>
             {pianoKeys}
           </div>
           <div
