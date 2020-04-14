@@ -178,11 +178,11 @@ PianoNote.defaultProps = {
 
 PianoNote.displayName = 'PianoNote';
 
-const mapStateToProps = ({ studio }) => ({
+const mapStateToProps = ({ studio, studioUndoable }) => ({
   selectedTrack: studio.selectedTrack,
   selectedSample: studio.selectedSample,
-  tracks: studio.tracks,
-  samples: studio.samples,
+  tracks: studioUndoable.present.tracks,
+  samples: studioUndoable.present.samples,
 });
 
 export default connect(mapStateToProps)(PianoNote);
