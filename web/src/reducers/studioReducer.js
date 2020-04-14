@@ -516,6 +516,30 @@ export default (
         samples,
       };
     }
+    case 'SET_SAMPLE_PATCH': {
+      return {
+        ...state,
+        samples: {
+          ...state.samples,
+          [action.sampleId]: {
+            ...state.samples[action.sampleId],
+            patch: action.patchData,
+          },
+        },
+      };
+    }
+    case 'SET_SAMPLE_PATCH_ID': {
+      return {
+        ...state,
+        samples: {
+          ...state.samples,
+          [action.sampleId]: {
+            ...state.samples[action.sampleId],
+            patchId: action.patchId,
+          },
+        },
+      };
+    }
     default:
       return state;
   }

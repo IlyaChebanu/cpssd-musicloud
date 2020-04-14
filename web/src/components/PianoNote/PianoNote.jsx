@@ -116,9 +116,10 @@ const PianoNote = memo(({
         0,
         null,
         sample.url,
+        sample.patch,
       );
     }
-  }, [isDragging, noteData.url, noteDisplayData.noteNumber, sample.url]);
+  }, [isDragging, noteData.url, noteDisplayData.noteNumber, sample.patch, sample.url]);
 
   const handleDelete = useCallback((e) => {
     e.preventDefault();

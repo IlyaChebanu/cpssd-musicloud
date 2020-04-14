@@ -11,7 +11,7 @@ import React, {
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import _ from 'lodash';
-import { useMouseEvents, useGlobalEvent } from 'beautiful-react-hooks';
+import { useGlobalEvent } from 'beautiful-react-hooks';
 import Tone from 'tone';
 import ReactTooltip from 'react-tooltip';
 import styles from './PianoRoll.module.scss';
@@ -40,7 +40,7 @@ const MIDI = {
 const PianoRoll = memo(({
   showPianoRoll, selectedSample, dispatch, samples, currentBeat, recording, loopEnabled, loopEnd, ppq, gridUnitWidth,
 }) => {
-  if (!showPianoRoll) return null;
+  if (!selectedSample) return null;
 
   const [tracksRef, setTracksRef] = useState();
   const [scroll, setScroll] = useState(0);
@@ -127,6 +127,7 @@ const PianoRoll = memo(({
           0,
           null,
           selectedSampleObject.url,
+          selectedSampleObject.patch,
         );
         playingNotes.current[key].velocity = velocity / 256;
         setPressedNotes({ ...pressedNotes, [key]: true });
@@ -164,7 +165,7 @@ const PianoRoll = memo(({
   const playingNote = useRef();
   const [hoveredKey, setHoveredKey] = useState();
   const [isMouseDown, setIsMouseDown] = useState(false);
-  const { onMouseDown } = useMouseEvents(keysRef);
+  const onMouseDown = useGlobalEvent('mousedown');
   const onMouseUp = useGlobalEvent('mouseup');
 
   onMouseDown((e) => {
@@ -183,7 +184,7 @@ const PianoRoll = memo(({
 
   useEffect(() => {
     const audioContext = Tone.context.rawContext;
-    if (isMouseDown) {
+    if (isMouseDown && hoveredKey) {
       if (playingNote.current) {
         stopNote(playingNote.current);
         playingNote.current = null;
@@ -196,6 +197,7 @@ const PianoRoll = memo(({
         0,
         null,
         selectedSampleObject.url,
+        selectedSampleObject.patch,
       );
     }
   }, [hoveredKey, isMouseDown, selectedSampleObject]);
@@ -312,6 +314,7 @@ const PianoRoll = memo(({
     return null;
   }, [selectedSampleObject]);
 
+  if (!showPianoRoll) return null;
   return (
     <div
       className={styles.background}
@@ -357,7 +360,7 @@ const PianoRoll = memo(({
           </div>
         </div>
         <div className={styles.keyboard}>
-          <div className={styles.keys} ref={keysRef}>
+          <div className={styles.keys} ref={keysRef} onMouseLeave={() => setHoveredKey(null)}>
             {pianoKeys}
           </div>
           <div

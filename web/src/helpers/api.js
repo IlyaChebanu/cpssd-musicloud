@@ -336,6 +336,28 @@ export const getFolderContent = (folderId) => axios.get(
   },
 );
 
+export const getSynths = () => axios.get(
+  `${API_URL}/v1/audio/synth`,
+  { headers: getAuth() },
+);
+
+export const createSynth = (name, patch) => axios.post(
+  `${API_URL}/v1/audio/synth`,
+  { name, patch },
+  { headers: getAuth() },
+);
+
+export const updateSynth = (patchId, patch) => axios.patch(
+  `${API_URL}/v1/audio/synth?id=${patchId}`,
+  { patch },
+  { headers: getAuth() },
+);
+
+export const deleteSynth = (synthId) => axios.delete(
+  `${API_URL}/v1/audio/synth?id=${synthId}`,
+  { headers: getAuth() },
+);
+
 export const deleteSampleFile = (fileId) => axios.delete(
   `${API_URL}/v1/audio/files?file_id=${fileId}`,
   {

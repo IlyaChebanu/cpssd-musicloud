@@ -408,6 +408,7 @@ export default (store) => {
               noteOffset,
               noteEndTime,
               sample.url,
+              sample.patch,
             );
           }
         }
@@ -504,6 +505,7 @@ export default (store) => {
               noteOffset,
               noteEndTime,
               sample.url,
+              sample.patch,
             );
           }
         }

@@ -11,6 +11,17 @@ export default (
   offset = 0,
   endTime = null,
   url = null,
+  patch = {
+    envelope: {
+      attack: 0.01,
+      decay: 1,
+      sustain: 1,
+      release: 0.3,
+    },
+    oscillator: {
+      type: 'triangle',
+    },
+  },
 ) => {
   if (url) {
     const source = new Tone.BufferSource();
@@ -27,17 +38,7 @@ export default (
 
   const frequency = 2 ** ((note.noteNumber - 49) / 12) * 440;
 
-  const synth = new Tone.Synth({
-    envelope: {
-      attack: 0.01,
-      decay: 1,
-      sustain: 1,
-      release: 0.3,
-    },
-    oscillator: {
-      type: 'triangle',
-    },
-  });
+  const synth = new Tone.Synth(patch);
 
   synth.triggerAttack(
     frequency,

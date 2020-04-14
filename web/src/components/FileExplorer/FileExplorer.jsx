@@ -1,5 +1,7 @@
+/* eslint-disable consistent-return */
+/* eslint-disable react/prop-types */
 import React, {
-  useState, useCallback, useMemo, memo, useRef, useEffect,
+  useState, useCallback, memo, useRef, useEffect,
 } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
@@ -8,10 +10,16 @@ import styles from './FileExplorer.module.scss';
 import samplesIcon from '../../assets/icons/samples.svg';
 import instrumentsIcon from '../../assets/icons/instruments.svg';
 import { ReactComponent as Create } from '../../assets/icons/newFolder.svg';
-import { getRootFolderContents, createRootSampleFolder } from '../../helpers/api';
+import {
+  getRootFolderContents, createRootSampleFolder, getSynths, deleteSynth,
+} from '../../helpers/api';
 import FolderContents from '../FolderContents/FolderContents';
-import { hideFileExplorer } from '../../actions/studioActions';
+import {
+  hideFileExplorer, setSamplePatchId, setSamplePatch, addSample,
+} from '../../actions/studioActions';
 import { showNotification } from '../../actions/notificationsActions';
+import { ReactComponent as DeleteIcon } from '../../assets/icons/delete_outline-24px.svg';
+import { ReactComponent as SynthIcon } from '../../assets/icons/waveform-path-light.svg';
 
 
 const FileExplorer = memo((props) => {
@@ -65,31 +73,6 @@ const FileExplorer = memo((props) => {
     }
   }, [dispatch]);
 
-  const instruments = [
-    { name: 'Instruments', action: null, icon: instrumentsIcon },
-  ];
-
-  const instrumentsMap = useMemo(
-    () => instruments.map((item) => (
-      <li
-        key={item.name}
-        onMouseDown={() => {
-          if (item.action) item.action();
-        }}
-      >
-        {item.icon && (
-        <img
-          className={styles.icon}
-          src={item.icon}
-          alt="explorer item icon"
-        />
-        )}
-        <p>{item.name}</p>
-      </li>
-    )),
-    [instruments],
-  );
-
   const handleClick = useCallback((e) => {
     try {
       if (node.current.contains(e.target)) {
@@ -123,6 +106,57 @@ const FileExplorer = memo((props) => {
       document.removeEventListener('mousedown', handleClick);
     };
   }, [handleClick]);
+
+  const [synths, setSynths] = useState([]);
+
+  useEffect(() => {
+    if (!props.fileExplorerHidden) {
+      getSynths().then((res) => {
+        setSynths(res.data.synths);
+      });
+    }
+  }, [props.fileExplorerHidden]);
+
+  const handleSynthClick = useCallback((synth) => (e) => {
+    e.preventDefault();
+    if (!props.studio.selectedSample) {
+      if (!props.studio.selectedTrack) {
+        return dispatch(showNotification({
+          message: 'Please selecte a track first',
+          type: 'info',
+        }));
+      }
+      return dispatch(addSample(
+        props.studio.selectedTrack,
+        {
+          name: synth.name,
+          time: props.studio.currentBeat,
+          fade: {
+            fadeIn: 0,
+            fadeOut: 0,
+          },
+          type: 'pattern',
+          duration: 0,
+          notes: [],
+          patch: synth.patch,
+          patchId: synth.id,
+        },
+      ));
+    }
+    dispatch(setSamplePatchId(props.studio.selectedSample, synth.id));
+    dispatch(setSamplePatch(props.studio.selectedSample, synth.patch));
+  }, [dispatch, props.studio.currentBeat, props.studio.selectedSample, props.studio.selectedTrack]);
+
+  const handleDeleteSynth = useCallback((synthId) => async (e) => {
+    e.preventDefault();
+    await deleteSynth(synthId);
+  }, []);
+
+  const [instrumentsOpen, setInstrumentsOpen] = useState(false);
+  const handleToggleInstruments = useCallback(() => {
+    setInstrumentsOpen((v) => !v);
+  }, []);
+
   return (
     <div
       ref={node}
@@ -160,7 +194,31 @@ const FileExplorer = memo((props) => {
           folders={folderList}
           level={1}
         />
-        {instrumentsMap}
+        <li
+          onClick={handleToggleInstruments}
+        >
+          {instrumentsIcon && (
+          <img
+            className={styles.icon}
+            src={instrumentsIcon}
+            alt="explorer item icon"
+          />
+          )}
+          <p>Instruments</p>
+        </li>
+        {instrumentsOpen && (
+          <ul className={styles.instrumentsList}>
+            {synths.map((synth) => (
+              <li key={synth.id} onClick={handleSynthClick(synth)} className={styles.synth}>
+                <span>
+                  <SynthIcon className={styles.synthIcon} />
+                  {synth.name}
+                </span>
+                <DeleteIcon className={styles.delete} onClick={handleDeleteSynth(synth.id)} />
+              </li>
+            ))}
+          </ul>
+        )}
 
       </ul>
 

@@ -382,6 +382,10 @@ export const removeSample = (sampleId) => (dispatch) => {
     type: 'REMOVE_SAMPLE',
     sampleId,
   });
+  dispatch({
+    type: 'SET_SELECTED_SAMPLE',
+    id: null,
+  });
 };
 
 export const setSampleBufferLoading = (sampleId, value) => (dispatch) => {
@@ -508,4 +512,16 @@ export const startRecording = () => ({
 
 export const stopRecording = () => ({
   type: 'RECORDING_STOP',
+});
+
+export const setSamplePatch = (sampleId, patchData) => ({
+  type: 'SET_SAMPLE_PATCH',
+  sampleId,
+  patchData,
+});
+
+export const setSamplePatchId = (sampleId, patchId) => ({
+  type: 'SET_SAMPLE_PATCH_ID',
+  sampleId,
+  patchId,
 });
