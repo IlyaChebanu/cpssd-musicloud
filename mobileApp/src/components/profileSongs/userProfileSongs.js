@@ -119,7 +119,7 @@ class UserProfileSongs extends React.Component {
               <Image style={styles.profilePic} source={profilePic} />}
             <Text style={styles.authorNameText}>{authorName}</Text>
           </View>
-          <TouchableOpacity onPress={() => this.handleLikeClick(item, index)}>
+          <TouchableOpacity style={styles.heartlike} onPress={() => this.handleLikeClick(item, index)}>
             {likedSong ? <View style={styles.likeContainer}>
               <Text style={styles.likedText}>{songLikes}</Text><Image style={styles.likeImg} source={likedImg} />
             </View> :

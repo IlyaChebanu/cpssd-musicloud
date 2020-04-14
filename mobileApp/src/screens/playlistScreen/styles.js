@@ -20,7 +20,13 @@ export default StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#FFF',
   },
-
+  heartlike: {
+    width: 50,
+    height: 50,
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+  },
   arrowBack: {
     marginLeft: 15,
   },

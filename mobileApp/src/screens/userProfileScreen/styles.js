@@ -14,6 +14,13 @@ export default StyleSheet.create({
     paddingLeft: 20,
     paddingRight: 20,
   },
+  heartlike: {
+    width: 50,
+    height: 50,
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+  },
   logo: {
     resizeMode: 'contain',
     width: 160,
