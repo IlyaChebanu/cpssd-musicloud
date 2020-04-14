@@ -8,6 +8,9 @@ export const SET_AUTH_TOKEN = 'set_auth_token';
 export const SET_DEVICE_TOKEN = 'set_device_token';
 export const SET_USERNAME = 'set_username';
 export const SET_ONLINE_STATUS = 'set_online_status';
+export const SET_SORTING_TYPE = 'set_sorting_type';
+export const SET_SORTING_ORDER = 'set_sorting_order';
+export const SET_SEARCH_TERM = 'set_search_term';
 
 //Registration actions
 export const SET_NEW_ACCOUNT = 'set_new_account';

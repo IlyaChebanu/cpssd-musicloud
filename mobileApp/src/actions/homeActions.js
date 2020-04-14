@@ -33,3 +33,24 @@ export function setOnlineStatus(isOnline) {
         isOnline
     }
 }
+
+export function setSortingType(sortingType) {
+    return {
+        type: actionsTypes.SET_SORTING_TYPE,
+        sortingType
+    }
+}
+
+export function setSortingOrder(sortingOrder) {
+    return {
+        type: actionsTypes.SET_SORTING_ORDER,
+        sortingOrder
+    }
+}
+
+export function setSearchTerm(searchTerm) {
+    return {
+        type: actionsTypes.SET_SEARCH_TERM,
+        searchTerm
+    }
+}
