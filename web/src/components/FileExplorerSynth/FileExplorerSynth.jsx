@@ -73,7 +73,7 @@ const FileExplorerSynth = ({
     <li key={synth.id} className={styles.synth}>
       <span>
         <SynthIcon onClick={handleSynthClick} className={styles.synthIcon} />
-        <input type="text" value={synth.name} onChange={handleUpdateSynthName} />
+        <input type="text" value={synthName} onChange={handleUpdateSynthName} />
       </span>
       <DeleteIcon className={styles.delete} onClick={handleDeleteSynth} />
     </li>
