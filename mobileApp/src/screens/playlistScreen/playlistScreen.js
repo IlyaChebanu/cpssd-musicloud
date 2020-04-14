@@ -24,6 +24,9 @@ class PlaylistScreen extends React.Component {
             nextPage: null,
             nextPagePlaylist: null,
             refreshing: false,
+            showLikeAlert: false,
+            alertLikeTitle: 'Error',
+            alertLikeMessage: '',
         };
     }
 
@@ -109,17 +112,25 @@ class PlaylistScreen extends React.Component {
     handleLikeClick(item, index) {
         if (item.like_status === 0) {
             postLikeSong(this.props.token, item.sid).then(response => {
-                let array = Object.assign({}, this.state.playlistSongData);
-                array[index].like_status = 1
-                array[index].likes++
-                this.setState({ array });
+                if (response.status === 200) {
+                    let array = Object.assign({}, this.state.playlistSongData);
+                    array[index].like_status = 1
+                    array[index].likes++
+                    this.setState({ array });
+                } else {
+                    this.setState({ showLikeAlert: true, alertLikeMessage: response.data.message })
+                }
             })
         } else {
             postUnlikeSong(this.props.token, item.sid).then(response => {
-                let array = Object.assign({}, this.state.playlistSongData);
-                array[index].like_status = 0
-                array[index].likes--
-                this.setState({ array });
+                if (response.status === 200) {
+                    let array = Object.assign({}, this.state.playlistSongData);
+                    array[index].like_status = 0
+                    array[index].likes--
+                    this.setState({ array });
+                } else {
+                    this.setState({ showLikeAlert: true, alertLikeMessage: response.data.message })
+                }
             })
         }
     }
@@ -181,6 +192,10 @@ class PlaylistScreen extends React.Component {
         this.setState({ showExitAlert: false })
     };
 
+    onPressLikeAlertPositiveButton = () => {
+        this.setState({ showLikeAlert: false, alertLikeMessage: '' })
+    }
+
     _handleLoadMore() {
         if (this.state.nextPage !== null) {
             getPlaylistSongs(this.props.token, this.state.pid, 10, this.state.nextPage).then(response => {
@@ -216,6 +231,14 @@ class PlaylistScreen extends React.Component {
                     negativeButtonText={'CANCEL'}
                     onPressPositiveButton={this.onPressExitAlertPositiveButton}
                     onPressNegativeButton={this.onPressExitAlertNegativeButton}
+                />
+                <CustomAlertComponent
+                    displayAlert={this.state.showLikeAlert}
+                    alertTitleText={this.state.alertLikeTitle}
+                    alertMessageText={this.state.alertLikeMessage}
+                    displayPositiveButton={true}
+                    positiveButtonText={'OK'}
+                    onPressPositiveButton={this.onPressLikeAlertPositiveButton}
                 />
                 <View style={{ 'backgroundColor': '#1B1E23', 'flex': 1 }}>
                     <HeaderComponent navigation={this.props.navigation} />
