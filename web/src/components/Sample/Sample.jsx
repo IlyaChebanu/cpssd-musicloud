@@ -27,12 +27,15 @@ import {
   setSelectedTrack,
   setSampleDuration,
   setSampleType,
+  toggleSampleSelection,
+  resetSampleSelection,
+  addSample,
 } from '../../actions/studioActions';
 
 import { ReactComponent as EditIcon } from '../../assets/icons/edit-sample.svg';
 import { ReactComponent as PianoIcon } from '../../assets/icons/piano-keyboard-light.svg';
 import Spinner from '../Spinner/Spinner';
-import { useGlobalDrag } from '../../helpers/hooks';
+import { useGlobalDrag, useIsKeyDown } from '../../helpers/hooks';
 import store from '../../store';
 
 const Sample = memo((props) => {
@@ -48,6 +51,9 @@ const Sample = memo((props) => {
     tracks,
     sampleEffectsHidden,
     showPianoRoll,
+    multipleSelectedSamples,
+    samples,
+    clipboard,
   } = props;
 
   const ref = useRef();
@@ -55,14 +61,20 @@ const Sample = memo((props) => {
   const [samplePosition, setSamplePosition] = useState({ time: data.time, trackId: data.trackId });
   const { onDragStart, onDragging, onDragEnd } = useGlobalDrag(ref);
 
+  const isShiftDown = useIsKeyDown(16); // shift key code - 16
+
   useEffect(() => {
     setSamplePosition({ time: data.time, trackId: data.trackId });
   }, [data.time, data.trackId]);
 
   onDragStart(() => {
     setDragStartData({ ...data, trackIndex: _.findIndex(tracks, (o) => o.id === data.trackId) });
+    if (!isShiftDown) {
+      dispatch(resetSampleSelection());
+    }
     dispatch(setSelectedSample(id));
     dispatch(setSelectedTrack(data.trackId));
+    dispatch(toggleSampleSelection(id));
   });
 
   onDragging(({
@@ -151,7 +163,7 @@ const Sample = memo((props) => {
 
   const wrapperStyle = useMemo(() => {
     const colourIdx = trackIndexLocal % dColours.length;
-    const selected = id === selectedSample;
+    const selected = id === selectedSample || multipleSelectedSamples.includes(id);
     let width;
     if (data.bufferLoading) {
       width = 55;
@@ -168,7 +180,7 @@ const Sample = memo((props) => {
       zIndex: selected ? 2 : 1,
     };
   // eslint-disable-next-line max-len
-  }, [trackIndexLocal, id, selectedSample, data.bufferLoading, data.duration, samplePosition.time, gridSizePx]);
+  }, [trackIndexLocal, id, selectedSample, multipleSelectedSamples, data.bufferLoading, data.duration, samplePosition.time, gridSizePx]);
 
   const container = ref.current;
   const wavesurfer = useRef();
@@ -233,12 +245,23 @@ const Sample = memo((props) => {
 
   const keyMap = {
     COPY_SAMPLE: 'ctrl+c',
+    PASTE_SAMPLE: 'ctrl+v',
     DELETE_SAMPLE: ['del', 'backspace'],
   };
 
   const handlers = {
     DELETE_SAMPLE: deleteSample,
     COPY_SAMPLE: copySample,
+    PASTE_SAMPLE: () => {
+      const newSample = { ...clipboard };
+      if (_.isEmpty(sample)) {
+        return;
+      }
+      const trackSamples = Object.values(samples).filter((s) => s.trackId === sample.trackId);
+      const latestSample = _.maxBy(trackSamples, (o) => o.time + o.duration);
+      newSample.time = latestSample ? latestSample.time + latestSample.duration : 1;
+      dispatch(addSample(sample.trackId, newSample));
+    },
   };
 
   const handleShowHideSampleEffects = useCallback((e) => {
@@ -313,6 +336,9 @@ Sample.propTypes = {
   tracks: PropTypes.arrayOf(PropTypes.object).isRequired,
   sampleEffectsHidden: PropTypes.bool.isRequired,
   showPianoRoll: PropTypes.bool.isRequired,
+  multipleSelectedSamples: PropTypes.arrayOf(PropTypes.string).isRequired,
+  samples: PropTypes.object.isRequired,
+  clipboard: PropTypes.object.isRequired,
 };
 
 Sample.defaultProps = {
@@ -331,6 +357,9 @@ const mapStateToProps = ({ studio, studioUndoable }) => ({
   tracks: studioUndoable.present.tracks,
   sampleEffectsHidden: studio.sampleEffectsHidden,
   showPianoRoll: studio.showPianoRoll,
+  multipleSelectedSamples: studio.multipleSelectedSamples,
+  samples: studioUndoable.present.samples,
+  clipboard: studio.clipboard,
 });
 
 export default connect(mapStateToProps)(Sample);

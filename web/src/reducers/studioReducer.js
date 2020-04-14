@@ -372,6 +372,7 @@ export default (
     channels: [],
     selectedTrack: 0,
     selectedSample: '',
+    multipleSelectedSamples: [],
     clipboard: {},
     title: 'Untitled',
     songPickerHidden: false,
@@ -386,6 +387,21 @@ export default (
   action,
 ) => {
   switch (action.type) {
+    case 'ADD_TO_SAMPLE_SELECTION':
+      return {
+        ...state,
+        multipleSelectedSamples: [...state.multipleSelectedSamples, action.payload],
+      };
+    case 'REMOVE_FROM_SAMPLE_SELECTION':
+      return {
+        ...state,
+        multipleSelectedSamples: state.multipleSelectedSamples.filter((s) => s !== action.payload),
+      };
+    case 'RESET_SAMPLE_SELECTION':
+      return {
+        ...state,
+        multipleSelectedSamples: [],
+      };
     case 'RECORDING_START':
       return {
         ...state,

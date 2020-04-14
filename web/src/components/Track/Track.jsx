@@ -11,6 +11,7 @@ import {
   hideSampleEffects,
   setShowPianoRoll,
   addSample,
+  resetSampleSelection,
 } from '../../actions/studioActions';
 
 configure({
@@ -45,31 +46,32 @@ Ticks.displayName = 'Ticks';
 
 const Track = memo((props) => {
   const {
-    dispatch, clipboard, track, className, gridSize, gridWidth, gridUnitWidth, index,
+    dispatch, clipboard, track, className, gridSize, gridWidth, gridUnitWidth, index, samples,
   } = props;
 
   const handleSetSelected = useCallback(() => {
     dispatch(setSelectedTrack(track.id));
     dispatch(setSelectedSample(''));
+    dispatch(resetSampleSelection());
     dispatch(hideSampleEffects());
     dispatch(setShowPianoRoll(false));
   }, [dispatch, track.id]);
-
-  const pasteSample = useCallback(() => {
-    const sample = { ...clipboard };
-    if (_.isEmpty(sample)) {
-      return;
-    }
-    sample.time += sample.duration;
-    dispatch(addSample(track.id, sample));
-  }, [clipboard, dispatch, track.id]);
 
   const keyMap = {
     PASTE_SAMPLE: 'ctrl+v',
   };
 
   const handlers = {
-    PASTE_SAMPLE: pasteSample,
+    PASTE_SAMPLE: () => {
+      const sample = { ...clipboard };
+      if (_.isEmpty(sample)) {
+        return;
+      }
+      const trackSamples = Object.values(samples).filter((s) => s.trackId === track.id);
+      const latestSample = _.maxBy(trackSamples, (o) => o.time + o.duration);
+      sample.time = latestSample ? latestSample.time + latestSample.duration : 1;
+      dispatch(addSample(track.id, sample));
+    },
   };
 
   const widthStyle = useMemo(() => ({
@@ -99,6 +101,7 @@ Track.propTypes = {
   gridSize: PropTypes.number.isRequired,
   gridWidth: PropTypes.number.isRequired,
   gridUnitWidth: PropTypes.number.isRequired,
+  samples: PropTypes.object.isRequired,
 };
 
 Track.defaultProps = {
@@ -108,7 +111,6 @@ Track.defaultProps = {
 Track.displayName = 'Track';
 
 const mapStateToProps = ({ studio, studioUndoable }) => ({
-  tracks: studioUndoable.present.tracks,
   scroll: studio.scroll,
   selectedTrack: studio.selectedTrack,
   clipboard: studio.clipboard,
@@ -116,6 +118,7 @@ const mapStateToProps = ({ studio, studioUndoable }) => ({
   gridSize: studio.gridSize,
   gridWidth: studio.gridWidth,
   gridUnitWidth: studio.gridUnitWidth,
+  samples: studioUndoable.present.samples,
 });
 
 export default connect(mapStateToProps)(Track);
