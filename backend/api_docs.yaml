@@ -4489,8 +4489,8 @@ paths:
     patch:
       tags:
       - "audio"
-      summary: "Update a synth definition."
-      description: "This endpoint takes two arguments and updates a synths patch column in the DB. The arguments that are to be provided are as follows:\n\n \"id\" = The ID of the synth you want to update.\n\n \"patch\" = The new JSON object you want to put into that synths patch column."
+      summary: "Update a synth definition or name."
+      description: "This endpoint takes multiple arguments and updates a synths patch column in the DB, the synths name, or both. The arguments that can be provided are as follows:\n\n \"id\" = The ID of the synth you want to update.\n\n \"patch\" = The new JSON object you want to put into that synths patch column.\n\n \"name\" = The new name we want to assign to our synth."
       consumes:
       - "application/json"
       produces:
@@ -4515,6 +4515,9 @@ paths:
           properties:
             patch:
               type: "object"
+            name:
+              type: "string"
+              example: "aNewSynthName"
       responses:
         200:
           description: "Synth updated"

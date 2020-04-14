@@ -5,7 +5,6 @@ Test suite for /audio endpoints.
 import unittest
 import json
 import mock
-import pytest
 
 from jwt.exceptions import InvalidSignatureError
 
@@ -5195,7 +5194,6 @@ class AudioTests(unittest.TestCase):
             )
             self.assertEqual(500, res.status_code)
 
-    @pytest.mark.skip(reason="Broken in Travis only")
     @mock.patch('backend.src.controllers.audio.controllers.get_synth')
     @mock.patch('backend.src.controllers.audio.controllers.json.loads')
     def test_edit_synths_success(self, mocked_patch, mocked_synth):
@@ -5205,11 +5203,11 @@ class AudioTests(unittest.TestCase):
         mocked_patch.return_value = {}
         mocked_synth.return_value = [[None, -1]]
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-            with mock.patch('backend.src.controllers.audio.controllers.update_synth'):
+            with mock.patch('backend.src.controllers.audio.controllers.update_synth_name'):
                 mock_token.return_value = ALT_MOCKED_TOKEN
                 res = self.test_client.patch(
                     "/api/v1/audio/synth?id=-1",
-                    json={"patch": {"attack": 200}},
+                    json={"name": "newName"},
                     headers={'Authorization': 'Bearer ' + TEST_TOKEN},
                     follow_redirects=True
                 )
