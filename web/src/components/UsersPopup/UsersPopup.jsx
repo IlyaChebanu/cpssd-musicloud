@@ -63,9 +63,9 @@ UsersPopup.propTypes = {
 
 UsersPopup.displayName = 'UsersPopup';
 
-const mapStateToProps = ({ studio, user }) => ({
+const mapStateToProps = ({ user, studioUndoable }) => ({
   usersPopupHidden: user.usersPopupHidden,
-  tracks: studio.tracks,
+  tracks: studioUndoable.present.tracks,
 });
 
 export default connect(mapStateToProps)(UsersPopup);

@@ -1397,6 +1397,28 @@ def update_synth(synth_id, patch):
     query(sql, args)
 
 
+def update_synth_name(synth_id, name):
+    """
+    Takes a synth ID and a new name to update that synth with.
+    :param synth_id:
+    Int - ID of the synth we want to update.
+    :param  name:
+    Str - New name for the synth.
+    :return:
+    None - Updates the synth and returns None.
+    """
+    sql = (
+        "UPDATE Synth "
+        "SET name=%s "
+        "WHERE id = %s"
+    )
+    args = (
+        name,
+        synth_id,
+    )
+    query(sql, args)
+
+
 def get_all_synths(uid):
     """
     Get all synths belonging to a user from the DB.

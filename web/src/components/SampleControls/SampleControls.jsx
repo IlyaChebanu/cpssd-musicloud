@@ -15,9 +15,9 @@ import { createSynth, updateSynth } from '../../helpers/api';
 
 const SampleControls = memo((props) => {
   const {
-    dispatch, studio,
+    dispatch, studio, samples,
   } = props;
-  const { samples, selectedSample } = studio;
+  const { selectedSample } = studio;
 
   const ref = useRef();
   const [inputSelected, setInputSelected] = useState(false);
@@ -174,6 +174,7 @@ SampleControls.propTypes = {
   dispatch: PropTypes.func.isRequired,
   studio: PropTypes.object.isRequired,
   selectedSample: PropTypes.string,
+  samples: PropTypes.object.isRequired,
 };
 
 SampleControls.defaultProps = {
@@ -182,6 +183,9 @@ SampleControls.defaultProps = {
 
 SampleControls.displayName = 'SampleControls';
 
-const mapStateToProps = ({ studio }) => ({ studio });
+const mapStateToProps = ({ studio, studioUndoable }) => ({
+  studio,
+  samples: studioUndoable.present.samples,
+});
 
 export default withRouter(connect(mapStateToProps)(SampleControls));

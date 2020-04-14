@@ -14,6 +14,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { GlobalHotKeys } from 'react-hotkeys';
 import ReactTooltip from 'react-tooltip';
+import { ActionCreators as UndoActionCreators } from 'redux-undo';
 import styles from './Studio.module.scss';
 import Header from '../../components/Header';
 import {
@@ -44,11 +45,11 @@ import PianoRoll from '../../components/PianoRoll/PianoRoll';
 import FileExplorer from '../../components/FileExplorer/FileExplorer';
 import Sample from '../../components/Sample/Sample';
 
+
 const Studio = memo((props) => {
   const {
-    loopEnd, dispatch, studio, songPickerHidden,
+    loopEnd, dispatch, studio, songPickerHidden, tracks, samples,
   } = props;
-  const { samples, tracks } = studio;
 
   const [tracksLoading, setTracksLoading] = useState(false);
   const [isLogoutShowing, setIsLogoutShowing] = useState(false);
@@ -149,10 +150,12 @@ const Studio = memo((props) => {
 
   const keyMap = {
     SAVE: 'ctrl+s',
+    UNDO: 'ctrl+z',
   };
 
   const handlers = {
     SAVE: handleSaveState,
+    UNDO: () => dispatch(UndoActionCreators.undo()),
   };
 
   return (
@@ -225,14 +228,16 @@ Studio.propTypes = {
   tracks: PropTypes.arrayOf(PropTypes.object).isRequired,
   studio: PropTypes.object.isRequired,
   songPickerHidden: PropTypes.bool.isRequired,
+  samples: PropTypes.object.isRequired,
 };
 
 Studio.displayName = 'Studio';
 
-const mapStateToProps = ({ studio }) => ({
+const mapStateToProps = ({ studio, studioUndoable }) => ({
   loopEnd: studio.loop.stop,
   studio,
-  tracks: studio.tracks,
+  tracks: studioUndoable.present.tracks,
+  samples: studioUndoable.present.samples,
   songPickerHidden: studio.songPickerHidden,
 });
 

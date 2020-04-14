@@ -37,7 +37,7 @@ from ...models.audio import (
     get_root_folder_entry, delete_file_entry, move_folder_entry,
     move_file_entry, get_child_folders, get_child_files, add_synth, get_synth,
     update_synth, get_all_synths, delete_synth_entry, rename_file_entry,
-    rename_folder_entry
+    rename_folder_entry, update_synth_name
 )
 from ...models.users import get_user_via_username
 from ...models.errors import NoResults
@@ -1768,9 +1768,12 @@ def edit_synth(user_data):  # pylint: disable=R0911
         "properties": {
             "patch": {
                 "type": "object"
+            },
+            "name": {
+                "type": "string",
+                "minLength": 1
             }
-        },
-        "required": ["patch"]
+        }
     }
     try:
         validate(request.json, schema=expected_body)
@@ -1782,18 +1785,34 @@ def edit_synth(user_data):  # pylint: disable=R0911
     if not synth_id:
         return {"message": "No id sent"}, 422
 
-    patch = json.dumps(request.json.get("patch"))
+    if not request.json.get("patch") and not request.json.get("name"):
+        return {"message": "You must send at least 1 valid body item."}, 422
 
-    try:
-        synth = get_synth(synth_id)[0]
-        if user_data.get("uid") != synth[1]:
-            return {"message": "You can't edit that synth!"}, 401
-    except NoResults:
-        return {
-            "message": ("Invalid synth ID. Synth does not exist!")
-        }, 400
+    if request.json.get("patch"):
+        patch = json.dumps(request.json.get("patch"))
 
-    update_synth(synth_id, patch)
+        try:
+            synth = get_synth(synth_id)[0]
+            if user_data.get("uid") != synth[1]:
+                return {"message": "You can't edit that synth!"}, 401
+        except NoResults:
+            return {
+                "message": ("Invalid synth ID. Synth does not exist!")
+            }, 400
+
+        update_synth(synth_id, patch)
+
+    if request.json.get("name"):
+        try:
+            synth = get_synth(synth_id)[0]
+            if user_data.get("uid") != synth[1]:
+                return {"message": "You can't edit that synth!"}, 401
+        except NoResults:
+            return {
+                "message": ("Invalid synth ID. Synth does not exist!")
+            }, 400
+
+        update_synth_name(synth_id, request.json.get("name"))
 
     return {"message": "Synth updated"}, 200
 

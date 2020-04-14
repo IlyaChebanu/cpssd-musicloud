@@ -409,11 +409,11 @@ PianoRoll.defaultProps = {
 
 PianoRoll.displayName = 'PianoRoll';
 
-const mapStateToProps = ({ studio }) => ({
+const mapStateToProps = ({ studio, studioUndoable }) => ({
   currentBeat: studio.currentBeat,
   showPianoRoll: studio.showPianoRoll,
   selectedSample: studio.selectedSample,
-  samples: studio.samples,
+  samples: studioUndoable.present.samples,
   recording: studio.recording,
   loopEnabled: studio.loopEnabled,
   loopEnd: studio.loop.stop,

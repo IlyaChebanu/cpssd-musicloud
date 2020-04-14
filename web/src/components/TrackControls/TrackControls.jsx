@@ -212,8 +212,8 @@ TrackControls.propTypes = {
 
 TrackControls.displayName = 'TrackControls';
 
-const mapStateToProps = ({ studio }) => ({
-  tracks: studio.tracks,
+const mapStateToProps = ({ studio, studioUndoable }) => ({
+  tracks: studioUndoable.present.tracks,
   selectedTrack: studio.selectedTrack,
 });
 
