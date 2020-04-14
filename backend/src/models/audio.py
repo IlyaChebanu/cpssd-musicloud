@@ -1353,7 +1353,10 @@ def add_synth(name, uid, patch):
     """
     sql = "INSERT INTO Synth (name, uid, patch) VALUES (%s, %s, %s)"
     args = (name, uid, patch)
-    query(sql, args)
+    synth_id = query(sql, args, get_insert_row_id=True)
+    if not synth_id:
+        raise NoResults
+    return synth_id
 
 
 def get_synth(synth_id):

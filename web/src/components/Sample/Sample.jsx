@@ -44,6 +44,7 @@ const Sample = memo((props) => {
     dispatch,
     gridSnapEnabled,
     gridSize,
+    gridUnitWidth,
     tracks,
     sampleEffectsHidden,
     showPianoRoll,
@@ -63,7 +64,7 @@ const Sample = memo((props) => {
   onDragging(({
     oldX, oldY, x, y,
   }) => {
-    const gridSizePx = 40 * gridSize; // TODO: change hardcoded value to redux
+    const gridSizePx = gridUnitWidth * gridSize;
     const newStartTime = Math.max(1, dragStartData.time + (x - oldX) / gridSizePx);
     const numDecimalPlaces = Math.max(0, String(1 / gridSize).length - 2);
     const time = gridSnapEnabled
@@ -115,7 +116,7 @@ const Sample = memo((props) => {
 
   const sample = data;
 
-  const gridSizePx = 40 * gridSize; // TODO: change hardcoded value to redux
+  const gridSizePx = gridUnitWidth * gridSize;
   const ppq = 1; // TODO: Unhardcode
   useEffect(() => {
     if (data.type === 'pattern') {
@@ -177,12 +178,12 @@ const Sample = memo((props) => {
           hideScrollbar: true,
         });
       }
-      setTimeout(() => wavesurfer.current.loadDecodedBuffer(buffer), 300);
+      setTimeout(() => wavesurfer.current.loadDecodedBuffer(buffer), 200);
     } else if (wavesurfer.current && data.type === 'pattern') {
       wavesurfer.current.destroy();
       wavesurfer.current = null;
     }
-  }, [buffer, container, data.duration, data.type, gridSize, tempo]);
+  }, [buffer, container, data.duration, data.type, gridUnitWidth, gridSize, tempo]);
 
   const patternPreview = useMemo(() => {
     const highestNote = _.maxBy(Object.values(data.notes), (n) => n.noteNumber);
@@ -300,6 +301,7 @@ Sample.propTypes = {
   dispatch: PropTypes.func.isRequired,
   gridSnapEnabled: PropTypes.bool.isRequired,
   gridSize: PropTypes.number.isRequired,
+  gridUnitWidth: PropTypes.number.isRequired,
   tracks: PropTypes.arrayOf(PropTypes.object).isRequired,
   sampleEffectsHidden: PropTypes.bool.isRequired,
   showPianoRoll: PropTypes.bool.isRequired,
@@ -316,6 +318,7 @@ const mapStateToProps = ({ studio }) => ({
   tempo: studio.tempo,
   gridSnapEnabled: studio.gridSnapEnabled,
   gridSize: studio.gridSize,
+  gridUnitWidth: studio.gridUnitWidth,
   selectedSample: studio.selectedSample,
   tracks: studio.tracks,
   sampleEffectsHidden: studio.sampleEffectsHidden,

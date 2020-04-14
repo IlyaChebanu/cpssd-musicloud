@@ -125,7 +125,7 @@ const Folder = memo((props) => {
             className={selectedFolder === dir ? styles.selected : (expanded ? styles.expanded : '')}
             style={{ transition: 'width 200ms', marginLeft: `${level * 25}px` }}
             onClick={folderClick}
-            key={dir.folder_id}
+            key={`${dir.folder_id}_folder`}
           >
             { expanded
               ? <OpenFolder style={{ width: '22px', paddingRight: '6px', fill: 'white' }} />
