@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 
 import _ from 'lodash';
-import undoable, { includeAction } from 'redux-undo';
+import undoable, { includeAction, groupByActionTypes } from 'redux-undo';
 
 export const undoableStateReducer = undoable((
   state = {
@@ -331,6 +331,14 @@ export const undoableStateReducer = undoable((
     'SET_PATTERN_NOTE_NUMBER',
     'SET_PATTERN_NOTE_VELOCITY',
     'SET_PATTERN_NOTE_DURATION',
+    'SET_SAMPLE_PATCH',
+    'SET_SAMPLE_FADE_IN',
+    'SET_SAMPLE_FADE_OUT',
+  ]),
+  groupBy: groupByActionTypes([
+    'SET_SAMPLE_PATCH',
+    'SET_SAMPLE_FADE_IN',
+    'SET_SAMPLE_FADE_OUT',
   ]),
 });
 
