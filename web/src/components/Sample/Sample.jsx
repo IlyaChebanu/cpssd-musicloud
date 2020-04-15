@@ -134,8 +134,6 @@ const Sample = memo((props) => {
     }
   }, [buffer, data.type, data.url, dispatch, id, tempo]);
 
-  const sample = data;
-
   const gridSizePx = gridUnitWidth * gridSize;
   const ppq = 1; // TODO: Unhardcode
   useEffect(() => {
@@ -240,8 +238,9 @@ const Sample = memo((props) => {
   }, [dispatch, id]);
 
   const copySample = useCallback(() => {
-    dispatch(setClipboard(sample));
-  }, [dispatch, sample]);
+    const clipSamples = multipleSelectedSamples.map((sampleId) => samples[sampleId]);
+    dispatch(setClipboard(clipSamples));
+  }, [dispatch, multipleSelectedSamples, samples]);
 
   const keyMap = {
     COPY_SAMPLE: 'ctrl+c',
@@ -253,14 +252,24 @@ const Sample = memo((props) => {
     DELETE_SAMPLE: deleteSample,
     COPY_SAMPLE: copySample,
     PASTE_SAMPLE: () => {
-      const newSample = { ...clipboard };
-      if (_.isEmpty(sample)) {
+      if (!clipboard.length) {
         return;
       }
-      const trackSamples = Object.values(samples).filter((s) => s.trackId === sample.trackId);
-      const latestSample = _.maxBy(trackSamples, (o) => o.time + o.duration);
-      newSample.time = latestSample ? latestSample.time + latestSample.duration : 1;
-      dispatch(addSample(sample.trackId, newSample));
+
+      const tracksInClipboard = [...new Set(clipboard.map((s) => s.trackId))];
+
+      const trackSamples = Object.values(samples).filter(
+        (s) => tracksInClipboard.includes(s.trackId),
+      );
+      const latestInTrack = _.maxBy(trackSamples, (o) => o.time + o.duration);
+      const earliestInClipboard = _.minBy(clipboard, (s) => s.time);
+
+      clipboard.forEach((clipSample) => {
+        const newSample = { ...clipSample };
+
+        newSample.time += (latestInTrack.time + latestInTrack.duration - earliestInClipboard.time);
+        dispatch(addSample(newSample.trackId, newSample));
+      });
     },
   };
 

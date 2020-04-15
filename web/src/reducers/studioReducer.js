@@ -373,7 +373,7 @@ export default (
     selectedTrack: 0,
     selectedSample: '',
     multipleSelectedSamples: [],
-    clipboard: {},
+    clipboard: [],
     title: 'Untitled',
     songPickerHidden: false,
     fileExplorerHidden: true,

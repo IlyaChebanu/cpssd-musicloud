@@ -63,14 +63,24 @@ const Track = memo((props) => {
 
   const handlers = {
     PASTE_SAMPLE: () => {
-      const sample = { ...clipboard };
-      if (_.isEmpty(sample)) {
+      if (!clipboard.length) {
         return;
       }
-      const trackSamples = Object.values(samples).filter((s) => s.trackId === track.id);
-      const latestSample = _.maxBy(trackSamples, (o) => o.time + o.duration);
-      sample.time = latestSample ? latestSample.time + latestSample.duration : 1;
-      dispatch(addSample(track.id, sample));
+
+      const tracksInClipboard = [...new Set(clipboard.map((s) => s.trackId))];
+
+      const trackSamples = Object.values(samples).filter(
+        (s) => tracksInClipboard.includes(s.trackId),
+      );
+      const latestInTrack = _.maxBy(trackSamples, (o) => o.time + o.duration);
+      const earliestInClipboard = _.minBy(clipboard, (s) => s.time);
+
+      clipboard.forEach((clipSample) => {
+        const newSample = { ...clipSample };
+
+        newSample.time += (latestInTrack.time + latestInTrack.duration - earliestInClipboard.time);
+        dispatch(addSample(newSample.trackId, newSample));
+      });
     },
   };
 
