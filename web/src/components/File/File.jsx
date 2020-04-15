@@ -121,13 +121,13 @@ const File = memo((props) => {
   }, [dir.file_id]);
 
   return (
-    <div ref={ref}>
+    <div>
       {!deleted
         ? (
           <li
             id={dir.file_id}
             type="file"
-
+            ref={ref}
             style={{ backgroundColor: !selectedFile ? shadeColor('#414448', +20 * level) : '' }}
             onBlur={(e) => setSelectedFile(`${path}/${e.target.value}`)}
             onClick={async (e) => {
