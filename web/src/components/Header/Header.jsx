@@ -111,6 +111,7 @@ const Header = memo((props) => {
     fileSelector.onchange = async () => {
       const sampleFile = fileSelector.files[0];
       const url = await uploadFile('audio', sampleFile);
+      console.log(url);
       const sampleState = {
         url,
         name: sampleFile.name,
@@ -122,6 +123,7 @@ const Header = memo((props) => {
       };
       await saveFile(sampleFile.name, url);
       dispatch(addSample(studio.selectedTrack, sampleState));
+      console.log(studio.selectedTrack);
     };
   }, [dispatch, studio.currentBeat, studio.selectedTrack, tracks.length]);
 

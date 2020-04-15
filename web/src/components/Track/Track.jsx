@@ -1,16 +1,19 @@
 /* eslint-disable react/no-array-index-key */
-import React, { memo, useCallback, useMemo } from 'react';
+import React, {
+  memo, useCallback, useMemo, useRef,
+} from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 import { HotKeys, configure } from 'react-hotkeys';
+import { useDragEvents } from 'beautiful-react-hooks';
 import styles from './Track.module.scss';
 import {
   setSelectedTrack,
   setSelectedSample,
   hideSampleEffects,
   setShowPianoRoll,
-  addSample,
+  addSample as addSampleAction,
 } from '../../actions/studioActions';
 
 configure({
@@ -18,12 +21,24 @@ configure({
 });
 
 const Ticks = memo(({ gridSize, gridWidth, gridUnitWidth }) => {
+  const ref = useRef();
+  const { onDragOver, onDrop } = useDragEvents(ref, false);
+  onDragOver((e) => {
+    e.preventDefault();
+  });
+
+  onDrop((e) => {
+    e.preventDefault();
+  });
+
   const ticks = useMemo(() => (
     [...Array(Math.ceil(gridWidth * gridSize))]
       .map((__, i) => <rect key={i} x={i * gridUnitWidth} className={styles.tick} />)
   ), [gridSize, gridWidth, gridUnitWidth]);
   return (
     <svg
+      onDrop={(e) => { e.stopPropagation(); }}
+      onDragOver={(e) => { e.preventDefault(); }}
       className={styles.gridLines}
       style={{
         width: Math.ceil(gridWidth * gridSize)
@@ -48,6 +63,37 @@ const Track = memo((props) => {
     dispatch, clipboard, track, className, gridSize, gridWidth, gridUnitWidth, index,
   } = props;
 
+  const ref = useRef();
+  const { onDrop, onDragOver } = useDragEvents(ref, false);
+
+  onDragOver((event) => {
+    event.preventDefault();
+  });
+
+  const addSample = useCallback((url, name, offsetX) => {
+    console.log(offsetX);
+    const sampleState = {
+      url,
+      name,
+      time: offsetX / gridUnitWidth,
+      fade: {
+        fadeIn: 0,
+        fadeOut: 0,
+      },
+    };
+    dispatch(addSampleAction(track.id, sampleState));
+  }, [dispatch, gridUnitWidth, track.id]);
+
+  onDrop((event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const type = event.dataTransfer.getData('type');
+    const url = event.dataTransfer.getData('url');
+    const name = event.dataTransfer.getData('name');
+
+    addSample(url, name, event.offsetX);
+  });
+
   const handleSetSelected = useCallback(() => {
     dispatch(setSelectedTrack(track.id));
     dispatch(setSelectedSample(''));
@@ -62,7 +108,7 @@ const Track = memo((props) => {
     }
     sample.time += sample.duration;
     dispatch(addSample(track.id, sample));
-  }, [clipboard, dispatch, track.id]);
+  }, [addSample, clipboard, dispatch, track.id]);
 
   const keyMap = {
     PASTE_SAMPLE: 'ctrl+v',
@@ -78,6 +124,7 @@ const Track = memo((props) => {
 
   return (
     <HotKeys
+      // onDrop={(e) => { e.stopPropagation(); }}
       allowChanges
       keyMap={keyMap}
       handlers={handlers}
@@ -85,7 +132,9 @@ const Track = memo((props) => {
       onMouseDown={handleSetSelected}
       style={widthStyle}
     >
-      <Ticks gridSize={gridSize} gridWidth={gridWidth} gridUnitWidth={gridUnitWidth} />
+      <div ref={ref}>
+        <Ticks gridSize={gridSize} gridWidth={gridWidth} gridUnitWidth={gridUnitWidth} />
+      </div>
     </HotKeys>
   );
 });

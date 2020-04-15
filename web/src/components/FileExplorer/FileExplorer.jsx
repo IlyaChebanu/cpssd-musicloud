@@ -6,42 +6,92 @@ import React, {
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import { useDragEvents } from 'beautiful-react-hooks';
 import styles from './FileExplorer.module.scss';
 import samplesIcon from '../../assets/icons/samples.svg';
 import instrumentsIcon from '../../assets/icons/instruments.svg';
 import { ReactComponent as Create } from '../../assets/icons/newFolder.svg';
 import {
-  getRootFolderContents, createRootSampleFolder, getSynths,
+  getRootFolderContents, createRootSampleFolder, getSynths, moveFile, moveFolder,
 } from '../../helpers/api';
 import FolderContents from '../FolderContents/FolderContents';
 import {
-  hideFileExplorer,
+  hideFileExplorer, setFileMoved, setFolderMoved,
 } from '../../actions/studioActions';
 import { showNotification } from '../../actions/notificationsActions';
 import FileExplorerSynth from '../FileExplorerSynth/FileExplorerSynth';
-
 
 const FileExplorer = memo((props) => {
   const { dispatch } = props;
   const [fileList, setFileList] = useState([]);
   const [folderList, setFolderList] = useState([]);
-
+  const [rootFolderId, setRootFolderId] = useState(0);
   const [sampleTreeSelected, setSampleTreeSelected] = useState(false);
   const node = useRef();
+
+  const dropRef = useRef();
+  const { onDrop, onDragOver } = useDragEvents(dropRef, false);
+
+  const moveFileToFolder = useCallback(async (fileId, folderId) => {
+    const res = await moveFile(fileId, folderId);
+    if (res.status === 200) {
+      return true;
+    }
+  }, []);
+
+  const moveFolderToFolder = useCallback(async (folderId, parentFolderId) => {
+    const res = await moveFolder(folderId, parentFolderId);
+    if (res.status === 200) {
+      return true;
+    }
+  }, []);
+
   const getFiles = useCallback(async () => {
     const res = await getRootFolderContents();
     if (res.status === 200) {
       const files = res.data.folder.child_files;
       const folders = res.data.folder.child_folders;
+      console.log(folders);
+      console.log(files);
       setFileList(files);
       setFolderList(folders);
       setSampleTreeSelected(true);
+      setRootFolderId(res.data.folder.folder_id);
       return;
     }
     dispatch(showNotification({
       message: res,
     }));
-  }, [dispatch]);
+  }, [dispatch, setFileList, setFolderList]);
+
+  onDragOver((event) => {
+    event.preventDefault();
+  });
+
+
+  onDrop(async (event) => {
+    const id = parseInt(event.dataTransfer.getData('id'), 10);
+    const type = event.dataTransfer.getData('type');
+
+    if (type === 'file') {
+      const moved = await moveFileToFolder(id, rootFolderId); // promise
+
+      if (moved) {
+        console.log('MOVEDDDD');
+        await getFiles();
+      }
+      dispatch(setFileMoved(id));
+    } else if (type === 'folder') {
+      const moved = await moveFolderToFolder(id, rootFolderId);
+
+      if (moved) {
+        console.log('MOVEDDDD');
+        await getFiles();
+      }
+      dispatch(setFolderMoved(id));
+    }
+  });
+
 
   const collapseSampleTree = useCallback(() => {
     const allAudio = document.getElementsByTagName('audio');
@@ -116,6 +166,7 @@ const FileExplorer = memo((props) => {
     }
   }, [props.fileExplorerHidden]);
 
+
   const handleSynthDelete = useCallback((synthId) => () => {
     setSynths((a) => a.filter((synth) => synth.id !== synthId));
   }, []);
@@ -133,6 +184,7 @@ const FileExplorer = memo((props) => {
     >
       <ul>
         <li
+          ref={dropRef}
           key="Samples"
           onClick={sampleTreeSelected ? collapseSampleTree : getFiles}
           className={sampleTreeSelected ? styles.selected : ''}
@@ -157,7 +209,7 @@ const FileExplorer = memo((props) => {
 
         </li>
         <FolderContents
-
+          getParentContents={getFiles}
           files={fileList}
           folders={folderList}
           level={1}

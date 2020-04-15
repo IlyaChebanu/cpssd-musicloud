@@ -349,6 +349,8 @@ export default (
       start: 1,
       stop: 17,
     },
+    fileMoved: 0,
+    folderMoved: 0,
     selectedFile: {},
     selectedFolder: {},
     songName: 'New Song',
@@ -549,6 +551,17 @@ export default (
         ...state,
         fileExplorerHidden: false,
       };
+    case 'SET_FILE_MOVED':
+      return {
+        ...state,
+        fileMoved: action.fileMoved,
+      };
+    case 'SET_FOLDER_MOVED':
+      return {
+        ...state,
+        folderMoved: action.folderMoved,
+      };
+
     case 'SET_SELECTED_FILE':
       return {
         ...state,

@@ -1,18 +1,21 @@
 import React, {
-  useState, useCallback, memo,
+  useState, useCallback, memo, useRef, useEffect,
 } from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { deleteFile } from 'react-s3';
+import { useDragEvents, useDrag } from 'beautiful-react-hooks';
+import { shadeColor } from '../../helpers/utils';
 import { generatePresigned, deleteSampleFile, renameFile } from '../../helpers/api';
 import { ReactComponent as SampleIcon } from '../../assets/icons/music_note-24px.svg';
 import styles from './File.module.scss';
 import { ReactComponent as Delete } from '../../assets/icons/delete_outline-24px.svg';
+import { setFileMoved } from '../../actions/studioActions';
 
 const File = memo((props) => {
   const {
-    dir, level, dispatch,
+    dir, level, dispatch, getParentContents, fileMoved,
   } = props;
   const [deleted, setDeleted] = useState(false);
   const [selectedFile, setSelectedFile] = useState(false);
@@ -28,6 +31,43 @@ const File = memo((props) => {
     secretAccessKey: 'XVdgFyhjyhnqicDxxXZa9rLouFv5WQdXzXwxrP0u',
     region: 'eu-west-1',
   });
+  const ref = useRef();
+  const inputRef = useRef();
+  const { onDragOver, onDrop } = useDragEvents(inputRef, false);
+  useDragEvents(ref, false);
+  const [isDragged, setIsDragged] = useState(false);
+  const { onDragStart, onDragEnd } = useDragEvents(ref);
+  onDragStart((event) => {
+    event.dataTransfer.setData('id', dir.file_id);
+    console.log(dir);
+    event.dataTransfer.setData('type', 'file');
+    event.dataTransfer.setData('url', url);
+    event.dataTransfer.setData('name', newName);
+    setIsDragged(true);
+  });
+
+  useEffect(() => {
+    if (fileMoved === dir.file_id) {
+      getParentContents();
+    }
+  }, [dir.file_id, fileMoved, getParentContents]);
+
+  onDragEnd((event) => {
+    event.preventDefault();
+    console.log('DRAG FINISHED');
+    dispatch(setFileMoved(-1));
+    // getParentContents(); // promise
+    setIsDragged(false);
+  });
+
+  onDragOver((e) => {
+    e.preventDefault();
+  });
+
+  onDrop((e) => {
+    e.preventDefault();
+  });
+
 
   const awsConfig = useCallback(async (directory) => {
     const res = await generatePresigned('/');
@@ -42,13 +82,13 @@ const File = memo((props) => {
   const handleFileNameChange = useCallback(async (e) => {
     e.preventDefault();
     let name = e.target.value;
-    dispatch(setSelectedFile(`${path}/${name}`));
+    setSelectedFile(`${path}/${name}`);
     setNewName(e.target.value);
     if (!name) {
       name = 'Unnamed File';
     }
-    await renameFile(dir.folder_id, name);
-  }, [dir.folder_id, dispatch, path]);
+    await renameFile(dir.file_id, name);
+  }, [dir.file_id, path]);
 
   const selected = useCallback(() => {
     setSelectedFile(true);
@@ -87,11 +127,14 @@ const File = memo((props) => {
   }, [dir.file_id]);
 
   return (
-    <div>
+    <div ref={ref}>
       {!deleted
         ? (
           <li
-            style={{ marginLeft: `${level * 25}px` }}
+            id={dir.file_id}
+            type="file"
+
+            style={{ backgroundColor: !selectedFile ? shadeColor('#414448', +20 * level) : '' }}
             onBlur={(e) => setSelectedFile(`${path}/${e.target.value}`)}
             onClick={async (e) => {
               e.preventDefault();
@@ -106,6 +149,8 @@ const File = memo((props) => {
             <SampleIcon style={{ paddingRight: '4px', fill: 'white' }} />
             <form onSubmit={(e) => { e.preventDefault(); }}>
               <input
+                ref={inputRef}
+                // onMouseMove={(e) => { e.preventDefault(); console.log(selectedFile); }}
                 onBlur={(e) => { onInputBlur(e); }}
                 onKeyDown={(e) => {
                   if (e.keyCode === 13) {
@@ -141,8 +186,12 @@ File.propTypes = {
   dir: PropTypes.object.isRequired,
   dispatch: PropTypes.func.isRequired,
   level: PropTypes.number.isRequired,
+  getParentContents: PropTypes.func.isRequired,
+  fileMoved: PropTypes.number.isRequired,
 };
 
-const mapStateToProps = () => ({});
+const mapStateToProps = ({ studio }) => ({
+  fileMoved: studio.fileMoved,
+});
 
 export default withRouter(connect(mapStateToProps)(File));

@@ -10,6 +10,7 @@ import { HotKeys } from 'react-hotkeys';
 import axios from 'axios';
 import WaveSurfer from 'wavesurfer.js';
 import ReactTooltip from 'react-tooltip';
+import { useDragEvents } from 'beautiful-react-hooks';
 import styles from './Sample.module.scss';
 import {
   dColours, colours, bufferStore, audioContext,
@@ -54,6 +55,10 @@ const Sample = memo((props) => {
   const [dragStartData, setDragStartData] = useState(data);
   const [samplePosition, setSamplePosition] = useState({ time: data.time, trackId: data.trackId });
   const { onDragStart, onDragging, onDragEnd } = useGlobalDrag(ref);
+  const { onDrop, onDragOver } = useDragEvents(ref, false);
+
+  onDragOver((e) => { e.preventDefault(); });
+  onDrop((e) => { e.preventDefault(); e.stopPropagation(); });
 
   useEffect(() => {
     setSamplePosition({ time: data.time, trackId: data.trackId });
@@ -265,7 +270,10 @@ const Sample = memo((props) => {
       style={{ ...wrapperStyle, ...props.style }}
       innerRef={ref}
     >
-      <div className={styles.fadeWrapper}>
+      <div
+
+        className={styles.fadeWrapper}
+      >
         {id === selectedSample && !!(data.fade.fadeIn || data.fade.fadeOut) && (
           <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" fill="rgba(0, 0, 0, 0.3)">
             <path d={`M 0 0 L ${data.fade.fadeIn * 100} 0 L 0 100`} />

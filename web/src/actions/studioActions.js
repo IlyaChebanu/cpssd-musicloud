@@ -217,6 +217,20 @@ export const showFileExplorer = () => (dispatch) => {
   });
 };
 
+export const setFileMoved = (fileMoved) => (dispatch) => {
+  dispatch({
+    type: 'SET_FILE_MOVED',
+    fileMoved,
+  });
+};
+
+export const setFolderMoved = (folderMoved) => (dispatch) => {
+  dispatch({
+    type: 'SET_FOLDER_MOVED',
+    folderMoved,
+  });
+};
+
 export const setSelectedFile = (selectedFile) => (dispatch) => {
   dispatch({
     type: 'SET_SELECTED_FILE',

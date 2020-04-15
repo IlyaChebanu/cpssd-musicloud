@@ -1,5 +1,4 @@
-import React, {
-} from 'react';
+import React, { } from 'react';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import File from '../File/File';
@@ -7,14 +6,21 @@ import File from '../File/File';
 import Folder from '../Folder/Folder';
 
 const FolderContents = (folder) => {
-  const { files, folders, level } = folder;
+  const {
+    files, folders, level, getParentContents,
+  } = folder;
   return (
-    <div>
+    <div style={{ borderRadius: '5px 5px 5px 5px', marginLeft: `${20}px` }}>
       {folders.map((item) => (
-        <Folder dir={item} level={level} />
+        <Folder
+          getParentContents={getParentContents}
+          dir={item}
+          level={level}
+        />
       ))}
       {files.map((file) => (
         <File
+          getParentContents={getParentContents}
           dir={file}
           level={level}
         />
