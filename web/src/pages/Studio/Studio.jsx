@@ -151,11 +151,13 @@ const Studio = memo((props) => {
   const keyMap = {
     SAVE: 'ctrl+s',
     UNDO: 'ctrl+z',
+    REDO: 'ctrl+shift+z',
   };
 
   const handlers = {
     SAVE: handleSaveState,
     UNDO: () => dispatch(UndoActionCreators.undo()),
+    REDO: () => dispatch(UndoActionCreators.redo()),
   };
 
   return (

@@ -389,7 +389,7 @@ export const addSample = (trackId, sample) => (dispatch) => {
     type: 'ADD_SAMPLE',
     sampleId: genId(),
     sample: {
-      type: 'sample', notes: {}, trackId, ...sample,
+      type: 'sample', notes: {}, ...sample, trackId,
     },
   });
 };
@@ -542,4 +542,27 @@ export const setSamplePatchId = (sampleId, patchId) => ({
   type: 'SET_SAMPLE_PATCH_ID',
   sampleId,
   patchId,
+});
+
+export const addToSampleSelection = (sampleId) => ({
+  type: 'ADD_TO_SAMPLE_SELECTION',
+  payload: sampleId,
+});
+
+export const removeFromSampleSelection = (sampleId) => ({
+  type: 'REMOVE_FROM_SAMPLE_SELECTION',
+  payload: sampleId,
+});
+
+export const toggleSampleSelection = (sampleId) => (dispatch) => {
+  const { multipleSelectedSamples } = store.getState().studio;
+  if (multipleSelectedSamples.includes(sampleId)) {
+    dispatch(removeFromSampleSelection(sampleId));
+  } else {
+    dispatch(addToSampleSelection(sampleId));
+  }
+};
+
+export const resetSampleSelection = () => ({
+  type: 'RESET_SAMPLE_SELECTION',
 });

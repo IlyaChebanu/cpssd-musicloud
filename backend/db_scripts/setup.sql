@@ -1,5 +1,20 @@
 CREATE DATABASE `musicloud_db`;
 
+CREATE TABLE `musicloud_db`.`Folder` (
+    `folder_id` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    `parent_id` INT DEFAULT NULL,
+    `name` VARCHAR(3072) NOT NULL,
+    FOREIGN KEY (parent_id) REFERENCES Folder(folder_id) ON DELETE CASCADE
+);
+
+CREATE TABLE `musicloud_db`.`File` (
+    `file_id` INT UNIQUE NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    `folder_id` INT NOT NULL,
+    `name` VARCHAR(3072) NOT NULL,
+    `url` VARCHAR(3072) NOT NULL,
+    FOREIGN KEY (folder_id) REFERENCES Folder(folder_id) ON DELETE CASCADE
+);
+
 CREATE TABLE `musicloud_db`.`Users` (
     `uid` INT UNIQUE NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `email` VARCHAR(255) NOT NULL UNIQUE,
@@ -10,7 +25,9 @@ CREATE TABLE `musicloud_db`.`Users` (
     `silence_follow_notifcation` TINYINT DEFAULT 0,
     `silence_post_notifcation` TINYINT DEFAULT 0,
     `silence_song_notifcation` TINYINT DEFAULT 0,
-    `silence_like_notifcation` TINYINT DEFAULT 0
+    `silence_like_notifcation` TINYINT DEFAULT 0,
+    `root_folder` INT UNIQUE NOT NULL,
+    FOREIGN KEY (root_folder) REFERENCES Folder(folder_id) ON DELETE CASCADE
 );
 
 CREATE TABLE `musicloud_db`.`Songs` (
@@ -103,4 +120,12 @@ CREATE TABLE `musicloud_db`.`Notifications` (
     `did` VARCHAR(255) NOT NULL UNIQUE PRIMARY KEY,
     `uid` INT NOT NULL,
     FOREIGN KEY (uid) REFERENCES Users(uid)
+);
+
+CREATE TABLE `musicloud_db`.`Synth` (
+    `id` INT UNIQUE NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    `uid` INT NOT NULL,
+    `name` VARCHAR(500) NOT NULL,
+    `patch` JSON NOT NULL,
+    FOREIGN KEY (uid) REFERENCES Users(uid) ON DELETE CASCADE
 );

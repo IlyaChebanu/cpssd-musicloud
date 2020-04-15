@@ -10,6 +10,7 @@ import { withRouter, Link } from 'react-router-dom';
 import toWav from 'audiobuffer-to-wav';
 import _ from 'lodash';
 import ReactTooltip from 'react-tooltip';
+import { ActionCreators as UndoActionCreators } from 'redux-undo';
 import styles from './Header.module.scss';
 import { deleteToken } from '../../actions/userActions';
 import {
@@ -32,6 +33,11 @@ import openIcon from '../../assets/icons/file_dropdown/open.svg';
 import publishIcon from '../../assets/icons/file_dropdown/publish.svg';
 import importIcon from '../../assets/icons/file_dropdown/import.svg';
 import exportIcon from '../../assets/icons/file_dropdown/export.svg';
+import undoIcon from '../../assets/icons/undo-alt-light.svg';
+import redoIcon from '../../assets/icons/redo-alt-light.svg';
+import copyIcon from '../../assets/icons/copy-light.svg';
+import pasteIcon from '../../assets/icons/paste-light.svg';
+import deleteIcon from '../../assets/icons/trash-alt-light.svg';
 import { renderTracks } from '../../middleware/audioRedux';
 import { forceDownload } from '../../helpers/utils';
 import {
@@ -46,6 +52,8 @@ import {
   hideSampleEffects,
   setCompleteTracksState,
   setCompleteSamplesState,
+  removeSample,
+  setClipboard,
 } from '../../actions/studioActions';
 import Button from '../Button';
 import Modal from '../Modal';
@@ -268,17 +276,91 @@ const Header = memo((props) => {
   );
 
   const editDropdownItems = useMemo(
-    () => [
-      { name: 'Edit 1' },
-      { name: 'Edit 2' },
-      { name: 'Edit 3' },
-      { name: 'Edit 4' },
-      { name: 'Edit 5' },
-      { name: 'Edit 6' },
-      { name: 'Edit 7' },
-      { name: 'Edit 8' },
+    () => {
+      const items = [];
+      if (studioUndoable.past.length) {
+        items.push({
+          name: 'Undo',
+          icon: undoIcon,
+          dataTip: 'Undo last change [ctrl+z]',
+          action: () => dispatch(UndoActionCreators.undo()),
+        });
+      }
+      if (studioUndoable.future.length) {
+        items.push({
+          name: 'Redo',
+          icon: redoIcon,
+          dataTip: 'Redo last change',
+          action: () => dispatch(UndoActionCreators.redo()),
+        });
+      }
+      if (studio.selectedSample) {
+        items.push({
+          name: 'Remove selected sample [delete/backspace]',
+          icon: deleteIcon,
+          dataTip: 'Remove currently selected sample',
+          action: () => dispatch(removeSample(studio.selectedSample)),
+        }, {
+          name: 'Copy sample(s)',
+          icon: copyIcon,
+          dataTip: 'Copy selected sample(s) [ctrl+c]',
+          action: () => {
+            const clipSamples = studio.multipleSelectedSamples.map((sampleId) => samples[sampleId]);
+            dispatch(setClipboard(clipSamples));
+          },
+        });
+      }
+      if (studio.clipboard.length) {
+        items.push({
+          name: 'Paste sample(s)',
+          icon: pasteIcon,
+          dataTip: 'Paste copied sample(s) [ctrl+v]',
+          action: () => {
+            const tracksInClipboard = [...new Set(studio.clipboard.map((s) => s.trackId))];
+
+            let trackSamples;
+            if (tracksInClipboard.length > 1) {
+              trackSamples = Object.values(samples).filter(
+                (s) => tracksInClipboard.includes(s.trackId),
+              );
+            } else {
+              trackSamples = Object.values(samples).filter(
+                (s) => s.trackId === studio.selectedTrack,
+              );
+            }
+            const latestInTrack = _.maxBy(
+              trackSamples,
+              (o) => o.time + o.duration,
+            ) || { time: 1, duration: 0 };
+            const earliestInClipboard = _.minBy(studio.clipboard, (s) => s.time);
+
+            studio.clipboard.forEach((clipSample) => {
+              const newSample = { ...clipSample };
+
+              newSample.time += (
+                latestInTrack.time + latestInTrack.duration - earliestInClipboard.time
+              );
+              if (tracksInClipboard.length > 1) {
+                dispatch(addSample(newSample.trackId, newSample));
+              } else {
+                dispatch(addSample(studio.selectedTrack, newSample));
+              }
+            });
+          },
+        });
+      }
+      return items;
+    },
+    [
+      dispatch,
+      samples,
+      studio.clipboard,
+      studio.multipleSelectedSamples,
+      studio.selectedSample,
+      studio.selectedTrack,
+      studioUndoable.future.length,
+      studioUndoable.past.length,
     ],
-    [],
   );
 
   const handleSignout = useCallback(() => {

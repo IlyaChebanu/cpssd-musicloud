@@ -34,7 +34,7 @@ const SeekBar = memo((props) => {
     dispatch(setDraggingSeekBar(true));
     dispatch(pause);
     const mousePosOffset = ev.screenX;
-    const startBeat = currentBeat;
+    const startBeat = currentBeatStudio;
     const handleMouseMove = (e) => {
       ReactTooltip.hide(ref.current);
       e.preventDefault();
@@ -60,7 +60,7 @@ const SeekBar = memo((props) => {
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleDragStop);
-  }, [currentBeat, dispatch, gridUnitWidth, playing, scaleFactor]);
+  }, [currentBeatStudio, dispatch, gridUnitWidth, playing, scaleFactor]);
 
   const offset = props.currentBeat ? 0 : 220;
   const iconStyle = useMemo(() => {
