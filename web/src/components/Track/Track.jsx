@@ -107,7 +107,7 @@ const Track = memo((props) => {
       return dispatch(addSampleAction(track.id, synthState));
     }
     dispatch(setSamplePatchId(selectedSample, id));
-    dispatch(setSamplePatch(selectedSample, patch));
+    return dispatch(setSamplePatch(selectedSample, patch));
   }, [dispatch, gridUnitWidth, selectedSample, track.id]);
 
   onDrop((event) => {
