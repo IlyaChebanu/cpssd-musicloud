@@ -74,9 +74,9 @@ const PianoNote = memo(({
   });
 
   move.onDragEnd(() => {
+    setIsDragging(false);
     dispatch(setPatternNoteTick(selectedSample, noteData.id, noteDisplayData.tick));
     dispatch(setPatternNoteNumber(selectedSample, noteData.id, noteDisplayData.noteNumber));
-    setIsDragging(false);
     if (playingNote.current) {
       stopNote(playingNote.current);
       playingNote.current = null;
