@@ -136,6 +136,35 @@ export const useMidi = () => {
   };
 };
 
+export const useIsKeyDown = (keyCode) => {
+  const [isKeyDown, setIsKeyDown] = useState(false);
+
+  useEffect(() => {
+    const keyDownHandler = (e) => {
+      if (e.keyCode === keyCode) {
+        setIsKeyDown(true);
+      }
+    };
+
+    const keyUpHandler = (e) => {
+      if (e.keyCode === keyCode) {
+        setIsKeyDown(false);
+      }
+    };
+
+    window.addEventListener('keydown', keyDownHandler);
+    window.addEventListener('keyup', keyUpHandler);
+
+    return () => {
+      window.removeEventListener('keydown', keyDownHandler);
+      window.removeEventListener('keyup', keyUpHandler);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return isKeyDown;
+};
+
 export const useEffectAfterMount = (cb, deps) => {
   const isFirstRun = useRef(true);
 
