@@ -106,7 +106,7 @@ Track.propTypes = {
   index: PropTypes.number.isRequired,
   dispatch: PropTypes.func.isRequired,
   track: PropTypes.object.isRequired,
-  clipboard: PropTypes.object.isRequired,
+  clipboard: PropTypes.array.isRequired,
   className: PropTypes.string,
   gridSize: PropTypes.number.isRequired,
   gridWidth: PropTypes.number.isRequired,

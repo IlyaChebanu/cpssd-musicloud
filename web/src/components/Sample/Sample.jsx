@@ -347,7 +347,7 @@ Sample.propTypes = {
   showPianoRoll: PropTypes.bool.isRequired,
   multipleSelectedSamples: PropTypes.arrayOf(PropTypes.string).isRequired,
   samples: PropTypes.object.isRequired,
-  clipboard: PropTypes.object.isRequired,
+  clipboard: PropTypes.array.isRequired,
 };
 
 Sample.defaultProps = {
