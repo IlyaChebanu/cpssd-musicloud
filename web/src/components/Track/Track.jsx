@@ -69,9 +69,16 @@ const Track = memo((props) => {
 
       const tracksInClipboard = [...new Set(clipboard.map((s) => s.trackId))];
 
-      const trackSamples = Object.values(samples).filter(
-        (s) => tracksInClipboard.includes(s.trackId),
-      );
+      let trackSamples;
+      if (tracksInClipboard.length > 1) {
+        trackSamples = Object.values(samples).filter(
+          (s) => tracksInClipboard.includes(s.trackId),
+        );
+      } else {
+        trackSamples = Object.values(samples).filter(
+          (s) => s.trackId === track.id,
+        );
+      }
       const latestInTrack = _.maxBy(trackSamples, (o) => o.time + o.duration);
       const earliestInClipboard = _.minBy(clipboard, (s) => s.time);
 
@@ -79,7 +86,11 @@ const Track = memo((props) => {
         const newSample = { ...clipSample };
 
         newSample.time += (latestInTrack.time + latestInTrack.duration - earliestInClipboard.time);
-        dispatch(addSample(newSample.trackId, newSample));
+        if (tracksInClipboard.length > 1) {
+          dispatch(addSample(newSample.trackId, newSample));
+        } else {
+          dispatch(addSample(track.id, newSample));
+        }
       });
     },
   };
