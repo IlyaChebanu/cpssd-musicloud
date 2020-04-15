@@ -36,6 +36,7 @@
         margin: 0;
         text-align: left;
         border-bottom: 1px solid #3d4044;
+        align-items: center;
         p {
             margin: 0;
             padding: 8px;
@@ -66,3 +67,6 @@
     }
 }
 
+.icon {
+    height: 22px;
+}
