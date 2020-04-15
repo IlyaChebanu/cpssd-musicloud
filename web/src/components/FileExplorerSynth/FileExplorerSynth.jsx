@@ -1,7 +1,8 @@
 /* eslint-disable consistent-return */
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import { useDragEvents } from 'beautiful-react-hooks';
 import styles from './FileExplorerSynth.module.scss';
 import { showNotification } from '../../actions/notificationsActions';
 import { addSample, setSamplePatchId, setSamplePatch } from '../../actions/studioActions';
@@ -15,6 +16,23 @@ const FileExplorerSynth = ({
   synth, studio, dispatch, onDelete,
 }) => {
   const [synthName, setSynthName] = useState(synth.name);
+  const ref = useRef();
+  const { onDragStart, onDragEnd } = useDragEvents(ref);
+
+  onDragStart((e) => {
+    e.dataTransfer.setData('id', synth.id);
+    e.dataTransfer.setData('type', 'synth');
+    e.dataTransfer.setData('attack', synth.patch.envelope.attack);
+    e.dataTransfer.setData('decay', synth.patch.envelope.decay);
+    e.dataTransfer.setData('release', synth.patch.envelope.release);
+    e.dataTransfer.setData('sustain', synth.patch.envelope.sustain);
+    e.dataTransfer.setData('oscillator', synth.patch.oscillator.type);
+    e.dataTransfer.setData('name', synth.name);
+  });
+
+  onDragEnd((event) => {
+    event.preventDefault();
+  });
 
   useEffectAfterMount(() => {
     changeSynthName(synth.id, synthName);
@@ -22,6 +40,21 @@ const FileExplorerSynth = ({
 
   const handleSynthClick = useCallback((e) => {
     e.preventDefault();
+    console.log(studio.selectedSample);
+    console.log(studio.selectedTrack);
+    console.log({
+      name: synth.name,
+      time: studio.currentBeat,
+      fade: {
+        fadeIn: 0,
+        fadeOut: 0,
+      },
+      type: 'pattern',
+      duration: 0,
+      notes: [],
+      patch: synth.patch,
+      patchId: synth.id,
+    });
     if (!studio.selectedSample) {
       if (!studio.selectedTrack) {
         return dispatch(showNotification({
@@ -70,7 +103,7 @@ const FileExplorerSynth = ({
   }, []);
 
   return (
-    <li key={synth.id} className={styles.synth}>
+    <li ref={ref} key={synth.id} className={styles.synth}>
       <span>
         <SynthIcon onClick={handleSynthClick} className={styles.synthIcon} />
         <input type="text" value={synthName} onChange={handleUpdateSynthName} />

@@ -11,6 +11,8 @@ import styles from './Track.module.scss';
 import {
   setSelectedTrack,
   setSelectedSample,
+  setSamplePatchId,
+  setSamplePatch,
   hideSampleEffects,
   setShowPianoRoll,
   addSample as addSampleAction,
@@ -21,7 +23,9 @@ configure({
   allowCombinationSubmatches: true,
 });
 
-const Ticks = memo(({ gridSize, gridWidth, gridUnitWidth }) => {
+const Ticks = memo(({
+  gridSize, gridWidth, gridUnitWidth,
+}) => {
   const ref = useRef();
   const { onDragOver, onDrop } = useDragEvents(ref, false);
   onDragOver((e) => {
@@ -61,7 +65,8 @@ Ticks.displayName = 'Ticks';
 
 const Track = memo((props) => {
   const {
-    dispatch, clipboard, track, className, gridSize, gridWidth, gridUnitWidth, index, samples,
+    dispatch, clipboard, track, className, gridSize, gridWidth, gridUnitWidth,
+    index, samples, selectedSample,
   } = props;
 
   const ref = useRef();
@@ -84,17 +89,54 @@ const Track = memo((props) => {
     dispatch(addSampleAction(track.id, sampleState));
   }, [dispatch, gridUnitWidth, track.id]);
 
+  const addSynth = useCallback((name, offsetX, patch, id) => {
+    console.log(patch);
+    const synthState = {
+      name,
+      time: offsetX / gridUnitWidth,
+      fade: {
+        fadeIn: 0,
+        fadeOut: 0,
+      },
+      type: 'pattern',
+      duration: 0,
+      notes: [],
+      patch,
+      patchId: id,
+    };
+    console.log(synthState);
+    if (!selectedSample) {
+      return dispatch(addSampleAction(track.id, synthState));
+    }
+    dispatch(setSamplePatchId(selectedSample, id));
+    dispatch(setSamplePatch(selectedSample, patch));
+  }, [dispatch, gridUnitWidth, selectedSample, track.id]);
+
   onDrop((event) => {
     event.preventDefault();
     event.stopPropagation();
     const type = event.dataTransfer.getData('type');
-    if (type !== 'file') {
+    if (type !== 'file' && type !== 'synth') {
       return;
     }
-    const url = event.dataTransfer.getData('url');
     const name = event.dataTransfer.getData('name');
-
-    addSample(url, name, event.offsetX);
+    if (type === 'file') {
+      const url = event.dataTransfer.getData('url');
+      addSample(url, name, event.offsetX);
+    } else if (type === 'synth') {
+      const id = event.dataTransfer.getData('id');
+      const decay = parseFloat(event.dataTransfer.getData('decay'));
+      const attack = parseFloat(event.dataTransfer.getData('attack'));
+      const release = parseFloat(event.dataTransfer.getData('release'));
+      const sustain = parseFloat(event.dataTransfer.getData('sustain'));
+      const oscillator = event.dataTransfer.getData('oscillator');
+      addSynth(name, event.offsetX, {
+        envelope: {
+          decay, attack, release, sustain,
+        },
+        oscillator: { type: oscillator },
+      }, id);
+    }
   });
 
   const handleSetSelected = useCallback(() => {
@@ -176,6 +218,7 @@ Track.propTypes = {
   gridWidth: PropTypes.number.isRequired,
   gridUnitWidth: PropTypes.number.isRequired,
   samples: PropTypes.object.isRequired,
+  selectedSample: PropTypes.string.isRequired,
 };
 
 Track.defaultProps = {
@@ -193,6 +236,7 @@ const mapStateToProps = ({ studio, studioUndoable }) => ({
   gridWidth: studio.gridWidth,
   gridUnitWidth: studio.gridUnitWidth,
   samples: studioUndoable.present.samples,
+  selectedSample: studio.selectedSample,
 });
 
 export default connect(mapStateToProps)(Track);
