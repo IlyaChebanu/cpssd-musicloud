@@ -75,7 +75,6 @@ const Folder = memo((props) => {
     const res = await getFolderContent(dir.folder_id);
     if (res.status === 200) {
       setExpanded(true);
-      // dispatch(setSelectedFolder(dir));
       const files = res.data.folder.child_files;
       const folders = res.data.folder.child_folders;
       setFiles(files);
@@ -106,7 +105,6 @@ const Folder = memo((props) => {
         await getFolderContents();
       }
     }
-
   });
 
   const handleFolderNameChange = useCallback(async (e) => {
@@ -203,7 +201,6 @@ const Folder = memo((props) => {
                 }
               }}
               onBlur={(e) => { onInputBlur(e); }}
-              // disabled={!selectedFolder === dir}
               style={{ cursor: !selectedFolder === dir ? 'pointer' : '' }}
               onChange={handleFolderNameChange}
               onClick={(e) => { dispatch(setSelectedFolder(dir)); e.stopPropagation(); }}
