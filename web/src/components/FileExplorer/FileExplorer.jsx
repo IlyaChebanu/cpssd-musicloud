@@ -11,15 +11,14 @@ import samplesIcon from '../../assets/icons/samples.svg';
 import instrumentsIcon from '../../assets/icons/instruments.svg';
 import { ReactComponent as Create } from '../../assets/icons/newFolder.svg';
 import {
-  getRootFolderContents, createRootSampleFolder, getSynths, deleteSynth,
+  getRootFolderContents, createRootSampleFolder, getSynths,
 } from '../../helpers/api';
 import FolderContents from '../FolderContents/FolderContents';
 import {
-  hideFileExplorer, setSamplePatchId, setSamplePatch, addSample,
+  hideFileExplorer,
 } from '../../actions/studioActions';
 import { showNotification } from '../../actions/notificationsActions';
-import { ReactComponent as DeleteIcon } from '../../assets/icons/delete_outline-24px.svg';
-import { ReactComponent as SynthIcon } from '../../assets/icons/waveform-path-light.svg';
+import FileExplorerSynth from '../FileExplorerSynth/FileExplorerSynth';
 
 
 const FileExplorer = memo((props) => {
@@ -117,39 +116,8 @@ const FileExplorer = memo((props) => {
     }
   }, [props.fileExplorerHidden]);
 
-  const handleSynthClick = useCallback((synth) => (e) => {
-    e.preventDefault();
-    if (!props.studio.selectedSample) {
-      if (!props.studio.selectedTrack) {
-        return dispatch(showNotification({
-          message: 'Please selecte a track first',
-          type: 'info',
-        }));
-      }
-      return dispatch(addSample(
-        props.studio.selectedTrack,
-        {
-          name: synth.name,
-          time: props.studio.currentBeat,
-          fade: {
-            fadeIn: 0,
-            fadeOut: 0,
-          },
-          type: 'pattern',
-          duration: 0,
-          notes: [],
-          patch: synth.patch,
-          patchId: synth.id,
-        },
-      ));
-    }
-    dispatch(setSamplePatchId(props.studio.selectedSample, synth.id));
-    dispatch(setSamplePatch(props.studio.selectedSample, synth.patch));
-  }, [dispatch, props.studio.currentBeat, props.studio.selectedSample, props.studio.selectedTrack]);
-
-  const handleDeleteSynth = useCallback((synthId) => async (e) => {
-    e.preventDefault();
-    await deleteSynth(synthId);
+  const handleSynthDelete = useCallback((synthId) => () => {
+    setSynths((a) => a.filter((synth) => synth.id !== synthId));
   }, []);
 
   const [instrumentsOpen, setInstrumentsOpen] = useState(false);
@@ -209,13 +177,11 @@ const FileExplorer = memo((props) => {
         {instrumentsOpen && (
           <ul className={styles.instrumentsList}>
             {synths.map((synth) => (
-              <li key={synth.id} onClick={handleSynthClick(synth)} className={styles.synth}>
-                <span>
-                  <SynthIcon className={styles.synthIcon} />
-                  {synth.name}
-                </span>
-                <DeleteIcon className={styles.delete} onClick={handleDeleteSynth(synth.id)} />
-              </li>
+              <FileExplorerSynth
+                key={synth.id}
+                synth={synth}
+                onDelete={handleSynthDelete(synth.id)}
+              />
             ))}
           </ul>
         )}
