@@ -210,6 +210,7 @@ const FileExplorer = memo((props) => {
         />
         <li
           onClick={handleToggleInstruments}
+          key="Instruments"
         >
           {instrumentsIcon && (
           <img
@@ -224,7 +225,7 @@ const FileExplorer = memo((props) => {
           <ul className={styles.instrumentsList}>
             {synths.map((synth) => (
               <FileExplorerSynth
-                key={synth.id}
+                key={`${synth.id}_synth`}
                 synth={synth}
                 onDelete={handleSynthDelete(synth.id)}
               />

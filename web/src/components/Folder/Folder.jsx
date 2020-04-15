@@ -185,6 +185,7 @@ const Folder = memo((props) => {
             onClick={folderClick}
             key={`${dir.folder_id}_folder`}
           >
+            {console.log(`${dir.folder_id}_folder`)}
             { expanded
               ? <OpenFolder style={{ width: '22px', paddingRight: '6px', fill: 'white' }} />
               : <ClosedFolder style={{ width: '22px', paddingRight: '6px', fill: 'white' }} />}

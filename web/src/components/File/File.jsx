@@ -139,6 +139,7 @@ const File = memo((props) => {
             className={selectedFile ? styles.selected : ''}
             key={`${dir.file_id}_file`}
           >
+            {console.log(`${dir.file_id}_file`)}
             <audio id={`file_id_${dir.file_id}_audio`} controls="controls" src={dir.url} style={{ display: 'none' }} />
             <SampleIcon style={{ paddingRight: '4px', fill: 'white' }} />
             <form onSubmit={(e) => { e.preventDefault(); }}>
