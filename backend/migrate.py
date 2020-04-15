@@ -116,7 +116,10 @@ class Song_Likes(db.Model):
         db.PrimaryKeyConstraint('sid', 'uid'),
     )
 
-    sid = db.Column(db.Integer, db.ForeignKey(Songs.sid), nullable=False)
+    sid = db.Column(
+        db.Integer, db.ForeignKey(Songs.sid, ondelete='CASCADE'),
+        nullable=False
+    )
     uid = db.Column(db.Integer, db.ForeignKey(Users.uid), nullable=False)
 
 
@@ -126,7 +129,10 @@ class Song_Editors(db.Model):
         db.PrimaryKeyConstraint('sid', 'uid'),
     )
 
-    sid = db.Column(db.Integer, db.ForeignKey(Songs.sid), nullable=False)
+    sid = db.Column(
+        db.Integer, db.ForeignKey(Songs.sid, ondelete='CASCADE'),
+        nullable=False
+    )
     uid = db.Column(db.Integer, db.ForeignKey(Users.uid), nullable=False)
 
 
@@ -178,7 +184,10 @@ class Song_State(db.Model):
         db.PrimaryKeyConstraint('sid'),
     )
 
-    sid = db.Column(db.Integer, db.ForeignKey(Songs.sid), nullable=False)
+    sid = db.Column(
+        db.Integer, db.ForeignKey(Songs.sid, ondelete='CASCADE'),
+        nullable=False
+    )
     state = db.Column(db.JSON, nullable=False)
     time_updated = db.Column(db.DATETIME, nullable=False)
 
