@@ -1,4 +1,5 @@
 /* eslint-disable react/no-array-index-key */
+/* eslint-disable consistent-return */
 import React, {
   memo, useCallback, useMemo, useRef,
 } from 'react';
@@ -130,7 +131,7 @@ const Track = memo((props) => {
       const oscillator = event.dataTransfer.getData('oscillator');
       addSynth(name, event.offsetX, {
         envelope: {
-          decay, attack, release, sustain,
+          attack, decay, release, sustain,
         },
         oscillator: { type: oscillator },
       }, id);
