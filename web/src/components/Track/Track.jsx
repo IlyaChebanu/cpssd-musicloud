@@ -90,7 +90,6 @@ const Track = memo((props) => {
   }, [dispatch, gridUnitWidth, track.id]);
 
   const addSynth = useCallback((name, offsetX, patch, id) => {
-    console.log(patch);
     const synthState = {
       name,
       time: offsetX / gridUnitWidth,
@@ -104,7 +103,6 @@ const Track = memo((props) => {
       patch,
       patchId: id,
     };
-    console.log(synthState);
     if (!selectedSample) {
       return dispatch(addSampleAction(track.id, synthState));
     }

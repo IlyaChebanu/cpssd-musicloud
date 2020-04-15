@@ -40,21 +40,6 @@ const FileExplorerSynth = ({
 
   const handleSynthClick = useCallback((e) => {
     e.preventDefault();
-    console.log(studio.selectedSample);
-    console.log(studio.selectedTrack);
-    console.log({
-      name: synth.name,
-      time: studio.currentBeat,
-      fade: {
-        fadeIn: 0,
-        fadeOut: 0,
-      },
-      type: 'pattern',
-      duration: 0,
-      notes: [],
-      patch: synth.patch,
-      patchId: synth.id,
-    });
     if (!studio.selectedSample) {
       if (!studio.selectedTrack) {
         return dispatch(showNotification({
