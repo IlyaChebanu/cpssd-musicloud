@@ -4,6 +4,7 @@ import React, {
 import zxcvbn from 'zxcvbn';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import cookie from 'js-cookie';
 import styles from './Settings.module.scss';
 import Header from '../../components/Header';
 import InputField from '../../components/InputField';
@@ -11,8 +12,7 @@ import SubmitButton from '../../components/SubmitButton';
 import { emailRe } from '../../helpers/constants';
 import { showNotification } from '../../actions/notificationsActions';
 import { patchUserDetails, deleteUser } from '../../helpers/api';
-import Modal from "../../components/Modal";
-import cookie from "js-cookie";
+import Modal from '../../components/Modal';
 
 const Settings = memo((props) => {
   const { dispatch, history } = props;
