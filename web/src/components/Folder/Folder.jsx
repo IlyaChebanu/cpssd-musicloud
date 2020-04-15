@@ -87,7 +87,7 @@ const Folder = memo((props) => {
     }
   }, [dir, dispatch]);
 
-  onDrop(useCallback(async (event) => {
+  onDrop(async (event) => {
     const id = parseInt(event.dataTransfer.getData('id'), 10);
     const type = event.dataTransfer.getData('type');
     if (type === 'folder' && dir.folder_id === id) {
@@ -106,7 +106,8 @@ const Folder = memo((props) => {
         await getFolderContents();
       }
     }
-  }, [dir.folder_id, dispatch, expanded, getFolderContents, moveFileToFolder, moveFolderToFolder]));
+
+  });
 
   const handleFolderNameChange = useCallback(async (e) => {
     e.preventDefault();
@@ -172,10 +173,11 @@ const Folder = memo((props) => {
 
 
   return (
-    <div ref={ref}>
+    <div>
       {!deleted
         ? (
           <li
+            ref={ref}
             onMouseEnter={() => { dispatch(setSelectedFolder(dir)); }}
             onMouseLeave={() => { dispatch(setSelectedFolder('')); }}
             type="folder"
