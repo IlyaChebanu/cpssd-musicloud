@@ -15,10 +15,13 @@ export default (sample, channel, context = Tone.context.rawContext, isOffline = 
 
   // Scheduling / Timing calculations
   const startTime = context.currentTime + beatsToSeconds(sample.time - currentBeat, studio.tempo);
-  const endTime = context.currentTime + beatsToSeconds(
+  let endTime = context.currentTime + beatsToSeconds(
     sample.time + sample.duration - currentBeat,
     studio.tempo,
   );
+  if (studio.loopEnabled && !isOffline && sample.time + sample.duration > studio.loop.stop) {
+    endTime = context.currentTime + beatsToSeconds(studio.loop.stop, studio.tempo);
+  }
   const offset = Math.max(0, beatsToSeconds(currentBeat - sample.time, studio.tempo));
 
 
