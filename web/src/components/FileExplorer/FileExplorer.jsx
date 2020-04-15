@@ -51,8 +51,6 @@ const FileExplorer = memo((props) => {
     if (res.status === 200) {
       const files = res.data.folder.child_files;
       const folders = res.data.folder.child_folders;
-      console.log(folders);
-      console.log(files);
       setFileList(files);
       setFolderList(folders);
       setSampleTreeSelected(true);
@@ -74,18 +72,14 @@ const FileExplorer = memo((props) => {
     const type = event.dataTransfer.getData('type');
 
     if (type === 'file') {
-      const moved = await moveFileToFolder(id, rootFolderId); // promise
-
+      const moved = await moveFileToFolder(id, rootFolderId);
       if (moved) {
-        console.log('MOVEDDDD');
         await getFiles();
       }
       dispatch(setFileMoved(id));
     } else if (type === 'folder') {
       const moved = await moveFolderToFolder(id, rootFolderId);
-
       if (moved) {
-        console.log('MOVEDDDD');
         await getFiles();
       }
       dispatch(setFolderMoved(id));

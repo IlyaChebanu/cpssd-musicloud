@@ -72,7 +72,6 @@ const Track = memo((props) => {
   });
 
   const addSample = useCallback((url, name, offsetX) => {
-    console.log(offsetX);
     const sampleState = {
       url,
       name,
@@ -89,6 +88,9 @@ const Track = memo((props) => {
     event.preventDefault();
     event.stopPropagation();
     const type = event.dataTransfer.getData('type');
+    if (type !== 'file') {
+      return;
+    }
     const url = event.dataTransfer.getData('url');
     const name = event.dataTransfer.getData('name');
 
@@ -150,7 +152,6 @@ const Track = memo((props) => {
 
   return (
     <HotKeys
-      // onDrop={(e) => { e.stopPropagation(); }}
       allowChanges
       keyMap={keyMap}
       handlers={handlers}

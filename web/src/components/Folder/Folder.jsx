@@ -34,29 +34,21 @@ const Folder = memo((props) => {
   const oldName = { current: dir.name };
   const [newName, setNewName] = useState(oldName.current);
   const ref = useRef();
-  const [isDragged, setIsDragged] = useState(false);
   const { onDragStart, onDragEnd } = useDragEvents(ref);
   const { onDrop, onDragOver } = useDragEvents(ref, false);
   onDragStart((event) => {
     event.dataTransfer.setData('id', dir.folder_id);
     event.dataTransfer.setData('type', 'folder');
-    setIsDragged(true);
   });
 
   useEffect(() => {
     if (folderMoved === dir.folder_id) {
       getParentContents();
     }
-    console.log('HOHO');
   }, [dir.folder_id, folderMoved, getParentContents]);
 
   onDragEnd(() => {
-    // event.preventDefault();
-    setIsDragged(false);
-    // dispatch(setFolderMoved(dir.folder_id));
-    console.log(dir.folder_id);
     dispatch(setFolderMoved(-1));
-    // getParentContents(); // Promise
   });
 
   onDragOver((event) => {
@@ -98,24 +90,19 @@ const Folder = memo((props) => {
   onDrop(useCallback(async (event) => {
     const id = parseInt(event.dataTransfer.getData('id'), 10);
     const type = event.dataTransfer.getData('type');
-    console.log(id);
     if (type === 'folder' && dir.folder_id === id) {
       return;
     }
     if (type === 'file') {
-      const moved = await moveFileToFolder(id, dir.folder_id); // promise
+      const moved = await moveFileToFolder(id, dir.folder_id);
       dispatch(setFileMoved(id));
-      console.log(moved);
       if (moved && expanded) {
-        // await getParentContents();
         await getFolderContents();
       }
     } else if (type === 'folder') {
-      const moved = await moveFolderToFolder(id, dir.folder_id); // promise
+      const moved = await moveFolderToFolder(id, dir.folder_id);
       dispatch(setFolderMoved(id));
-      console.log();
       if (moved && expanded) {
-        // await getParentContents();
         await getFolderContents();
       }
     }
@@ -189,10 +176,11 @@ const Folder = memo((props) => {
       {!deleted
         ? (
           <li
-
+            onMouseEnter={() => { dispatch(setSelectedFolder(dir)); }}
+            onMouseLeave={() => { dispatch(setSelectedFolder('')); }}
             type="folder"
             // eslint-disable-next-line no-nested-ternary
-            className={expanded ? styles.expanded : ''}
+            className={selected ? styles.selected : (expanded ? styles.expanded : '')}
             style={{ transition: 'width 200ms', backgroundColor: shadeColor('#414448', +20 * level) }}
             onClick={folderClick}
             key={`${dir.folder_id}_folder`}

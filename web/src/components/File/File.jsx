@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { deleteFile } from 'react-s3';
-import { useDragEvents, useDrag } from 'beautiful-react-hooks';
+import { useDragEvents } from 'beautiful-react-hooks';
 import { shadeColor } from '../../helpers/utils';
 import { generatePresigned, deleteSampleFile, renameFile } from '../../helpers/api';
 import { ReactComponent as SampleIcon } from '../../assets/icons/music_note-24px.svg';
@@ -35,15 +35,12 @@ const File = memo((props) => {
   const inputRef = useRef();
   const { onDragOver, onDrop } = useDragEvents(inputRef, false);
   useDragEvents(ref, false);
-  const [isDragged, setIsDragged] = useState(false);
   const { onDragStart, onDragEnd } = useDragEvents(ref);
   onDragStart((event) => {
     event.dataTransfer.setData('id', dir.file_id);
-    console.log(dir);
     event.dataTransfer.setData('type', 'file');
     event.dataTransfer.setData('url', url);
     event.dataTransfer.setData('name', newName);
-    setIsDragged(true);
   });
 
   useEffect(() => {
@@ -54,10 +51,7 @@ const File = memo((props) => {
 
   onDragEnd((event) => {
     event.preventDefault();
-    console.log('DRAG FINISHED');
     dispatch(setFileMoved(-1));
-    // getParentContents(); // promise
-    setIsDragged(false);
   });
 
   onDragOver((e) => {
@@ -150,7 +144,7 @@ const File = memo((props) => {
             <form onSubmit={(e) => { e.preventDefault(); }}>
               <input
                 ref={inputRef}
-                // onMouseMove={(e) => { e.preventDefault(); console.log(selectedFile); }}
+
                 onBlur={(e) => { onInputBlur(e); }}
                 onKeyDown={(e) => {
                   if (e.keyCode === 13) {
