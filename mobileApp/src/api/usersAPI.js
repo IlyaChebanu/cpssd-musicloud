@@ -1,6 +1,6 @@
 const API_URL = 'https://dcumusicloud.com:5000/'
 
-export function loginUser(username, password) {
+export function loginUser(username, password, deviceToken) {
 
     let url = `${API_URL}api/v1/auth/login`;
     var request = new Request(url, {
@@ -10,7 +10,8 @@ export function loginUser(username, password) {
         }),
         body: JSON.stringify({
             "username": username,
-            "password": password
+            "password": password,
+            "did": deviceToken
         })
     });
     if (__DEV__) {
@@ -75,7 +76,7 @@ export function registerUser(username, email, password) {
         });
 }
 
-export function logoutUser(token) {
+export function logoutUser(token, deviceToken) {
 
     let url = `${API_URL}api/v1/auth/logout`;
     var request = new Request(url, {
@@ -84,6 +85,9 @@ export function logoutUser(token) {
             "Content-Type": "application/json",
             "Authorization": 'Bearer ' + token,
         }),
+        body: JSON.stringify({
+            "did": deviceToken
+        })
     });
     if (__DEV__) {
         console.log("logoutUser : request " + JSON.stringify(request))

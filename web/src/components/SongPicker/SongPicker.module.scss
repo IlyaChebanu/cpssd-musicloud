@@ -6,8 +6,8 @@
     top:0;
 	bottom: 0;
 	left: 0;
-	right: 0;
-
+    right: 0;
+    
 	margin: auto;
     background-color: #303237;
     z-index: 11;
@@ -25,5 +25,15 @@
         align-content: space-around;
         grid-auto-columns: minmax(min-content, max-content);
         justify-items: center;
+        -webkit-touch-callout: none; /* iOS Safari */
+        -webkit-user-select: none; /* Safari */
+        -khtml-user-select: none; /* Konqueror HTML */
+        -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+        user-select: none; /* Non-prefixed version */
       }
   }
+
+.noScrollBar {
+    overflow-y: hidden !important;
+}

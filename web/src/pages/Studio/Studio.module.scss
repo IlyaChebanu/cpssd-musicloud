@@ -21,7 +21,7 @@
 
 .scrollable {
   height: calc(100vh - 200px);
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 .sidebar {
@@ -49,6 +49,15 @@
   overflow-y: scroll;
 
 }
+.tooltip {
+  position: absolute;
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version */
+}
 
 .newTrack {
   width: 220px;
@@ -59,6 +68,12 @@
   color: white;
   font-size: 18px;
   background-color: #303237;
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version */
 
   &:hover {
     cursor: pointer;
@@ -79,8 +94,7 @@
   width: calc(100vw - 220px);
   overflow-x: scroll;
   overflow-y: hidden;
-  // height: fit-content;
-  // overflow-y: scroll;
+  position: relative;
 }
 
 .track:last-child {

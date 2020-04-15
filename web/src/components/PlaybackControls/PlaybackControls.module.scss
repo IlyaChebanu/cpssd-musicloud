@@ -10,6 +10,16 @@
   justify-content: space-between;
   padding: 0px 20px 0px 20px;
 
+  .selectedIcon {
+    width: 30px;
+    fill: white;
+  }
+
+  .notSelectedIcon {
+    padding: 0px;
+    height: 20px;
+  }
+
   span {
     display: flex;
     align-items: center;
@@ -30,6 +40,44 @@
     }
     p {
       color: white;
+      -webkit-touch-callout: none; /* iOS Safari */
+      -webkit-user-select: none; /* Safari */
+      -khtml-user-select: none; /* Konqueror HTML */
+      -moz-user-select: none; /* Old versions of Firefox */
+      -ms-user-select: none; /* Internet Explorer/Edge */
+      user-select: none; /* Non-prefixed version */
+    }
+  }
+
+
+}
+
+.recordButtonOuter {
+  margin-right: 20px;
+  height: 25px;
+  width: 25px;
+  box-sizing: border-box;
+  border: 1px solid white;
+  border-radius: 50%;
+  display: flex;
+  cursor: pointer;
+  opacity: 0.7;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  .recordButtonInner {
+    height: 13px;
+    width: 13px;
+    background-color: white;
+    border-radius: 50%;
+    margin: auto;
+  }
+
+  &.active {
+    .recordButtonInner {
+      background-color: #ff0f60;
     }
   }
 }

@@ -11,14 +11,14 @@
     transition: height 1s;
   }
 
-  
+
   .profilePicture {
-    background: url('../../assets/profiler.jpg');
     background-size: cover;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
     border-radius: 20px;
     height: 235px;
     width: 376px;
+    transition: filter 300ms, opacity 300ms;
   }
 
   .stats {
@@ -26,7 +26,7 @@
     flex-direction: column;
     justify-content: space-between;
     height: 235px;
-    margin-left: 20px;
+    margin-right: 70px;
 
     .num {
         text-decoration: none;
@@ -62,3 +62,59 @@
     margin-left: auto;
     width: 150px;
   }
+
+  .hide {
+    display: none;
+  }
+
+  .imgBlock {
+    margin-right: 200px;
+    padding: 0;
+    transition: filter 300ms;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    position: relative;
+    justify-content: center;
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version */
+
+    svg {
+      width: 50px;
+      height: 50px;
+      position: absolute;
+      margin: auto;
+      z-index: 11;
+      cursor: pointer;
+      color: white;
+      transition: opacity 300ms;
+      opacity: 0;
+    }
+
+    &:hover {
+      cursor: pointer;
+      content: #000000 url('../../assets/icons/plus-circle-light.svg') center center no-repeat;
+      svg {
+        margin: 0;
+        pointer-events: none;
+        opacity: 1;
+      }
+    }
+}
+
+.spinner {
+  height: 100px;
+  width: 300px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.filter {
+  .profilePicture {
+        filter: grayscale(30%);
+      }
+}

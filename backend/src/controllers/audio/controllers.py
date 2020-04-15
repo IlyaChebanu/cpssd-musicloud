@@ -4,6 +4,7 @@
 """
 import datetime
 import json
+from math import ceil
 
 import jwt
 from flask import Blueprint
@@ -16,7 +17,7 @@ from ...middleware.sql_err_catcher import sql_err_catcher
 from ...utils.logger import log
 from ...utils import (
     permitted_to_edit, gen_scroll_tokens, gen_song_object, gen_playlist_object,
-    notification_sender
+    notification_sender, gen_folder_object, gen_file_object, gen_synth_object
 )
 from ...models.audio import (
     insert_song, insert_song_state, get_song_state, get_all_compiled_songs,
@@ -30,7 +31,13 @@ from ...models.audio import (
     get_number_of_songs_in_playlist, get_playlist_data, add_to_playlist,
     remove_from_playlist, get_from_playlist, update_playlist_timestamp,
     update_playlist_name, update_publised_timestamp, notify_like_dids,
-    notify_song_dids, update_song_name
+    notify_song_dids, update_song_name, update_description,
+    get_number_of_searchable_songs, get_all_search_results, delete_song_data,
+    create_folder_entry, add_sample, get_folder_entry, delete_folder_entry,
+    get_root_folder_entry, delete_file_entry, move_folder_entry,
+    move_file_entry, get_child_folders, get_child_files, add_synth, get_synth,
+    update_synth, get_all_synths, delete_synth_entry, rename_file_entry,
+    rename_folder_entry, update_synth_name
 )
 from ...models.users import get_user_via_username
 from ...models.errors import NoResults
@@ -198,7 +205,7 @@ def get_compiled_songs(user_data):  # pylint: disable=R0912,R0915
             current_page = 1
         current_page = int(current_page)
 
-        total_pages = (total_songs // songs_per_page)
+        total_pages = ceil(total_songs / songs_per_page)
         if total_pages == 0:
             total_pages = 1
         if current_page > total_pages:
@@ -334,9 +341,14 @@ def like_song(user_data):
         return {"message": str(exc)}, 422
 
     try:
-        get_song_data(request.json.get("sid"), user_data.get("uid"))
+        song = get_song_data(
+            request.json.get("sid"), user_data.get("uid")
+        )
     except NoResults:
         return {"message": "Song does not exist!"}, 400
+
+    if user_data.get("username") == song[0][1]:
+        return {"message": "You cannot like your own song"}, 422
 
     like_pair = get_like_pair(user_data.get("uid"), request.json.get("sid"))
 
@@ -347,7 +359,10 @@ def like_song(user_data):
         dids = []
         for did in notify_like_dids(request.json.get("sid")):
             dids += did
-        message = user_data.get("username") + " just liked your song!"
+        message = (
+            user_data.get("username") + " just liked your song: \""
+            + song[0][2] + "\""
+        )
         notification_sender(message, dids, "New Like")
     except NoResults:
         pass
@@ -378,6 +393,16 @@ def unlike_song(user_data):
         log("warning", "Request validation failed.", str(exc))
         return {"message": str(exc)}, 422
 
+    try:
+        song = get_song_data(
+            request.json.get("sid"), user_data.get("uid")
+        )
+    except NoResults:
+        return {"message": "Song does not exist!"}, 400
+
+    if user_data.get("username") == song[0][1]:
+        return {"message": "You cannot unlike your own song"}, 422
+
     post_unlike(user_data.get("uid"), request.json.get("sid"))
     return {"message": "Song unliked"}, 200
 
@@ -404,7 +429,7 @@ def get_editable_songs(user_data):
             current_page = 1
         current_page = int(current_page)
 
-        total_pages = (total_songs // songs_per_page)
+        total_pages = ceil(total_songs / songs_per_page)
         if total_pages == 0:
             total_pages = 1
         if current_page > total_pages:
@@ -511,7 +536,7 @@ def get_liked_songs(user_data):
             current_page = 1
         current_page = int(current_page)
 
-        total_pages = (total_songs // songs_per_page)
+        total_pages = ceil(total_songs / songs_per_page)
         if total_pages == 0:
             total_pages = 1
         if current_page > total_pages:
@@ -630,10 +655,20 @@ def publish_song(user_data):
     )
 
     try:
+        title = get_song_data(
+            request.json.get("sid"), user_data.get("uid")
+        )[0][2]
+    except NoResults:
+        return {"message": "Song does not exist!"}, 400
+
+    try:
         dids = []
         for did in notify_song_dids(user_data.get("uid")):
             dids += did
-        message = user_data.get("username") + " just dropped a new song!"
+        message = (
+            user_data.get("username") + " just dropped a new song: \""
+            + title + "\""
+        )
         notification_sender(message, dids, "New Song")
     except NoResults:
         pass
@@ -848,7 +883,7 @@ def get_my_playlists(user_data):
             current_page = 1
         current_page = int(current_page)
 
-        total_pages = (total_playlists // playlists_per_page)
+        total_pages = ceil(total_playlists / playlists_per_page)
         if total_pages == 0:
             total_pages = 1
         if current_page > total_pages:
@@ -1001,7 +1036,7 @@ def get_my_playlist_songs(user_data):  # pylint: disable=R0911
             current_page = 1
         current_page = int(current_page)
 
-        total_pages = (total_songs // songs_per_page)
+        total_pages = ceil(total_songs / songs_per_page)
         if total_pages == 0:
             total_pages = 1
         if current_page > total_pages:
@@ -1175,3 +1210,649 @@ def remove_song_from_playlist(user_data):
     remove_from_playlist(request.json.get('pid'), request.json.get('sid'))
     update_playlist_timestamp(request.json.get('pid'))
     return {"message": "Song removed"}, 200
+
+
+@AUDIO.route("/description", methods=["PATCH"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def description(user_data):
+    """
+    Endpoint for updating a songs description.
+    """
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "sid": {
+                "type": "integer",
+                "minimum": 1
+            },
+            "description": {
+                "type": "string",
+                "minLength": 1
+            }
+        },
+        "required": ["sid", "description"],
+        "minProperties": 2
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    if not permitted_to_edit(request.json.get("sid"), user_data.get("uid")):
+        return {"message": "You can't update that song!"}, 401
+
+    update_description(
+        request.json.get("sid"), request.json.get("description")
+    )
+    return {"message": "Description updated."}, 200
+
+
+@AUDIO.route("/search", methods=["GET"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def search_songs(user_data):  # pylint: disable=R0911,R0912,R0914,R0915
+    """
+    Endpoint for searching the song catalog.
+    """
+
+    next_page = request.args.get('next_page')
+    back_page = request.args.get('back_page')
+    if not next_page and not back_page:
+        profile_search = False
+        search_my_profile = request.args.get('profile_search')
+        if search_my_profile:
+            profile_search = True
+
+        search_term = request.args.get('search_term')
+        if search_term:
+            total_songs = get_number_of_searchable_songs(search_term)
+        else:
+            if profile_search:
+                total_songs = get_number_of_compiled_songs_by_uid(
+                    user_data.get("uid")
+                )
+            else:
+                total_songs = get_number_of_compiled_songs()
+
+        publish_sort = request.args.get('publish_sort')
+        title_sort = request.args.get('title_sort')
+        artist_sort = request.args.get('artist_sort')
+        duration_sort = request.args.get('duration_sort')
+
+        sorts = [
+            sort for sort in
+            [publish_sort, title_sort, artist_sort, duration_sort]
+            if sort is not None
+        ]
+
+        sort_sql = None
+        if sorts:
+            if len(sorts) > 1:
+                return {
+                    "message": "Only one sort can be applied at a time."
+                }, 400
+
+            if not isinstance(sorts[0], str):
+                return {
+                    "message": "Sort values, must be a str of value 'up' or "
+                               "'down'"
+                }, 400
+
+            sorts[0] = sorts[0].lower()
+
+            if sorts[0] != "up" and sorts[0] != "down":
+                return {
+                    "message": "Sort values, must be a str of value 'up' or "
+                               "'down'"
+                }, 400
+
+            if publish_sort:
+                if sorts[0] == "up":
+                    sort_sql = " ORDER BY published ASC "
+                else:
+                    sort_sql = " ORDER BY published DESC "
+
+            if title_sort:
+                if sorts[0] == "up":
+                    sort_sql = " ORDER BY title DESC "
+                else:
+                    sort_sql = " ORDER BY title ASC "
+
+            if artist_sort:
+                if sorts[0] == "up":
+                    sort_sql = " ORDER BY username DESC, sid ASC "
+                else:
+                    sort_sql = " ORDER BY username ASC, sid ASC "
+
+            if duration_sort:
+                if sorts[0] == "up":
+                    sort_sql = " ORDER BY duration ASC "
+                else:
+                    sort_sql = " ORDER BY duration DESC "
+
+        songs_per_page = request.args.get('songs_per_page')
+        if not songs_per_page:
+            songs_per_page = 50
+        songs_per_page = int(songs_per_page)
+
+        current_page = request.args.get('current_page')
+        if not current_page:
+            current_page = 1
+        current_page = int(current_page)
+
+        total_pages = ceil(total_songs / songs_per_page)
+        if total_pages == 0:
+            total_pages = 1
+        if current_page > total_pages:
+            return {
+                "message": (
+                    "current_page exceeds the total number of pages available("
+                    + str(total_pages) + ")."
+                )
+            }, 422
+
+        start_index = (current_page * songs_per_page) - songs_per_page
+
+        if search_term:
+            search_results = get_all_search_results(
+                start_index, songs_per_page, user_data.get("uid"), search_term,
+                sort_sql, profile_search
+            )
+        else:
+            if profile_search:
+                search_results = get_all_compiled_songs_by_uid(
+                    user_data.get("uid"), start_index, songs_per_page,
+                    user_data.get("uid"), sort_sql
+                )
+            else:
+                search_results = get_all_compiled_songs(
+                    start_index, songs_per_page, user_data.get("uid"), sort_sql
+                )
+
+        res = []
+        for song in search_results:
+            res.append(gen_song_object(song))
+
+        jwt_payload = {
+            "search_term": search_term,
+            "sort_sql": sort_sql,
+            "total_pages": total_pages,
+            "songs_per_page": songs_per_page,
+            "profile_search": profile_search,
+        }
+
+        back_page, next_page = gen_scroll_tokens(
+            current_page, total_pages, jwt_payload
+        )
+
+        return {
+            "current_page": current_page,
+            "total_pages": total_pages,
+            "songs_per_page": songs_per_page,
+            "next_page": next_page,
+            "back_page": back_page,
+            "songs": res,
+        }, 200
+    if next_page and back_page:
+        return {
+            "message": (
+                "You can't send both a 'next_page' token and a 'back_page' "
+                "token."
+            )
+        }, 422
+    token = next_page
+    if not token:
+        token = back_page
+    token = jwt.decode(token, JWT_SECRET, algorithms=['HS256'])
+
+    search_term = token.get("search_term")
+    sort_sql = token.get("sort_sql")
+
+    current_page = token.get("current_page")
+    songs_per_page = token.get("songs_per_page")
+    total_pages = token.get("total_pages")
+    profile_search = token.get("profile_search")
+    start_index = (current_page * songs_per_page) - songs_per_page
+
+    if search_term:
+        search_results = get_all_search_results(
+            start_index, songs_per_page, user_data.get("uid"), search_term,
+            sort_sql, profile_search
+        )
+    else:
+        if profile_search:
+            search_results = get_all_compiled_songs_by_uid(
+                user_data.get("uid"), start_index, songs_per_page,
+                user_data.get("uid"), sort_sql
+            )
+        else:
+            search_results = get_all_compiled_songs(
+                start_index, songs_per_page, user_data.get("uid"), sort_sql
+            )
+
+    res = []
+    for song in search_results:
+        res.append(gen_song_object(song))
+
+    jwt_payload = {
+        "search_term": search_term,
+        "sort_sql": sort_sql,
+        "total_pages": total_pages,
+        "profile_search": profile_search,
+        "songs_per_page": songs_per_page,
+    }
+
+    back_page, next_page = gen_scroll_tokens(
+        current_page, total_pages, jwt_payload
+    )
+
+    return {
+        "current_page": current_page,
+        "total_pages": total_pages,
+        "songs_per_page": songs_per_page,
+        "next_page": next_page,
+        "back_page": back_page,
+        "songs": res,
+    }, 200
+
+
+@AUDIO.route("", methods=["DELETE"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def delete_song(user_data):
+    """
+    Endpoint for deleting a song.
+    """
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "sid": {
+                "type": "integer",
+                "minimum": 1
+            }
+        },
+        "required": ["sid"]
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    try:
+        get_song_data(request.json.get("sid"), user_data.get("uid"))
+    except NoResults:
+        return {"message": "Song does not exist!"}, 400
+
+    if not permitted_to_edit(request.json.get("sid"), user_data.get("uid")):
+        return {"message": "You can't delete that song!"}, 401
+
+    delete_song_data(request.json.get('sid'))
+
+    return {"message": "Song deleted"}, 200
+
+
+@AUDIO.route("/folders", methods=["POST"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def create_folder(user_data):  # pylint: disable=R0911
+    """
+    Endpoint for creating a folder in the DB.
+    """
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "folder_name": {
+                "type": "string",
+                "minLength": 1
+            },
+            "parent_folder_id": {
+                "type": "integer",
+                "minimum": 1
+            }
+        },
+        "required": ["folder_name"]
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    if request.json.get("parent_folder_id"):
+        try:
+            get_folder_entry(request.json.get("parent_folder_id"))
+            parent_folder_id = request.json.get("parent_folder_id")
+        except NoResults:
+            return {
+                "message": ("Invalid parent folder ID. "
+                            "Folder does not exist!")
+            }, 400
+    else:
+        parent_folder_id = get_user_via_username(
+            user_data.get("username")
+        )[0][-1]
+
+    create_folder_entry(
+        request.json.get("folder_name"), parent_folder_id
+    )
+
+    return {"message": "Folder created"}, 200
+
+
+@AUDIO.route("/files", methods=["POST"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def create_file(user_data):  # pylint: disable=R0911
+    """
+    Endpoint for creating a File in the DB.
+    """
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "file_name": {
+                "type": "string",
+                "minLength": 1
+            },
+            "file_url": {
+                "type": "string",
+                "minLength": 1
+            },
+            "folder_id": {
+                "type": "integer",
+                "minimum": 1
+            }
+        },
+        "required": ["file_name", "file_url"]
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    if request.json.get("folder_id"):
+        try:
+            get_folder_entry(request.json.get("folder_id"))
+            folder_id = request.json.get("folder_id")
+        except NoResults:
+            return {
+                "message": ("Invalid parent folder ID. "
+                            "Folder does not exist!")
+            }, 400
+    else:
+        folder_id = get_user_via_username(
+            user_data.get("username")
+        )[0][-1]
+
+    add_sample(
+        request.json.get("file_name"),
+        request.json.get("file_url"),
+        folder_id
+    )
+
+    return {"message": "File added to folder"}, 200
+
+
+@AUDIO.route("/folders", methods=["DELETE"])
+@sql_err_catcher()
+@auth_required()
+def delete_folder():  # pylint: disable=R0911
+    """
+    Endpoint for deleting a folder in the DB.
+    """
+    folder_id = request.args.get('folder_id')
+    if not folder_id:
+        return {"message": "No folder_id sent"}, 422
+
+    try:
+        get_root_folder_entry(folder_id)
+        return {"message": "You can't delete a root folder"}, 401
+    except NoResults:
+        delete_folder_entry(folder_id)
+        return {"message": "Folder deleted"}, 200
+
+
+@AUDIO.route("/files", methods=["DELETE"])
+@sql_err_catcher()
+@auth_required()
+def delete_file():  # pylint: disable=R0911
+    """
+    Endpoint for deleting a file in the DB.
+    """
+    file_id = request.args.get('file_id')
+    if not file_id:
+        return {"message": "No file_id sent"}, 422
+
+    delete_file_entry(file_id)
+    return {"message": "File deleted"}, 200
+
+
+@AUDIO.route("/folders", methods=["PATCH"])
+@sql_err_catcher()
+@auth_required()
+def move_folder():  # pylint: disable=R0911
+    """
+    Endpoint for moving a folder in the DB.
+    """
+    if not request.args.get('name'):
+        folder_id = request.args.get('folder_id')
+        if not folder_id:
+            return {"message": "No folder_id sent"}, 422
+
+        parent_folder_id = request.args.get('parent_folder_id')
+        if not parent_folder_id:
+            return {"message": "No parent_folder_id sent"}, 422
+
+        try:
+            get_root_folder_entry(folder_id)
+            return {"message": "You can't move a root folder"}, 401
+        except NoResults:
+            move_folder_entry(folder_id, parent_folder_id)
+            return {"message": "Folder moved"}, 200
+    folder_id = request.args.get('folder_id')
+    if not folder_id:
+        return {"message": "No folder_id sent"}, 422
+    rename_folder_entry(folder_id, request.args.get('name'))
+    return {"message": "Folder renamed"}, 200
+
+@AUDIO.route("/files", methods=["PATCH"])
+@sql_err_catcher()
+@auth_required()
+def move_file():  # pylint: disable=R0911
+    """
+    Endpoint for moving a file in the DB or renaming it.
+    """
+    if not request.args.get('name'):
+        folder_id = request.args.get('folder_id')
+        if not folder_id:
+            return {"message": "No folder_id sent"}, 422
+
+        file_id = request.args.get('file_id')
+        if not file_id:
+            return {"message": "No file_id sent"}, 422
+
+        move_file_entry(folder_id, file_id)
+        return {"message": "File moved"}, 200
+    file_id = request.args.get('file_id')
+    if not file_id:
+        return {"message": "No file_id sent"}, 422
+
+    rename_file_entry(request.args.get('name'), file_id)
+    return {"message": "File renamed"}, 200
+
+@AUDIO.route("/folders", methods=["GET"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def read_folder(user_data):  # pylint: disable=R0911
+    """
+    Endpoint for getting a folders contents in the DB.
+    """
+    res = {}
+
+    folder_id = request.args.get('folder_id')
+    if not folder_id:
+        folder_id = get_user_via_username(user_data.get("username"))[0][-1]
+
+    try:
+        row = get_folder_entry(folder_id)
+        res["folder_id"] = row[0][0]
+        res["folder_name"] = row[0][2]
+        row = get_child_folders(folder_id)
+        folders = []
+        for folder in row:
+            folders.append(gen_folder_object(folder))
+        res["child_folders"] = folders
+        row = get_child_files(folder_id)
+        files = []
+        for file in row:
+            files.append(gen_file_object(file))
+        res["child_files"] = files
+    except NoResults:
+        return {
+            "message": ("Invalid folder ID. Folder does not exist!")
+        }, 400
+
+    return {"folder": res}, 200
+
+
+@AUDIO.route("/synth", methods=["POST"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def create_synth(user_data):  # pylint: disable=R0911
+    """
+    Endpoint for creating a Synth in the DB.
+    """
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "name": {
+                "type": "string",
+                "minLength": 1
+            },
+            "patch": {
+                "type": "object"
+            }
+        },
+        "required": ["name"]
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    patch = json.dumps({})
+    if request.json.get("patch"):
+        patch = json.dumps(request.json.get("patch"))
+
+    synth_id = add_synth(
+        request.json.get("name"),
+        user_data.get("uid"),
+        patch
+    )
+    return {"message": "Synth created", "synth_id": synth_id}, 200
+
+
+@AUDIO.route("/synth", methods=["PATCH"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def edit_synth(user_data):  # pylint: disable=R0911
+    """
+    Endpoint for updating a synth in the DB.
+    """
+    expected_body = {
+        "type": "object",
+        "properties": {
+            "patch": {
+                "type": "object"
+            },
+            "name": {
+                "type": "string",
+                "minLength": 1
+            }
+        }
+    }
+    try:
+        validate(request.json, schema=expected_body)
+    except ValidationError as exc:
+        log("warning", "Request validation failed.", str(exc))
+        return {"message": str(exc)}, 422
+
+    synth_id = request.args.get('id')
+    if not synth_id:
+        return {"message": "No id sent"}, 422
+
+    if not request.json.get("patch") and not request.json.get("name"):
+        return {"message": "You must send at least 1 valid body item."}, 422
+
+    if request.json.get("patch"):
+        patch = json.dumps(request.json.get("patch"))
+
+        try:
+            synth = get_synth(synth_id)[0]
+            if user_data.get("uid") != synth[1]:
+                return {"message": "You can't edit that synth!"}, 401
+        except NoResults:
+            return {
+                "message": ("Invalid synth ID. Synth does not exist!")
+            }, 400
+
+        update_synth(synth_id, patch)
+
+    if request.json.get("name"):
+        try:
+            synth = get_synth(synth_id)[0]
+            if user_data.get("uid") != synth[1]:
+                return {"message": "You can't edit that synth!"}, 401
+        except NoResults:
+            return {
+                "message": ("Invalid synth ID. Synth does not exist!")
+            }, 400
+
+        update_synth_name(synth_id, request.json.get("name"))
+
+    return {"message": "Synth updated"}, 200
+
+
+@AUDIO.route("/synth", methods=["GET"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def get_synths(user_data):  # pylint: disable=R0911
+    """
+    Endpoint for getting all a user's synths from the DB.
+    """
+    synths = get_all_synths(
+        user_data.get("uid")
+    )
+    res = {"synths": []}
+    for synth in synths:
+        res["synths"].append(gen_synth_object(synth))
+    return res, 200
+
+
+@AUDIO.route("/synth", methods=["DELETE"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def delete_synth(user_data):  # pylint: disable=R0911
+    """
+    Endpoint for deleting a synth in the DB.
+    """
+    synth_id = request.args.get('id')
+    if not synth_id:
+        return {"message": "No id sent"}, 422
+
+    try:
+        synth = get_synth(synth_id)[0]
+        if user_data.get("uid") != synth[1]:
+            return {"message": "You can't delete that synth!"}, 401
+    except NoResults:
+        return {
+            "message": ("Invalid synth ID. Synth does not exist!")
+        }, 400
+
+    delete_synth_entry(synth_id)
+
+    return {"message": "Synth deleted"}, 200

@@ -1,108 +1,121 @@
-import React, { memo, useCallback, useMemo } from 'react';
+/* eslint-disable jsx-a11y/mouse-events-have-key-events */
+import React, {
+  memo, useCallback, useMemo, useState, useRef,
+} from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import _ from 'lodash';
+import ReactTooltip from 'react-tooltip';
 import styles from './TrackControls.module.scss';
-import { setTracks, setTrackAtIndex, setSelectedTrack } from '../../actions/studioActions';
-import { ReactComponent as Knob } from '../../assets/icons/Knob.svg';
+import {
+  setSelectedTrack,
+  setSelectedSample,
+  setTrackName,
+  setTrackVolume,
+  setTrackPan,
+  setTrackMute,
+  setTrackSolo,
+  hideSampleEffects,
+  setShowPianoRoll,
+  removeTrack,
+  setTrackReverb,
+} from '../../actions/studioActions';
+import Knob from '../Knob';
 import { ReactComponent as Mute } from '../../assets/icons/volume-up-light.svg';
 import { ReactComponent as MuteActive } from '../../assets/icons/volume-slash-light.svg';
 import { ReactComponent as Solo } from '../../assets/icons/headphones-alt-light.svg';
 import { ReactComponent as SoloActive } from '../../assets/icons/headphones-alt-solid.svg';
-import { clamp, lerp } from '../../helpers/utils';
-import store from '../../store';
+import { ReactComponent as Delete } from '../../assets/icons/close-24px.svg';
+import { clamp } from '../../helpers/utils';
 import { colours } from '../../helpers/constants';
-
+import Modal from '../Modal';
 
 const TrackControls = memo((props) => {
   const {
     track, tracks, dispatch, index, selectedTrack,
   } = props;
+  const soloTrack = _.find(tracks, 'solo');
 
-  const handleTrackVolume = useCallback((ev) => {
-    ev.preventDefault();
-    const startPos = ev.screenY;
-    const startVolume = track.volume;
-    let lastVolume = startVolume;
-    const handleMouseMove = (e) => {
-      const newTrack = store.getState().studio.tracks[index];
-      const pos = e.screenY;
-      const volume = clamp(0, 1, startVolume - (pos - startPos) / 200);
-      if (volume !== lastVolume) {
-        lastVolume = volume;
-        track.volume = volume;
-        dispatch(setTrackAtIndex(newTrack, index));
-      }
-    };
-    const handleDragStop = () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleDragStop);
-    };
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleDragStop);
-  }, [dispatch, index, track.volume]);
+  const [inputSelected, setInputSelected] = useState(false);
+  const ref = useRef();
 
-  const handleTrackPan = useCallback((ev) => {
-    ev.preventDefault();
-    const startPos = ev.screenY;
-    const startPan = track.pan;
-    let lastPan = startPan;
-    const handleMouseMove = (e) => {
-      const newTrack = store.getState().studio.tracks[index];
-      const pos = e.screenY;
-      const pan = clamp(-1, 1, startPan - (pos - startPos) / 200);
-      if (pan !== lastPan) {
-        lastPan = pan;
-        track.pan = pan;
-        dispatch(setTrackAtIndex(newTrack, index));
-      }
-    };
-    const handleDragStop = () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleDragStop);
-    };
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleDragStop);
-  }, [dispatch, index, track.pan]);
+  const [isModalShowing, setIsModalShowing] = useState(false);
 
-  const handleTrackMute = useCallback(() => {
-    track.mute = !track.mute;
-    dispatch(setTrackAtIndex(track, props.index));
-  }, [dispatch, props.index, track]);
+  const handleSetTrackVolume = useCallback((val) => {
+    dispatch(setTrackVolume(track.id, clamp(0, 1, val)));
+  }, [dispatch, track.id]);
 
-  const handleTrackSolo = useCallback(() => {
-    const newTracks = store.getState().studio.tracks.map((t, i) => ({
-      ...t,
-      solo: !track.solo && i === index,
-    }));
-    dispatch(setTracks(newTracks));
-  }, [dispatch, index, track]);
+  const handleSetTrackPan = useCallback((val) => {
+    dispatch(setTrackPan(track.id, clamp(-1, 1, val)));
+  }, [dispatch, track.id]);
 
-  const volumeStyle = useMemo(() => ({
-    transform: `rotate(${lerp(-140, 140, track.volume)}deg)`,
-  }), [track.volume]);
+  const handleSetTrackReverb = useCallback((val) => {
+    dispatch(setTrackReverb(track.id, clamp(0, 1, val)));
+  }, [dispatch, track.id]);
 
-  const panStyle = useMemo(() => ({
-    transform: `rotate(${lerp(-140, 140, (track.pan + 1) / 2)}deg)`,
-  }), [track.pan]);
+  const handleTrackMute = useCallback((e) => {
+    e.preventDefault();
+    dispatch(setTrackMute(track.id, !track.mute));
+  }, [dispatch, track.id, track.mute]);
+
+  const handleTrackSolo = useCallback((e) => {
+    e.preventDefault();
+    dispatch(setTrackSolo(track.id, !track.solo));
+  }, [dispatch, track.id, track.solo]);
 
   const handleTrackNameChange = useCallback((e) => {
-    track.name = e.target.value;
-    dispatch(setTrackAtIndex(track, index));
-  }, [dispatch, index, track]);
+    e.preventDefault();
+    dispatch(setTrackName(track.id, e.target.value));
+  }, [dispatch, track.id]);
 
-  const soloTrack = _.findIndex(tracks, 'solo');
+  const handleSetSelected = useCallback((e) => {
+    e.preventDefault();
+    dispatch(setSelectedTrack(track.id));
+    dispatch(setSelectedSample(''));
+    dispatch(hideSampleEffects());
+    dispatch(setShowPianoRoll(false));
+  }, [dispatch, track.id]);
 
-  const handleSetSelected = useCallback(() => {
-    dispatch(setSelectedTrack(index));
-  }, [dispatch, index]);
 
   const barStyle = useMemo(() => {
     const colour = index % 2 ? '#303237' : '#36393D';
     return {
-      backgroundColor: selectedTrack === index ? colours[index % colours.length] : colour,
+      backgroundColor: selectedTrack === track.id ? colours[index % colours.length] : colour,
     };
-  }, [index, selectedTrack]);
+  }, [index, selectedTrack, track.id]);
+
+  const handleDeleteTrack = useCallback((e) => {
+    // Stop propagation to void selecting track when deleting
+    e.stopPropagation();
+    dispatch(removeTrack(track.id));
+  }, [dispatch, track.id]);
+
+  const openModal = () => {
+    setIsModalShowing(true);
+  };
+
+  const closeModal = () => {
+    setIsModalShowing(false);
+  };
+
+  const deleteTrackModal = useMemo(() => (
+    <div className={styles.modal} style={{ visibility: isModalShowing ? 'visible' : 'hidden' }}>
+
+      { isModalShowing ? <div role="none" onClick={closeModal} className={styles.backDrop} /> : null}
+      <Modal
+        header="Confirm deleting track"
+        className={styles.modal}
+        show={isModalShowing}
+        close={closeModal}
+        submit={handleDeleteTrack}
+      >
+        Are you sure you want to delete track?
+      </Modal>
+    </div>
+
+
+  ), [handleDeleteTrack, isModalShowing]);
+
 
   return (
     <div
@@ -111,30 +124,71 @@ const TrackControls = memo((props) => {
       role="row"
       tabIndex={0}
     >
+
       <div
         className={`${styles.selectBar} ${selectedTrack === index ? styles.selected : ''}`}
         style={barStyle}
       />
-      <div className={`${styles.wrapper} ${props.index % 2 ? styles.even : ''}`}>
-        <div className={styles.title}>
-          <input type="text" value={track.name} onChange={handleTrackNameChange} />
+      <div role="none" onMouseDown={ReactTooltip.rebuild} className={`${styles.wrapper} ${props.index % 2 ? styles.even : ''}`}>
+        <div data-place="right" data-tip="Delete track" data-for="tooltip" onMouseOver={ReactTooltip.rebuild}>
+          <Delete onClick={openModal} className={styles.deleteTrack} />
+        </div>
+        <div
+          className={styles.title}
+        >
+          <input
+            data-place="right"
+            data-tip={!inputSelected ? 'Rename track' : ''}
+            data-for="tooltip"
+            onMouseOver={ReactTooltip.rebuild}
+            ref={(r) => { ref.current = r; }}
+            onClick={() => {
+              setInputSelected(true);
+              ReactTooltip.hide(ref.current);
+            }}
+            onMouseMove={() => {
+              if (inputSelected) {
+                ReactTooltip.hide(ref.current);
+              }
+            }}
+            onBlur={() => setInputSelected(false)}
+            type="text"
+            value={track.name}
+            onChange={handleTrackNameChange}
+          />
         </div>
         <div className={styles.buttons}>
-          <span>
-            <Knob onMouseDown={handleTrackVolume} style={volumeStyle} />
-            <p>Vol</p>
-          </span>
-          <span>
-            <Knob onMouseDown={handleTrackPan} style={panStyle} />
-            <p>Pan</p>
-          </span>
-          <span>
-            {track.mute || (soloTrack !== -1 && soloTrack !== index)
+          <Knob
+            dataTip="Hold and move up or down to adjust the volume"
+            min={0}
+            max={1}
+            value={track.volume}
+            onChange={handleSetTrackVolume}
+            name="Vol"
+          />
+          <Knob
+            dataTip="Hold and move up or down to make the sound more prominent on one side or another"
+            min={-1}
+            max={1}
+            value={track.pan}
+            onChange={handleSetTrackPan}
+            name="Pan"
+          />
+          <Knob
+            dataTip="Hold and move up or down to add reverberation effect"
+            min={0}
+            max={1}
+            value={track.reverb}
+            onChange={handleSetTrackReverb}
+            name="Reverb"
+          />
+          <span data-place="right" data-tip={track.mute ? 'Unmute track' : 'Mute track'} data-for="tooltip" onMouseOver={ReactTooltip.rebuild}>
+            {track.mute || (soloTrack && soloTrack.id !== track.id)
               ? <MuteActive onClick={handleTrackMute} />
               : <Mute onClick={handleTrackMute} />}
             <p>Mute</p>
           </span>
-          <span>
+          <span data-place="right" data-tip={track.solo ? 'Unsolo track' : 'Solo track'} data-for="tooltip" onMouseOver={ReactTooltip.rebuild}>
             {track.solo
               ? <SoloActive onClick={handleTrackSolo} />
               : <Solo onClick={handleTrackSolo} />}
@@ -142,7 +196,9 @@ const TrackControls = memo((props) => {
           </span>
         </div>
       </div>
+      {deleteTrackModal}
     </div>
+
   );
 });
 
@@ -156,8 +212,8 @@ TrackControls.propTypes = {
 
 TrackControls.displayName = 'TrackControls';
 
-const mapStateToProps = ({ studio }) => ({
-  tracks: studio.tracks,
+const mapStateToProps = ({ studio, studioUndoable }) => ({
+  tracks: studioUndoable.present.tracks,
   selectedTrack: studio.selectedTrack,
 });
 

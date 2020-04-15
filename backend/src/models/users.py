@@ -18,16 +18,22 @@ def insert_user(email, username, password):
     :return:
     None - Inserts new user into DB & returns None.
     """
+    sql = "INSERT INTO Folder (name) VALUE (%s)"
+    args = (
+        username,
+    )
+    root_folder_id = query(sql, args, get_insert_row_id=True)
     sql = (
         "INSERT INTO Users "
-        "(email, username, password, verified) "
-        "VALUES (%s, %s, %s, %s)"
+        "(email, username, password, verified, root_folder) "
+        "VALUES (%s, %s, %s, %s, %s)"
     )
     args = (
         email,
         username,
         password,
         0,
+        root_folder_id,
     )
     query(sql, args)
 
@@ -270,7 +276,7 @@ def get_song_count(uid):
     """
     sql = (
         "SELECT COUNT(*) FROM Songs "
-        "WHERE uid = %s"
+        "WHERE uid = %s AND public = 1"
     )
     args = (
         uid,
@@ -401,7 +407,7 @@ def get_posts(uid, start_index, posts_per_page):
     List - Contains lists of post data.
     """
     sql = (
-        "SELECT message, time FROM Posts "
+        "SELECT message, time, post_id FROM Posts "
         "WHERE uid = %s "
         "ORDER BY time DESC "
         "LIMIT %s, %s"
@@ -627,24 +633,24 @@ def get_timeline(uid, start_index, items_per_page):
     """
     sql = (
         "SELECT * FROM ((SELECT sid, "
-        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as usernanme"
+        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as username"
         ", title, duration, created, public,"
         "published AS time, url, cover, NULL AS message, "
         "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid ) "
         "as likes, "
         "(SELECT profiler FROM Users WHERE Songs.uid=Users.uid) as profiler, "
         "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid "
-        "AND Song_Likes.uid=%s) AS like_status, "
+        "AND Song_Likes.uid=%s) AS like_status, description,"
         "'song' AS type FROM "
         "Songs WHERE (uid IN "
         "(SELECT Followers.following FROM Followers WHERE follower=%s)"
         " OR uid=%s) AND public=1) UNION (SELECT NULL AS sid, "
-        "(SELECT username FROM Users WHERE Posts.uid=Users.uid) as usernanme"
+        "(SELECT username FROM Users WHERE Posts.uid=Users.uid) as username"
         ", NULL AS title,"
         "NULL AS duration, NULL AS created, NULL AS public, time, NULL AS url,"
         "NULL AS cover, message, NULL AS likes,"
         "(SELECT profiler FROM Users WHERE Posts.uid=Users.uid) as profiler,"
-        "NULL AS like_status, 'post' AS type FROM Posts "
+        "NULL AS like_status, NULL AS description, 'post' AS type FROM Posts "
         "WHERE uid IN "
         "(SELECT Followers.following FROM Followers WHERE follower=%s) "
         "OR uid=%s)) AS Sp ORDER BY `time` DESC LIMIT %s, %s;"
@@ -674,29 +680,30 @@ def get_timeline_length(uid):
     """
     sql = (
         "SELECT COUNT(*) FROM ((SELECT sid, "
-        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as usernanme"
+        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as username"
         ", title, duration, created, public,"
         "published AS time, url, cover, NULL AS message, "
         "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid ) "
         "as likes, "
         "(SELECT profiler FROM Users WHERE Songs.uid=Users.uid) as profiler,"
         "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid "
-        "AND Song_Likes.uid=%s) AS like_status, "
+        "AND Song_Likes.uid=%s) AS like_status, description,"
         "'song' AS type FROM "
         "Songs WHERE (uid IN "
         "(SELECT Followers.following FROM Followers WHERE follower=%s)"
         " OR uid=%s) AND public=1) UNION (SELECT NULL AS sid, "
-        "(SELECT username FROM Users WHERE Posts.uid=Users.uid) as usernanme"
+        "(SELECT username FROM Users WHERE Posts.uid=Users.uid) as username"
         ", NULL AS title,"
         "NULL AS duration, NULL AS created, NULL AS public, time, NULL AS url,"
         "NULL AS cover, message, NULL AS likes, "
         "(SELECT profiler FROM Users WHERE Posts.uid=Users.uid) as profiler,"
-        "NULL AS like_status, 'post' AS type FROM Posts "
+        "NULL AS like_status, NULL AS description, 'post' AS type FROM Posts "
         "WHERE uid IN "
         "(SELECT Followers.following FROM Followers WHERE follower=%s)"
         " OR uid=%s)) AS Sp ORDER BY `time` DESC;"
     )
     args = (
+        uid,
         uid,
         uid,
         uid,
@@ -723,12 +730,12 @@ def get_timeline_posts_only(uid, start_index, items_per_page):
     """
     sql = (
         "SELECT * FROM ((SELECT NULL AS sid, "
-        "(SELECT username FROM Users WHERE Posts.uid=Users.uid) as usernanme"
+        "(SELECT username FROM Users WHERE Posts.uid=Users.uid) as username"
         ", NULL AS title,"
         "NULL AS duration, NULL AS created, NULL AS public, time, NULL AS url,"
         "NULL AS cover, message, NULL AS likes,"
         "(SELECT profiler FROM Users WHERE Posts.uid=Users.uid) as profiler, "
-        "NULL AS like_status, 'post' AS type FROM Posts "
+        "NULL AS like_status, NULL AS description, 'post' AS type FROM Posts "
         "WHERE uid IN "
         "(SELECT Followers.following FROM Followers WHERE follower=%s)"
         " OR uid=%s )) AS Sp ORDER BY `time` DESC LIMIT %s, %s;"
@@ -755,12 +762,12 @@ def get_timeline_posts_only_length(uid):
     """
     sql = (
         "SELECT COUNT(*) FROM ((SELECT NULL AS sid, "
-        "(SELECT username FROM Users WHERE Posts.uid=Users.uid) as usernanme"
+        "(SELECT username FROM Users WHERE Posts.uid=Users.uid) as username"
         ", NULL AS title,"
         "NULL AS duration, NULL AS created, NULL AS public, time, NULL AS url,"
         "NULL AS cover, message, NULL AS likes,"
         "(SELECT profiler FROM Users WHERE Posts.uid=Users.uid) as profiler, "
-        "NULL AS like_status, 'post' AS type FROM Posts "
+        "NULL AS like_status, NULL AS description, 'post' AS type FROM Posts "
         "WHERE uid IN "
         "(SELECT Followers.following FROM Followers WHERE follower=%s)"
         " OR uid=%s)) AS Sp ORDER BY `time` DESC;"
@@ -790,15 +797,15 @@ def get_timeline_song_only(uid, start_index, items_per_page):
     """
     sql = (
         "SELECT * FROM ((SELECT sid, "
-        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as usernanme"
+        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as username"
         ", title, duration, created, public,"
         "published AS time, url, cover, NULL AS message, "
         "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid ) "
         "as likes, "
         "(SELECT profiler FROM Users WHERE Songs.uid=Users.uid) as profiler,"
         "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid "
-        "AND Song_Likes.uid=%s) AS like_status, 'song' AS type FROM "
-        "Songs WHERE (uid IN "
+        "AND Song_Likes.uid=%s) AS like_status, description, 'song' AS type "
+        "FROM Songs WHERE (uid IN "
         "(SELECT Followers.following FROM Followers WHERE follower=%s)"
         " OR uid=%s) AND public=1)) AS Sp ORDER BY `time` DESC LIMIT %s, %s;"
     )
@@ -825,15 +832,15 @@ def get_timeline_song_only_length(uid):
     """
     sql = (
         "SELECT COUNT(*) FROM ((SELECT sid, "
-        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as usernanme"
+        "(SELECT username FROM Users WHERE Songs.uid=Users.uid) as username"
         ", title, duration, created, public,"
         "published AS time, url, cover, NULL AS message, "
         "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid ) "
         "as likes, "
         "(SELECT profiler FROM Users WHERE Songs.uid=Users.uid) as profiler, "
         "(SELECT COUNT(*) FROM Song_Likes WHERE Song_Likes.sid=Songs.sid "
-        "AND Song_Likes.uid=%s) AS like_status, 'song' AS type FROM "
-        "Songs WHERE (uid IN "
+        "AND Song_Likes.uid=%s) AS like_status, description, 'song' AS type "
+        "FROM Songs WHERE (uid IN "
         "(SELECT Followers.following FROM Followers WHERE follower=%s)"
         " OR uid=%s) AND public=1)) AS Sp ORDER BY `time` DESC;"
     )
@@ -1052,3 +1059,57 @@ def notify_post_dids(uid):
     if not res:
         raise NoResults
     return res
+
+
+def delete_user_data(uid):
+    """
+    Delete a user given there uid.
+    :param uid:
+    Int - Uid of the user we are deleting.
+    :return:
+    None - Deletes the user and returns None.
+    """
+    args = (
+        uid,
+    )
+    alt_args = (
+        uid,
+        uid,
+    )
+    sql = (
+        "DELETE FROM Song_State WHERE sid IN "
+        "(SELECT sid FROM Songs WHERE uid=%s)"
+    )
+    query(sql, args)
+    sql = "DELETE FROM Song_Likes WHERE uid=%s"
+    query(sql, args)
+    sql = "DELETE FROM Song_Editors WHERE uid=%s"
+    query(sql, args)
+    sql = (
+        "DELETE FROM Playlist_State WHERE sid IN "
+        "(SELECT sid FROM Songs WHERE uid=%s)"
+    )
+    query(sql, args)
+    sql = "DELETE FROM Songs WHERE uid=%s"
+    query(sql, args)
+    sql = "DELETE FROM Verification WHERE uid=%s"
+    query(sql, args)
+    sql = "DELETE FROM Playlists WHERE uid=%s"
+    query(sql, args)
+    sql = "DELETE FROM Notifications WHERE uid=%s"
+    query(sql, args)
+    sql = "DELETE FROM Notifications WHERE uid=%s"
+    query(sql, args)
+    sql = "DELETE FROM Followers WHERE follower=%s OR following=%s"
+    query(sql, alt_args)
+    sql = "DELETE FROM Posts WHERE uid=%s"
+    query(sql, args)
+    sql = "DELETE FROM Logins WHERE uid=%s"
+    query(sql, args)
+    sql = "DELETE FROM Resets WHERE uid=%s"
+    query(sql, args)
+    sql = (
+        "DELETE FROM Folder WHERE folder_id=("
+        "SELECT root_folder FROM Users WHERE uid=%s);"
+    )
+    query(sql, args)

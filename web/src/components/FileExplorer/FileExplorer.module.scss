@@ -1,0 +1,121 @@
+.explorer {
+  border-radius: 5px;
+  max-width: 30%;
+  height: calc(100vh - 140px);
+  position: absolute;
+  background-color: #414448;
+  top: 80px;
+  right: 0;
+  z-index: 13;
+  border-radius: 5px 0px 0px 5px;
+  overflow-y: auto;
+  transition-property: all;
+  transition: max-width 0.2s;
+
+  ul {
+    border-radius: 5px 0px 0px 5px;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    z-index: 13;
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version */
+  }
+
+  img {
+    width: 20px;
+    height: 20px;
+    padding: 0 10px 0 0;
+    display: flex;
+  }
+
+  li {
+    transition-property: all;
+    transition: max-width 0.2s;
+    border-radius: 5px 0px 0px 5px;
+    padding: 5px 10px 5px 10px;
+    margin: 0px 0px 8px 0px;
+    flex-direction: row;
+    color: #fff;
+    text-decoration: none;
+    display: flex;
+    text-align: left;
+    p {
+      font-size: 18px;
+      margin: 0;
+      white-space: nowrap;
+    }
+    input {
+      margin: 0;
+      color: white;
+      font-size: 18px;
+      background: none;
+      border: none;
+      width: 100%;
+
+      &:focus {
+        outline: none;
+      }
+    }
+    .newFolder {
+      right: 0;
+      height: 20px;
+      margin: 0px auto;
+      padding-right: 10px;
+      transition: fill 200ms;
+      position: absolute;
+      fill: #3A3A3A;
+      &:hover {
+        transition: fill 200ms;
+        fill: white;
+      }
+    }
+  }
+
+  .selected {
+      box-shadow: 0px 2px 2px 0px rgba(0, 0, 0, 0.1);
+      background-color: #5f6065;
+      cursor: pointer;
+      color: white;
+  }
+
+  .child {
+    width: calc(100%-20px);
+  }
+
+  li:last-child {
+    border-bottom: none;
+  }
+
+  li:hover {
+    box-shadow: 0px 2px 2px 0px rgba(0, 0, 0, 0.1);
+    background-color: #5f6065;
+    cursor: pointer;
+    color: white;
+  }
+
+  li:active {
+    box-shadow: 0px 2px 2px 0px rgba(0, 0, 0, 0.1);
+    background-color: #5f6065;
+    cursor: pointer;
+    color: white;
+  }
+  li:focus {
+    box-shadow: 0px 2px 2px 0px rgba(0, 0, 0, 0.1);
+    background-color: #5f6065;
+    cursor: pointer;
+    color: white;
+  }
+
+  .button {
+    cursor: pointer;
+    height: 18px;
+    border-radius: 5px;
+
+    color: white;
+  }
+}

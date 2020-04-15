@@ -4,13 +4,15 @@ import React, {
 import zxcvbn from 'zxcvbn';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import cookie from 'js-cookie';
 import styles from './Settings.module.scss';
 import Header from '../../components/Header';
 import InputField from '../../components/InputField';
 import SubmitButton from '../../components/SubmitButton';
 import { emailRe } from '../../helpers/constants';
 import { showNotification } from '../../actions/notificationsActions';
-import { patchUserDetails } from '../../helpers/api';
+import { patchUserDetails, deleteUser } from '../../helpers/api';
+import Modal from '../../components/Modal';
 
 const Settings = memo((props) => {
   const { dispatch, history } = props;
@@ -20,6 +22,7 @@ const Settings = memo((props) => {
   const [newPassword, setNewPassword] = useState('');
   const [repeatPassword, setRepeatPassword] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [isModalShowing, setIsModalShowing] = useState(false);
   const [errorText] = useState('');
 
   const passwordStrength = useMemo(() => {
@@ -65,6 +68,42 @@ const Settings = memo((props) => {
     setSubmitted(true);
   }, [dispatch, history, email, password, newPassword, repeatPassword]);
 
+  const handleAccountDeletion = useCallback(async (e) => {
+    e.preventDefault();
+    cookie.remove('token');
+    const res = await deleteUser();
+    if (res.status === 200) {
+      dispatch(showNotification({ message: 'Account deleted', type: 'info' }));
+      history.push('/login');
+    }
+    setSubmitted(true);
+  }, [dispatch, history]);
+
+  const openModal = (e) => {
+    e.preventDefault();
+    setIsModalShowing(true);
+  };
+
+  const closeModal = (e) => {
+    e.preventDefault();
+    setIsModalShowing(false);
+  };
+
+  const accountDeletionModal = useMemo(() => (
+    <div className={styles.modal} style={{ visibility: isModalShowing ? 'visible' : 'hidden' }}>
+      { isModalShowing ? <div role="none" onClick={closeModal} className={styles.backDrop} /> : null}
+      <Modal
+        header="Confirm account deletion"
+        className={styles.modal}
+        show={isModalShowing}
+        close={closeModal}
+        submit={handleAccountDeletion}
+      >
+        Are you sure you want to delete your account?
+      </Modal>
+    </div>
+  ), [handleAccountDeletion, isModalShowing]);
+
   return (
     <div className={styles.wrapper}>
       <Header selected={2} />
@@ -81,7 +120,11 @@ const Settings = memo((props) => {
           <InputField animate onChange={setRepeatPassword} name="passwordRepeat" placeholder="Repeat password" borderColour={repeatPasswordBorder} password />
           <SubmitButton className={styles.submit} text="Save changes" />
         </form>
+        <form onSubmit={openModal}>
+          <SubmitButton className={styles.submit} text="Delete User" />
+        </form>
       </div>
+      {accountDeletionModal}
     </div>
   );
 });

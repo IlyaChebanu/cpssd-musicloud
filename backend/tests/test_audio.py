@@ -5,6 +5,7 @@ Test suite for /audio endpoints.
 import unittest
 import json
 import mock
+import pytest
 
 from jwt.exceptions import InvalidSignatureError
 
@@ -416,7 +417,7 @@ class AudioTests(unittest.TestCase):
         Ensure getting all compiled songs is successful without scroll tokens.
         """
         test_songs = [
-            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0]
+            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0, "a description"]
         ]
         mocked_num_songs.return_value = 2
         mocked_songs.return_value = test_songs
@@ -439,7 +440,8 @@ class AudioTests(unittest.TestCase):
                     "url": None,
                     "cover": None,
                     "likes": 8,
-                    "like_status": 0
+                    "like_status": 0,
+                    "description": "a description"
                 }
             ]
             expected_body = {
@@ -458,7 +460,7 @@ class AudioTests(unittest.TestCase):
         Ensure getting songs is successful with a next page scroll token and no username encoded.
         """
         test_song = [
-            [2, "username2", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0]
+            [2, "username2", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0, "a description"]
         ]
         mocked_songs.return_value = test_song
         test_req_data = {
@@ -488,7 +490,8 @@ class AudioTests(unittest.TestCase):
                     "url": None,
                     "cover": None,
                     "likes": 8,
-                    "like_status": 0
+                    "like_status": 0,
+                    "description": "a description"
                 }
             ]
             expected_body = {
@@ -508,7 +511,7 @@ class AudioTests(unittest.TestCase):
         Ensure getting songs is successful with a back page scroll token and no username encoded.
         """
         test_song = [
-            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0]
+            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0, "a description"]
         ]
         mocked_songs.return_value = test_song
         test_req_data = {
@@ -539,7 +542,8 @@ class AudioTests(unittest.TestCase):
                     "url": None,
                     "cover": None,
                     "likes": 8,
-                    "like_status": 0
+                    "like_status": 0,
+                    "description": "a description"
                 }
             ]
             expected_body = {
@@ -560,8 +564,8 @@ class AudioTests(unittest.TestCase):
         Ensure getting all compiled songs for a specified username is successful without scroll tokens.
         """
         test_songs = [
-            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0],
-            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0]
+            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0, "a description"],
+            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0, "a description"]
         ]
         mocked_num_songs.return_value = 2
         mocked_songs.return_value = test_songs
@@ -589,7 +593,8 @@ class AudioTests(unittest.TestCase):
                     "url": None,
                     "cover": None,
                     "likes": 8,
-                    "like_status": 0
+                    "like_status": 0,
+                    "description": "a description"
                 },
                 {
                     "sid": 2,
@@ -601,7 +606,8 @@ class AudioTests(unittest.TestCase):
                     "url": None,
                     "cover": None,
                     "likes": 8,
-                    "like_status": 0
+                    "like_status": 0,
+                    "description": "a description"
                 }
             ]
             expected_body = {
@@ -620,7 +626,7 @@ class AudioTests(unittest.TestCase):
         Ensure getting songs using a next page scroll token works with username also being defined.
         """
         test_song = [
-            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0]
+            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0, "a description"]
         ]
         mocked_songs.return_value = test_song
         test_req_data = {
@@ -651,7 +657,8 @@ class AudioTests(unittest.TestCase):
                     "url": None,
                     "cover": None,
                     "likes": 8,
-                    "like_status": 0
+                    "like_status": 0,
+                    "description": "a description"
                 }
             ]
             expected_body = {
@@ -670,7 +677,7 @@ class AudioTests(unittest.TestCase):
         Ensure getting songs using a back page scroll token works with username also being defined.
         """
         test_song = [
-            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0]
+            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0, "a description"]
         ]
         mocked_songs.return_value = test_song
         test_req_data = {
@@ -701,7 +708,8 @@ class AudioTests(unittest.TestCase):
                     "url": None,
                     "cover": None,
                     "likes": 8,
-                    "like_status": 0
+                    "like_status": 0,
+                    "description": "a description"
                 }
             ]
             expected_body = {
@@ -818,7 +826,7 @@ class AudioTests(unittest.TestCase):
         """
         Ensure user's can get a song's info successfully.
         """
-        test_song = [[1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0]]
+        test_song = [[1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0, "a description"]]
         mocked_song.return_value = test_song
         with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
             mock_token.return_value = ALT_MOCKED_TOKEN
@@ -832,7 +840,7 @@ class AudioTests(unittest.TestCase):
                 follow_redirects=True
             )
             self.assertEqual(200, res.status_code)
-            expected_body = {'song': {'sid': 1, 'username': 'username', 'like_status': 0, 'title': 'A test song', 'duration': 0, 'created': 'Wed, 13 Nov 2019 17:07:39 GMT', 'public': 1, 'url': None, 'cover': None, 'likes': 8}}
+            expected_body = {'song': {'sid': 1, 'username': 'username', 'like_status': 0, 'title': 'A test song', 'duration': 0, 'created': 'Wed, 13 Nov 2019 17:07:39 GMT', 'public': 1, 'url': None, 'cover': None, 'likes': 8, 'description': 'a description'}}
             self.assertEqual(expected_body, json.loads(res.data))
 
     def test_get_song_data_fail_missing_sid(self):
@@ -937,8 +945,8 @@ class AudioTests(unittest.TestCase):
         Ensure getting all editable songs for the current user is successful without scroll tokens.
         """
         test_songs = [
-            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0],
-            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0]
+            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0, "a description"],
+            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0, "a description"]
         ]
         mocked_num_songs.return_value = 2
         mocked_songs.return_value = test_songs
@@ -961,7 +969,8 @@ class AudioTests(unittest.TestCase):
                     "url": None,
                     "cover": None,
                     "likes": 8,
-                    "like_status": 0
+                    "like_status": 0,
+                    "description": "a description"
                 },
                 {
                     "sid": 2,
@@ -973,7 +982,8 @@ class AudioTests(unittest.TestCase):
                     "url": None,
                     "cover": None,
                     "likes": 8,
-                    "like_status": 0
+                    "like_status": 0,
+                    "description": "a description"
                 }
             ]
             expected_body = {
@@ -992,7 +1002,7 @@ class AudioTests(unittest.TestCase):
         Ensure getting editable songs for the current user is successful with a next page scroll token.
         """
         test_song = [
-            [2, "username2", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0]
+            [2, "username2", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0, "a description"]
         ]
         mocked_songs.return_value = test_song
         test_req_data = {
@@ -1022,7 +1032,8 @@ class AudioTests(unittest.TestCase):
                     "url": None,
                     "cover": None,
                     "likes": 8,
-                    "like_status": 0
+                    "like_status": 0,
+                    "description": "a description"
                 }
             ]
             expected_body = {
@@ -1041,7 +1052,7 @@ class AudioTests(unittest.TestCase):
         Ensure getting editable songs for the current user is successful with a back page scroll token.
         """
         test_song = [
-            [1, "username2", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0]
+            [1, "username2", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0, "a description"]
         ]
         mocked_songs.return_value = test_song
         test_req_data = {
@@ -1071,7 +1082,8 @@ class AudioTests(unittest.TestCase):
                     "url": None,
                     "cover": None,
                     "likes": 8,
-                    "like_status": 0
+                    "like_status": 0,
+                    "description": "a description"
                 }
             ]
             expected_body = {
@@ -1192,8 +1204,8 @@ class AudioTests(unittest.TestCase):
         Ensure getting all liked songs for a specified username is successful without scroll tokens.
         """
         test_songs = [
-            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0],
-            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0]
+            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0, "a description"],
+            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0, "a description"]
         ]
         mocked_num_songs.return_value = 2
         mocked_songs.return_value = test_songs
@@ -1221,7 +1233,8 @@ class AudioTests(unittest.TestCase):
                     "url": None,
                     "cover": None,
                     "likes": 8,
-                    "like_status": 0
+                    "like_status": 0,
+                    "description": "a description"
                 },
                 {
                     "sid": 2,
@@ -1233,7 +1246,8 @@ class AudioTests(unittest.TestCase):
                     "url": None,
                     "cover": None,
                     "likes": 8,
-                    "like_status": 0
+                    "like_status": 0,
+                    "description": "a description"
                 }
             ]
             expected_body = {
@@ -1253,7 +1267,7 @@ class AudioTests(unittest.TestCase):
         Ensure getting liked songs using a next page scroll token works with username also being defined.
         """
         test_song = [
-            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0]
+            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0, "a description"]
         ]
         mocked_songs.return_value = test_song
         mocked_user.return_value = [[1]]
@@ -1285,7 +1299,8 @@ class AudioTests(unittest.TestCase):
                     "url": None,
                     "cover": None,
                     "likes": 8,
-                    "like_status": 0
+                    "like_status": 0,
+                    "description": "a description"
                 }
             ]
             expected_body = {
@@ -1305,7 +1320,7 @@ class AudioTests(unittest.TestCase):
         Ensure getting liked songs using a back page scroll token works with username also being defined.
         """
         test_song = [
-            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0]
+            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0, "a description"]
         ]
         mocked_user.return_value = [[1]]
         mocked_songs.return_value = test_song
@@ -1337,7 +1352,8 @@ class AudioTests(unittest.TestCase):
                     "url": None,
                     "cover": None,
                     "likes": 8,
-                    "like_status": 0
+                    "like_status": 0,
+                    "description": "a description"
                 }
             ]
             expected_body = {
@@ -1449,28 +1465,29 @@ class AudioTests(unittest.TestCase):
             )
             self.assertEqual(422, res.status_code)
 
+    @mock.patch("backend.src.controllers.audio.controllers.get_song_data")
     @mock.patch('backend.src.controllers.audio.controllers.get_like_pair')
-    def test_like_success(self, mocked_likes):
+    def test_like_success(self, mocked_likes, mocked_song):
         """
         Ensure liking is successful.
         """
         mocked_likes.return_value = []
+        mocked_song.return_value = [[None, None, "A Cool Tune"]]
         test_req_data = {
             "sid": 1,
         }
-        with mock.patch("backend.src.controllers.audio.controllers.get_song_data"):
-            with mock.patch("backend.src.controllers.audio.controllers.post_like"):
-                with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-                    mock_token.return_value = MOCKED_TOKEN
-                    res = self.test_client.post(
-                        "/api/v1/audio/like",
-                        json=test_req_data,
-                        headers={'Authorization': 'Bearer ' + TEST_TOKEN},
-                        follow_redirects=True
-                    )
-                    self.assertEqual(200, res.status_code)
-                    expected_body = {"message": "Song liked"}
-                    self.assertEqual(expected_body, json.loads(res.data))
+        with mock.patch("backend.src.controllers.audio.controllers.post_like"):
+            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+                mock_token.return_value = MOCKED_TOKEN
+                res = self.test_client.post(
+                    "/api/v1/audio/like",
+                    json=test_req_data,
+                    headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                    follow_redirects=True
+                )
+                self.assertEqual(200, res.status_code)
+                expected_body = {"message": "Song liked"}
+                self.assertEqual(expected_body, json.loads(res.data))
 
     def test_like_fail_missing_access_token(self):
         """
@@ -1548,13 +1565,15 @@ class AudioTests(unittest.TestCase):
             )
             self.assertEqual(422, res.status_code)
 
-    def test_unlike_success(self):
+    @mock.patch('backend.src.controllers.audio.controllers.get_song_data')
+    def test_unlike_success(self, mocked_song):
         """
         Ensure unliking is successful.
         """
         test_req_data = {
             "sid": 1,
         }
+        mocked_song.return_value = [[None, "A username"]]
         with mock.patch("backend.src.controllers.audio.controllers.post_unlike"):
             with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
                 mock_token.return_value = MOCKED_TOKEN
@@ -1644,26 +1663,29 @@ class AudioTests(unittest.TestCase):
             )
             self.assertEqual(422, res.status_code)
 
-    def test_publish_success(self):
+    @mock.patch('backend.src.controllers.audio.controllers.get_song_data')
+    def test_publish_success(self, mocked_song):
         """
         Ensure publish is successful.
         """
         test_req_data = {
             "sid": 1,
         }
+        mocked_song.return_value = [[None, None, "A Cool Tune"]]
         with mock.patch("backend.src.controllers.audio.controllers.permitted_to_edit"):
             with mock.patch("backend.src.controllers.audio.controllers.update_published_status"):
-                with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
-                    mock_token.return_value = MOCKED_TOKEN
-                    res = self.test_client.post(
-                        "/api/v1/audio/publish",
-                        json=test_req_data,
-                        headers={'Authorization': 'Bearer ' + TEST_TOKEN},
-                        follow_redirects=True
-                    )
-                    self.assertEqual(200, res.status_code)
-                    expected_body = {"message": "Song published."}
-                    self.assertEqual(expected_body, json.loads(res.data))
+                with mock.patch("backend.src.controllers.audio.controllers.update_publised_timestamp"):
+                    with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+                        mock_token.return_value = MOCKED_TOKEN
+                        res = self.test_client.post(
+                            "/api/v1/audio/publish",
+                            json=test_req_data,
+                            headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                            follow_redirects=True
+                        )
+                        self.assertEqual(200, res.status_code)
+                        expected_body = {"message": "Song published."}
+                        self.assertEqual(expected_body, json.loads(res.data))
 
     def test_publish_fail_missing_access_token(self):
         """
@@ -3014,8 +3036,8 @@ class AudioTests(unittest.TestCase):
         tokens.
         """
         test_songs = [
-            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0],
-            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0]
+            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0, "a description"],
+            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0, "a description"]
         ]
         mocked_num_songs.return_value = 2
         mocked_songs.return_value = test_songs
@@ -3043,7 +3065,8 @@ class AudioTests(unittest.TestCase):
                     "url": None,
                     "cover": None,
                     "likes": 8,
-                    "like_status": 0
+                    "like_status": 0,
+                    "description": "a description"
                 },
                 {
                     "sid": 2,
@@ -3055,7 +3078,8 @@ class AudioTests(unittest.TestCase):
                     "url": None,
                     "cover": None,
                     "likes": 8,
-                    "like_status": 0
+                    "like_status": 0,
+                    "description": "a description"
                 }
             ]
             expected_body = {
@@ -3074,7 +3098,7 @@ class AudioTests(unittest.TestCase):
         Ensure getting all the songs in a playlist is successful with a next page scroll token.
         """
         test_songs = [
-            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0]
+            [2, "username", "A very test song", 0, "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0, "a description"]
         ]
         mocked_songs.return_value = test_songs
         test_req_data = {
@@ -3104,7 +3128,8 @@ class AudioTests(unittest.TestCase):
                     "url": None,
                     "cover": None,
                     "likes": 8,
-                    "like_status": 0
+                    "like_status": 0,
+                    "description": "a description"
                 }
             ]
             expected_body = {
@@ -3123,7 +3148,7 @@ class AudioTests(unittest.TestCase):
         Ensure getting all the songs in a playlist is successful with a back page scroll token.
         """
         test_songs = [
-            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0]
+            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT", 1, None, None, 8, 0, "a description"]
         ]
         mocked_songs.return_value = test_songs
         test_req_data = {
@@ -3153,7 +3178,8 @@ class AudioTests(unittest.TestCase):
                     "url": None,
                     "cover": None,
                     "likes": 8,
-                    "like_status": 0
+                    "like_status": 0,
+                    "description": "a description"
                 }
             ]
             expected_body = {
@@ -3963,3 +3989,1353 @@ class AudioTests(unittest.TestCase):
                 follow_redirects=True
             )
             self.assertEqual(401, res.status_code)
+
+    @mock.patch("backend.src.controllers.audio.controllers.permitted_to_edit")
+    def test_patch_description_success(self, mocked_editor_check):
+        """
+        Ensure editing a description for a song works.
+        """
+        test_req_data = {
+            "description": "a description",
+            "sid": 1,
+        }
+        mocked_editor_check.return_value = True
+        with mock.patch('backend.src.controllers.audio.controllers.update_description'):
+            with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+                mock_token.return_value = ALT_MOCKED_TOKEN
+                res = self.test_client.patch(
+                    "/api/v1/audio/description",
+                    json=test_req_data,
+                    headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                    follow_redirects=True
+                )
+                self.assertEqual(200, res.status_code)
+                expected_body = {'message': 'Description updated.'}
+                self.assertEqual(expected_body, json.loads(res.data))
+
+    def test_patch_description_fail_missing_access_token(self):
+        """
+        Ensure patching a description for a song fails if no access_token is sent.
+        """
+        res = self.test_client.patch(
+            "/api/v1/audio/description",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_patch_description_fail_access_token_expired(self):
+        """
+        Ensure patching the description for a song fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
+            res = self.test_client.patch(
+                "/api/v1/audio/description",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_patch_description_fail_bad_access_token_signature(self):
+        """
+        Ensure patching the description for a song fails if the access_token signature does not match
+        the one configured on the server.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
+            res = self.test_client.patch(
+                "/api/v1/audio/description",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_patch_description_fail_unknown_access_token_issue(self):
+        """
+        Ensure patching the description for a song fails if some unknown error relating to the access_token
+        occurs.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
+            res = self.test_client.patch(
+                "/api/v1/audio/description",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_patch_description_fail_missing_description(self):
+        """
+        Ensure patching the description for a song fails if the user doesn't send a description.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = ALT_MOCKED_TOKEN
+            test_req_data = {
+                "sid": 1,
+            }
+            res = self.test_client.patch(
+                "/api/v1/audio/description",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+            test_req_data = {
+                "description": "",
+                "sid": 1,
+            }
+            res = self.test_client.patch(
+                "/api/v1/audio/description",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    def test_patch_description_fail_missing_sid(self):
+        """
+        Ensure patching the description for a song fails if the user doesn't send a sid.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = ALT_MOCKED_TOKEN
+            test_req_data = {
+                "description": "a description"
+            }
+            res = self.test_client.patch(
+                "/api/v1/audio/description",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+            test_req_data = {
+                "description": "a description",
+                "sid": None
+            }
+            res = self.test_client.patch(
+                "/api/v1/audio/description",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    def test_patch_description_fail_bad_sid(self):
+        """
+        Ensure patching the description for a song fails if the user doesn't send a valid sid.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = ALT_MOCKED_TOKEN
+            test_req_data = {
+                "sid": -1,
+                "description": "a description"
+            }
+            res = self.test_client.patch(
+                "/api/v1/audio/description",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    @mock.patch("backend.src.controllers.audio.controllers.permitted_to_edit")
+    def test_patch_description_fail_not_permitted_to_edit(self, mocked_editor_check):
+        """
+        Ensure patching the description for a song fails if you don't have permission to edit the song.
+        """
+        test_req_data = {
+            "sid": 1,
+            "description": "a description"
+        }
+        mocked_editor_check.return_value = False
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = MOCKED_TOKEN
+            res = self.test_client.patch(
+                "/api/v1/audio/description",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+            expected_body = {"message": "You can't update that song!"}
+            self.assertEqual(expected_body, json.loads(res.data))
+
+    @mock.patch("backend.src.controllers.audio.controllers.permitted_to_edit")
+    def test_delete_song_success(self, mocked_editor_check):
+        """
+        Ensure deleting a song works.
+        """
+        test_req_data = {
+            "sid": 1
+        }
+        mocked_editor_check.return_value = True
+        with mock.patch('backend.src.controllers.audio.controllers.delete_song_data'):
+            with mock.patch('backend.src.controllers.audio.controllers.get_song_data'):
+                with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+                    mock_token.return_value = ALT_MOCKED_TOKEN
+                    res = self.test_client.delete(
+                        "/api/v1/audio",
+                        json=test_req_data,
+                        headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                        follow_redirects=True
+                    )
+                    self.assertEqual(200, res.status_code)
+                    expected_body = {'message': 'Song deleted'}
+                    self.assertEqual(expected_body, json.loads(res.data))
+
+    def test_delete_song_fail_missing_access_token(self):
+        """
+        Ensure deleting a song fails if no access_token is sent.
+        """
+        res = self.test_client.delete(
+            "/api/v1/audio",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_delete_song_fail_access_token_expired(self):
+        """
+        Ensure deleting a song fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
+            res = self.test_client.delete(
+                "/api/v1/audio",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_delete_song_fail_bad_access_token_signature(self):
+        """
+        Ensure deleting a song fails if the access_token signature does
+        not match the one configured on the server.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
+            res = self.test_client.delete(
+                "/api/v1/audio",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_delete_song_fail_unknown_access_token_issue(self):
+        """
+        Ensure deleting a song fails if some unknown error relating to the
+        access_token occurs.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
+            res = self.test_client.delete(
+                "/api/v1/audio",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_delete_song_fail_missing_sid(self):
+        """
+        Ensure deleting a song fails if a sid is not sent.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = ALT_MOCKED_TOKEN
+            res = self.test_client.delete(
+                "/api/v1/audio",
+                json={},
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+            test_req_data = {
+                "sid": None
+            }
+            res = self.test_client.delete(
+                "/api/v1/audio",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_song_data')
+    def test_delete_song_fail_invalid_sid(self, mock_raise):
+        """
+        Ensure deleting a song fails if the sid sent is invalid.
+        """
+        test_req_data = {
+            "sid": 1
+        }
+        mock_raise.side_effect = NoResults
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = ALT_MOCKED_TOKEN
+            res = self.test_client.delete(
+                "/api/v1/audio",
+                json=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(400, res.status_code)
+
+    @mock.patch('backend.src.controllers.audio.controllers.permitted_to_edit')
+    def test_delete_song_fail_not_permitted(self, mock_uid):
+        """
+        Ensure deleting a playlist fails if the user is not permitted to edit
+        the playlist.
+        """
+        test_req_data = {
+            "sid": 1
+        }
+        mock_uid.return_value = False
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            with mock.patch('backend.src.controllers.audio.controllers.get_song_data'):
+                mock_token.return_value = ALT_MOCKED_TOKEN
+                res = self.test_client.delete(
+                    "/api/v1/audio",
+                    json=test_req_data,
+                    headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                    follow_redirects=True
+                )
+                self.assertEqual(401, res.status_code)
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_all_search_results')
+    @mock.patch('backend.src.controllers.audio.controllers.get_number_of_searchable_songs')
+    def test_get_search_success_no_scroll_token(self, mocked_num_songs, mocked_songs):
+        """
+        Ensure searching for songs is successful without scroll tokens.
+        """
+        test_songs = [
+            [1, "username", "A test song", 0, "Wed, 13 Nov 2019 17:07:39 GMT",
+             1, None, None, 8, 0, "a description"]
+        ]
+        mocked_num_songs.return_value = 2
+        mocked_songs.return_value = test_songs
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = ALT_MOCKED_TOKEN
+            res = self.test_client.get(
+                "/api/v1/audio/search?search_term=fakeSearch",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(200, res.status_code)
+            expected_songs = [
+                {
+                    "sid": 1,
+                    "username": "username",
+                    "title": "A test song",
+                    "duration": 0,
+                    "created": "Wed, 13 Nov 2019 17:07:39 GMT",
+                    "public": 1,
+                    "url": None,
+                    "cover": None,
+                    "likes": 8,
+                    "like_status": 0,
+                    "description": "a description"
+                }
+            ]
+            expected_body = {
+                'back_page': None,
+                'songs': expected_songs,
+                'current_page': 1,
+                'next_page': None,
+                'songs_per_page': 50,
+                'total_pages': 1
+            }
+            self.assertEqual(expected_body, json.loads(res.data))
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_all_search_results')
+    @mock.patch('backend.src.controllers.audio.controllers.get_number_of_searchable_songs')
+    def test_get_search_success_next_scroll_token(self, mocked_num_songs, mocked_songs):
+        """
+        Ensure searching for songs is successful with a next page scroll token.
+        """
+        test_song = [
+            [2, "username2", "A very test song", 0,
+             "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0,
+             "a description"]
+        ]
+        mocked_num_songs.return_value = 2
+        mocked_songs.return_value = test_song
+        test_req_data = {
+            "next_page": (
+                "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZWFyY2hfdGVybSI6InRl"
+                "c3QiLCJzb3J0X3NxbCI6IiBPUkRFUiBCWSBkdXJhdGlvbiBBU0MgIiwidG90Y"
+                "WxfcGFnZXMiOjIxLCJzb25nc19wZXJfcGFnZSI6NTAsImN1cnJlbnRfcGFnZS"
+                "I6M30.OBCFnHwAZRjhwZEkJAPvaRqAA7GxMP76ZlcpCGcazBI"
+            ),
+            "search_term": "fakeSearch"
+        }
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = ALT_MOCKED_TOKEN
+            res = self.test_client.get(
+                "/api/v1/audio/search",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(200, res.status_code)
+            expected_songs = [
+                {
+                    "sid": 2,
+                    "username": "username2",
+                    "title": "A very test song",
+                    "duration": 0,
+                    "created": "Wed, 13 Nov 2019 17:07:40 GMT",
+                    "public": 1,
+                    "url": None,
+                    "cover": None,
+                    "likes": 8,
+                    "like_status": 0,
+                    "description": "a description"
+                }
+            ]
+            expected_body = {
+                'back_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZWFyY2hfdGVybSI6InRlc3QiLCJzb3J0X3NxbCI6IiBPUkRFUiBCWSBkdXJhdGlvbiBBU0MgIiwidG90YWxfcGFnZXMiOjIxLCJwcm9maWxlX3NlYXJjaCI6bnVsbCwic29uZ3NfcGVyX3BhZ2UiOjUwLCJjdXJyZW50X3BhZ2UiOjJ9.G1ohS2qgUPUiqgLq2F82yod_1vdGp_NZka2_OZwMSMU',
+                'current_page': 3,
+                'next_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZWFyY2hfdGVybSI6InRlc3QiLCJzb3J0X3NxbCI6IiBPUkRFUiBCWSBkdXJhdGlvbiBBU0MgIiwidG90YWxfcGFnZXMiOjIxLCJwcm9maWxlX3NlYXJjaCI6bnVsbCwic29uZ3NfcGVyX3BhZ2UiOjUwLCJjdXJyZW50X3BhZ2UiOjR9.aNc5EDcv3TGLb67VXgFEx0Q_e4nvQWZI3PbMAfaz9nc',
+                'songs': expected_songs,
+                'songs_per_page': 50,
+                'total_pages': 21
+            }
+            self.assertEqual(expected_body, json.loads(res.data))
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_all_search_results')
+    @mock.patch('backend.src.controllers.audio.controllers.get_number_of_searchable_songs')
+    def test_get_search_success_back_scroll_token(self, mocked_num_songs, mocked_songs):
+        """
+        Ensure searching for songs is successful with a back page scroll token.
+        """
+        test_song = [
+            [2, "username2", "A very test song", 0,
+             "Wed, 13 Nov 2019 17:07:40 GMT", 1, None, None, 8, 0,
+             "a description"]
+        ]
+        mocked_songs.return_value = test_song
+        mocked_num_songs.return_value = 2
+        test_req_data = {
+            "back_page": (
+                "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZWFyY2hfdGVybSI6InRl"
+                "c3QiLCJzb3J0X3NxbCI6IiBPUkRFUiBCWSBkdXJhdGlvbiBBU0MgIiwidG90Y"
+                "WxfcGFnZXMiOjIxLCJzb25nc19wZXJfcGFnZSI6NTAsImN1cnJlbnRfcGFnZS"
+                "I6Mn0.iILstA3UP8PZ_DkAjWoDqE8YJfiElEhCCNhm9rg7wR0"
+            ),
+            "search_term": "fakeSearch"
+        }
+        with mock.patch(
+                'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = ALT_MOCKED_TOKEN
+            res = self.test_client.get(
+                "/api/v1/audio/search",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(200, res.status_code)
+            expected_songs = [
+                {
+                    "sid": 2,
+                    "username": "username2",
+                    "title": "A very test song",
+                    "duration": 0,
+                    "created": "Wed, 13 Nov 2019 17:07:40 GMT",
+                    "public": 1,
+                    "url": None,
+                    "cover": None,
+                    "likes": 8,
+                    "like_status": 0,
+                    "description": "a description"
+                }
+            ]
+            expected_body = {
+                'back_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZWFyY2hfdGVybSI6InRlc3QiLCJzb3J0X3NxbCI6IiBPUkRFUiBCWSBkdXJhdGlvbiBBU0MgIiwidG90YWxfcGFnZXMiOjIxLCJwcm9maWxlX3NlYXJjaCI6bnVsbCwic29uZ3NfcGVyX3BhZ2UiOjUwLCJjdXJyZW50X3BhZ2UiOjF9.sm9O8YA5bjSXXJDcduWOuYxrPgUVeqzud_AyIUPMXN0',
+                'current_page': 2,
+                'next_page': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZWFyY2hfdGVybSI6InRlc3QiLCJzb3J0X3NxbCI6IiBPUkRFUiBCWSBkdXJhdGlvbiBBU0MgIiwidG90YWxfcGFnZXMiOjIxLCJwcm9maWxlX3NlYXJjaCI6bnVsbCwic29uZ3NfcGVyX3BhZ2UiOjUwLCJjdXJyZW50X3BhZ2UiOjN9.0YLsVccpDToQny2P3Qr9PkAosaIRWV0M3awmHSoFpsw',
+                'songs': expected_songs,
+                'songs_per_page': 50,
+                'total_pages': 21
+            }
+            self.assertEqual(expected_body, json.loads(res.data))
+
+    def test_get_search_fail_missing_access_token(self):
+        """
+        Ensure searching for songs fails if no access_token is sent.
+        """
+        res = self.test_client.get(
+            "/api/v1/audio/search?search_term=fakeSearch",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_get_search_fail_access_token_expired(self):
+        """
+        Ensure searching for songs fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
+            res = self.test_client.get(
+                "/api/v1/audio/search?search_term=fakeSearch",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_get_search_fail_bad_access_token_signature(self):
+        """
+        Ensure searching for songs fails if the access_token signature does not match
+        the one configured on the server.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
+            res = self.test_client.get(
+                "/api/v1/audio/search?search_term=fakeSearch",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_get_search_fail_unknown_access_token_issue(self):
+        """
+        Ensure searching for songs fails if some unknown error relating to the access_token
+        occurs.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
+            res = self.test_client.get(
+                "/api/v1/audio/search?search_term=fakeSearch",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_number_of_searchable_songs')
+    def test_get_search_fail_no_scroll_token_exceeded_last_page(self, mocked_num_songs):
+        """
+        Ensure searching for songs fails if the user tries to access a page that doesn't exist.
+        """
+        mocked_num_songs.return_value = 2
+        test_req_data = {
+            "current_page": 12,
+            "posts_per_page": 1,
+            "search_term": "fakeSearch"
+        }
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = ALT_MOCKED_TOKEN
+            res = self.test_client.get(
+                "/api/v1/audio/search",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    def test_get_search_fail_sent_both_tokens(self):
+        """
+        Ensure searching for songs fails if the user tries to send a next_page & back_page token.
+        """
+        test_req_data = {
+            "next_page": (
+                "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0xLCJ0b"
+                "3RhbF9wYWdlcyI6MiwicG9zdHNfcGVyX3BhZ2UiOjEsImN1cnJlbnR"
+                "fcGFnZSI6Mn0.rOexY_eF1nUjFJvpDbbbTTgpoVjxIh9ZbVs0Q6ggR"
+                "uQ"
+            ),
+            "back_page": (
+                "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOi0x"
+                "LCJ0b3RhbF9wYWdlcyI6MiwicG9zdHNfcGVyX3BhZ2UiOjEsI"
+                "mN1cnJlbnRfcGFnZSI6MX0.pkQCRbBgvwuozzSG6LK-kFGuxT"
+                "8YYsYN3m9g-AzquyM"
+            )
+        }
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = ALT_MOCKED_TOKEN
+            res = self.test_client.get(
+                "/api/v1/audio/search",
+                query_string=test_req_data,
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(422, res.status_code)
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_child_files')
+    @mock.patch('backend.src.controllers.audio.controllers.get_child_folders')
+    @mock.patch('backend.src.controllers.audio.controllers.get_folder_entry')
+    def test_get_folder_success(self, mock_folder, mock_child_folders, mock_child_files):
+        """
+        Ensure getting a folder is successful.
+        """
+        mock_folder.return_value = [[1, None, "A Folder"]]
+        mock_child_folders.return_value = []
+        mock_child_files.return_value = []
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = ALT_MOCKED_TOKEN
+            res = self.test_client.get(
+                "/api/v1/audio/folders",
+                query_string={"folder_id": 1},
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(200, res.status_code)
+            expected_body = {
+                "folder": {
+                    "child_files":[],
+                    "child_folders": [],
+                    "folder_id": 1,
+                    "folder_name": "A Folder"
+                }
+            }
+            self.assertEqual(expected_body, json.loads(res.data))
+
+
+    def test_get_folder_fail_missing_access_token(self):
+        """
+        Ensure getting a folder fails if no access_token is sent.
+        """
+        res = self.test_client.get(
+            "/api/v1/audio/folders",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_get_folder_fail_access_token_expired(self):
+        """
+        Ensure getting a folder fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
+            res = self.test_client.get(
+                "/api/v1/audio/folders",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_get_folder_fail_bad_access_token_signature(self):
+        """
+        Ensure getting a folder fails if the access_token signature does not match
+        the one configured on the server.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
+            res = self.test_client.get(
+                "/api/v1/audio/folders",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_get_folder_fail_unknown_access_token_issue(self):
+        """
+        Ensure getting a folder fails if some unknown error relating to the access_token
+        occurs.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
+            res = self.test_client.get(
+                "/api/v1/audio/folders",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_creating_a_folder_success(self):
+        """
+        Ensure creating a folder is successful.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            with mock.patch('backend.src.controllers.audio.controllers.get_folder_entry'):
+                with mock.patch('backend.src.controllers.audio.controllers.create_folder_entry'):
+                    mock_token.return_value = ALT_MOCKED_TOKEN
+                    res = self.test_client.post(
+                        "/api/v1/audio/folders",
+                        json={"folder_name": "name", "parent_folder_id": 1},
+                        headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                        follow_redirects=True
+                    )
+                    self.assertEqual(200, res.status_code)
+                    self.assertEqual({"message": "Folder created"}, json.loads(res.data))
+
+    def test_creating_a_folder_fail_missing_access_token(self):
+        """
+        Ensure creating a folder fails if no access_token is sent.
+        """
+        res = self.test_client.post(
+            "/api/v1/audio/folders",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_creating_a_folder_fail_access_token_expired(self):
+        """
+        Ensure creating a folder fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
+            res = self.test_client.post(
+                "/api/v1/audio/folders",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_creating_a_folder_fail_bad_access_token_signature(self):
+        """
+        Ensure creating a folder fails if the access_token signature does not match
+        the one configured on the server.
+        """
+        with mock.patch(
+                'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
+            res = self.test_client.post(
+                "/api/v1/audio/folders",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_creating_a_folder_fail_unknown_access_token_issue(self):
+        """
+        Ensure creating a folder fails if some unknown error relating to the access_token
+        occurs.
+        """
+        with mock.patch(
+                'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
+            res = self.test_client.post(
+                "/api/v1/audio/folders",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_root_folder_entry')
+    def test_deleting_a_folder_success(self, mock_root):
+        """
+        Ensure deleting a folder is successful.
+        """
+        mock_root.side_effect = NoResults
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            with mock.patch('backend.src.controllers.audio.controllers.delete_folder_entry'):
+                mock_token.return_value = ALT_MOCKED_TOKEN
+                res = self.test_client.delete(
+                    "/api/v1/audio/folders",
+                    query_string={"folder_id": 1},
+                    headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                    follow_redirects=True
+                )
+                self.assertEqual(200, res.status_code)
+                self.assertEqual({"message": "Folder deleted"}, json.loads(res.data))
+
+    def test_deleting_a_folder_fail_missing_access_token(self):
+        """
+        Ensure deleting a folder fails if no access_token is sent.
+        """
+        res = self.test_client.delete(
+            "/api/v1/audio/folders",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_deleting_a_folder_fail_access_token_expired(self):
+        """
+        Ensure deleting a folder fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
+            res = self.test_client.delete(
+                "/api/v1/audio/folders",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_deleting_a_folder_fail_bad_access_token_signature(self):
+        """
+        Ensure deleting a folder fails if the access_token signature does not match
+        the one configured on the server.
+        """
+        with mock.patch(
+                'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
+            res = self.test_client.delete(
+                "/api/v1/audio/folders",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_deleting_a_folder_fail_unknown_access_token_issue(self):
+        """
+        Ensure deleting a folder fails if some unknown error relating to the access_token
+        occurs.
+        """
+        with mock.patch(
+                'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
+            res = self.test_client.delete(
+                "/api/v1/audio/folders",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    @mock.patch(
+        'backend.src.controllers.audio.controllers.get_root_folder_entry')
+    def test_moving_a_folder_success(self, mock_root):
+        """
+        Ensure moving a folder is successful.
+        """
+        mock_root.side_effect = NoResults
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            with mock.patch('backend.src.controllers.audio.controllers.move_folder_entry'):
+                mock_token.return_value = ALT_MOCKED_TOKEN
+                res = self.test_client.patch(
+                    "/api/v1/audio/folders",
+                    query_string={"folder_id": 2, "parent_folder_id": 1},
+                    headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                    follow_redirects=True
+                )
+                self.assertEqual(200, res.status_code)
+                self.assertEqual({"message": "Folder moved"}, json.loads(res.data))
+
+    def test_moving_a_folder_fail_missing_access_token(self):
+        """
+        Ensure moving a folder fails if no access_token is sent.
+        """
+        res = self.test_client.patch(
+            "/api/v1/audio/folders",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_moving_a_folder_fail_access_token_expired(self):
+        """
+        Ensure moving a folder fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
+            res = self.test_client.patch(
+                "/api/v1/audio/folders",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_moving_a_folder_fail_bad_access_token_signature(self):
+        """
+        Ensure moving a folder fails if the access_token signature does not match
+        the one configured on the server.
+        """
+        with mock.patch(
+                'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
+            res = self.test_client.patch(
+                "/api/v1/audio/folders",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_moving_a_folder_fail_unknown_access_token_issue(self):
+        """
+        Ensure moving a folder fails if some unknown error relating to the access_token
+        occurs.
+        """
+        with mock.patch(
+                'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
+            res = self.test_client.patch(
+                "/api/v1/audio/folders",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_creating_a_file_success(self):
+        """
+        Ensure creating a file is successful.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            with mock.patch('backend.src.controllers.audio.controllers.get_folder_entry'):
+                with mock.patch('backend.src.controllers.audio.controllers.add_sample'):
+                    mock_token.return_value = ALT_MOCKED_TOKEN
+                    res = self.test_client.post(
+                        "/api/v1/audio/files",
+                        json={"file_name": "name", "file_url": "http://afakeurl.com", "folder_id": 1},
+                        headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                        follow_redirects=True
+                    )
+                    self.assertEqual(200, res.status_code)
+                    self.assertEqual({"message": "File added to folder"}, json.loads(res.data))
+
+    def test_creating_a_file_fail_missing_access_token(self):
+        """
+        Ensure creating a file fails if no access_token is sent.
+        """
+        res = self.test_client.post(
+            "/api/v1/audio/files",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_creating_a_file_fail_access_token_expired(self):
+        """
+        Ensure creating a file fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
+            res = self.test_client.post(
+                "/api/v1/audio/files",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_creating_a_file_fail_bad_access_token_signature(self):
+        """
+        Ensure creating a file fails if the access_token signature does not match
+        the one configured on the server.
+        """
+        with mock.patch(
+                'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
+            res = self.test_client.post(
+                "/api/v1/audio/files",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_creating_a_file_fail_unknown_access_token_issue(self):
+        """
+        Ensure creating a file fails if some unknown error relating to the access_token
+        occurs.
+        """
+        with mock.patch(
+                'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
+            res = self.test_client.post(
+                "/api/v1/audio/files",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_deleting_a_file_success(self):
+        """
+        Ensure deleting a file is successful.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            with mock.patch('backend.src.controllers.audio.controllers.delete_file_entry'):
+                mock_token.return_value = ALT_MOCKED_TOKEN
+                res = self.test_client.delete(
+                    "/api/v1/audio/files",
+                    query_string={"file_id": 1},
+                    headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                    follow_redirects=True
+                )
+                self.assertEqual(200, res.status_code)
+                self.assertEqual({"message": "File deleted"}, json.loads(res.data))
+
+    def test_deleting_a_file_fail_missing_access_token(self):
+        """
+        Ensure deleting a file fails if no access_token is sent.
+        """
+        res = self.test_client.delete(
+            "/api/v1/audio/files",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_deleting_a_file_fail_access_token_expired(self):
+        """
+        Ensure deleting a file fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
+            res = self.test_client.delete(
+                "/api/v1/audio/files",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_deleting_a_file_fail_bad_access_token_signature(self):
+        """
+        Ensure deleting a file fails if the access_token signature does not match
+        the one configured on the server.
+        """
+        with mock.patch(
+                'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
+            res = self.test_client.delete(
+                "/api/v1/audio/files",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_deleting_a_file_fail_unknown_access_token_issue(self):
+        """
+        Ensure deleting a file fails if some unknown error relating to the access_token
+        occurs.
+        """
+        with mock.patch(
+                'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
+            res = self.test_client.delete(
+                "/api/v1/audio/files",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_moving_a_file_success(self):
+        """
+        Ensure moving a file is successful.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            with mock.patch('backend.src.controllers.audio.controllers.move_file_entry'):
+                mock_token.return_value = ALT_MOCKED_TOKEN
+                res = self.test_client.patch(
+                    "/api/v1/audio/files",
+                    query_string={"file_id": 2, "folder_id": 1},
+                    headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                    follow_redirects=True
+                )
+                self.assertEqual(200, res.status_code)
+                self.assertEqual({"message": "File moved"}, json.loads(res.data))
+
+    def test_moving_a_file_fail_missing_access_token(self):
+        """
+        Ensure moving a file fails if no access_token is sent.
+        """
+        res = self.test_client.patch(
+            "/api/v1/audio/files",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_moving_a_file_fail_access_token_expired(self):
+        """
+        Ensure moving a file fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
+            res = self.test_client.patch(
+                "/api/v1/audio/files",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_moving_a_file_fail_bad_access_token_signature(self):
+        """
+        Ensure moving a file fails if the access_token signature does not match
+        the one configured on the server.
+        """
+        with mock.patch(
+                'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
+            res = self.test_client.patch(
+                "/api/v1/audio/files",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_moving_a_file_fail_unknown_access_token_issue(self):
+        """
+        Ensure moving a file fails if some unknown error relating to the access_token
+        occurs.
+        """
+        with mock.patch(
+                'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
+            res = self.test_client.patch(
+                "/api/v1/audio/files",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_all_synths')
+    def test_get_synths_success(self, mocked_synths):
+        """
+        Ensure getting synths is successful.
+        """
+        mocked_synths.return_value = []
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = ALT_MOCKED_TOKEN
+            res = self.test_client.get(
+                "/api/v1/audio/synth",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(200, res.status_code)
+            expected_body = {"synths": []}
+            self.assertEqual(expected_body, json.loads(res.data))
+
+    def test_get_synths_fail_missing_access_token(self):
+        """
+        Ensure getting synths fails if no access_token is sent.
+        """
+        res = self.test_client.get(
+            "/api/v1/audio/synth",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_get_synths_fail_access_token_expired(self):
+        """
+        Ensure getting synths fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
+            res = self.test_client.get(
+                "/api/v1/audio/synth",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_get_synths_fail_bad_access_token_signature(self):
+        """
+        Ensure getting synths fails if the access_token signature does not match
+        the one configured on the server.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
+            res = self.test_client.get(
+                "/api/v1/audio/synth",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_get_synths_fail_unknown_access_token_issue(self):
+        """
+        Ensure getting synths fails if some unknown error relating to the access_token
+        occurs.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
+            res = self.test_client.get(
+                "/api/v1/audio/synth",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    @mock.patch('backend.src.controllers.audio.controllers.add_synth')
+    def test_post_synth_success(self, mock_synth_id):
+        """
+        Ensure creating a synth is successful.
+        """
+        mock_synth_id.return_value = 1
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.return_value = ALT_MOCKED_TOKEN
+            res = self.test_client.post(
+                "/api/v1/audio/synth",
+                json={'name': 'Piano'},
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(200, res.status_code)
+            expected_body = {'message': 'Synth created', 'synth_id': 1}
+            self.assertEqual(expected_body, json.loads(res.data))
+
+    def test_post_synth_fail_missing_access_token(self):
+        """
+        Ensure posting a synth fails if no access_token is sent.
+        """
+        res = self.test_client.post(
+            "/api/v1/audio/synth",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_post_synth_fail_access_token_expired(self):
+        """
+        Ensure posting a synth fails if the access_token is expired.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
+            res = self.test_client.post(
+                "/api/v1/audio/synth",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_post_synth_fail_bad_access_token_signature(self):
+        """
+        Ensure posting a synth fails if the access_token signature does not match
+        the one configured on the server.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
+            res = self.test_client.post(
+                "/api/v1/audio/synth",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_post_synth_fail_unknown_access_token_issue(self):
+        """
+        Ensure posting a synth fails if some unknown error relating to the access_token
+        occurs.
+        """
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
+            res = self.test_client.post(
+                "/api/v1/audio/synth",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    @pytest.mark.skip(reason="Broken in Travis only")
+    @mock.patch('backend.src.controllers.audio.controllers.get_synth')
+    @mock.patch('backend.src.controllers.audio.controllers.json.loads')
+    def test_edit_synths_success(self, mocked_patch, mocked_synth):
+        """
+        Ensure editing synths is successful.
+        """
+        mocked_patch.return_value = {}
+        mocked_synth.return_value = [[None, -1]]
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            with mock.patch('backend.src.controllers.audio.controllers.update_synth_name'):
+                mock_token.return_value = ALT_MOCKED_TOKEN
+                res = self.test_client.patch(
+                    "/api/v1/audio/synth?id=-1",
+                    json={"name": "newName"},
+                    headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                    follow_redirects=True
+                )
+                self.assertEqual(200, res.status_code)
+
+    def test_edit_synths_fail_missing_access_token(self):
+        """
+        Ensure editing synths fails if no access_token is sent.
+        """
+        res = self.test_client.patch(
+            "/api/v1/audio/synth",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_edit_synths_fail_access_token_expired(self):
+        """
+        Ensure editing synths fails if the access_token is expired.
+        """
+        with mock.patch(
+                'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
+            res = self.test_client.patch(
+                "/api/v1/audio/synth",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_edit_synths_fail_bad_access_token_signature(self):
+        """
+        Ensure editing synths fails if the access_token signature does not match
+        the one configured on the server.
+        """
+        with mock.patch(
+                'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
+            res = self.test_client.patch(
+                "/api/v1/audio/synth",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_edit_synths_fail_unknown_access_token_issue(self):
+        """
+        Ensure editing synths fails if some unknown error relating to the access_token
+        occurs.
+        """
+        with mock.patch(
+                'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
+            res = self.test_client.patch(
+                "/api/v1/audio/synth",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    @mock.patch('backend.src.controllers.audio.controllers.get_synth')
+    def test_delete_synths_success(self, mocked_synth):
+        """
+        Ensure deleting synths is successful.
+        """
+        mocked_synth.return_value = [[None, -1]]
+        with mock.patch('backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            with mock.patch('backend.src.controllers.audio.controllers.delete_synth_entry'):
+                mock_token.return_value = ALT_MOCKED_TOKEN
+                res = self.test_client.delete(
+                    "/api/v1/audio/synth",
+                    query_string={"id": -1},
+                    headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                    follow_redirects=True
+                )
+                self.assertEqual(200, res.status_code)
+
+    def test_delete_synths_fail_missing_access_token(self):
+        """
+        Ensure deleting synths fails if no access_token is sent.
+        """
+        res = self.test_client.delete(
+            "/api/v1/audio/synth",
+            follow_redirects=True
+        )
+        self.assertEqual(401, res.status_code)
+
+    def test_delete_synths_fail_access_token_expired(self):
+        """
+        Ensure deleting synths fails if the access_token is expired.
+        """
+        with mock.patch(
+                'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = ValueError
+            res = self.test_client.delete(
+                "/api/v1/audio/synth",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(401, res.status_code)
+
+    def test_delete_synths_fail_bad_access_token_signature(self):
+        """
+        Ensure deleting synths fails if the access_token signature does not match
+        the one configured on the server.
+        """
+        with mock.patch(
+                'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = InvalidSignatureError
+            res = self.test_client.delete(
+                "/api/v1/audio/synth",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)
+
+    def test_delete_synths_fail_unknown_access_token_issue(self):
+        """
+        Ensure deleting synths fails if some unknown error relating to the access_token
+        occurs.
+        """
+        with mock.patch(
+                'backend.src.middleware.auth_required.verify_and_refresh') as mock_token:
+            mock_token.side_effect = Exception
+            res = self.test_client.delete(
+                "/api/v1/audio/synth",
+                headers={'Authorization': 'Bearer ' + TEST_TOKEN},
+                follow_redirects=True
+            )
+            self.assertEqual(500, res.status_code)

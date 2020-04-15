@@ -8,5 +8,7 @@ CREATE TABLE `musicloud_db`.`Users` (
     `silence_follow_notifcation` TINYINT DEFAULT 0,
     `silence_post_notifcation` TINYINT DEFAULT 0,
     `silence_song_notifcation` TINYINT DEFAULT 0,
-    `silence_like_notifcation` TINYINT DEFAULT 0
+    `silence_like_notifcation` TINYINT DEFAULT 0,
+    `root_folder` INT UNIQUE NOT NULL,
+    FOREIGN KEY (root_folder) REFERENCES Folder(folder_id) ON DELETE CASCADE
 );

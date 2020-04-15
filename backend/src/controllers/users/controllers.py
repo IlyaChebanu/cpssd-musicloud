@@ -6,6 +6,7 @@ import re
 import traceback
 import datetime
 import random
+from math import ceil
 
 import jwt
 import mysql.connector
@@ -15,7 +16,7 @@ from flask import Blueprint
 from flask import request
 from jsonschema import validate, ValidationError
 
-from ...config import HOST, RESET_TIMEOUT, JWT_SECRET
+from ...config import HOST, RESET_TIMEOUT, JWT_SECRET, PROTOCOL
 from ...models.errors import NoResults
 from ...utils.logger import log
 from ...utils import (
@@ -34,7 +35,7 @@ from ...models.users import (
     get_timeline_song_only_length, update_silence_all_notificaitons,
     get_dids_for_a_user, update_silence_follow_notificaitons,
     update_silence_post_notificaitons, update_silence_song_notificaitons,
-    update_silence_like_notificaitons, notify_post_dids
+    update_silence_like_notificaitons, notify_post_dids, delete_user_data
 )
 from ...models.verification import insert_verification, get_verification
 from ...middleware.auth_required import auth_required
@@ -184,7 +185,7 @@ def register():
             continue
 
     subject = "MusiCloud Email Verification"
-    url = "http://" + HOST + "/api/v1/auth/verify?code=" + code
+    url = PROTOCOL + HOST + "/api/v1/auth/verify?code=" + code
     body = (
         "Welcome to MusiCloud. Please click on this URL to verify "
         "your account:\n" + url
@@ -237,7 +238,7 @@ def reverify():
         code = code[0][0]
 
     subject = "MusiCloud Email Verification"
-    url = "http://" + HOST + "/api/v1/auth/verify?code=" + code
+    url = PROTOCOL + HOST + "/api/v1/auth/verify?code=" + code
     body = (
         "Welcome to MusiCloud. Please click on this URL to verify "
         "your account:\n" + url
@@ -421,7 +422,10 @@ def post(user_data):
         dids = []
         for did in notify_post_dids(user_data.get("uid")):
             dids += did
-        message = user_data.get("username") + " just posted."
+        message = (
+            user_data.get("username") + " just posted: \""
+            + request.json.get("message") + "\""
+        )
         notification_sender(message, dids, "New Post")
     except NoResults:
         pass
@@ -455,8 +459,7 @@ def posts():
         current_page = int(current_page)
 
         total_posts = get_number_of_posts(uid)
-
-        total_pages = (total_posts // posts_per_page)
+        total_pages = ceil(total_posts / posts_per_page)
         if total_pages == 0:
             total_pages = 1
         if current_page > total_pages:
@@ -583,7 +586,7 @@ def patch_user(user_data):
                 continue
 
         subject = "MusiCloud Email Verification"
-        url = "http://" + HOST + "/api/v1/auth/verify?code=" + code
+        url = PROTOCOL + HOST + "/api/v1/auth/verify?code=" + code
         body = (
             "Welcome to MusiCloud. Please click on this URL to verify your "
             "account:\n" + url
@@ -669,7 +672,7 @@ def followers():
         current_page = int(current_page)
 
         total_users = get_follower_count(uid)
-        total_pages = (total_users // users_per_page)
+        total_pages = ceil(total_users / users_per_page)
         if total_pages == 0:
             total_pages = 1
         if current_page > total_pages:
@@ -786,7 +789,7 @@ def following():
         current_page = int(current_page)
 
         total_users = get_following_count(uid)
-        total_pages = (total_users // users_per_page)
+        total_pages = ceil(total_users / users_per_page)
         if total_pages == 0:
             total_pages = 1
         if current_page > total_pages:
@@ -915,7 +918,7 @@ def timeline(user_data):  # pylint:disable=R0912, R0914, R0915
         else:
             total_items = get_timeline_length(uid)
 
-        total_pages = (total_items // items_per_page)
+        total_pages = ceil(total_items / items_per_page)
         if total_pages == 0:
             total_pages = 1
         if current_page > total_pages:
@@ -1192,3 +1195,14 @@ def patch_like_notification_status(user_data):
     if request.json.get("status") == 0:
         return {"message": "Like notifications unmuted"}, 200
     return {"message": "Like notifications muted"}, 200
+
+
+@USERS.route("", methods=["DELETE"])
+@sql_err_catcher()
+@auth_required(return_user=True)
+def delete_user(user_data):
+    """
+    Endpoint for deleting a user.
+    """
+    delete_user_data(user_data.get("uid"))
+    return {"message": "User deleted."}, 200

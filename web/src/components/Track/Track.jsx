@@ -5,21 +5,32 @@ import { connect } from 'react-redux';
 import _ from 'lodash';
 import { HotKeys, configure } from 'react-hotkeys';
 import styles from './Track.module.scss';
-import { genId } from '../../helpers/utils';
-import Sample from '../Sample/Sample';
-import { setSelectedTrack, setTrackAtIndex } from '../../actions/studioActions';
+import {
+  setSelectedTrack,
+  setSelectedSample,
+  hideSampleEffects,
+  setShowPianoRoll,
+  addSample,
+  resetSampleSelection,
+} from '../../actions/studioActions';
 
 configure({
   allowCombinationSubmatches: true,
 });
 
-const Ticks = memo(({ gridSize, gridWidth }) => {
+const Ticks = memo(({ gridSize, gridWidth, gridUnitWidth }) => {
   const ticks = useMemo(() => (
     [...Array(Math.ceil(gridWidth * gridSize))]
-      .map((__, i) => <rect key={i} x={i * 40} className={styles.tick} />)
-  ), [gridSize, gridWidth]);
+      .map((__, i) => <rect key={i} x={i * gridUnitWidth} className={styles.tick} />)
+  ), [gridSize, gridWidth, gridUnitWidth]);
   return (
-    <svg className={styles.gridLines} style={{ width: Math.ceil(gridWidth * gridSize) * 40 }}>
+    <svg
+      className={styles.gridLines}
+      style={{
+        width: Math.ceil(gridWidth * gridSize)
+    * gridUnitWidth,
+      }}
+    >
       {ticks}
     </svg>
   );
@@ -28,56 +39,68 @@ const Ticks = memo(({ gridSize, gridWidth }) => {
 Ticks.propTypes = {
   gridSize: PropTypes.number.isRequired,
   gridWidth: PropTypes.number.isRequired,
+  gridUnitWidth: PropTypes.number.isRequired,
 };
 
 Ticks.displayName = 'Ticks';
 
 const Track = memo((props) => {
   const {
-    index, dispatch, clipboard, track, tempo, className, gridSize, gridWidth,
+    dispatch, clipboard, track, className, gridSize, gridWidth, gridUnitWidth, index, samples,
   } = props;
 
-  const getSample = useCallback((sample) => (
-    <Sample
-      sample={{ ...sample, track: index }}
-      style={{
-        position: 'absolute',
-        transform: `translateX(${(sample.time - 1) * (40 * gridSize)}px)`,
-      }}
-      key={sample.id}
-    />
-  ), [gridSize, index]);
-
-  const samples = useMemo(() => (
-    track.samples && track.samples.map(getSample)
-  ), [getSample, track.samples]);
-
   const handleSetSelected = useCallback(() => {
-    dispatch(setSelectedTrack(index));
-  }, [dispatch, index]);
-
-  const pasteSample = useCallback(() => {
-    const sample = { ...clipboard };
-    if (_.isEmpty(sample)) {
-      return;
-    }
-    sample.id = genId();
-    sample.time += sample.duration * (tempo / 60);
-    track.samples = [...track.samples, sample];
-    dispatch(setTrackAtIndex(track, index));
-  }, [clipboard, dispatch, index, tempo, track]);
+    dispatch(setSelectedTrack(track.id));
+    dispatch(setSelectedSample(''));
+    dispatch(resetSampleSelection());
+    dispatch(hideSampleEffects());
+    dispatch(setShowPianoRoll(false));
+  }, [dispatch, track.id]);
 
   const keyMap = {
     PASTE_SAMPLE: 'ctrl+v',
   };
 
   const handlers = {
-    PASTE_SAMPLE: pasteSample,
+    PASTE_SAMPLE: () => {
+      if (!clipboard.length) {
+        return;
+      }
+
+      const tracksInClipboard = [...new Set(clipboard.map((s) => s.trackId))];
+
+      let trackSamples;
+      if (tracksInClipboard.length > 1) {
+        trackSamples = Object.values(samples).filter(
+          (s) => tracksInClipboard.includes(s.trackId),
+        );
+      } else {
+        trackSamples = Object.values(samples).filter(
+          (s) => s.trackId === track.id,
+        );
+      }
+      const latestInTrack = _.maxBy(
+        trackSamples,
+        (o) => o.time + o.duration,
+      ) || { time: 1, duration: 0 };
+      const earliestInClipboard = _.minBy(clipboard, (s) => s.time);
+
+      clipboard.forEach((clipSample) => {
+        const newSample = { ...clipSample };
+
+        newSample.time += (latestInTrack.time + latestInTrack.duration - earliestInClipboard.time);
+        if (tracksInClipboard.length > 1) {
+          dispatch(addSample(newSample.trackId, newSample));
+        } else {
+          dispatch(addSample(track.id, newSample));
+        }
+      });
+    },
   };
 
   const widthStyle = useMemo(() => ({
-    width: Math.ceil(gridWidth * gridSize) * 40,
-  }), [gridSize, gridWidth]);
+    width: Math.ceil(gridWidth * gridSize) * gridUnitWidth,
+  }), [gridSize, gridUnitWidth, gridWidth]);
 
   return (
     <HotKeys
@@ -88,8 +111,7 @@ const Track = memo((props) => {
       onMouseDown={handleSetSelected}
       style={widthStyle}
     >
-      <Ticks gridSize={gridSize} gridWidth={gridWidth} />
-      {samples}
+      <Ticks gridSize={gridSize} gridWidth={gridWidth} gridUnitWidth={gridUnitWidth} />
     </HotKeys>
   );
 });
@@ -98,11 +120,12 @@ Track.propTypes = {
   index: PropTypes.number.isRequired,
   dispatch: PropTypes.func.isRequired,
   track: PropTypes.object.isRequired,
-  clipboard: PropTypes.object.isRequired,
-  tempo: PropTypes.number.isRequired,
+  clipboard: PropTypes.array.isRequired,
   className: PropTypes.string,
   gridSize: PropTypes.number.isRequired,
   gridWidth: PropTypes.number.isRequired,
+  gridUnitWidth: PropTypes.number.isRequired,
+  samples: PropTypes.object.isRequired,
 };
 
 Track.defaultProps = {
@@ -111,15 +134,15 @@ Track.defaultProps = {
 
 Track.displayName = 'Track';
 
-const mapStateToProps = ({ studio }) => ({
-  tracks: studio.tracks,
+const mapStateToProps = ({ studio, studioUndoable }) => ({
   scroll: studio.scroll,
   selectedTrack: studio.selectedTrack,
   clipboard: studio.clipboard,
-  tempo: studio.tempo,
   test: studio.test,
   gridSize: studio.gridSize,
   gridWidth: studio.gridWidth,
+  gridUnitWidth: studio.gridUnitWidth,
+  samples: studioUndoable.present.samples,
 });
 
 export default connect(mapStateToProps)(Track);

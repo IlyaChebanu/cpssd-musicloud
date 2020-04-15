@@ -11,7 +11,7 @@ def gen_song_object(song_list):
     :return:
     Dict - The input data structured in a standard dict.
     """
-    return {
+    res = {
         "sid": song_list[0],
         "username": song_list[1],
         "title": song_list[2],
@@ -21,5 +21,9 @@ def gen_song_object(song_list):
         "url": song_list[6],
         "cover": song_list[7],
         "likes": song_list[8],
-        "like_status": song_list[9]
+        "like_status": song_list[9],
+        "description": song_list[10],
     }
+    if len(song_list) == 12:
+        res["profiler"] = song_list[11]
+    return res

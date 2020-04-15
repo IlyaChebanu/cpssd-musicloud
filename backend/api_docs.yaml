@@ -16,7 +16,7 @@ tags:
   - name: "s3"
     description: "S3 Bucket operations"
 schemes:
-  - "http"
+  - "https"
 paths:
   /audio:
     post:
@@ -70,6 +70,78 @@ paths:
               message:
                 type: "string"
                 example: "A result could not be found."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable"
+    delete:
+      tags:
+      - "audio"
+      summary: "Delete a song"
+      description: "Deletes the song and all associated information."
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "Send the sid of the song you want to delete."
+          required: true
+          schema:
+            type: "object"
+            properties:
+              sid:
+                type: "integer"
+                example: 1
+      responses:
+        200:
+          description: "Song Deleted"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Song deleted"
+        400:
+          description: "Song does not exist."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Song does not exist!"
+        401:
+          description: "Access_token missing or expired."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Request missing access_token."
         422:
           description: "Malformed request body."
           schema:
@@ -757,13 +829,69 @@ paths:
               message:
                 type: "string"
                 example: "MySQL unavailable."
+    delete:
+      tags:
+      - "users"
+      summary: "Delete a user's account and all associated information."
+      description: "By passing your access_token, you will delete that user's account & associated information."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+      responses:
+        200:
+          description: "User deleted"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "User deleted."
+        401:
+          description: "Access_token expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
                 
   /users/notifications:
     patch:
       tags:
       - "users"
       summary: "Mute/Unmute all a user's notifications"
-      description: "Changes the user's notification status (for all types of notification) between muted(0) & unmuted(1).\n\nThe status sent may only be 1 or 0."
+      description: "Changes the user's notification status (for all types of notification) between unmuted(0) & muted(1).\n\nThe status sent may only be 1 or 0."
       consumes:
       - "application/json"
       produces:
@@ -830,7 +958,7 @@ paths:
       tags:
       - "users"
       summary: "Mute/Unmute all a user's follow notifications"
-      description: "Changes the user's notification status (for 'follow' types of notification) between muted(0) & unmuted(1).\n\nThe status sent may only be 1 or 0."
+      description: "Changes the user's notification status (for 'follow' types of notification) between unmuted(0) & muted(1).\n\nThe status sent may only be 1 or 0."
       consumes:
       - "application/json"
       produces:
@@ -897,7 +1025,7 @@ paths:
       tags:
       - "users"
       summary: "Mute/Unmute all a user's post notifications"
-      description: "Changes the user's notification status (for 'post' types of notification) between muted(0) & unmuted(1).\n\nThe status sent may only be 1 or 0."
+      description: "Changes the user's notification status (for 'post' types of notification) between unmuted(0) & muted(1).\n\nThe status sent may only be 1 or 0."
       consumes:
       - "application/json"
       produces:
@@ -964,7 +1092,7 @@ paths:
       tags:
       - "users"
       summary: "Mute/Unmute all a user's song notifications"
-      description: "Changes the user's notification status (for 'song' types of notification) between muted(0) & unmuted(1).\n\nThe status sent may only be 1 or 0."
+      description: "Changes the user's notification status (for 'song' types of notification) between unmuted(0) & muted(1).\n\nThe status sent may only be 1 or 0."
       consumes:
       - "application/json"
       produces:
@@ -1031,7 +1159,7 @@ paths:
       tags:
       - "users"
       summary: "Mute/Unmute all a user's like notifications"
-      description: "Changes the user's notification status (for 'like' types of notification) between muted(0) & unmuted(1).\n\nThe status sent may only be 1 or 0."
+      description: "Changes the user's notification status (for 'like' types of notification) between unmuted(0) & muted(1).\n\nThe status sent may only be 1 or 0."
       consumes:
       - "application/json"
       produces:
@@ -1892,6 +2020,12 @@ paths:
                     likes:
                       type: "string"
                       example: 8
+                    like_status:
+                      type: "integer"
+                      example: 0
+                    description:
+                      type: "string"
+                      example: "A description"
               songs_per_page:
                 type: "integer"
                 example: 50
@@ -2014,6 +2148,12 @@ paths:
                     likes:
                       type: "string"
                       example: 8
+                    like_status:
+                      type: "integer"
+                      example: 0
+                    description:
+                      type: "string"
+                      example: "A description"
               songs_per_page:
                 type: "integer"
                 example: 50
@@ -2141,6 +2281,12 @@ paths:
                     likes:
                       type: "string"
                       example: 8
+                    like_status:
+                      type: "integer"
+                      example: 1
+                    description:
+                      type: "string"
+                      example: "A description"
               songs_per_page:
                 type: "integer"
                 example: 50
@@ -2580,6 +2726,12 @@ paths:
                   likes:
                     type: "string"
                     example: 8
+                  like_status:
+                    type: "integer"
+                    example: 0
+                  description:
+                      type: "string"
+                      example: "A description"
         401:
           description: "Access_token expired"
           schema:
@@ -3361,6 +3513,12 @@ paths:
                     likes:
                       type: "string"
                       example: 8
+                    like_status:
+                      type: "integer"
+                      example: 0
+                    description:
+                      type: "string"
+                      example: "A description"
               songs_per_page:
                 type: "integer"
                 example: 50
@@ -3493,6 +3651,12 @@ paths:
                     likes:
                       type: "string"
                       example: 8
+                    like_status:
+                      type: "integer"
+                      example: 0
+                    description:
+                      type: "string"
+                      example: "A description"
                     type:
                       type: "string"
                       example: "song"
@@ -3502,6 +3666,996 @@ paths:
               total_pages:
                 type: "integer"
                 example: 2
+        401:
+          description: "User's token has expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Failed to decode token."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+                
+  /audio/description:
+    patch:
+      tags:
+      - "audio"
+      summary: "Update the description of the selected song."
+      description: "Change a songs description (512 char limit) by sending an access_token for a user permitted to edit the song, the song ID, and the new description."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "Send the required information."
+          required: true
+          schema:
+            type: "object"
+            properties:
+              description:
+                type: "string"
+                example: "a description"
+              sid:
+                type: "integer"
+                example: 1
+                
+      responses:
+        200:
+          description: "successful query"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Description updated."
+        401:
+          description: "Access_token expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+                
+  /audio/search:
+    get:
+      tags:
+      - "audio"
+      summary: "Search through the song catalog with song & artist name search, and result filtering."
+      description: "This endpoint takes several arguments and returns a subset of all the songs on our system. The arguments that can be provided are as follows:\n\n \"search_term\" = If a 'next_page' or 'back_page' argument is not sent, then this is an optional argument you may send. This should be set to the username of the user who's songs you are trying to view, or the title of the song itself.\n\n \"publish_sort\" = If a 'next_page' or 'back_page' argument is not sent, then this is an optional argument you may send. This should be set to either the value 'up', to view results from the oldest publication date to the most recent, or to 'down', to view results from the newest publication date to the oldest. Only one type of sort can be applied to a search at a time.\n\n \"title_sort\" = If a 'next_page' or 'back_page' argument is not sent, then this is an optional argument you may send. This should be set to either the value 'up', to view results in reverse alphabetical order based on the song title, or to 'down', to view results in alphabetical order based on the song title. Only one type of sort can be applied to a search at a time.\n\n \"artist_sort\" = If a 'next_page' or 'back_page' argument is not sent, then this is an optional argument you may send. This should be set to either the value 'up', to view results in reverse alphabetical order based on the artist's name, or to 'down', to view results in alphabetical order based on the artist's name. Only one type of sort can be applied to a search at a time.\n\n \"duration_sort\" = If a 'next_page' or 'back_page' argument is not sent, then this is an optional argument you may send. This should be set to either the value 'up', to view results from the shortest songs to the longest, or to 'down', to view results from the longest songs to the shortest. Only one type of sort can be applied to a search at a time.\n\n \"profile_search\" = If a 'next_page' or 'back_page' argument is not sent, then this is an optional argument you may send. If any value is sent for this, the results will be limited to songs your user owns.\n\n \"songs_per_page\" = If a 'next_page' or 'back_page' argument is not sent, then this an optional argument you may send. This is used to adjust the number of songs you will get back per page of results.\n\n \"current_page\" = If a 'next_page' or 'back_page' argument is not sent, then this is an optional argument you may send. This is used to navigate through each of the pages of results. If this argument is not sent, the default page of results returned will be page 1.\n\n \"next_page\" = If this value is sent, then a back_page value should not be sent. This value should be set to a 'next_page' token. These tokens are returned by standard requests to support infinited scrolling. Making a request with this token requires no other value to be passed as it encodes all required data for the next request.\n\n \"back_page\" = If this value is sent, then a next_page value should not be sent. This value should be set to a 'back_page' token. These tokens are returned by standard requests to support infinited scrolling. Making a request with this token requires no other value to be passed as it encodes all required data for the next request."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "query"
+          name: "search_term"
+          type: "string"
+          required: false
+          description: "The artist username or song title you want to find."
+        - in: "query"
+          name: "publish_sort"
+          type: "string"
+          required: false
+          description: "Sort based on date of song publication (valid values are either 'up' or 'down')."
+        - in: "query"
+          name: "title_sort"
+          type: "string"
+          required: false
+          description: "Sort based on the alphabetical order of song titles (valid values are either 'up' or 'down')."
+        - in: "query"
+          name: "artist_sort"
+          type: "string"
+          required: false
+          description: "Sort based on the alphabetical order of artist usernames (valid values are either 'up' or 'down')."
+        - in: "query"
+          name: "duration_sort"
+          type: "string"
+          required: false
+          description: "Sort based on the duration of songs (valid values are either 'up' or 'down')."
+        - in: "query"
+          name: "profile_search"
+          type: "string"
+          required: false
+          description: "Limit results to only songs you own."
+        - in: "query"
+          name: "current_page"
+          type: "string"
+          required: false
+          description: "The page of results you wish to view."
+        - in: "query"
+          name: "songs_per_page"
+          type: "string"
+          required: false
+          description: "The number of songs you wish to have per page of results."
+        - in: "query"
+          name: "next_page"
+          type: "string"
+          required: false
+          description: "A next page token to get the next page of results."
+        - in: "query"
+          name: "back_page"
+          type: "string"
+          required: false
+          description: "A back_page token to get the previous page of results."
+      responses:
+        200:
+          description: "Successful search query"
+          schema:
+            type: "object"
+            properties:
+              back_page:
+                type: "string"
+                example: "will be null or a token"
+              current_page:
+                type: "integer"
+                example: 1
+              next_page:
+                type: "string"
+                example: "will be null or a token"
+              songs:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    sid:
+                      type: "integer"
+                      example: 1
+                    username:
+                      type: "string"
+                      example: "testUser"
+                    title:
+                      type: "string"
+                      example: "A test song"
+                    duration:
+                      type: "integer"
+                      example: 1
+                    created:
+                      type: "string"
+                      example: "Wed, 13 Nov 2019 17:07:39 GMT"
+                    public:
+                      type: "integer"
+                      example: 1
+                    url:
+                      type: "string"
+                      example: "None"
+                    cover:
+                      type: "string"
+                      example: "None"
+                    likes:
+                      type: "string"
+                      example: 8
+                    like_status:
+                      type: "integer"
+                      example: 0
+                    description:
+                      type: "string"
+                      example: "A description"
+              songs_per_page:
+                type: "integer"
+                example: 50
+              total_pages:
+                type: "integer"
+                example: 2
+        401:
+          description: "User's token has expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Failed to decode token."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+                
+  /audio/folders:
+    get:
+      tags:
+      - "audio"
+      summary: "Get a folders content."
+      description: "This endpoint takes one optional argument and returns an object containing a folders content and details. The argument that can be provided is as follows:\n\n \"folder_id\" = The ID of the folder whos contents and details you want to view.\n\n If no folder_id is provided then this endpoint will return the contents and details of a user's root folder."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "query"
+          name: "folder_id"
+          type: "string"
+          required: false
+          description: "A valid folder ID."
+      responses:
+        200:
+          description: "Successful Folder lookup"
+          schema:
+            type: "object"
+            properties:
+              folder:
+                type: "object"
+                properties:
+                  folder_name:
+                    type: "string"
+                    example: "Example Folder Name"
+                  folder_id:
+                    type: "integer"
+                    example: 1
+                  child_folders:
+                    type: "array"
+                    items:
+                      type: "object"
+                      properties:
+                        folder_id:
+                          type: "integer"
+                          example: 1
+                        name:
+                          type: "string"
+                          example: "A Subfolder"
+                  child_files:
+                    type: "array"
+                    items:
+                      type: "object"
+                      properties:
+                        file_id:
+                          type: "integer"
+                          example: 1
+                        name:
+                          type: "string"
+                          example: "A Song"
+                        url:
+                          type: "string"
+                          example: "http://afakeurl.com"
+        400:
+          description: "Invalid folder ID"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Invalid folder ID. Folder does not exist!"
+        401:
+          description: "User's token has expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        500:
+          description: "Failed to decode token."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+    patch:
+      tags:
+      - "audio"
+      summary: "Move a non-root folder."
+      description: "This endpoint takes multiple arguments and either renames or moves a folder in the DB. The arguments that are to be provided are as follows:\n\n \"folder_id\" = The ID of the folder you want to move or rename.\n\n \"parent_folder_id\" = The ID of the folder you want to move your selected folder into. If you attempt to move a root folder, an error will be returned.\n\n \"name\" = The new name for the folder. If this argument is provided then a rename will occur provided the folder_id has been sent. Otherwise a move will occur provided both the folder & parent folder IDs were sent."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "Authorization Header"
+        description: "This is where you should set your access_token."
+        required: true
+        type: "string"
+      - in: "query"
+        name: "folder_id"
+        type: "integer"
+        required: true
+        description: "The ID of the folder you want to move."
+      - in: "query"
+        name: "parent_folder_id"
+        type: "integer"
+        required: true
+        description: "The ID of the folder you want to move the selected folder into."
+      responses:
+        200:
+          description: "Folder moved"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Folder moved"
+        401:
+          description: "User's token has expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Failed to decode token."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+    delete:
+      tags:
+      - "audio"
+      summary: "Delete a non-root folder."
+      description: "This endpoint takes a folder ID & deletes that folder and all the subfolders and files in it from the DB. The argument that is to be provided is as follows:\n\n \"folder_id\" = The ID of a non-root folder you want to delete."
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "query"
+          name: "folder_id"
+          type: "integer"
+          required: true
+          description: "The ID of the folder you want to delete."
+      responses:
+        200:
+          description: "Folder Deleted"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Folder deleted"
+        401:
+          description: "Access_token missing or expired."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Request missing access_token."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable"
+    post:
+      tags:
+      - "audio"
+      summary: "Create a folder."
+      description: "This endpoint takes one mandatory and one optional argument and creates a folder in the DB. The arguments that can be provided are as follows:\n\n \"folder_name\" = This argument is mandatory. It is the name of your new folder.\n\n \"parent_folder_id\" = An optional argument that lets you create a folder inside another folder. By default all new folders are created in a user's root folder."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "Authorization Header"
+        description: "This is where you should set your access_token."
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "Folder creation data"
+        schema:
+          type: "object"
+          properties:
+            folder_name:
+              type: "string"
+              example: "A Folder Name"
+            parent_folder_id:
+              type: "integer"
+              example: 1
+      responses:
+        200:
+          description: "Folder created"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Folder created"
+        401:
+          description: "User's token has expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Failed to decode token."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+                
+  /audio/files:
+    patch:
+      tags:
+      - "audio"
+      summary: "Move or rename a file."
+      description: "This endpoint takes multiple arguments and either renames or moves a file in the DB. The arguments that are to be provided are as follows:\n\n \"folder_id\" = The ID of the folder you want to move your file into.\n\n \"file_id\" = The ID of the file you want to move to your selected folder or rename.\n\n \"name\" = The new name for the file. If this argument is provided then a rename will occur provided the file_id has been sent. Otherwise a move will occur provided both the file & folder IDs were sent."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "Authorization Header"
+        description: "This is where you should set your access_token."
+        required: true
+        type: "string"
+      - in: "query"
+        name: "folder_id"
+        type: "integer"
+        required: false
+        description: "The ID of the folder you want to move a file into."
+      - in: "query"
+        name: "file_id"
+        type: "integer"
+        required: true
+        description: "The ID of the file you want to move."
+      - in: "query"
+        name: "name"
+        type: "string"
+        required: false
+        description: "The new name you want to give your file."
+      responses:
+        200:
+          description: "File moved or renamed"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "File moved"
+        401:
+          description: "User's token has expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Failed to decode token."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+    delete:
+      tags:
+      - "audio"
+      summary: "Delete a file."
+      description: "This endpoint takes a file ID & deletes that file from the DB. The argument that is to be provided is as follows:\n\n \"file_id\" = The ID of a file you want to delete."
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "query"
+          name: "file_id"
+          type: "integer"
+          required: true
+          description: "The ID of the file you want to delete."
+      responses:
+        200:
+          description: "File Deleted"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "File deleted"
+        401:
+          description: "Access_token missing or expired."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Request missing access_token."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable"
+    post:
+      tags:
+      - "audio"
+      summary: "Create a file."
+      description: "This endpoint takes two mandatory and one optional argument and creates a file in the DB. The arguments that can be provided are as follows:\n\n \"file_name\" = This argument is mandatory. It is the name of your new file.\n\n \"file_url\" = This argument is mandatory. It is the URL of your new file. \n\n \"folder_id\" = An optional argument that lets you create a file inside a specific folder. By default all new files are created in a user's root folder."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "Authorization Header"
+        description: "This is where you should set your access_token."
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "File creation data"
+        schema:
+          type: "object"
+          properties:
+            file_name:
+              type: "string"
+              example: "A File Name"
+            file_url:
+              type: "string"
+              example: "http://afakeurl.com"
+            folder_id:
+              type: "integer"
+              example: 1
+      responses:
+        200:
+          description: "File created"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "File added to folder"
+        401:
+          description: "User's token has expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Failed to decode token."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+                
+  /audio/synth:
+    get:
+      tags:
+      - "audio"
+      summary: "Get all of a user's synths."
+      description: "This endpoint takes a user's access_token and returns all of the synth definitions belonging to that user."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+      responses:
+        200:
+          description: "Successful synth lookup"
+          schema:
+            type: "object"
+            properties:
+              synths:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    id:
+                      type: "integer"
+                      example: 1
+                    name:
+                      type: "string"
+                      example: "Piano"
+                    patch:
+                      type: "object"
+        400:
+          description: "Invalid Synth ID"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Invalid synth ID. Synth does not exist!"
+        401:
+          description: "User's token has expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        500:
+          description: "Failed to decode token."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+    patch:
+      tags:
+      - "audio"
+      summary: "Update a synth definition or name."
+      description: "This endpoint takes multiple arguments and updates a synths patch column in the DB, the synths name, or both. The arguments that can be provided are as follows:\n\n \"id\" = The ID of the synth you want to update.\n\n \"patch\" = The new JSON object you want to put into that synths patch column.\n\n \"name\" = The new name we want to assign to our synth."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "Authorization Header"
+        description: "This is where you should set your access_token."
+        required: true
+        type: "string"
+      - in: "query"
+        name: "id"
+        type: "integer"
+        required: true
+        description: "The ID of the synth you want to update."
+      - in: "body"
+        name: "body"
+        required: true
+        description: "New patch data"
+        schema:
+          type: "object"
+          properties:
+            patch:
+              type: "object"
+            name:
+              type: "string"
+              example: "aNewSynthName"
+      responses:
+        200:
+          description: "Synth updated"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Synth updated"
+        401:
+          description: "User's token has expired"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Token expired."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Failed to decode token."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable."
+    delete:
+      tags:
+      - "audio"
+      summary: "Delete a synth from the DB."
+      description: "This endpoint takes a synth ID & deletes that synth from the DB. The argument that is to be provided is as follows:\n\n \"id\" = The ID of the synth you want to delete."
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Header"
+          description: "This is where you should set your access_token."
+          required: true
+          type: "string"
+        - in: "query"
+          name: "id"
+          type: "integer"
+          required: true
+          description: "The ID of the synth you want to delete."
+      responses:
+        200:
+          description: "Synth deleted"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Synth deleted"
+        401:
+          description: "Access_token missing or expired."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Request missing access_token."
+        422:
+          description: "Malformed request body."
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "A req validation traceback will be here."
+        500:
+          description: "Server error"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Server failed to decode token."
+        503:
+          description: "Server is unavailable"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "MySQL unavailable"
+    post:
+      tags:
+      - "audio"
+      summary: "Create a synth."
+      description: "This endpoint takes one mandatory and one optional argument and creates a synth in the DB. The arguments that can be provided are as follows:\n\n \"name\" = This argument is mandatory. It is the name of your new synth.\n\n \"patch\" = An optional argument that lets you define the initial state of the synth. If this argument isn't sent, the patch column defaults to an empty object."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "Authorization Header"
+        description: "This is where you should set your access_token."
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "Synth creation data"
+        schema:
+          type: "object"
+          properties:
+            name:
+              type: "string"
+              example: "Piano"
+            patch:
+              type: "object"
+      responses:
+        200:
+          description: "Synth created"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Synth created"
+              synth_id:
+                type: "integer"
+                example: 1
         401:
           description: "User's token has expired"
           schema:
