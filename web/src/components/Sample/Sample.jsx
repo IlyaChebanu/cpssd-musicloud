@@ -268,7 +268,10 @@ const Sample = memo((props) => {
           (s) => s.trackId === data.trackId,
         );
       }
-      const latestInTrack = _.maxBy(trackSamples, (o) => o.time + o.duration);
+      const latestInTrack = _.maxBy(
+        trackSamples,
+        (o) => o.time + o.duration,
+      ) || { time: 1, duration: 0 };
       const earliestInClipboard = _.minBy(clipboard, (s) => s.time);
 
       clipboard.forEach((clipSample) => {
