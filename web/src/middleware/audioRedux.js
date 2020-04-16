@@ -27,6 +27,7 @@ const setEffectValues = (adapter, effectNodeObject, desiredEffectsState) => {
   Object.entries(effectNodeObject).forEach(([effectName, effectNode]) => {
     if (!desiredEffectsState[effectName]) {
       delete effectNodeObject[effectName];
+      return;
     }
 
     const desiredEffectParameters = Object.keys(desiredEffectsState[effectName]);

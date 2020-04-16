@@ -9,6 +9,8 @@ import styles from './EffectsWindow.module.scss';
 import Knob from '../Knob/Knob';
 import { setTrackEffects, hideEffectsWindow } from '../../actions/studioActions';
 import Button from '../Button/Button';
+import { ReactComponent as DeleteIcon } from '../../assets/icons/trash-alt-light.svg';
+
 
 // For more effects visit https://tonejs.github.io/docs/13.8.25/Distortion
 const effects = {
@@ -102,37 +104,40 @@ const EffectsWindow = ({
         </div>
         {track.effects && Object.entries(track.effects).map(([effectName, parameters]) => (
           <div className={styles.row}>
-            <span className={styles.effectName}>{effectName}</span>
-            {Object.entries(parameters).map(([parameterName, values]) => {
-              if (values.isContinuous) {
+            <div className={styles.left}>
+              <span className={styles.effectName}>{effectName}</span>
+              {Object.entries(parameters).map(([parameterName, values]) => {
+                if (values.isContinuous) {
+                  return (
+                    <Knob
+                      name={parameterName}
+                      value={values.value}
+                      className={styles.knob}
+                      dataTip="Hold and move up or down to change effect value"
+                      onChange={handleSetEffectValue(effectName, parameterName)}
+                      min={values.range[0]}
+                      max={values.range[1]}
+                    />
+                  );
+                }
                 return (
-                  <Knob
-                    name={parameterName}
-                    value={values.value}
-                    className={styles.knob}
-                    dataTip="Hold and move up or down to change effect value"
-                    onChange={handleSetEffectValue(effectName, parameterName)}
-                    min={values.range[0]}
-                    max={values.range[1]}
-                  />
+                  <div className={styles.selectWrapper}>
+                    <select>
+                      {values.values.map((optionName) => (
+                        <option
+                          value={optionName}
+                          selected={values.value === optionName}
+                        >
+                          {optionName}
+                        </option>
+                      ))}
+                    </select>
+                    <span>{parameterName}</span>
+                  </div>
                 );
-              }
-              return (
-                <div className={styles.selectWrapper}>
-                  <select>
-                    {values.values.map((optionName) => (
-                      <option
-                        value={optionName}
-                        selected={values.value === optionName}
-                      >
-                        {optionName}
-                      </option>
-                    ))}
-                  </select>
-                  <span>{parameterName}</span>
-                </div>
-              );
-            })}
+              })}
+            </div>
+            <DeleteIcon className={styles.deleteIcon} onClick={handleDisableEffect(effectName)} />
           </div>
         ))}
         <div className={styles.footer}>
