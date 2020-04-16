@@ -35,7 +35,7 @@ const FileExplorerSynth = ({
   });
 
   useEffectAfterMount(() => {
-    changeSynthName(synth.id, synthName);
+    changeSynthName(synth.id, synthName || 'Unnamed Synth');
   }, [synth.id, synthName]);
 
   const handleSynthClick = useCallback((e) => {
@@ -84,8 +84,7 @@ const FileExplorerSynth = ({
 
   const handleUpdateSynthName = useCallback((e) => {
     e.preventDefault();
-    const name = 'Unnamed Synth';
-    setSynthName(e.target.value ? e.target.value : name);
+    setSynthName(e.target.value);
   }, []);
 
   return (
