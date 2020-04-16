@@ -19,8 +19,11 @@ class HomeScreen extends React.Component {
     this.state = {
       songsData: [],
       showAlert: false,
+      showLikeAlert: false,
       alertTitle: 'Confirm exit',
       alertMessage: 'Do you want to quit the app?',
+      alertLikeTitle: 'Error',
+      alertLikeMessage: '',
       nextPage: null,
       refreshing: false,
       searchTerm: '',
@@ -60,17 +63,25 @@ class HomeScreen extends React.Component {
   handleLikeClick(item, index) {
     if (item.like_status === 0) {
       postLikeSong(this.props.token, item.sid).then(response => {
-        let array = Object.assign({}, this.state.songsData);
-        array[index].like_status = 1
-        array[index].likes++
-        this.setState({ array });
+        if (response.status===200) {
+          let array = Object.assign({}, this.state.songsData);
+          array[index].like_status = 1
+          array[index].likes++
+          this.setState({ array });
+        } else {
+          this.setState({ showLikeAlert: true, alertLikeMessage: response.data.message})
+        }
       })
     } else {
       postUnlikeSong(this.props.token, item.sid).then(response => {
-        let array = Object.assign({}, this.state.songsData);
-        array[index].like_status = 0
-        array[index].likes--
-        this.setState({ array });
+        if (response.status===200) {
+          let array = Object.assign({}, this.state.songsData);
+          array[index].like_status = 0
+          array[index].likes--
+          this.setState({ array });
+        } else {
+          this.setState({ showLikeAlert: true, alertLikeMessage: response.data.message})
+        }
       })
     }
   }
@@ -155,6 +166,10 @@ class HomeScreen extends React.Component {
     this.setState({ showAlert: false })
   };
 
+  onPressLikeAlertPositiveButton = () => {
+    this.setState({ showLikeAlert: false, alertLikeMessage: '' })
+  }
+
   onPressAlertNegativeButton = () => {
     this.setState({ showAlert: false })
   };
@@ -183,6 +198,14 @@ class HomeScreen extends React.Component {
           negativeButtonText={'CANCEL'}
           onPressPositiveButton={this.onPressAlertPositiveButton}
           onPressNegativeButton={this.onPressAlertNegativeButton}
+        />
+        <CustomAlertComponent
+          displayAlert={this.state.showLikeAlert}
+          alertTitleText={this.state.alertLikeTitle}
+          alertMessageText={this.state.alertLikeMessage}
+          displayPositiveButton={true}
+          positiveButtonText={'OK'}
+          onPressPositiveButton={this.onPressLikeAlertPositiveButton}
         />
         <View style={{ 'backgroundColor': '#1B1E23', 'flex': 1 }}>
           <HeaderComponent navigation={this.props.navigation} />

@@ -8,6 +8,7 @@ import { formattedTime } from '../../utils/helpers';
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { postLikeSong, postUnlikeSong } from "../../api/audioAPI";
 import MusicControl from 'react-native-music-control';
+import CustomAlertComponent from "../alertComponent/customAlert";
 
 const { width, height } = Dimensions.get('window');
 
@@ -22,6 +23,9 @@ export default class Player extends React.Component {
             songIndex: props.songIndex,
             liked: props.SongPlaying ? props.SongPlaying.like_status : 0,
             numLikes: props.SongPlaying ? props.SongPlaying.like_status : 0,
+            showLikeAlert: false,
+            alertLikeTitle: 'Error',
+            alertLikeMessage: '',
         };
         MusicControl.on('play', () => {
             this.togglePlay(this.state.playing)
@@ -101,23 +105,23 @@ export default class Player extends React.Component {
             let songPlaying = this.props.songs[this.state.songIndex];
             let songCover = songPlaying.cover ? songPlaying.cover : 'https://dcumusicloudbucket.s3-eu-west-1.amazonaws.com/cover/1001_index.jpg'
             Platform.OS === 'ios' ?
-            MusicControl.updatePlayback({
-                title: songPlaying.title,
-                state: MusicControl.STATE_PLAYING,
-                elapsedTime: 0,
-                artwork: songCover,
-                artist: songPlaying.username,
-                description: songPlaying.description,
-                duration: this.state.songDuration,
-            }) :
-            MusicControl.setNowPlaying({
-                title: songPlaying.title,
-                artwork: songCover,
-                artist: songPlaying.username,
-                description: songPlaying.description,
-                duration: this.state.songDuration,
-                notificationIcon: 'ic_notification',
-            })
+                MusicControl.updatePlayback({
+                    title: songPlaying.title,
+                    state: MusicControl.STATE_PLAYING,
+                    elapsedTime: 0,
+                    artwork: songCover,
+                    artist: songPlaying.username,
+                    description: songPlaying.description,
+                    duration: this.state.songDuration,
+                }) :
+                MusicControl.setNowPlaying({
+                    title: songPlaying.title,
+                    artwork: songCover,
+                    artist: songPlaying.username,
+                    description: songPlaying.description,
+                    duration: this.state.songDuration,
+                    notificationIcon: 'ic_notification',
+                })
         } else {
             this.refs.audio.seek(0);
             this.setState({
@@ -139,23 +143,23 @@ export default class Player extends React.Component {
         }, () => {
             let songPlaying = this.props.songs[this.state.songIndex];
             let songCover = songPlaying.cover ? songPlaying.cover : 'https://dcumusicloudbucket.s3-eu-west-1.amazonaws.com/cover/1001_index.jpg'
-            Platform.OS === 'ios' ? 
-            MusicControl.updatePlayback({
-                state: MusicControl.STATE_PLAYING,
-                elapsedTime: 0,
-                title: songPlaying.title,
-                artwork: songCover,
-                artist: songPlaying.username,
-                description: songPlaying.description,
-            }) :
-            MusicControl.setNowPlaying({
-                title: songPlaying.title,
-                artwork: songCover,
-                artist: songPlaying.username,
-                description: songPlaying.description,
-                duration: this.state.songDuration,
-                notificationIcon: 'ic_notification',
-            })
+            Platform.OS === 'ios' ?
+                MusicControl.updatePlayback({
+                    state: MusicControl.STATE_PLAYING,
+                    elapsedTime: 0,
+                    title: songPlaying.title,
+                    artwork: songCover,
+                    artist: songPlaying.username,
+                    description: songPlaying.description,
+                }) :
+                MusicControl.setNowPlaying({
+                    title: songPlaying.title,
+                    artwork: songCover,
+                    artist: songPlaying.username,
+                    description: songPlaying.description,
+                    duration: this.state.songDuration,
+                    notificationIcon: 'ic_notification',
+                })
             setTimeout(function () {
                 MusicControl.updatePlayback({
                     duration: this.state.songDuration,
@@ -224,14 +228,26 @@ export default class Player extends React.Component {
 
     likeSong() {
         postLikeSong(this.props.accessToken, this.props.songs[this.state.songIndex].sid).then(response => {
-            this.setState({ liked: !this.state.liked, numLikes: this.state.numLikes + 1 })
+            if (response.status === 200) {
+                this.setState({ liked: !this.state.liked, numLikes: this.state.numLikes + 1 })
+            } else {
+                this.setState({ showLikeAlert: true, alertLikeMessage: response.data.message })
+            }
         })
     }
 
     unlikeSong() {
         postUnlikeSong(this.props.accessToken, this.props.songs[this.state.songIndex].sid).then(response => {
-            this.setState({ liked: !this.state.liked, numLikes: this.state.numLikes - 1 })
+            if (response.status === 200) {
+                this.setState({ liked: !this.state.liked, numLikes: this.state.numLikes - 1 })
+            } else {
+                this.setState({ showLikeAlert: true, alertLikeMessage: response.data.message })
+            }
         })
+    }
+
+    onPressLikeAlertPositiveButton = () => {
+        this.setState({ showLikeAlert: false, alertLikeMessage: '' })
     }
 
     render() {
@@ -275,6 +291,14 @@ export default class Player extends React.Component {
 
         return (
             <View style={styles.container}>
+                <CustomAlertComponent
+                    displayAlert={this.state.showLikeAlert}
+                    alertTitleText={this.state.alertLikeTitle}
+                    alertMessageText={this.state.alertLikeMessage}
+                    displayPositiveButton={true}
+                    positiveButtonText={'OK'}
+                    onPressPositiveButton={this.onPressLikeAlertPositiveButton}
+                />
                 <Video source={{ uri: songUrl }}
                     ref="audio"
                     volume={this.state.muted ? 0 : 1.0}

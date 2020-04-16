@@ -8,6 +8,7 @@ import styles from "./styles";
 import ProfileComponent from "../profileComponent/profileComponent";
 import { getUserTimeline } from "../../api/usersAPI";
 import { postLikeSong, postUnlikeSong } from "../../api/audioAPI";
+import CustomAlertComponent from "../alertComponent/customAlert";
 
 class ProfileSongs extends React.Component {
   constructor(props) {
@@ -16,6 +17,9 @@ class ProfileSongs extends React.Component {
       songsData: [],
       nextPage: null,
       refreshing: false,
+      showLikeAlert: false,
+      alertLikeTitle: 'Error',
+      alertLikeMessage: '',
     };
   }
 
@@ -38,6 +42,7 @@ class ProfileSongs extends React.Component {
   }
 
   onRefresh = async () => {
+    console.warn('refr')
     this.setState({ refreshing: true });
     await this.getSongs();
     this.setState({ refreshing: false });
@@ -66,17 +71,25 @@ class ProfileSongs extends React.Component {
   handleLikeClick(item, index) {
     if (item.like_status === 0) {
       postLikeSong(this.props.token, item.sid).then(response => {
-        let array = Object.assign({}, this.state.songsData);
-        array[index].like_status = 1
-        array[index].likes++
-        this.setState({ array });
+        if (response.status===200) {
+          let array = Object.assign({}, this.state.songsData);
+          array[index].like_status = 1
+          array[index].likes++
+          this.setState({ array });
+        } else {
+          this.setState({ showLikeAlert: true, alertLikeMessage: response.data.message})
+        }
       })
     } else {
       postUnlikeSong(this.props.token, item.sid).then(response => {
-        let array = Object.assign({}, this.state.songsData);
-        array[index].like_status = 0
-        array[index].likes--
-        this.setState({ array });
+        if (response.status===200) {
+          let array = Object.assign({}, this.state.songsData);
+          array[index].like_status = 0
+          array[index].likes--
+          this.setState({ array });
+        } else {
+          this.setState({ showLikeAlert: true, alertLikeMessage: response.data.message})
+        }
       })
     }
   }
@@ -144,10 +157,22 @@ class ProfileSongs extends React.Component {
     }
   }
 
+  onPressLikeAlertPositiveButton = () => {
+    this.setState({ showLikeAlert: false, alertLikeMessage: '' })
+  }
+
   render() {
 
     return (
       <View style={styles.container}>
+        <CustomAlertComponent
+          displayAlert={this.state.showLikeAlert}
+          alertTitleText={this.state.alertLikeTitle}
+          alertMessageText={this.state.alertLikeMessage}
+          displayPositiveButton={true}
+          positiveButtonText={'OK'}
+          onPressPositiveButton={this.onPressLikeAlertPositiveButton}
+        />
         <FlatList
           ListHeaderComponent={this.renderheader()}
           style={styles.songFlatList}
