@@ -100,18 +100,6 @@ const Header = memo((props) => {
   }, [songId, tempo, tracks, samples, dispatch]);
 
   const handleSampleImport = useCallback(() => {
-    if (tracks.length === 0) {
-      dispatch(
-        showNotification({ message: 'Please add a track first', type: 'info' }),
-      );
-      return;
-    }
-    if (!studio.selectedTrack) {
-      dispatch(
-        showNotification({ message: 'Please select a track first', type: 'info' }),
-      );
-      return;
-    }
     const fileSelector = document.createElement('input');
     fileSelector.setAttribute('type', 'file');
     fileSelector.setAttribute('accept', 'audio/*');
@@ -119,6 +107,13 @@ const Header = memo((props) => {
     fileSelector.onchange = async () => {
       const sampleFile = fileSelector.files[0];
       const url = await uploadFile('audio', sampleFile);
+      await saveFile(sampleFile.name, url);
+      if (tracks.length === 0 || !studio.selectedTrack) {
+        dispatch(
+          showNotification({ message: 'Audio uploaded, check out the file explorer', type: 'info' }),
+        );
+        return;
+      }
       const sampleState = {
         url,
         name: sampleFile.name,
@@ -128,7 +123,6 @@ const Header = memo((props) => {
           fadeOut: 0,
         },
       };
-      await saveFile(sampleFile.name, url);
       dispatch(addSample(studio.selectedTrack, sampleState));
     };
   }, [dispatch, studio.currentBeat, studio.selectedTrack, tracks.length]);
