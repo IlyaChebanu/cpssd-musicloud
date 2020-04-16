@@ -414,3 +414,8 @@ export const createRootSampleFolder = (folderName) => axios.post(
     headers: getAuth(),
   },
 );
+
+export const deleteUser = () => axios.delete(
+  `${API_URL}/v1/users`,
+  { headers: getAuth() },
+);
