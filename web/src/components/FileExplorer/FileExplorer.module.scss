@@ -63,14 +63,15 @@
     }
 
     .icons {
-      padding-left: 10px;
-      padding-right: 0px;
+      padding-left: 5px;
+      padding-right: 5px;
       margin: 0px auto;
       right: 0;
-      position: relative;
+      margin-right: 0;
     }
 
     .newFolder {
+      position: relative;
       height: 20px;
       transition: fill 200ms;
       fill: #3A3A3A;
