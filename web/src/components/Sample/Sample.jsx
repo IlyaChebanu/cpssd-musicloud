@@ -359,7 +359,7 @@ Sample.propTypes = {
   data: PropTypes.object.isRequired,
   id: PropTypes.string.isRequired,
   tempo: PropTypes.number.isRequired,
-  selectedSample: PropTypes.string.isRequired,
+  selectedSample: PropTypes.string,
   dispatch: PropTypes.func.isRequired,
   gridSnapEnabled: PropTypes.bool.isRequired,
   gridSize: PropTypes.number.isRequired,
