@@ -40,8 +40,6 @@ const MIDI = {
 const PianoRoll = memo(({
   showPianoRoll, selectedSample, dispatch, samples, currentBeat, recording, loopEnabled, loopEnd, ppq, gridUnitWidth,
 }) => {
-  if (!selectedSample) return null;
-
   const [tracksRef, setTracksRef] = useState();
   const [scroll, setScroll] = useState(0);
 
@@ -314,7 +312,7 @@ const PianoRoll = memo(({
     return null;
   }, [selectedSampleObject]);
 
-  if (!showPianoRoll) return null;
+  if (!selectedSample || !showPianoRoll) return null;
   return (
     <div
       className={styles.background}
