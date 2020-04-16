@@ -1,5 +1,4 @@
 import { ActionCreators } from 'redux-undo';
-import _ from 'lodash';
 import { genId } from '../helpers/utils';
 // eslint-disable-next-line import/no-cycle
 import store from '../store';
