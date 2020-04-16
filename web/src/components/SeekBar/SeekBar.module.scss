@@ -15,5 +15,6 @@
     height: calc(100vh - 100px);
     top: -40px;
     background-color: #FE0A63;
+    pointer-events: none;
   }
 }
