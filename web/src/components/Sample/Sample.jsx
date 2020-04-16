@@ -374,6 +374,7 @@ Sample.propTypes = {
 
 Sample.defaultProps = {
   style: {},
+  selectedSample: '',
 };
 
 Sample.displayName = 'Sample';
