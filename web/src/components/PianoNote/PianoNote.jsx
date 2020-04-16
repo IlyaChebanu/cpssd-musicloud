@@ -164,7 +164,7 @@ const PianoNote = memo(({
 
 PianoNote.propTypes = {
   noteData: PropTypes.object.isRequired,
-  selectedTrack: PropTypes.number.isRequired,
+  selectedTrack: PropTypes.any.isRequired,
   selectedSample: PropTypes.string,
   tracks: PropTypes.arrayOf(PropTypes.object),
   dispatch: PropTypes.func.isRequired,

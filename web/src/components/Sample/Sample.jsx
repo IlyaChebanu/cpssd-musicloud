@@ -174,7 +174,7 @@ const Sample = memo((props) => {
       width = data.duration * gridSizePx;
     }
     return {
-      width,
+      width: width || 0,
       position: 'absolute',
       top: 0,
       left: 0,

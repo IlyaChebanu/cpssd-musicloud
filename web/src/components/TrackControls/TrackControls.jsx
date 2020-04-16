@@ -207,7 +207,7 @@ TrackControls.propTypes = {
   index: PropTypes.number.isRequired,
   track: PropTypes.object.isRequired,
   tracks: PropTypes.arrayOf(PropTypes.object).isRequired,
-  selectedTrack: PropTypes.number.isRequired,
+  selectedTrack: PropTypes.any.isRequired,
 };
 
 TrackControls.displayName = 'TrackControls';
