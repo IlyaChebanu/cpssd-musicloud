@@ -63,15 +63,15 @@
     }
 
     .icons {
-      padding-right: 10px;
+      padding-left: 10px;
+      padding-right: 0px;
       margin: 0px auto;
       right: 0;
-      position: absolute;
+      position: relative;
     }
 
     .newFolder {
       height: 20px;
-      padding-right: 5px;
       transition: fill 200ms;
       fill: #3A3A3A;
       &:hover {
