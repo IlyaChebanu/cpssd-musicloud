@@ -288,15 +288,15 @@ const Header = memo((props) => {
         items.push({
           name: 'Redo',
           icon: redoIcon,
-          dataTip: 'Redo last change',
+          dataTip: 'Redo last change [ctrl+shift+z]',
           action: () => dispatch(UndoActionCreators.redo()),
         });
       }
       if (studio.selectedSample) {
         items.push({
-          name: 'Remove selected sample [delete/backspace]',
+          name: 'Remove selected sample',
           icon: deleteIcon,
-          dataTip: 'Remove currently selected sample',
+          dataTip: 'Remove currently selected sample [delete/backspace]',
           action: () => dispatch(removeSample(studio.selectedSample)),
         }, {
           name: 'Copy sample(s)',
