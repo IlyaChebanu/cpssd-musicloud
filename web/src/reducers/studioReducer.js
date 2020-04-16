@@ -385,10 +385,16 @@ export default (
     showPianoRoll: false,
     recording: false,
     draggingSeekBar: false,
+    samplesLoading: false,
   },
   action,
 ) => {
   switch (action.type) {
+    case 'SET_SAMPLES_LOADING':
+      return {
+        ...state,
+        samplesLoading: action.payload,
+      };
     case 'ADD_TO_SAMPLE_SELECTION':
       return {
         ...state,

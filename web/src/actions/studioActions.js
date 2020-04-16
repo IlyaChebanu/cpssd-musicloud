@@ -1,4 +1,5 @@
 import { ActionCreators } from 'redux-undo';
+import _ from 'lodash';
 import { genId } from '../helpers/utils';
 // eslint-disable-next-line import/no-cycle
 import store from '../store';
@@ -405,12 +406,24 @@ export const removeSample = (sampleId) => (dispatch) => {
   });
 };
 
+export const setSamplesLoading = (bool) => ({
+  type: 'SET_SAMPLES_LOADING',
+  payload: bool,
+});
+
+
 export const setSampleBufferLoading = (sampleId, value) => (dispatch) => {
   dispatch({
     type: 'SET_SAMPLE_BUFFER_LOADING',
     sampleId,
     value,
   });
+  const { studioUndoable } = store.getState();
+  const isDoneLoading = Object.values(studioUndoable.present.samples).reduce(
+    (acc, cur) => acc && (cur.bufferLoading === undefined || cur.bufferLoading === false),
+    true,
+  );
+  dispatch(setSamplesLoading(!isDoneLoading));
   dispatch(ActionCreators.clearHistory());
 };
 
