@@ -235,7 +235,7 @@ const Folder = memo((props) => {
 
 Folder.propTypes = {
   dispatch: PropTypes.func.isRequired,
-  selectedFolder: PropTypes.object.isRequired,
+  selectedFolder: PropTypes.any.isRequired,
   dir: PropTypes.object.isRequired,
   level: PropTypes.number.isRequired,
   getParentContents: PropTypes.func.isRequired,

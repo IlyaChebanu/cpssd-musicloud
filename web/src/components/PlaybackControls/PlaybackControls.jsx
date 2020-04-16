@@ -31,11 +31,11 @@ const PlaybackControls = memo((props) => {
     currentBeat, tempo, playing, recording,
   } = studio;
   const handlePlay = useCallback((e) => {
-    if (songPickerHidden) {
+    if (songPickerHidden && !studio.samplesLoading) {
       e.preventDefault();
       dispatch(play);
     }
-  }, [dispatch, songPickerHidden]);
+  }, [dispatch, songPickerHidden, studio.samplesLoading]);
 
   const handlePause = useCallback((e) => {
     if (songPickerHidden) {

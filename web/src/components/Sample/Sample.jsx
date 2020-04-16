@@ -174,7 +174,7 @@ const Sample = memo((props) => {
       width = data.duration * gridSizePx;
     }
     return {
-      width,
+      width: width || 0,
       position: 'absolute',
       top: 0,
       left: 0,
@@ -359,7 +359,7 @@ Sample.propTypes = {
   data: PropTypes.object.isRequired,
   id: PropTypes.string.isRequired,
   tempo: PropTypes.number.isRequired,
-  selectedSample: PropTypes.string.isRequired,
+  selectedSample: PropTypes.string,
   dispatch: PropTypes.func.isRequired,
   gridSnapEnabled: PropTypes.bool.isRequired,
   gridSize: PropTypes.number.isRequired,
@@ -374,6 +374,7 @@ Sample.propTypes = {
 
 Sample.defaultProps = {
   style: {},
+  selectedSample: '',
 };
 
 Sample.displayName = 'Sample';

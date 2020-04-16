@@ -217,11 +217,12 @@ Track.propTypes = {
   gridWidth: PropTypes.number.isRequired,
   gridUnitWidth: PropTypes.number.isRequired,
   samples: PropTypes.object.isRequired,
-  selectedSample: PropTypes.string.isRequired,
+  selectedSample: PropTypes.string,
 };
 
 Track.defaultProps = {
   className: '',
+  selectedSample: '',
 };
 
 Track.displayName = 'Track';
