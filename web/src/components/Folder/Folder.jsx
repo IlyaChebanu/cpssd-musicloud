@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/mouse-events-have-key-events */
 import React, {
   useState, useCallback, memo, useRef, useEffect,
 } from 'react';
@@ -5,6 +6,7 @@ import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { useDragEvents } from 'beautiful-react-hooks';
+import ReactTooltip from 'react-tooltip';
 import {
   setSelectedFolder, setFolderMoved, setFileMoved,
 } from '../../actions/studioActions';
@@ -34,22 +36,12 @@ const Folder = memo((props) => {
   const oldName = { current: dir.name };
   const [newName, setNewName] = useState(oldName.current);
   const ref = useRef();
-  const { onDragStart, onDragEnd } = useDragEvents(ref);
   const { onDrop, onDragOver } = useDragEvents(ref, false);
-  onDragStart((event) => {
-    event.dataTransfer.setData('id', dir.folder_id);
-    event.dataTransfer.setData('type', 'folder');
-  });
-
   useEffect(() => {
     if (folderMoved === dir.folder_id) {
       getParentContents();
     }
   }, [dir.folder_id, folderMoved, getParentContents]);
-
-  onDragEnd(() => {
-    dispatch(setFolderMoved(-1));
-  });
 
   onDragOver((event) => {
     event.preventDefault();
@@ -99,6 +91,9 @@ const Folder = memo((props) => {
         await getFolderContents();
       }
     } else if (type === 'folder') {
+      if (id > dir.folder_id) {
+        return;
+      }
       const moved = await moveFolderToFolder(id, dir.folder_id);
       dispatch(setFolderMoved(id));
       if (moved && expanded) {
@@ -186,8 +181,24 @@ const Folder = memo((props) => {
             key={`${dir.folder_id}_folder`}
           >
             { expanded
-              ? <OpenFolder style={{ width: '22px', paddingRight: '6px', fill: 'white' }} />
-              : <ClosedFolder style={{ width: '22px', paddingRight: '6px', fill: 'white' }} />}
+              ? (
+                <OpenFolder
+                  data-tip="Click to close folder"
+                  data-for="tooltip"
+                  data-place="left"
+                  onMouseOver={ReactTooltip.rebuild}
+                  style={{ width: '22px', paddingRight: '6px', fill: 'white' }}
+                />
+              )
+              : (
+                <ClosedFolder
+                  onMouseOver={ReactTooltip.rebuild}
+                  data-tip="Click to open folder"
+                  data-for="tooltip"
+                  data-place="left"
+                  style={{ width: '22px', paddingRight: '6px', fill: 'white' }}
+                />
+              )}
             <input
               type="text"
               onKeyDown={(e) => {

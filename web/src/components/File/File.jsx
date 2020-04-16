@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/mouse-events-have-key-events */
 import React, {
   useState, useCallback, memo, useRef, useEffect,
 } from 'react';
@@ -6,6 +7,7 @@ import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { deleteFile } from 'react-s3';
 import { useDragEvents } from 'beautiful-react-hooks';
+import ReactTooltip from 'react-tooltip';
 import { shadeColor } from '../../helpers/utils';
 import { generatePresigned, deleteSampleFile, renameFile } from '../../helpers/api';
 import { ReactComponent as SampleIcon } from '../../assets/icons/music_note-24px.svg';
@@ -140,7 +142,15 @@ const File = memo((props) => {
             key={`${dir.file_id}_file`}
           >
             <audio id={`file_id_${dir.file_id}_audio`} controls="controls" src={dir.url} style={{ display: 'none' }} />
-            <SampleIcon style={{ paddingRight: '4px', fill: 'white' }} />
+
+            <SampleIcon
+              data-tip="Click to play, hold and drag to rearrange or add to track"
+              data-for="tooltip"
+              data-place="left"
+              onBlur={ReactTooltip.hide}
+              onMouseOver={ReactTooltip.rebuild}
+              style={{ paddingRight: '4px', fill: 'white' }}
+            />
             <form onSubmit={(e) => { e.preventDefault(); }}>
               <input
                 ref={inputRef}

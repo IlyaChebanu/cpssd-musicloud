@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/mouse-events-have-key-events */
 /* eslint-disable consistent-return */
 /* eslint-disable react/prop-types */
 import React, {
@@ -7,12 +8,15 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { useDragEvents } from 'beautiful-react-hooks';
+import ReactTooltip from 'react-tooltip';
 import styles from './FileExplorer.module.scss';
 import samplesIcon from '../../assets/icons/samples.svg';
 import instrumentsIcon from '../../assets/icons/instruments.svg';
 import { ReactComponent as Create } from '../../assets/icons/newFolder.svg';
+import { ReactComponent as Add } from '../../assets/icons/add-24px.svg';
 import {
   getRootFolderContents, createRootSampleFolder, getSynths, moveFile, moveFolder,
+  uploadFile, saveFile,
 } from '../../helpers/api';
 import FolderContents from '../FolderContents/FolderContents';
 import {
@@ -170,6 +174,19 @@ const FileExplorer = memo((props) => {
     setInstrumentsOpen((v) => !v);
   }, []);
 
+  const handleSampleImport = useCallback(() => {
+    const fileSelector = document.createElement('input');
+    fileSelector.setAttribute('type', 'file');
+    fileSelector.setAttribute('accept', 'audio/*');
+    fileSelector.click();
+    fileSelector.onchange = async () => {
+      const sampleFile = fileSelector.files[0];
+      const url = await uploadFile('audio', sampleFile);
+      await saveFile(sampleFile.name, url);
+      await getFiles();
+    };
+  }, [getFiles]);
+
   return (
     <div
       ref={node}
@@ -193,11 +210,28 @@ const FileExplorer = memo((props) => {
           <p>Samples</p>
           { sampleTreeSelected
             ? (
-              <Create
-                style={{ visibility: sampleTreeSelected ? 'visible' : 'hidden' }}
-                className={styles.newFolder}
-                onClick={(e) => { e.stopPropagation(); createFile(); }}
-              />
+              <div className={styles.icons}>
+                <Add
+                  data-tip="Import sample"
+                  data-for="tooltip"
+                  data-place="left"
+                  onMouseOver={ReactTooltip.rebuild}
+                  onBlur={ReactTooltip.hide}
+                  style={{ visibility: sampleTreeSelected ? 'visible' : 'hidden' }}
+                  className={styles.newFolder}
+                  onClick={(e) => { e.stopPropagation(); handleSampleImport(); }}
+                />
+                <Create
+                  data-tip="New folder"
+                  data-for="tooltip"
+                  data-place="left"
+                  onMouseOver={ReactTooltip.rebuild}
+                  onBlur={ReactTooltip.hide}
+                  style={{ visibility: sampleTreeSelected ? 'visible' : 'hidden' }}
+                  className={styles.newFolder}
+                  onClick={(e) => { e.stopPropagation(); createFile(); }}
+                />
+              </div>
             )
             : null}
 
