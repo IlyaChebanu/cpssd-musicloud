@@ -409,6 +409,7 @@ export default (
       return {
         ...state,
         samplesLoading: action.payload,
+      };
     case 'SHOW_EFFECTS_WINDOW':
       return {
         ...state,
