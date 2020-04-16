@@ -18,7 +18,7 @@ import {
   hideSampleEffects,
   setShowPianoRoll,
   removeTrack,
-  setTrackReverb,
+  showEffectsWindow,
 } from '../../actions/studioActions';
 import Knob from '../Knob';
 import { ReactComponent as Mute } from '../../assets/icons/volume-up-light.svg';
@@ -26,6 +26,7 @@ import { ReactComponent as MuteActive } from '../../assets/icons/volume-slash-li
 import { ReactComponent as Solo } from '../../assets/icons/headphones-alt-light.svg';
 import { ReactComponent as SoloActive } from '../../assets/icons/headphones-alt-solid.svg';
 import { ReactComponent as Delete } from '../../assets/icons/close-24px.svg';
+import { ReactComponent as Sliders } from '../../assets/icons/sliders-v-square-light.svg';
 import { clamp } from '../../helpers/utils';
 import { colours } from '../../helpers/constants';
 import Modal from '../Modal';
@@ -47,10 +48,6 @@ const TrackControls = memo((props) => {
 
   const handleSetTrackPan = useCallback((val) => {
     dispatch(setTrackPan(track.id, clamp(-1, 1, val)));
-  }, [dispatch, track.id]);
-
-  const handleSetTrackReverb = useCallback((val) => {
-    dispatch(setTrackReverb(track.id, clamp(0, 1, val)));
   }, [dispatch, track.id]);
 
   const handleTrackMute = useCallback((e) => {
@@ -75,6 +72,10 @@ const TrackControls = memo((props) => {
     dispatch(hideSampleEffects());
     dispatch(setShowPianoRoll(false));
   }, [dispatch, track.id]);
+
+  const handleShowEffectsWindow = useCallback(() => {
+    dispatch(showEffectsWindow());
+  }, [dispatch]);
 
 
   const barStyle = useMemo(() => {
@@ -174,14 +175,6 @@ const TrackControls = memo((props) => {
             onChange={handleSetTrackPan}
             name="Pan"
           />
-          <Knob
-            dataTip="Hold and move up or down to add reverberation effect"
-            min={0}
-            max={1}
-            value={track.reverb}
-            onChange={handleSetTrackReverb}
-            name="Reverb"
-          />
           <span data-place="right" data-tip={track.mute ? 'Unmute track' : 'Mute track'} data-for="tooltip" onMouseOver={ReactTooltip.rebuild}>
             {track.mute || (soloTrack && soloTrack.id !== track.id)
               ? <MuteActive onClick={handleTrackMute} />
@@ -193,6 +186,10 @@ const TrackControls = memo((props) => {
               ? <SoloActive onClick={handleTrackSolo} />
               : <Solo onClick={handleTrackSolo} />}
             <p>Solo</p>
+          </span>
+          <span data-place="right" data-tip="Show effects window" data-for="tooltip" onMouseOver={ReactTooltip.rebuild}>
+            <Sliders onClick={handleShowEffectsWindow} />
+            <p>Effects</p>
           </span>
         </div>
       </div>

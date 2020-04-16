@@ -278,7 +278,13 @@ export const setShowPianoRoll = (bool) => (dispatch) => {
 export const setCompleteTracksState = (tracks) => (dispatch) => {
   dispatch({
     type: 'SET_COMPLETE_TRACKS_STATE',
-    tracks,
+    tracks: tracks.map((track) => {
+      if (!track.effects) {
+        // eslint-disable-next-line no-param-reassign
+        track.effects = {};
+      }
+      return track;
+    }),
   });
   dispatch(ActionCreators.clearHistory());
 };
@@ -299,6 +305,7 @@ export const addTrack = (track = {
   pan: 0,
   reverb: 0,
   name: 'New Track',
+  effects: {},
 }) => (dispatch) => {
   dispatch({
     type: 'ADD_TRACK',
@@ -551,4 +558,18 @@ export const toggleSampleSelection = (sampleId) => (dispatch) => {
 
 export const resetSampleSelection = () => ({
   type: 'RESET_SAMPLE_SELECTION',
+});
+
+export const setTrackEffects = (trackId, effects) => ({
+  type: 'SET_TRACK_EFFECTS',
+  trackId,
+  effects,
+});
+
+export const showEffectsWindow = () => ({
+  type: 'SHOW_EFFECTS_WINDOW',
+});
+
+export const hideEffectsWindow = () => ({
+  type: 'HIDE_EFFECTS_WINDOW',
 });

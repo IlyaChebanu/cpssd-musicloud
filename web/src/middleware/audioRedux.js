@@ -14,17 +14,53 @@ import stopSample from './stopSample';
 import beatsToSeconds from './beatsToSeconds';
 import playNote from './playNote';
 import setFadeCurve from './setFadeCurve';
-import { map } from '../helpers/utils';
 
+const setEffectValues = (adapter, effectNodeObject, desiredEffectsState) => {
+  const audioContext = Tone.context.rawContext;
+
+  Object.keys(desiredEffectsState).forEach((effectName) => {
+    if (!effectNodeObject[effectName]) {
+      effectNodeObject[effectName] = new Tone[effectName]();
+    }
+  });
+
+  Object.entries(effectNodeObject).forEach(([effectName, effectNode]) => {
+    if (!desiredEffectsState[effectName]) {
+      delete effectNodeObject[effectName];
+      return;
+    }
+
+    const desiredEffectParameters = Object.keys(desiredEffectsState[effectName]);
+    desiredEffectParameters.forEach((parameterName) => {
+      const parameter = desiredEffectsState[effectName][parameterName];
+
+      if (parameter.isSignal) {
+        effectNode[parameterName].setValueAtTime(parameter.value);
+      } else {
+        effectNode[parameterName] = parameter.value;
+      }
+    });
+  });
+
+  adapter.disconnect();
+
+  if (Object.keys(effectNodeObject).length) {
+    const effectNodes = Object.values(effectNodeObject);
+    effectNodes.forEach((node) => {
+      node.disconnect();
+    });
+    adapter.chain(...effectNodes);
+    effectNodes[effectNodes.length - 1].connect(audioContext.globalGain);
+  } else {
+    adapter.connect(audioContext.globalGain);
+  }
+};
 
 const setTrackChannel = (track, soloTrack, channels) => {
   const audioContext = Tone.context.rawContext;
   const gain = audioContext.createGain();
   const pan = audioContext.createStereoPanner();
   const muterGain = audioContext.createGain();
-
-  const reverb = new Tone.Freeverb(0.5, map(1 - (track.reverb || 0), 0, 1, 100, 1000));
-  reverb.wet.setValueAtTime(track.reverb || 0);
 
   const adapter = new Tone.Gain();
 
@@ -38,14 +74,16 @@ const setTrackChannel = (track, soloTrack, channels) => {
   pan.connect(muterGain);
   // eslint-disable-next-line no-underscore-dangle
   muterGain.connect(adapter._gainNode);
-  adapter.connect(reverb);
-  reverb.connect(audioContext.globalGain);
+
+  const effects = {};
+  setEffectValues(adapter, effects, track.effects);
 
   channels[track.id] = {
     gain,
     pan,
     muterGain,
-    reverb,
+    effects,
+    adapter,
   };
 };
 
@@ -210,11 +248,9 @@ export default (store) => {
         break;
       }
 
-      case 'SET_TRACK_REVERB': {
-        trackChannels[action.trackId].reverb.wet.setValueAtTime(action.value || 0);
-        trackChannels[action.trackId].reverb.dampening.setValueAtTime(
-          map(1 - (action.value || 0), 0, 1, 100, 1000),
-        );
+      case 'SET_TRACK_EFFECTS': {
+        const track = trackChannels[action.trackId];
+        setEffectValues(track.adapter, track.effects, action.effects);
         break;
       }
 
