@@ -122,13 +122,12 @@ const EffectsWindow = ({
                   );
                 }
                 return (
-                  <div className={styles.selectWrapper}>
-                    <select>
+                  <div className={styles.selectWrapper} key={parameterName}>
+                    <select defaultValue={values.value}>
                       {values.values.map((optionName) => (
                         <option
                           key={optionName}
                           value={optionName}
-                          selected={values.value === optionName}
                         >
                           {optionName}
                         </option>
