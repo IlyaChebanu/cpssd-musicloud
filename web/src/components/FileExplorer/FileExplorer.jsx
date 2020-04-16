@@ -245,6 +245,7 @@ const FileExplorer = memo((props) => {
         <li
           onClick={handleToggleInstruments}
           key="Instruments"
+          className={`${instrumentsOpen ? styles.instrumentsOpen : ''}`}
         >
           {instrumentsIcon && (
           <img
