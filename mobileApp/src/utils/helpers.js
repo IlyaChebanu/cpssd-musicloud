@@ -77,7 +77,8 @@ function withLeadingZero(amount) {
     }
 }
 
-export function formattedTime(timeInSeconds) {
+export function formattedTime(timeSeconds) {
+    let timeInSeconds = Math.sign(timeSeconds) === -1 ? timeSeconds * -1 : timeSeconds
     let minutes = Math.floor(timeInSeconds / 60);
     let seconds = timeInSeconds - minutes * 60;
 
