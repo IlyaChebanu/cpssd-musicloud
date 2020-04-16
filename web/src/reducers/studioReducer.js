@@ -310,6 +310,20 @@ export const undoableStateReducer = undoable((
         },
       };
     }
+    case 'SET_TRACK_EFFECTS': {
+      return {
+        ...state,
+        tracks: state.tracks.map((track) => {
+          if (track.id === action.trackId) {
+            return {
+              ...track,
+              effects: action.effects,
+            };
+          }
+          return track;
+        }),
+      };
+    }
     default:
       return state;
   }
@@ -383,10 +397,21 @@ export default (
     showPianoRoll: false,
     recording: false,
     draggingSeekBar: false,
+    showEffectsWindow: false,
   },
   action,
 ) => {
   switch (action.type) {
+    case 'SHOW_EFFECTS_WINDOW':
+      return {
+        ...state,
+        showEffectsWindow: true,
+      };
+    case 'HIDE_EFFECTS_WINDOW':
+      return {
+        ...state,
+        showEffectsWindow: false,
+      };
     case 'ADD_TO_SAMPLE_SELECTION':
       return {
         ...state,

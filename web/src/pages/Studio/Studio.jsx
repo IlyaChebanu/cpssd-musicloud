@@ -44,6 +44,7 @@ import PianoRoll from '../../components/PianoRoll/PianoRoll';
 
 import FileExplorer from '../../components/FileExplorer/FileExplorer';
 import Sample from '../../components/Sample/Sample';
+import EffectsWindow from '../../components/EffectsWindow/EffectsWindow';
 
 
 const Studio = memo((props) => {
@@ -219,6 +220,7 @@ const Studio = memo((props) => {
         </div>
         <SongPicker songs={[]} />
         <ReactTooltip id="tooltip" className={styles.tooltip} delayShow={500} />
+        <EffectsWindow />
       </div>
     </GlobalHotKeys>
   );
