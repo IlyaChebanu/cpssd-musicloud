@@ -306,7 +306,7 @@ const PianoRoll = memo(({
   const renderableNotes = useMemo(() => {
     if (selectedSampleObject && selectedSampleObject.notes) {
       return Object.entries(selectedSampleObject.notes).map(([id, note]) => (
-        <PianoNote noteData={{ ...note, id }} />
+        <PianoNote noteData={{ ...note, id }} key={id} />
       ));
     }
     return null;
