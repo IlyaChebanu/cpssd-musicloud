@@ -84,7 +84,7 @@ const FileExplorerSynth = ({
 
   const handleUpdateSynthName = useCallback((e) => {
     e.preventDefault();
-    let name = 'Unnamed Synth';
+    const name = 'Unnamed Synth';
     setSynthName(e.target.value ? e.target.value : name);
   }, []);
 

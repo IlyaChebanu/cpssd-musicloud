@@ -16,7 +16,7 @@ const FolderContents = (folder) => {
           getParentContents={getParentContents}
           dir={item}
           level={level}
-          key={'folder' + item.folder_id}
+          key={`folder${item.folder_id}`}
         />
       ))}
       {files.map((file) => (
@@ -24,7 +24,7 @@ const FolderContents = (folder) => {
           getParentContents={getParentContents}
           dir={file}
           level={level}
-          key={'file' + file.file_id}
+          key={`file${file.file_id}`}
         />
       ))}
     </div>
