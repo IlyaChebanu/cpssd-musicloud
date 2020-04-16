@@ -76,7 +76,7 @@ class HomeScreen extends React.Component {
   }
 
   getSongs() {
-    getCompiledSongs(this.props.token, '', 10, '').then(response => {
+    getSearchSongs(this.props.token, this.props.searchTerm, this.props.sortingType, this.props.sortingOrder, 10, '').then(response => {
       if (response.status === 200) {
         this.setState({ songsData: response.data.songs, nextPage: response.data.next_page })
       }
@@ -85,7 +85,9 @@ class HomeScreen extends React.Component {
 
   searchSongs(searchTerm, sortType, sort, nextPage) {
     getSearchSongs(this.props.token, searchTerm, sortType, sort, 10, nextPage).then(response => {
-      this.setState({ songsData: response.data.songs, nextPage: response.data.next_page})
+      if (response.status === 200) {
+        this.setState({ songsData: response.data.songs, nextPage: response.data.next_page })
+      }
     })
   }
 
@@ -97,12 +99,13 @@ class HomeScreen extends React.Component {
 
   handleTyping(text) {
     this.setState({ searchTerm: text })
+    this.props.setSearchTerm(text)
     this.searchSongs(text, this.state.sortBy, this.state.sortOrder, '')
   }
 
   handleSorting(sortByNum, sortOrderNum) {
     let sortBy = ''
-    let sortOrder =''
+    let sortOrder = ''
     if (sortByNum === 1) {
       sortBy = 'publish_sort'
     } else if (sortByNum === 2) {
@@ -117,15 +120,17 @@ class HomeScreen extends React.Component {
     } else if (sortOrderNum === 2) {
       sortOrder = 'up'
     }
-    this.setState({ sortBy: sortBy, sortOrder: sortOrder})
+    this.setState({ sortBy: sortBy, sortOrder: sortOrder })
+    this.props.setSortingType(sortBy)
+    this.props.setSortingOrder(sortOrder)
     this.searchSongs(this.state.searchTerm, sortBy, sortOrder, '')
   }
-  
+
   renderheader() {
     return (
       <View style={styles.container}>
         <Text style={styles.titleText}>{"DISCOVER"}</Text>
-        <SearchComponent handleTyping={this.handleTyping.bind(this)} handleSorting={this.handleSorting.bind(this)}/>
+        <SearchComponent handleTyping={this.handleTyping.bind(this)} handleSorting={this.handleSorting.bind(this)} />
       </View>
     )
   }
@@ -156,7 +161,7 @@ class HomeScreen extends React.Component {
 
   _handleLoadMore() {
     if (this.state.nextPage !== null) {
-      getSearchSongs(this.props.token, this.state.searchTerm, this.state.sortBy, this.state.sortOrder, 10, this.state.nextPage).then(response => {
+      getSearchSongs(this.props.token, this.state.searchTerm, this.props.sortingType, this.props.sortingOrder, 10, this.state.nextPage).then(response => {
         if (response.status === 200) {
           var joined = this.state.songsData.concat(response.data.songs)
           this.setState({ songsData: joined, nextPage: response.data.next_page })
@@ -209,6 +214,9 @@ function mapStateToProps(state) {
   return {
     token: state.home.token,
     songUpdate: state.song.songUpdate,
+    sortingOrder: state.home.sortingOrder,
+    sortingType: state.home.sortingType,
+    searchTerm: state.home.searchTerm,
   };
 }
 

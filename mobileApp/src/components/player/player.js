@@ -293,7 +293,7 @@ export default class Player extends React.Component {
                 {image ? <Image style={styles.songImage} source={{ uri: image }} /> :
                     <Image source={placeholderImg} style={styles.songImage} />}
                 <View style={styles.titleContainer}>
-                    <Text style={styles.songTitle}>
+                    <Text numberOfLines={2} style={styles.songTitle}>
                         {songPlaying ? songPlaying.title : 'Title'}
                     </Text>
                     <View style={styles.likeContainer}>

@@ -48,7 +48,9 @@ export default StyleSheet.create({
       fontFamily: "Helvetica Neue",
       marginBottom: 10,
       marginTop: 13,
-      fontSize: 19
+      fontSize: 19,
+      marginRight: 70,
+      marginLeft: 30,
     },
     authorText: {
       color: "#BBB",

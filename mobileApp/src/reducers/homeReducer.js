@@ -1,6 +1,6 @@
 import * as Actions from '../actions/actionTypes'
 
-let initialState = { token: '', username: '', isOnline: true, };
+let initialState = { token: '', username: '', isOnline: true, sortingType: '', sortingOrd: '', searchTerm: '', };
 
 const HomeReducer = (state = initialState, action) => {
 
@@ -20,6 +20,18 @@ const HomeReducer = (state = initialState, action) => {
         case Actions.SET_ONLINE_STATUS:
             return Object.assign({}, state, {
                 isOnline: action.isOnline
+            });
+        case Actions.SET_SORTING_TYPE:
+            return Object.assign({}, state, {
+                sortingType: action.sortingType
+            });
+        case Actions.SET_SORTING_ORDER:
+            return Object.assign({}, state, {
+                sortingOrder: action.sortingOrder
+            });
+        case Actions.SET_SEARCH_TERM:
+            return Object.assign({}, state, {
+                searchTerm: action.searchTerm
             });
         default:
             return state;
