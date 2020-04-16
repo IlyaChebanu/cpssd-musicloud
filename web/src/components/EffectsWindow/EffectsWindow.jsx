@@ -42,7 +42,7 @@ const effects = {
     roomSize: {
       isSignal: true,
       isContinuous: true,
-      range: [0, 1],
+      range: [0, 0.9],
       value: 0.5,
     },
     wet: {

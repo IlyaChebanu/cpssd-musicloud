@@ -42,8 +42,13 @@ const setEffectValues = (adapter, effectNodeObject, desiredEffectsState) => {
     });
   });
 
+  adapter.disconnect();
+
   if (Object.keys(effectNodeObject).length) {
     const effectNodes = Object.values(effectNodeObject);
+    effectNodes.forEach((node) => {
+      node.disconnect();
+    });
     adapter.chain(...effectNodes);
     effectNodes[effectNodes.length - 1].connect(audioContext.globalGain);
   } else {
