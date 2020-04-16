@@ -11,6 +11,13 @@ export default StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  heartlike: {
+    width: 50,
+    height: 50,
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+  },
   playImage: {
     resizeMode: 'contain',
     width: 60,

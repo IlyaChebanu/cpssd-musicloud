@@ -33,7 +33,7 @@ class SongComponent extends React.Component {
                     <View style={styles.songDetailsContainer}>
                         <Text style={styles.songNameText}>{songName}</Text>
                         <Text style={styles.authorNameText}>{authorName}</Text>
-                        <TouchableOpacity onPress={() => this.handleLikeClick(item, index)}>
+                        <TouchableOpacity style={styles.heartlike} onPress={() => this.handleLikeClick(item, index)}>
                             {likedSong ?
                                 <View style={styles.likeContainer}>
                                     <Text style={styles.likedText}>{songLikes}</Text><Image style={styles.likeImg} source={likedImg} />

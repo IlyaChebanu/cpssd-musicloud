@@ -5,6 +5,20 @@ export default StyleSheet.create({
   container: {
     flex: 1,
   },
+  heartlike: {
+    width: 50,
+    height: 50,
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+  },
+  heartlike: {
+    width: 50,
+    height: 50,
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+  },
   titleText: {
     color: 'white',
     fontSize: 18,

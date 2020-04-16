@@ -12,6 +12,13 @@ export default StyleSheet.create({
     paddingRight: 20,
     paddingTop: 20,
   },
+  heartlike: {
+    width: 50,
+    height: 50,
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+  },
   followContainer: {
     flex: 1,
     position: 'absolute',
