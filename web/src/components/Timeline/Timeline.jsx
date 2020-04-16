@@ -195,8 +195,8 @@ Timeline.propTypes = {
   dispatch: PropTypes.func.isRequired,
   gridWidth: PropTypes.number.isRequired,
   gridUnitWidth: PropTypes.number.isRequired,
-  minGridUnitWidth: PropTypes.isRequired,
-  maxGridUnitWidth: PropTypes.isRequired,
+  minGridUnitWidth: PropTypes.number.isRequired,
+  maxGridUnitWidth: PropTypes.number.isRequired,
 };
 
 Timeline.displayName = 'Timeline';

@@ -1,18 +1,22 @@
+/* eslint-disable jsx-a11y/mouse-events-have-key-events */
 import React, {
-  useState, useCallback, memo,
+  useState, useCallback, memo, useRef, useEffect,
 } from 'react';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import { useDragEvents } from 'beautiful-react-hooks';
+import ReactTooltip from 'react-tooltip';
 import {
-  setSelectedFolder,
+  setSelectedFolder, setFolderMoved, setFileMoved,
 } from '../../actions/studioActions';
+import { shadeColor } from '../../helpers/utils';
 import { ReactComponent as ClosedFolder } from '../../assets/icons/file-explorer.svg';
 import { ReactComponent as OpenFolder } from '../../assets/icons/folder-24px.svg';
 import { ReactComponent as Delete } from '../../assets/icons/delete_outline-24px.svg';
 import { ReactComponent as Create } from '../../assets/icons/newFolder.svg';
 import {
-  renameFolder, getFolderContent, deleteSampleFolder, createSampleFolder,
+  renameFolder, getFolderContent, deleteSampleFolder, createSampleFolder, moveFile, moveFolder,
 } from '../../helpers/api';
 import { showNotification } from '../../actions/notificationsActions';
 import styles from './Folder.module.scss';
@@ -21,7 +25,7 @@ import FolderContents from '../FolderContents/FolderContents';
 
 const Folder = memo((props) => {
   const {
-    dir, level, dispatch, selectedFolder,
+    dir, level, dispatch, selectedFolder, getParentContents, folderMoved,
   } = props;
   const [deleted, setDeleted] = useState(false);
   // eslint-disable-next-line no-unused-vars
@@ -31,22 +35,38 @@ const Folder = memo((props) => {
   const [d, setFolders] = useState([]);
   const oldName = { current: dir.name };
   const [newName, setNewName] = useState(oldName.current);
-
-  const handleFolderNameChange = useCallback(async (e) => {
-    e.preventDefault();
-    let name = e.target.value;
-    setNewName(name);
-    if (!name) {
-      name = 'Unnamed Folder';
+  const ref = useRef();
+  const { onDrop, onDragOver } = useDragEvents(ref, false);
+  useEffect(() => {
+    if (folderMoved === dir.folder_id) {
+      getParentContents();
     }
-    await renameFolder(dir.folder_id, name);
-  }, [dir.folder_id]);
+  }, [dir.folder_id, folderMoved, getParentContents]);
+
+  onDragOver((event) => {
+    event.preventDefault();
+  });
+
+  const moveFileToFolder = useCallback(async (fileId, folderId) => {
+    const res = await moveFile(fileId, folderId);
+    if (res.status === 200) {
+      return true;
+    }
+    return false;
+  }, []);
+
+  const moveFolderToFolder = useCallback(async (folderId, parentFolderId) => {
+    const res = await moveFolder(folderId, parentFolderId);
+    if (res.status === 200) {
+      return true;
+    }
+    return false;
+  }, []);
 
   const getFolderContents = useCallback(async () => {
     const res = await getFolderContent(dir.folder_id);
     if (res.status === 200) {
       setExpanded(true);
-      dispatch(setSelectedFolder(dir));
       const files = res.data.folder.child_files;
       const folders = res.data.folder.child_folders;
       setFiles(files);
@@ -58,25 +78,54 @@ const Folder = memo((props) => {
     }
   }, [dir, dispatch]);
 
+  onDrop(async (event) => {
+    const id = parseInt(event.dataTransfer.getData('id'), 10);
+    const type = event.dataTransfer.getData('type');
+    if (type === 'folder' && dir.folder_id === id) {
+      return;
+    }
+    if (type === 'file') {
+      const moved = await moveFileToFolder(id, dir.folder_id);
+      dispatch(setFileMoved(id));
+      if (moved && expanded) {
+        await getFolderContents();
+      }
+    } else if (type === 'folder') {
+      if (id > dir.folder_id) {
+        return;
+      }
+      const moved = await moveFolderToFolder(id, dir.folder_id);
+      dispatch(setFolderMoved(id));
+      if (moved && expanded) {
+        await getFolderContents();
+      }
+    }
+  });
+
+  const handleFolderNameChange = useCallback(async (e) => {
+    e.preventDefault();
+    let name = e.target.value;
+    setNewName(name);
+    if (!name) {
+      name = 'Unnamed Folder';
+    }
+    await renameFolder(dir.folder_id, name);
+  }, [dir.folder_id]);
+
   const collapse = useCallback(() => {
     setExpanded(false);
-    dispatch(setSelectedFolder(''));
     setFiles([]);
     setFolders([]);
-  }, [dispatch]);
+  }, []);
 
   const folderClick = useCallback((e) => {
     e.preventDefault();
-    if (selected) {
-      dispatch(setSelectedFolder(''));
-    } else if (expanded && selectedFolder !== dir) {
-      dispatch(setSelectedFolder(dir));
-    } else if (expanded) {
+    if (expanded) {
       collapse();
     } else {
       getFolderContents();
     }
-  }, [collapse, dir, dispatch, expanded, getFolderContents, selected, selectedFolder]);
+  }, [collapse, expanded, getFolderContents]);
 
 
   const deleteFiles = useCallback(async () => {
@@ -92,10 +141,11 @@ const Folder = memo((props) => {
       res = await getFolderContent(dir.folder_id);
       if (res.status === 200) {
         setExpanded(true);
-        dispatch(setSelectedFolder(dir));
         const files = res.data.folder.child_files;
         const folders = res.data.folder.child_folders;
+        setFiles([]);
         setFiles(files);
+        setFolders([]);
         setFolders(folders);
       } else {
         dispatch(showNotification({
@@ -108,7 +158,6 @@ const Folder = memo((props) => {
       }));
     }
   }, [dir, dispatch]);
-
   const onInputBlur = async (e) => {
     oldName.current = newName;
     setNewName(e.target.value);
@@ -121,15 +170,35 @@ const Folder = memo((props) => {
       {!deleted
         ? (
           <li
+            ref={ref}
+            onMouseEnter={() => { dispatch(setSelectedFolder(dir)); }}
+            onMouseLeave={() => { dispatch(setSelectedFolder('')); }}
+            type="folder"
             // eslint-disable-next-line no-nested-ternary
-            className={selectedFolder === dir ? styles.selected : (expanded ? styles.expanded : '')}
-            style={{ transition: 'width 200ms', marginLeft: `${level * 25}px` }}
+            className={selected ? styles.selected : (expanded ? styles.expanded : '')}
+            style={{ transition: 'width 200ms', backgroundColor: shadeColor('#414448', +20 * level) }}
             onClick={folderClick}
             key={`${dir.folder_id}_folder`}
           >
             { expanded
-              ? <OpenFolder style={{ width: '22px', paddingRight: '6px', fill: 'white' }} />
-              : <ClosedFolder style={{ width: '22px', paddingRight: '6px', fill: 'white' }} />}
+              ? (
+                <OpenFolder
+                  data-tip="Click to close folder"
+                  data-for="tooltip"
+                  data-place="left"
+                  onMouseOver={ReactTooltip.rebuild}
+                  style={{ width: '22px', paddingRight: '6px', fill: 'white' }}
+                />
+              )
+              : (
+                <ClosedFolder
+                  onMouseOver={ReactTooltip.rebuild}
+                  data-tip="Click to open folder"
+                  data-for="tooltip"
+                  data-place="left"
+                  style={{ width: '22px', paddingRight: '6px', fill: 'white' }}
+                />
+              )}
             <input
               type="text"
               onKeyDown={(e) => {
@@ -143,7 +212,6 @@ const Folder = memo((props) => {
                 }
               }}
               onBlur={(e) => { onInputBlur(e); }}
-              disabled={!selectedFolder === dir}
               style={{ cursor: !selectedFolder === dir ? 'pointer' : '' }}
               onChange={handleFolderNameChange}
               onClick={(e) => { dispatch(setSelectedFolder(dir)); e.stopPropagation(); }}
@@ -165,6 +233,7 @@ const Folder = memo((props) => {
       {expanded
         ? (
           <FolderContents
+            getParentContents={getFolderContents}
             files={f}
             folders={d}
             level={level + 1}
@@ -177,14 +246,17 @@ const Folder = memo((props) => {
 
 Folder.propTypes = {
   dispatch: PropTypes.func.isRequired,
-  selectedFolder: PropTypes.object.isRequired,
+  selectedFolder: PropTypes.any.isRequired,
   dir: PropTypes.object.isRequired,
   level: PropTypes.number.isRequired,
+  getParentContents: PropTypes.func.isRequired,
+  folderMoved: PropTypes.number.isRequired,
 };
 
 
 const mapStateToProps = ({ studio }) => ({
   selectedFolder: studio.selectedFolder,
+  folderMoved: studio.folderMoved,
 });
 
 export default withRouter(connect(mapStateToProps)(Folder));

@@ -217,6 +217,20 @@ export const showFileExplorer = () => (dispatch) => {
   });
 };
 
+export const setFileMoved = (fileMoved) => (dispatch) => {
+  dispatch({
+    type: 'SET_FILE_MOVED',
+    fileMoved,
+  });
+};
+
+export const setFolderMoved = (folderMoved) => (dispatch) => {
+  dispatch({
+    type: 'SET_FOLDER_MOVED',
+    folderMoved,
+  });
+};
+
 export const setSelectedFile = (selectedFile) => (dispatch) => {
   dispatch({
     type: 'SET_SELECTED_FILE',
@@ -398,12 +412,24 @@ export const removeSample = (sampleId) => (dispatch) => {
   });
 };
 
+export const setSamplesLoading = (bool) => ({
+  type: 'SET_SAMPLES_LOADING',
+  payload: bool,
+});
+
+
 export const setSampleBufferLoading = (sampleId, value) => (dispatch) => {
   dispatch({
     type: 'SET_SAMPLE_BUFFER_LOADING',
     sampleId,
     value,
   });
+  const { studioUndoable } = store.getState();
+  const isDoneLoading = Object.values(studioUndoable.present.samples).reduce(
+    (acc, cur) => acc && (cur.bufferLoading === undefined || cur.bufferLoading === false),
+    true,
+  );
+  dispatch(setSamplesLoading(!isDoneLoading));
   dispatch(ActionCreators.clearHistory());
 };
 

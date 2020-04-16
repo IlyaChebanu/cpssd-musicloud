@@ -1,18 +1,23 @@
+/* eslint-disable jsx-a11y/mouse-events-have-key-events */
 import React, {
-  useState, useCallback, memo,
+  useState, useCallback, memo, useRef, useEffect,
 } from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { deleteFile } from 'react-s3';
+import { useDragEvents } from 'beautiful-react-hooks';
+import ReactTooltip from 'react-tooltip';
+import { shadeColor } from '../../helpers/utils';
 import { generatePresigned, deleteSampleFile, renameFile } from '../../helpers/api';
 import { ReactComponent as SampleIcon } from '../../assets/icons/music_note-24px.svg';
 import styles from './File.module.scss';
 import { ReactComponent as Delete } from '../../assets/icons/delete_outline-24px.svg';
+import { setFileMoved } from '../../actions/studioActions';
 
 const File = memo((props) => {
   const {
-    dir, level, dispatch,
+    dir, level, dispatch, getParentContents, fileMoved,
   } = props;
   const [deleted, setDeleted] = useState(false);
   const [selectedFile, setSelectedFile] = useState(false);
@@ -28,6 +33,37 @@ const File = memo((props) => {
     secretAccessKey: 'XVdgFyhjyhnqicDxxXZa9rLouFv5WQdXzXwxrP0u',
     region: 'eu-west-1',
   });
+  const ref = useRef();
+  const inputRef = useRef();
+  const { onDragOver, onDrop } = useDragEvents(inputRef, false);
+  useDragEvents(ref, false);
+  const { onDragStart, onDragEnd } = useDragEvents(ref);
+  onDragStart((event) => {
+    event.dataTransfer.setData('id', dir.file_id);
+    event.dataTransfer.setData('type', 'file');
+    event.dataTransfer.setData('url', url);
+    event.dataTransfer.setData('name', newName);
+  });
+
+  useEffect(() => {
+    if (fileMoved === dir.file_id) {
+      getParentContents();
+    }
+  }, [dir.file_id, fileMoved, getParentContents]);
+
+  onDragEnd((event) => {
+    event.preventDefault();
+    dispatch(setFileMoved(-1));
+  });
+
+  onDragOver((e) => {
+    e.preventDefault();
+  });
+
+  onDrop((e) => {
+    e.preventDefault();
+  });
+
 
   const awsConfig = useCallback(async (directory) => {
     const res = await generatePresigned('/');
@@ -42,13 +78,13 @@ const File = memo((props) => {
   const handleFileNameChange = useCallback(async (e) => {
     e.preventDefault();
     let name = e.target.value;
-    dispatch(setSelectedFile(`${path}/${name}`));
+    setSelectedFile(`${path}/${name}`);
     setNewName(e.target.value);
     if (!name) {
       name = 'Unnamed File';
     }
-    await renameFile(dir.folder_id, name);
-  }, [dir.folder_id, dispatch, path]);
+    await renameFile(dir.file_id, name);
+  }, [dir.file_id, path]);
 
   const selected = useCallback(() => {
     setSelectedFile(true);
@@ -91,7 +127,10 @@ const File = memo((props) => {
       {!deleted
         ? (
           <li
-            style={{ marginLeft: `${level * 25}px` }}
+            id={dir.file_id}
+            type="file"
+            ref={ref}
+            style={{ backgroundColor: !selectedFile ? shadeColor('#414448', +20 * level) : '' }}
             onBlur={(e) => setSelectedFile(`${path}/${e.target.value}`)}
             onClick={async (e) => {
               e.preventDefault();
@@ -103,9 +142,19 @@ const File = memo((props) => {
             key={`${dir.file_id}_file`}
           >
             <audio id={`file_id_${dir.file_id}_audio`} controls="controls" src={dir.url} style={{ display: 'none' }} />
-            <SampleIcon style={{ paddingRight: '4px', fill: 'white' }} />
+
+            <SampleIcon
+              data-tip="Click to play, hold and drag to rearrange or add to track"
+              data-for="tooltip"
+              data-place="left"
+              onBlur={ReactTooltip.hide}
+              onMouseOver={ReactTooltip.rebuild}
+              style={{ paddingRight: '4px', fill: 'white' }}
+            />
             <form onSubmit={(e) => { e.preventDefault(); }}>
               <input
+                ref={inputRef}
+
                 onBlur={(e) => { onInputBlur(e); }}
                 onKeyDown={(e) => {
                   if (e.keyCode === 13) {
@@ -141,8 +190,12 @@ File.propTypes = {
   dir: PropTypes.object.isRequired,
   dispatch: PropTypes.func.isRequired,
   level: PropTypes.number.isRequired,
+  getParentContents: PropTypes.func.isRequired,
+  fileMoved: PropTypes.number.isRequired,
 };
 
-const mapStateToProps = () => ({});
+const mapStateToProps = ({ studio }) => ({
+  fileMoved: studio.fileMoved,
+});
 
 export default withRouter(connect(mapStateToProps)(File));

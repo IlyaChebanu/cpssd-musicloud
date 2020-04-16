@@ -1,16 +1,22 @@
 /* eslint-disable react/no-array-index-key */
-import React, { memo, useCallback, useMemo } from 'react';
+/* eslint-disable consistent-return */
+import React, {
+  memo, useCallback, useMemo, useRef,
+} from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 import { HotKeys, configure } from 'react-hotkeys';
+import { useDragEvents } from 'beautiful-react-hooks';
 import styles from './Track.module.scss';
 import {
   setSelectedTrack,
   setSelectedSample,
+  setSamplePatchId,
+  setSamplePatch,
   hideSampleEffects,
   setShowPianoRoll,
-  addSample,
+  addSample as addSampleAction,
   resetSampleSelection,
 } from '../../actions/studioActions';
 
@@ -18,13 +24,27 @@ configure({
   allowCombinationSubmatches: true,
 });
 
-const Ticks = memo(({ gridSize, gridWidth, gridUnitWidth }) => {
+const Ticks = memo(({
+  gridSize, gridWidth, gridUnitWidth,
+}) => {
+  const ref = useRef();
+  const { onDragOver, onDrop } = useDragEvents(ref, false);
+  onDragOver((e) => {
+    e.preventDefault();
+  });
+
+  onDrop((e) => {
+    e.preventDefault();
+  });
+
   const ticks = useMemo(() => (
     [...Array(Math.ceil(gridWidth * gridSize))]
       .map((__, i) => <rect key={i} x={i * gridUnitWidth} className={styles.tick} />)
   ), [gridSize, gridWidth, gridUnitWidth]);
   return (
     <svg
+      onDrop={(e) => { e.stopPropagation(); }}
+      onDragOver={(e) => { e.preventDefault(); }}
       className={styles.gridLines}
       style={{
         width: Math.ceil(gridWidth * gridSize)
@@ -46,8 +66,77 @@ Ticks.displayName = 'Ticks';
 
 const Track = memo((props) => {
   const {
-    dispatch, clipboard, track, className, gridSize, gridWidth, gridUnitWidth, index, samples,
+    dispatch, clipboard, track, className, gridSize, gridWidth, gridUnitWidth,
+    index, samples, selectedSample,
   } = props;
+
+  const ref = useRef();
+  const { onDrop, onDragOver } = useDragEvents(ref, false);
+
+  onDragOver((event) => {
+    event.preventDefault();
+  });
+
+  const addSample = useCallback((url, name, offsetX) => {
+    const sampleState = {
+      url,
+      name,
+      time: offsetX / gridUnitWidth,
+      fade: {
+        fadeIn: 0,
+        fadeOut: 0,
+      },
+    };
+    dispatch(addSampleAction(track.id, sampleState));
+  }, [dispatch, gridUnitWidth, track.id]);
+
+  const addSynth = useCallback((name, offsetX, patch, id) => {
+    const synthState = {
+      name,
+      time: offsetX / gridUnitWidth,
+      fade: {
+        fadeIn: 0,
+        fadeOut: 0,
+      },
+      type: 'pattern',
+      duration: 0,
+      notes: [],
+      patch,
+      patchId: id,
+    };
+    if (!selectedSample) {
+      return dispatch(addSampleAction(track.id, synthState));
+    }
+    dispatch(setSamplePatchId(selectedSample, id));
+    return dispatch(setSamplePatch(selectedSample, patch));
+  }, [dispatch, gridUnitWidth, selectedSample, track.id]);
+
+  onDrop((event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const type = event.dataTransfer.getData('type');
+    if (type !== 'file' && type !== 'synth') {
+      return;
+    }
+    const name = event.dataTransfer.getData('name');
+    if (type === 'file') {
+      const url = event.dataTransfer.getData('url');
+      addSample(url, name, event.offsetX);
+    } else if (type === 'synth') {
+      const id = event.dataTransfer.getData('id');
+      const decay = parseFloat(event.dataTransfer.getData('decay'));
+      const attack = parseFloat(event.dataTransfer.getData('attack'));
+      const release = parseFloat(event.dataTransfer.getData('release'));
+      const sustain = parseFloat(event.dataTransfer.getData('sustain'));
+      const oscillator = event.dataTransfer.getData('oscillator');
+      addSynth(name, event.offsetX, {
+        envelope: {
+          attack, decay, release, sustain,
+        },
+        oscillator: { type: oscillator },
+      }, id);
+    }
+  });
 
   const handleSetSelected = useCallback(() => {
     dispatch(setSelectedTrack(track.id));
@@ -90,9 +179,9 @@ const Track = memo((props) => {
 
         newSample.time += (latestInTrack.time + latestInTrack.duration - earliestInClipboard.time);
         if (tracksInClipboard.length > 1) {
-          dispatch(addSample(newSample.trackId, newSample));
+          dispatch(addSampleAction(newSample.trackId, newSample));
         } else {
-          dispatch(addSample(track.id, newSample));
+          dispatch(addSampleAction(track.id, newSample));
         }
       });
     },
@@ -111,7 +200,9 @@ const Track = memo((props) => {
       onMouseDown={handleSetSelected}
       style={widthStyle}
     >
-      <Ticks gridSize={gridSize} gridWidth={gridWidth} gridUnitWidth={gridUnitWidth} />
+      <div ref={ref}>
+        <Ticks gridSize={gridSize} gridWidth={gridWidth} gridUnitWidth={gridUnitWidth} />
+      </div>
     </HotKeys>
   );
 });
@@ -126,10 +217,12 @@ Track.propTypes = {
   gridWidth: PropTypes.number.isRequired,
   gridUnitWidth: PropTypes.number.isRequired,
   samples: PropTypes.object.isRequired,
+  selectedSample: PropTypes.string,
 };
 
 Track.defaultProps = {
   className: '',
+  selectedSample: '',
 };
 
 Track.displayName = 'Track';
@@ -143,6 +236,7 @@ const mapStateToProps = ({ studio, studioUndoable }) => ({
   gridWidth: studio.gridWidth,
   gridUnitWidth: studio.gridUnitWidth,
   samples: studioUndoable.present.samples,
+  selectedSample: studio.selectedSample,
 });
 
 export default connect(mapStateToProps)(Track);

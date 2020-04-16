@@ -371,6 +371,14 @@ export const deleteSampleFile = (fileId) => axios.delete(
   },
 );
 
+export const moveFile = (fileId, folderId) => axios.patch(
+  `${API_URL}/v1/audio/files?file_id=${fileId}&folder_id=${folderId}`,
+  {},
+  {
+    headers: getAuth(),
+  },
+);
+
 export const renameFile = (fileId, name) => axios.patch(
   `${API_URL}/v1/audio/files?file_id=${fileId}&name=${name}`,
   {},
@@ -378,6 +386,15 @@ export const renameFile = (fileId, name) => axios.patch(
     headers: getAuth(),
   },
 );
+
+export const moveFolder = (folderId, parentFolderId) => axios.patch(
+  `${API_URL}/v1/audio/folders?parent_folder_id=${parentFolderId}&folder_id=${folderId}`,
+  {},
+  {
+    headers: getAuth(),
+  },
+);
+
 
 export const renameFolder = (folderId, name) => axios.patch(
   `${API_URL}/v1/audio/folders?folder_id=${folderId}&name=${name}`,

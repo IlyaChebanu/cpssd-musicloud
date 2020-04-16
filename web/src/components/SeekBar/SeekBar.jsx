@@ -4,6 +4,7 @@ import React, {
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import ReactTooltip from 'react-tooltip';
+import { useDragEvents } from 'beautiful-react-hooks';
 import styles from './SeekBar.module.scss';
 import { ReactComponent as SeekBarSvg } from '../../assets/seekbar.svg';
 import {
@@ -19,6 +20,15 @@ const SeekBar = memo((props) => {
   const ref = useRef();
   const scaleFactor = props.scaleFactor || gridSize;
   const scroll = props.scrollPosition !== null ? props.scrollPosition : props.scroll;
+  const { onDragOver, onDrop } = useDragEvents(ref, false);
+
+  onDragOver((e) => {
+    e.preventDefault();
+  });
+
+  onDrop((e) => {
+    e.preventDefault();
+  });
 
   const handleDragStart = useCallback((ev) => {
     dispatch(setDraggingSeekBar(true));
