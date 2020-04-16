@@ -103,13 +103,14 @@ const EffectsWindow = ({
           <span className={styles.title}>{`Effects for track: ${track.name}`}</span>
         </div>
         {track.effects && Object.entries(track.effects).map(([effectName, parameters]) => (
-          <div className={styles.row}>
+          <div className={styles.row} key={effectName}>
             <div className={styles.left}>
               <span className={styles.effectName}>{effectName}</span>
               {Object.entries(parameters).map(([parameterName, values]) => {
                 if (values.isContinuous) {
                   return (
                     <Knob
+                      key={parameterName}
                       name={parameterName}
                       value={values.value}
                       className={styles.knob}
@@ -125,6 +126,7 @@ const EffectsWindow = ({
                     <select>
                       {values.values.map((optionName) => (
                         <option
+                          key={optionName}
                           value={optionName}
                           selected={values.value === optionName}
                         >
@@ -142,7 +144,7 @@ const EffectsWindow = ({
         ))}
         <div className={styles.footer}>
           {disabledEffects.map((effectName) => (
-            <Button onClick={handleEnableEffect(effectName)}>
+            <Button onClick={handleEnableEffect(effectName)} key={effectName}>
               {`Enable ${effectName}`}
             </Button>
           ))}
