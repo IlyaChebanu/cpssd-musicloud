@@ -12,7 +12,7 @@
   "dependencies": {
     "@react-native-community/async-storage": "^1.6.2",
     "@react-native-community/netinfo": "^5.5.0",
-    "axios": "^0.19.0",
+    "axios": "^0.21.1",
     "buffer": "^5.4.3",
     "moment": "^2.24.0",
     "pushy-react-native": "^1.0.13",
