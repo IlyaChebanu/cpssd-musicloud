@@ -14,7 +14,7 @@
     "@react-native-community/netinfo": "^5.5.0",
     "axios": "^0.19.0",
     "buffer": "^5.4.3",
-    "moment": "^2.24.0",
+    "moment": "^2.29.2",
     "pushy-react-native": "^1.0.13",
     "react": "16.9.0",
     "react-native": "^0.62.2",
